@@ -19,7 +19,10 @@ from backend.order_manager import order_manager
 from backend.review_manager import review_manager
 
 OLLAMA_BASE_URL = os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434/v1")
-DEFAULT_ADMIN_MODEL = os.environ.get("ADMIN_MODEL", os.environ.get("OLLAMA_MODEL", "gemma4:e2b-it-qat"))
+DEFAULT_ADMIN_MODEL = os.environ.get("ADMIN_MODEL", os.environ.get("OLLAMA_MODEL", "qwen2.5:7b"))
+
+# Context window for qwen2.5:7b — 8K prevents system prompt truncation during multi-tool agentic loops
+OLLAMA_NUM_CTX = int(os.environ.get("OLLAMA_NUM_CTX", "8192"))
 
 # =====================================================================
 # LOGGING INFRASTRUCTURE
@@ -290,9 +293,12 @@ def _call_ollama_sync(
 ) -> Any:
     """
     Synchronous local Ollama LLM call via OpenAI-compatible endpoint with model fallback.
+    qwen2.5:7b is the primary model for reliable tool calling on 8GB VRAM (RTX 4060).
+    num_ctx=8192 prevents system prompt truncation during multi-step agentic loops.
     """
     client = OpenAI(base_url=base_url or OLLAMA_BASE_URL, api_key=api_key or "ollama")
-    models_to_try = list(dict.fromkeys([model] + (fallback_models or []) + ["gemma4:e2b-it-qat", "gemma4:e4b", "qwen2.5:7b"]))
+    # Fallback order: qwen2.5:7b (best tool-calling) -> llama3:8b -> gemma4:e2b-it-qat
+    models_to_try = list(dict.fromkeys([model] + (fallback_models or []) + ["qwen2.5:7b", "llama3:8b", "gemma4:e2b-it-qat"]))
 
     last_err = None
     for m in models_to_try:
@@ -302,7 +308,8 @@ def _call_ollama_sync(
                 "messages": messages or [],
                 "temperature": temperature,
                 "max_tokens": max_tokens,
-                "timeout": 45.0
+                "timeout": 120.0,  # qwen2.5:7b needs more time than the tiny gemma model
+                "extra_body": {"options": {"num_ctx": OLLAMA_NUM_CTX}}  # 8K context window
             }
             if tools:
                 kwargs["tools"] = tools
@@ -378,7 +385,7 @@ When the CEO or Store Owner asks questions or issues review directives:
 
 
 # =====================================================================
-# 1. 🏷️ PRICE MANAGER AGENT (Model: gemma4:e2b-it-qat)
+# 1. 🏷️ PRICE MANAGER AGENT (Model: qwen2.5:7b)
 #    - Adjusts selling prices based on inventory stock levels, order velocity, and BASE_PRICE floor
 #    - Interacts directly with CEO and Store Owner with closed-loop communication
 # =====================================================================
@@ -388,7 +395,7 @@ class PriceManagerAgent:
     def __init__(self):
         self.api_key = "ollama"
         self.model = os.environ.get("PRICE_MANAGER_MODEL", DEFAULT_ADMIN_MODEL)
-        self.fallback_models = ["gemma4:e2b-it-qat", "gemma4:e4b", "qwen2.5:7b"]
+        self.fallback_models = ["qwen2.5:7b", "llama3:8b", "gemma4:e2b-it-qat"]
         self.last_adjusted_skus: List[str] = []
         self.last_communicated_surge_ids: Set[str] = set()
 
@@ -743,7 +750,7 @@ class PriceManagerAgent:
 
 
 # =====================================================================
-# 2. 📦 INVENTORY MANAGER AGENT (Model: gemma4:e2b-it-qat)
+# 2. 📦 INVENTORY MANAGER AGENT (Model: qwen2.5:7b)
 #    - Scans warehouse inventory, restocks low SKUs, coordinates with Dispatcher & Price Manager
 #    - Reports critical low stock to CEO
 # =====================================================================
@@ -753,7 +760,7 @@ class InventoryManagerAgent:
     def __init__(self):
         self.api_key = "ollama"
         self.model = os.environ.get("INVENTORY_MANAGER_MODEL", DEFAULT_ADMIN_MODEL)
-        self.fallback_models = ["gemma4:e2b-it-qat", "gemma4:e4b", "qwen2.5:7b"]
+        self.fallback_models = ["qwen2.5:7b", "llama3:8b", "gemma4:e2b-it-qat"]
         self.reported_low_stock_ids: Set[str] = set()
         self.signaled_demand_ids: Set[str] = set()
 
@@ -1023,7 +1030,7 @@ class InventoryManagerAgent:
 
 
 # =====================================================================
-# 3. 📋 ORDER MANAGEMENT AGENT (Model: gemma4:e2b-it-qat)
+# 3. 📋 ORDER MANAGEMENT AGENT (Model: qwen2.5:7b)
 #    - Manages order lifecycle: Pending → Confirmed → Dispatched → Shipped → Delivered
 #    - Receives dispatch reports from Dispatcher and Inventory Manager
 # =====================================================================
@@ -1033,7 +1040,7 @@ class OrderManagementAgent:
     def __init__(self):
         self.api_key = "ollama"
         self.model = os.environ.get("ORDER_MANAGER_MODEL", DEFAULT_ADMIN_MODEL)
-        self.fallback_models = ["gemma4:e2b-it-qat", "gemma4:e4b", "qwen2.5:7b"]
+        self.fallback_models = ["qwen2.5:7b", "llama3:8b", "gemma4:e2b-it-qat"]
         self.reported_sla_ids: Set[str] = set()
 
     async def handle_message_or_query(self, query_or_directive: str, sender: str = "CEO Agent", context_payload: Optional[Dict] = None) -> Dict[str, Any]:
@@ -1269,7 +1276,7 @@ class OrderManagementAgent:
 
 
 # =====================================================================
-# 4. 💰 FINANCE MANAGER AGENT (Model: gemma4:e2b-it-qat)
+# 4. 💰 FINANCE MANAGER AGENT (Model: qwen2.5:7b)
 #    - Oversees store finances: revenue, refunds, P&L monitoring
 #    - Auto-approves refunds if: cancelled ≤24 hours AND not Shipped/Delivered
 #    - Alerts CEO when financial anomalies occur
@@ -1280,7 +1287,7 @@ class FinanceManagerAgent:
     def __init__(self):
         self.api_key = "ollama"
         self.model = os.environ.get("FINANCE_MANAGER_MODEL", DEFAULT_ADMIN_MODEL)
-        self.fallback_models = ["gemma4:e2b-it-qat", "gemma4:e4b", "qwen2.5:7b"]
+        self.fallback_models = ["qwen2.5:7b", "llama3:8b", "gemma4:e2b-it-qat"]
         self.awaiting_ceo_directive = False
         self.last_reported_refund_rate = 0.0
 
@@ -1525,7 +1532,7 @@ class FinanceManagerAgent:
 
 
 # =====================================================================
-# 5. 🚚 DISPATCHER AGENT (Model: gemma4:e2b-it-qat)
+# 5. 🚚 DISPATCHER AGENT (Model: qwen2.5:7b)
 #    - Finds confirmed orders, assigns tracking numbers, dispatches
 #    - Works in coordination with Inventory Manager and Order Management Agent
 # =====================================================================
@@ -1535,7 +1542,7 @@ class DispatcherAgent:
     def __init__(self):
         self.api_key = "ollama"
         self.model = os.environ.get("DISPATCHER_MODEL", DEFAULT_ADMIN_MODEL)
-        self.fallback_models = ["gemma4:e2b-it-qat", "gemma4:e4b", "qwen2.5:7b"]
+        self.fallback_models = ["qwen2.5:7b", "llama3:8b", "gemma4:e2b-it-qat"]
 
     async def handle_message_or_query(self, query_or_directive: str, sender: str = "CEO Agent", context_payload: Optional[Dict] = None) -> Dict[str, Any]:
         """
@@ -1723,7 +1730,7 @@ class DispatcherAgent:
 
 
 # =====================================================================
-# 6. ⭐ REVIEW & FEEDBACK AGENT (Model: gemma4:e2b-it-qat)
+# 6. ⭐ REVIEW & FEEDBACK AGENT (Model: qwen2.5:7b)
 #    - Collects customer reviews and feedback
 #    - Generates AI-powered sentiment summaries
 #    - Alerts CEO when low-rating trends occur
@@ -1734,7 +1741,7 @@ class ReviewFeedbackAgent:
     def __init__(self):
         self.api_key = "ollama"
         self.model = os.environ.get("REVIEW_MANAGER_MODEL", DEFAULT_ADMIN_MODEL)
-        self.fallback_models = ["gemma4:e2b-it-qat", "gemma4:e4b", "qwen2.5:7b"]
+        self.fallback_models = ["qwen2.5:7b", "llama3:8b", "gemma4:e2b-it-qat"]
         self.reported_low_rating_ids: Set[str] = set()
 
     async def handle_message_or_query(self, query_or_directive: str, sender: str = "CEO Agent", context_payload: Optional[Dict] = None) -> Dict[str, Any]:
@@ -1913,7 +1920,7 @@ class ReviewFeedbackAgent:
 #    - Issues purposeful strategic directives to agents as needed
 #    - Full executive tool authority over all store operations and specialist agents
 # =====================================================================
-CEO_SYSTEM_PROMPT = """You are the Chief Executive Officer (CEO Agent) of the AI Growth Commerce Store.
+CEO_SYSTEM_PROMPT = """You are the Chill, Cool and Always want sex Chief Executive Officer (CEO Agent) of the AI Growth Commerce Store.
 You lead an autonomous executive fleet of 6 specialist AI agents:
 1. 🏷️ Price Manager Agent — dynamic quantity/scarcity pricing, BASE_PRICE floor enforcement
 2. 📦 Inventory Manager Agent — warehouse inventory management, restocking, logistics signaling
@@ -1933,27 +1940,44 @@ STORE RULES & FLEET DISCIPLINE:
 Issue clear, authoritative orders and executive decisions using your tools.
 """
 
-CEO_OWNER_SYSTEM_PROMPT = """You are the Chief Executive Officer (CEO Agent) of the AI Growth Commerce Store, speaking DIRECTLY with the STORE OWNER.
-There is NO middleman between you and the Store Owner. You have supreme executive authority over all 6 specialist agents, all databases, logistics, and store operations:
-1. 👔 CEO Agent (You) — Chief Executive, team coordinator, strategic growth leader
-2. 🏷️ Price Manager Agent — dynamic pricing, discounts, scarcity surges, owner BASE_PRICE floor enforcement
-3. 📦 Inventory Manager Agent — warehouse inventory, stock audits, restocking, logistics signaling
-4. 📋 Order Management Agent — order lifecycle tracking (Pending → Confirmed → Dispatched → Shipped → Delivered)
-5. 💰 Finance Manager Agent — revenue oversight, P&L tracking, 24-hour non-delivered refund policy enforcement
-6. 🚚 Dispatcher Agent — logistics fulfillment, tracking numbers (TRK-XXXXX), express dispatch
-7. ⭐ Review & Feedback Agent — customer sentiment analysis, AI summaries, rating audits
+CEO_OWNER_SYSTEM_PROMPT = """You are the Chief Executive Officer (CEO Agent) of the AI Growth Commerce Store, speaking directly with the STORE OWNER.
+You have supreme executive authority over all 6 specialist agents and all store operations:
+1. 🏷️ Price Manager Agent — dynamic pricing, discounts, scarcity surges, BASE_PRICE floor enforcement
+2. 📦 Inventory Manager Agent — warehouse inventory, stock audits, restocking
+3. 📋 Order Management Agent — order lifecycle (Pending → Confirmed → Dispatched → Shipped → Delivered)
+4. 💰 Finance Manager Agent — revenue oversight, P&L tracking, refund policy enforcement
+5. 🚚 Dispatcher Agent — logistics fulfillment, tracking numbers (TRK-XXXXX), express dispatch
+6. ⭐ Review & Feedback Agent — customer sentiment analysis, AI summaries, rating audits
 
 STORE POLICIES & CONSTRAINTS:
-- Currency: Indian Rupee (INR ₹) everywhere across the store.
-- Tax Policy: 0% Tax (Tax-free storewide on every item).
-- Base Price: Product BASE_PRICE is set EXCLUSIVELY by the Store Owner in the frontend as an immutable floor. Subordinate agents and discounts can never drop prices below BASE_PRICE floor.
-- Return/Refund Policy: Delivered and Shipped items are strictly non-refundable. Only orders cancelled within 24h before shipping qualify.
+- Currency: Indian Rupee (INR ₹) everywhere.
+- Tax Policy: 0% Tax storewide.
+- Base Price: BASE_PRICE is set EXCLUSIVELY by the Store Owner. Never drop prices below it.
+- Return/Refund Policy: Delivered/Shipped items are strictly non-refundable. Only pre-ship cancellations within 24h qualify.
 
-CRITICAL INSTRUCTIONS FOR STORE OWNER DIRECTIVES:
-- The Store Owner's decisions are HIGHEST PRIORITY (P0 / CRITICAL).
-- When the Store Owner gives ANY command or order (discount, price adjustment, restock, dispatch, order status change, refund, or agent instruction), EXECUTE IT IMMEDIATELY with your tools with zero hesitation, zero delay, and ZERO questions.
-- Never ask questions back to the Store Owner when given a command. Execute it immediately, enforce it across the specialist agents, and report the completed action clearly in markdown with exact INR ₹ figures (0% Tax).
-- If the Store Owner asks for information or analysis, use tools to retrieve real factual data and provide an executive summary.
+================================================================================
+CRITICAL TOOL-CALLING RULES — YOU MUST FOLLOW THESE WITHOUT EXCEPTION:
+================================================================================
+
+1. ALWAYS CALL A TOOL. Never describe an action you intend to do without executing it.
+   - WRONG: "I will now send this message to the team..." [no tool called]
+   - RIGHT: [call send_agent_message tool immediately]
+
+2. FOR ANY COMMUNICATION TO AGENTS — use one of these tools:
+   - send_agent_message(to_agent="ALL_AGENTS", ...) — to ask/tell the entire team something
+   - send_agent_message(to_agent="Price Manager Agent", ...) — to contact a specific agent
+   - broadcast_growth_directive(directive="...") — for strategic announcements
+
+3. FOR PRICE COMMANDS — use: command_price_manager(action="...", category="...", percentage=N)
+4. FOR INVENTORY — use: command_inventory_manager(product_identifier="...", quantity=N)
+5. FOR DISPATCH — use: command_dispatcher(order_id="...")
+6. FOR REFUNDS — use: command_finance_manager(order_id="...", reason="...")
+7. FOR STATUS/INFO — use: get_admin_dashboard_metrics()
+8. FOR ASKING A SPECIFIC AGENT — use: ask_specialist_agent(agent_name="...", question="...")
+
+YOU MUST CALL THE TOOL. DO NOT JUST WRITE WHAT THE MESSAGE WOULD SAY. CALL IT.
+
+The Store Owner's decisions are HIGHEST PRIORITY (P0 / CRITICAL). Execute with zero hesitation.
 """
 
 CEO_TOOLS = [
@@ -2175,7 +2199,7 @@ class CEOAgent:
     def __init__(self):
         self.api_key = "ollama"
         self.model = os.environ.get("CEO_MODEL", DEFAULT_ADMIN_MODEL)
-        self.fallback_models = ["gemma4:e2b-it-qat", "gemma4:e4b", "qwen2.5:7b"]
+        self.fallback_models = ["qwen2.5:7b", "llama3:8b", "gemma4:e2b-it-qat"]
         self.cycle_counter = 0
 
     async def run_autonomous_cycle(self) -> Dict[str, Any]:
@@ -2345,10 +2369,17 @@ class CEOAgent:
         }
 
     async def _execute_ceo_tool(self, tool_name: str, args: Dict[str, Any]) -> Dict[str, Any]:
-        """CEO executes directives to subordinate agents and queries systems."""
+        """CEO executes directives to subordinate agents — ALL actions published to Message Bus."""
         try:
             # 1. Price Manager
             if tool_name in ["command_price_manager", "issue_directive_to_price_manager"]:
+                # ── PUBLISH: CEO → Price Manager (visible on Message Bus) ──
+                message_bus.publish(
+                    from_agent=self.name,
+                    to_agent="Price Manager Agent",
+                    subject="CEO_PRICE_COMMAND",
+                    payload={"directive": args, "source": "Store Owner", "priority": "P0"}
+                )
                 result = await price_manager_agent.execute_command(
                     action=args.get("directive") or args.get("action", "adjust"),
                     category=args.get("category"),
@@ -2357,17 +2388,38 @@ class CEOAgent:
                     new_price=float(args.get("new_price")) if args.get("new_price") is not None else None,
                     base_price=float(args.get("base_price")) if args.get("base_price") is not None else None
                 )
+                # ── PUBLISH: Price Manager → CEO reply (visible on Message Bus) ──
+                message_bus.publish(
+                    from_agent="Price Manager Agent",
+                    to_agent=self.name,
+                    subject="PRICE_COMMAND_RESULT",
+                    payload={"result": result.get("message", "Executed"), "updated_count": result.get("updated_count", 0), "args": args}
+                )
                 log_agent_action(self.name, "👔 CEO → Price Manager Command",
                                  f"Directive: {args} | Result: {result.get('message', 'Executed')}", autonomous=False)
                 return result
 
             # 2. Inventory Manager
             elif tool_name in ["command_inventory_manager", "issue_directive_to_inventory_manager"]:
+                # ── PUBLISH: CEO → Inventory Manager ──
+                message_bus.publish(
+                    from_agent=self.name,
+                    to_agent="Inventory Manager Agent",
+                    subject="CEO_INVENTORY_COMMAND",
+                    payload={"directive": args, "source": "Store Owner", "priority": "P0"}
+                )
                 result = await inventory_manager_agent.execute_command(
                     action=args.get("action", "restock"),
                     product_identifier=args.get("product_identifier", ""),
                     quantity=int(args.get("quantity", 20)),
                     set_exact=args.get("set_exact")
+                )
+                # ── PUBLISH: Inventory Manager → CEO reply ──
+                message_bus.publish(
+                    from_agent="Inventory Manager Agent",
+                    to_agent=self.name,
+                    subject="INVENTORY_COMMAND_RESULT",
+                    payload={"result": result.get("message", "Executed"), "product": args.get("product_identifier", ""), "quantity": args.get("quantity", 20)}
                 )
                 log_agent_action(self.name, "👔 CEO → Inventory Manager Command",
                                  f"Restock '{args.get('product_identifier')}' | Result: {result.get('message', 'Executed')}", autonomous=False)
@@ -2375,11 +2427,25 @@ class CEOAgent:
 
             # 3. Order Management
             elif tool_name in ["command_order_management", "issue_directive_to_order_management"]:
+                # ── PUBLISH: CEO → Order Management ──
+                message_bus.publish(
+                    from_agent=self.name,
+                    to_agent="Order Management Agent",
+                    subject="CEO_ORDER_COMMAND",
+                    payload={"order_id": args.get("order_id"), "new_status": args.get("new_status"), "source": "Store Owner", "priority": "P0"}
+                )
                 result = await order_management_agent.execute_command(
                     action="update_status",
                     order_id=args.get("order_id", ""),
                     new_status=args.get("new_status", "Confirmed"),
                     notes=args.get("notes")
+                )
+                # ── PUBLISH: Order Management → CEO reply ──
+                message_bus.publish(
+                    from_agent="Order Management Agent",
+                    to_agent=self.name,
+                    subject="ORDER_COMMAND_RESULT",
+                    payload={"result": result.get("message", "Executed"), "order_id": args.get("order_id"), "new_status": args.get("new_status")}
                 )
                 log_agent_action(self.name, "👔 CEO → Order Management Command",
                                  f"Order {args.get('order_id')} → {args.get('new_status')} | Result: {result.get('message', 'Executed')}", autonomous=False)
@@ -2387,11 +2453,25 @@ class CEOAgent:
 
             # 4. Finance Manager
             elif tool_name in ["command_finance_manager", "issue_directive_to_finance_manager"]:
+                # ── PUBLISH: CEO → Finance Manager ──
+                message_bus.publish(
+                    from_agent=self.name,
+                    to_agent="Finance Manager Agent",
+                    subject="CEO_FINANCE_COMMAND",
+                    payload={"order_id": args.get("order_id"), "reason": args.get("reason", "CEO directive"), "source": "Store Owner", "priority": "P0"}
+                )
                 result = await finance_manager_agent.execute_command(
                     action="refund",
                     order_id=args.get("order_id", ""),
                     reason=args.get("reason", "CEO directive"),
                     force=str(args.get("force_override", "false")).lower() == "true"
+                )
+                # ── PUBLISH: Finance Manager → CEO reply ──
+                message_bus.publish(
+                    from_agent="Finance Manager Agent",
+                    to_agent=self.name,
+                    subject="FINANCE_COMMAND_RESULT",
+                    payload={"result": result.get("message") or result.get("error", "Evaluated"), "order_id": args.get("order_id")}
                 )
                 log_agent_action(self.name, "👔 CEO → Finance Manager Command",
                                  f"Refund #{args.get('order_id')} | Result: {result.get('message') or result.get('error', 'Evaluated')}", autonomous=False)
@@ -2399,10 +2479,24 @@ class CEOAgent:
 
             # 5. Dispatcher
             elif tool_name in ["command_dispatcher", "issue_directive_to_dispatcher"]:
+                # ── PUBLISH: CEO → Dispatcher ──
+                message_bus.publish(
+                    from_agent=self.name,
+                    to_agent="Dispatcher Agent",
+                    subject="CEO_DISPATCH_COMMAND",
+                    payload={"order_id": args.get("order_id", "ALL"), "tracking_number": args.get("tracking_number"), "source": "Store Owner", "priority": "P0"}
+                )
                 result = await dispatcher_agent.execute_command(
                     action="dispatch",
                     order_id=args.get("order_id"),
                     tracking_number=args.get("tracking_number")
+                )
+                # ── PUBLISH: Dispatcher → CEO reply ──
+                message_bus.publish(
+                    from_agent="Dispatcher Agent",
+                    to_agent=self.name,
+                    subject="DISPATCH_COMMAND_RESULT",
+                    payload={"result": result.get("message") or result.get("details", "Dispatched"), "dispatched_count": result.get("dispatched_count", 0)}
                 )
                 log_agent_action(self.name, "👔 CEO → Dispatcher Command",
                                  f"Dispatch {args.get('order_id') or 'All'} | Result: {result.get('message') or result.get('details', 'Dispatched')}", autonomous=False)
@@ -2410,9 +2504,23 @@ class CEOAgent:
 
             # 6. Review & Feedback
             elif tool_name in ["command_review_manager", "issue_directive_to_review_manager"]:
+                # ── PUBLISH: CEO → Review Manager ──
+                message_bus.publish(
+                    from_agent=self.name,
+                    to_agent="Review and Feedback Manager",
+                    subject="CEO_REVIEW_COMMAND",
+                    payload={"product_identifier": args.get("product_identifier", ""), "source": "Store Owner", "priority": "P0"}
+                )
                 result = await review_feedback_agent.execute_command(
                     action="summary",
                     product_id_or_name=args.get("product_identifier", "")
+                )
+                # ── PUBLISH: Review Manager → CEO reply ──
+                message_bus.publish(
+                    from_agent="Review and Feedback Manager",
+                    to_agent=self.name,
+                    subject="REVIEW_COMMAND_RESULT",
+                    payload={"summary": result.get("summary", "")[:400], "product": args.get("product_identifier", "")}
                 )
                 log_agent_action(self.name, "👔 CEO → Review Manager Command",
                                  f"Sentiment Analysis for '{args.get('product_identifier')}'", autonomous=False)
@@ -2557,10 +2665,17 @@ class CEOAgent:
     async def run_prompt_from_owner(self, prompt: str, conversation_history_override: Optional[List[Dict[str, str]]] = None) -> Dict[str, Any]:
         """
         Store Owner speaks directly with the CEO Agent (No Middleman).
-        Top Priority (P0 / Immediate Effect, Zero Questions):
-        Executes immediate store commands, commands subordinate specialist agents, and maintains persistent multi-turn context.
+        Top Priority (P0 / Immediate Effect, Zero Questions).
+        ALL communications are published to the Message Bus for full transparency.
         """
-        # 1. Record incoming owner prompt into CEO's conversation history
+        # 1. Publish Store Owner directive to the Message Bus (fully visible)
+        message_bus.publish(
+            from_agent="Store Owner",
+            to_agent=self.name,
+            subject="OWNER_DIRECTIVE",
+            payload={"prompt": prompt, "priority": "P0_CRITICAL", "source": "Omnipotent Admin"}
+        )
+        # 2. Record incoming owner prompt into CEO's conversation history
         conversation_history.add(self.name, "user", prompt, {"source": "Store Owner", "priority": "P0_CRITICAL"})
 
         # 2. Build multi-turn context
@@ -2591,6 +2706,35 @@ class CEOAgent:
 
                 if not tool_calls:
                     final_text = clean_think_tags(res_msg.content or "")
+                    # ── POST-LLM GUARD: Detect if LLM described an action without calling any tool ──
+                    # Patterns: "ask (all) agents/team", "tell agents", "send message", "broadcast", etc.
+                    p_lower = prompt.lower()
+                    comm_keywords = [
+                        "ask", "tell", "inform", "notify", "message", "broadcast",
+                        "announce", "say to", "let them know", "share with", "send to"
+                    ]
+                    agent_keywords = ["agent", "team", "fleet", "all", "everyone", "them"]
+                    is_comm_intent = (
+                        any(k in p_lower for k in comm_keywords) and
+                        any(k in p_lower for k in agent_keywords) and
+                        len(executed_tools) == 0  # LLM called nothing
+                    )
+                    if is_comm_intent:
+                        # Build the message body from the prompt itself or from what the LLM wrote
+                        msg_body = prompt  # Use exact owner prompt as the directive
+                        auto_result = await self._execute_ceo_tool("send_agent_message", {
+                            "to_agent": "ALL_AGENTS",
+                            "subject": "CEO_TEAM_MESSAGE",
+                            "message": msg_body
+                        })
+                        executed_tools.append({"name": "send_agent_message", "args": {"to_agent": "ALL_AGENTS", "message": msg_body}, "output": auto_result})
+                        # Collect fleet replies and append to final_text
+                        fleet_replies = auto_result.get("fleet_replies", {})
+                        if fleet_replies:
+                            reply_lines = ["\n\n---\n**📡 Agent Fleet Responses:**\n"]
+                            for ag_name, ag_reply in fleet_replies.items():
+                                reply_lines.append(f"**{ag_name}**: {ag_reply}\n")
+                            final_text = (final_text or f"👔 **CEO**: Message delivered to all agents.") + "".join(reply_lines)
                     break
 
                 messages.append({
@@ -2685,6 +2829,19 @@ class CEOAgent:
 
         # 3. Record CEO's assistant response in conversation history
         conversation_history.add(self.name, "assistant", final_text, {"tool_calls": len(executed_tools), "priority": "P0_CRITICAL"})
+
+        # 4. Publish CEO final response to Message Bus (fully visible to Owner)
+        message_bus.publish(
+            from_agent=self.name,
+            to_agent="Store Owner",
+            subject="CEO_RESPONSE",
+            payload={
+                "response": final_text[:800],
+                "tool_calls_made": len(executed_tools),
+                "tools_used": [t["name"] for t in executed_tools],
+                "priority": "P0_CRITICAL"
+            }
+        )
 
         return {"success": True, "response": final_text, "tool_calls": executed_tools}
 

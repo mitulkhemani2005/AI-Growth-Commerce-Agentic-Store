@@ -35,14 +35,14 @@ load_dotenv()
 # =====================================================================
 
 OLLAMA_BASE_URL = os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434/v1")
-DEFAULT_MODEL = os.environ.get("CUSTOMER_MODEL", os.environ.get("OLLAMA_MODEL", "gemma4:e2b-it-qat"))
+DEFAULT_MODEL = os.environ.get("CUSTOMER_MODEL", os.environ.get("OLLAMA_MODEL", "qwen2.5:7b"))
 
 # Dedicated local Ollama model fallback hierarchy
 DEFAULT_MODELS = [
     DEFAULT_MODEL,
-    "gemma4:e2b-it-qat",
-    "gemma4:e4b",
-    "qwen2.5:7b"
+    "qwen2.5:7b",
+    "llama3:8b",
+    "gemma4:e2b-it-qat"
 ]
 
 
@@ -618,7 +618,8 @@ class CommerceAgent:
                         "messages": messages,
                         "temperature": temperature,
                         "max_tokens": max_tokens,
-                        "timeout": 60.0
+                        "timeout": 120.0,
+                        "extra_body": {"options": {"num_ctx": 8192}}  # 8K ctx for qwen2.5:7b tool calling
                     }
                     if tools:
                         kwargs["tools"] = tools
@@ -628,7 +629,7 @@ class CommerceAgent:
                     print(f"[Customer AI] Calling Ollama model '{model_name}' (messages: {len(messages)})...", flush=True)
                     resp = await asyncio.wait_for(
                         asyncio.to_thread(self.sync_client.chat.completions.create, **kwargs),
-                        timeout=60.0
+                        timeout=120.0
                     )
                     print(f"[Customer AI] Model '{model_name}' returned successfully.", flush=True)
                     return resp
