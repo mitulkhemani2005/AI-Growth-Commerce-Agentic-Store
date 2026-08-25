@@ -717,11 +717,45 @@ body.admin-body {
   background: rgba(0, 0, 0, 0.4);
   border: 1px solid var(--border-color);
   color: #fff;
-  padding: 0.35rem 0.55rem;
+  padding: 0.4rem 0.6rem;
   border-radius: var(--radius-sm);
   font-family: 'JetBrains Mono', monospace;
-  font-size: 0.85rem;
-  width: 80px;
+  font-size: 0.88rem;
+  width: 90px;
+}
+
+.inline-input.price-input {
+  width: 110px;
+}
+
+.price-box-base {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.price-badge-base {
+  font-size: 0.68rem;
+  color: #a5b4fc;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.price-box-selling {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.price-badge-selling {
+  font-size: 0.68rem;
+  color: #34d399;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
 }
 
 .admin-select {
@@ -1024,4 +1058,58 @@ body.admin-body {
   font-size: 0.8rem;
   color: #cbd5e1;
   line-height: 1.4;
+}
+
+/* Floating Toast Notifications */
+.admin-toast-container {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: 99999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
+}
+
+.admin-toast {
+  background: rgba(15, 23, 42, 0.95);
+  border: 1px solid rgba(16, 185, 129, 0.5);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6), 0 0 20px rgba(16, 185, 129, 0.2);
+  color: #fff;
+  padding: 12px 18px;
+  border-radius: var(--radius-md);
+  font-size: 0.88rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  pointer-events: auto;
+  animation: toastSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  backdrop-filter: blur(10px);
+}
+
+.admin-toast.error {
+  border-color: rgba(244, 63, 94, 0.6);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6), 0 0 20px rgba(244, 63, 94, 0.2);
+}
+
+@keyframes toastSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(40px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+.row-saved-highlight {
+  animation: rowGlow 1.8s ease-out;
+}
+
+@keyframes rowGlow {
+  0% { background-color: rgba(16, 185, 129, 0.25) !important; }
+  100% { background-color: transparent !important; }
 }

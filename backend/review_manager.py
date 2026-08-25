@@ -152,7 +152,7 @@ Format with clear bullet points and bold highlights. Keep it under 150 words."""
 
         summary_text = ""
         if self.client:
-            for model_candidate in ["openai/gpt-oss-20b", "openai/gpt-oss-120b", "qwen/qwen3.6-27b", "allam-2-7b"]:
+            for model_candidate in ["openai/gpt-oss-20b", "openai/gpt-oss-120b", "qwen/qwen3.6-27b"]:
                 try:
                     chat_resp = await self.client.chat.completions.create(
                         model=model_candidate,

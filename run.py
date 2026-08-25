@@ -13,4 +13,5 @@ if __name__ == "__main__":
     print("  - Web Storefront & Prompt Interface: http://127.0.0.1:8000")
     print("  - API Documentation: http://127.0.0.1:8000/docs")
     print("=" * 60)
-    uvicorn.run("backend.main:app", host="127.0.0.1", port=8000, reload=True)
+    # reload=False ensures backend does NOT restart on database/inventory JSON file writes
+    uvicorn.run("backend.main:app", host="127.0.0.1", port=8000, reload=False)

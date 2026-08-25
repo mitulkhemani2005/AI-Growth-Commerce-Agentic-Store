@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+  <defs>
+    <linearGradient id="laptopChassis" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <linearGradient id="laptopDisplay" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#1e1b4b"/>
+    </linearGradient>
+  </defs>
+  <!-- Background Glow -->
+  <circle cx="200" cy="180" r="130" fill="#6366f1" opacity="0.12"/>
+  <!-- Display Lid -->
+  <rect x="80" y="80" width="240" height="160" rx="14" fill="url(#laptopDisplay)" stroke="#818cf8" stroke-width="2.5"/>
+  <!-- Screen Bezel Interior -->
+  <rect x="92" y="92" width="216" height="136" rx="8" fill="#020617"/>
+  <!-- Code / IDE Graphic on Screen -->
+  <rect x="105" y="105" width="60" height="6" rx="3" fill="#60a5fa"/>
+  <rect x="105" y="118" width="120" height="6" rx="3" fill="#a855f7"/>
+  <rect x="105" y="131" width="90" height="6" rx="3" fill="#34d399"/>
+  <rect x="105" y="144" width="140" height="6" rx="3" fill="#f59e0b"/>
+  <!-- Base Keyboard Base -->
+  <polygon points="50,260 350,260 330,285 70,285" fill="url(#laptopChassis)" stroke="#818cf8" stroke-width="2"/>
+  <!-- Trackpad Notch -->
+  <rect x="175" y="263" width="50" height="4" rx="2" fill="#64748b"/>
+</svg>

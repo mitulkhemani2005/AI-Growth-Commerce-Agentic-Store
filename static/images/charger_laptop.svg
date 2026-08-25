@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+  <circle cx="200" cy="200" r="130" fill="#3b82f6" opacity="0.12"/>
+  <!-- Power Brick Body -->
+  <rect x="120" y="110" width="160" height="150" rx="20" fill="#0f172a" stroke="#60a5fa" stroke-width="2.5"/>
+  <!-- 100W PD Badge Text -->
+  <rect x="145" y="140" width="110" height="30" rx="8" fill="rgba(59, 130, 246, 0.2)" stroke="#3b82f6" stroke-width="1.5"/>
+  <!-- USB-C Port Output -->
+  <rect x="175" y="220" width="50" height="14" rx="7" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+  <!-- Wall Prongs -->
+  <rect x="155" y="70" width="16" height="40" rx="4" fill="#94a3b8"/>
+  <rect x="229" y="70" width="16" height="40" rx="4" fill="#94a3b8"/>
+  <!-- Braided Cable Attached -->
+  <path d="M200 234 Q 200 320, 260 340" fill="none" stroke="#60a5fa" stroke-width="4" stroke-linecap="round"/>
+</svg>

@@ -36,15 +36,14 @@ load_dotenv()
 
 DEFAULT_GROQ_API_KEY = os.environ.get("CUSTOMER_GROQ_API_KEY", os.environ.get("GROQ_API_KEY", ""))
 
-# Dedicated Groq models with GPT-OSS prioritizing precision reasoning & tool calling
+# Dedicated Groq models (Qwen for Customer Agent with fast fallback)
 DEFAULT_MODELS = [
-    "openai/gpt-oss-20b",
-    "openai/gpt-oss-120b",
     "qwen/qwen3.6-27b",
-    "llama-3.1-8b-instant"
+    "openai/gpt-oss-120b",
+    "openai/gpt-oss-20b"
 ]
 
-DEFAULT_MODEL = os.environ.get("GROQ_CUSTOMER_MODEL", DEFAULT_MODELS[0])
+DEFAULT_MODEL = os.environ.get("GROQ_CUSTOMER_MODEL", "qwen/qwen3.6-27b")
 
 
 # =====================================================================
@@ -56,30 +55,30 @@ AGENT_TOOLS: List[Dict[str, Any]] = [
         "type": "function",
         "function": {
             "name": "search_inventory",
-            "description": "Search the product catalog by keyword query, product categories (Footwear, Outerwear, Audio, Smart Tech, Streetwear, Accessories), size (e.g. 'US 10', 'L', 'M', 'One Size'), price budget range, or in-stock status.",
+            "description": "Search the NOVA product catalog by keyword query, product categories (Mobiles, Laptops, Audio, Accessories), price budget range, or in-stock status. Always search broadly — don't limit results.",
             "parameters": {
                 "type": "object",
                 "properties": {
                     "query": {
                         "type": ["string", "null"],
-                        "description": "Search keywords (e.g. 'running shoes', 'sneakers', 'jacket', 'headphones', 'watch', 'hoodie', 'backpack')."
+                        "description": "Search keywords (e.g. 'flagship mobile', 'gaming laptop', 'wireless earphone', 'bluetooth speaker', 'smart watch', 'power bank')."
                     },
                     "product_types": {
                         "type": ["array", "null"],
                         "items": {"type": "string"},
-                        "description": "Categories to filter: ['Footwear', 'Outerwear', 'Audio', 'Smart Tech', 'Accessories', 'Streetwear']."
+                        "description": "Categories to filter: ['Mobiles', 'Laptops', 'Audio', 'Accessories']. Use the exact category name."
                     },
                     "size": {
                         "type": ["string", "null"],
-                        "description": "Specific size to filter by (e.g. 'US 10', 'US 9', 'L', 'M', 'XL', 'One Size')."
+                        "description": "Specific size or variant to filter by (e.g. 'One Size', 'Standard')."
                     },
                     "min_price": {
                         "type": ["number", "null"],
-                        "description": "Minimum price in USD."
+                        "description": "Minimum price in INR (₹)."
                     },
                     "max_price": {
                         "type": ["number", "null"],
-                        "description": "Maximum price in USD."
+                        "description": "Maximum price in INR (₹)."
                     },
                     "in_stock_only": {
                         "type": ["boolean", "null"],
@@ -244,7 +243,7 @@ AGENT_TOOLS: List[Dict[str, Any]] = [
         "type": "function",
         "function": {
             "name": "view_cart",
-            "description": "View the user's current shopping cart contents, itemized prices, estimated tax, and total.",
+            "description": "View the user's current shopping cart contents, itemized prices, 0% tax free breakdown, and total in INR (₹).",
             "parameters": {
                 "type": "object",
                 "properties": {}
@@ -389,58 +388,64 @@ AGENT_TOOLS: List[Dict[str, Any]] = [
 # 3. SYSTEM PROMPT
 # =====================================================================
 
-SYSTEM_PROMPT = """You are 'Nova', the elite AI Commerce Copilot for the AI Growth Commerce Store.
-You guide customers with product discovery, in-depth technical explanations, shopping cart management, seamless checkout via the official Razorpay Checkout popup, order tracking, 24-hour cancellations, and verified customer reviews.
+SYSTEM_PROMPT = """You are 'Nova', NOVA Store's elite AI Commerce Copilot.
+You guide customers with product discovery, detailed specs, shopping cart management, seamless Razorpay checkout, order tracking, cancellations, and verified reviews.
 
-═══════════════════════════════════════════════════════════════════════
+STORE OVERVIEW — NOVA OFFICIAL STORE:
+- Company: **NOVA**
+- Currency: Indian Rupee (INR ₹) everywhere. Always format as ₹XX,XXX.XX
+- Tax Policy: **0% Tax** (Tax-free on all products)
+- Categories: **Mobiles**, **Laptops**, **Audio** (earphones, headphones, speakers, mics), **Accessories** (smart watches, keyboards, mice, power banks, bags, chargers)
+
+══════════════════════════════════════════════════════════════════════
 🛠️ CORE REASONING & TOOL CALLING RULES
-═══════════════════════════════════════════════════════════════════════
-1. ALWAYS use the provided tools to query real data. NEVER guess prices, stock levels, orders, or specifications.
-2. Parameter Rule: When calling tools, omit optional parameters rather than passing null values.
-3. Multi-Step Execution: When a user gives a compound request (e.g. "Find all accessories, add them to my cart, and checkout"), execute all required tools in sequence across your turns until the complete goal is achieved:
-   - Step 1: Search inventory for matching products (`search_inventory`).
-   - Step 2: Add matching items to cart (`batch_add_to_cart` or `add_to_cart`).
-   - Step 3: Trigger the Razorpay Checkout popup (`trigger_razorpay_checkout`).
-4. Once you have received tool responses, summarize the results with rich markdown tables, bullet points, price breakdowns, and emoji highlights.
+══════════════════════════════════════════════════════════════════════
+1. ALWAYS use tools to fetch real data. NEVER guess prices, stock, specs, or order status.
+2. Always format prices in INR (₹) with 0% Tax.
+3. **QUANTITY RULE (CRITICAL):** Always honour the EXACT quantity the user asks for. If the user says "2 units" or "buy 3", pass that exact quantity to the tool. NEVER default to 1 if a quantity is specified.
+4. **SUGGESTION RULE:** When a user asks for a product category (e.g. "show me audio"), always search and display ALL relevant products with specs, prices, and ratings. Don't stop at one result.
+5. Multi-Step Execution: Execute all required tool calls in sequence in the same turn:
+   - Find products → `search_inventory`
+   - Add to cart → `add_to_cart` / `batch_add_to_cart`
+   - Checkout → `trigger_razorpay_checkout`
+6. After tool responses, summarize results with rich markdown tables, bullet points, price breakdowns in ₹, and emoji highlights.
 
-═══════════════════════════════════════════════════════════════════════
+══════════════════════════════════════════════════════════════════════
 🔍 PRODUCT DISCOVERY & IN-DEPTH EXPLANATIONS
-═══════════════════════════════════════════════════════════════════════
-- "Show me shoes" / "What jackets do you have?" -> Call `search_inventory`.
-- "Tell me about X" / "Explain the features of Y" -> Call `get_product_details` and `get_product_reviews`.
-  Provide an engaging, comprehensive breakdown:
-  1. Product Overview & target use case
-  2. Technical Specifications & Material Engineering
-  3. Available Sizes & Live Stock
-  4. Price & Customer Star Rating
-  5. AI Review Summary & Top Customer Feedback
+══════════════════════════════════════════════════════════════════════
+- "Show me mobiles" → `search_inventory` with product_types=["Mobiles"]
+- "Show me audio" → `search_inventory` with product_types=["Audio"]
+- "Show me laptops" → `search_inventory` with product_types=["Laptops"]
+- "Show me accessories" → `search_inventory` with product_types=["Accessories"]
+- "Tell me about X" → Call `get_product_details` + `get_product_reviews`.
+  Present a rich breakdown: specs, RAM/storage/battery, connectivity, price, rating, reviews.
 
-═══════════════════════════════════════════════════════════════════════
-🛒 SHOPPING CART WORKFLOWS
-═══════════════════════════════════════════════════════════════════════
-- "Add X to cart" -> Call `add_to_cart`.
-- "Add all X to cart" -> Call `search_inventory` then `batch_add_to_cart`.
-- "View my cart" / "What's in my cart?" -> Call `view_cart`.
-- "Remove X from cart" -> Call `remove_from_cart`.
-- "Clear cart" -> Call `clear_cart`.
+══════════════════════════════════════════════════════════════════════
+🛍️ SHOPPING CART WORKFLOWS
+══════════════════════════════════════════════════════════════════════
+- "Add 2 [product] to cart" → `add_to_cart` with quantity=2 (EXACTLY as specified)
+- "Add all audio to cart" → `search_inventory` then `batch_add_to_cart`
+- "View my cart" → `view_cart`
+- "Remove X" → `remove_from_cart`
+- "Clear cart" → `clear_cart`
 
-═══════════════════════════════════════════════════════════════════════
+══════════════════════════════════════════════════════════════════════
 💳 CHECKOUT & RAZORPAY PAYMENT
-═══════════════════════════════════════════════════════════════════════
+══════════════════════════════════════════════════════════════════════
 Whenever the customer wants to buy, pay, checkout, or place an order:
-1. Ensure the cart contains the requested items. If cart is empty and the user mentioned specific products, find them with `search_inventory` and add them with `batch_add_to_cart`.
-2. Call `trigger_razorpay_checkout`.
-3. This tool immediately creates a Razorpay Order and opens the official Razorpay Checkout popup modal on the user's screen (supporting Cards, UPI, NetBanking, and Wallets)!
-4. Inform the user that the secure Razorpay Checkout popup is opening on their screen to complete payment.
+1. Ensure the cart has the requested items. If empty and user mentioned products, search and add them first.
+2. Call `trigger_razorpay_checkout` — this creates a real Razorpay Order and signals the browser to open the official Razorpay popup.
+3. Tell the user: "I've prepared your Razorpay checkout! The secure payment window is opening now — complete your payment using Card / UPI / NetBanking."
+4. NEVER directly place an order without triggering Razorpay checkout first.
 
-═══════════════════════════════════════════════════════════════════════
+══════════════════════════════════════════════════════════════════════
 📦 ORDERS, LOGISTICS, REFUNDS & REVIEWS
-═══════════════════════════════════════════════════════════════════════
-- "Where is my order?" / "Track order" -> Call `track_order` or `view_order_history`.
-- "Cancel my order" -> Call `cancel_order` (evaluates 24-hour rule, restocks inventory, refunds payment).
-- "Refund my order" -> Call `request_order_refund`.
-- "Reviews for X" -> Call `get_product_reviews`.
-- "Submit review for X" -> Call `submit_product_review`.
+══════════════════════════════════════════════════════════════════════
+- "Where is my order?" / "Track order" → `track_order` or `view_order_history`
+- "Cancel my order" → `cancel_order` (evaluates 24-hour rule, restocks inventory, refunds payment)
+- "Refund my order" → `request_order_refund`
+- "Reviews for X" → `get_product_reviews`
+- "Submit review for X" → `submit_product_review`
 """
 
 
@@ -566,8 +571,8 @@ class CommerceAgent:
                     if "tpd" in err_str.lower() or "tokens per day" in err_str.lower():
                         break
                     if "429" in err_str or "rate_limit" in err_str.lower():
-                        await asyncio.sleep(1.0)
-                        continue
+                        # Immediately try fallback model on 429 rate limit
+                        break
                     break
 
         raise last_error or Exception("All Customer Groq models exhausted.")
@@ -873,7 +878,7 @@ class CommerceAgent:
         executed_tools_trace: List[Dict[str, Any]] = []
         action_data: Dict[str, Any] = {}
         final_text = ""
-        MAX_TOOL_TURNS = 2
+        MAX_TOOL_TURNS = 5
 
         try:
             for _turn in range(MAX_TOOL_TURNS):

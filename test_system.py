@@ -43,7 +43,7 @@ async def run_tests():
     assert add_res["success"], f"Failed to add to cart: {add_res}"
     cart = cart_manager.get_cart(user_id)
     assert cart["item_count"] == 2, f"Expected 2 items in cart, got {cart['item_count']}"
-    print(f"  [PASS] Added item to cart. Cart subtotal: ${cart['subtotal']}")
+    print(f"  [PASS] Added item to cart. Cart subtotal: ₹{cart['subtotal']}")
 
     # Remove 1 quantity
     rem_res = cart_manager.remove_from_cart(user_id, "prod_001", quantity=1)
@@ -65,7 +65,7 @@ async def run_tests():
     )
     assert order_res["success"], f"Order placement failed: {order_res}"
     order = order_res["order"]
-    print(f"  [PASS] Order {order['order_id']} placed successfully! Total: ${order['total']}")
+    print(f"  [PASS] Order {order['order_id']} placed successfully! Total: ₹{order['total']}")
 
     # Verify inventory reduction in inventory.json
     updated_prod = inventory_manager.get_product_by_id("prod_001")

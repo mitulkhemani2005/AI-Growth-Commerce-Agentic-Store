@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+  <defs>
+    <linearGradient id="phoneBody" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e1b4b"/>
+      <stop offset="50%" stop-color="#312e81"/>
+      <stop offset="100%" stop-color="#4f46e5"/>
+    </linearGradient>
+    <linearGradient id="screenGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="60%" stop-color="#1e1b4b"/>
+      <stop offset="100%" stop-color="#6366f1"/>
+    </linearGradient>
+    <filter id="phoneGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="12" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+  <!-- Background Aura -->
+  <circle cx="200" cy="200" r="140" fill="#6366f1" opacity="0.15" filter="url(#phoneGlow)"/>
+  <!-- Phone Outer Frame -->
+  <rect x="120" y="50" width="160" height="300" rx="32" fill="url(#phoneBody)" stroke="#818cf8" stroke-width="3" filter="url(#phoneGlow)"/>
+  <!-- Phone Screen -->
+  <rect x="130" y="62" width="140" height="276" rx="24" fill="url(#screenGrad)"/>
+  <!-- Dynamic Island / Punch Hole -->
+  <rect x="175" y="72" width="50" height="14" rx="7" fill="#000" stroke="#374151" stroke-width="1"/>
+  <!-- UI Elements on Screen -->
+  <circle cx="200" cy="160" r="32" fill="none" stroke="#a5b4fc" stroke-width="3" stroke-dasharray="8 4"/>
+  <path d="M190 160 L197 167 L212 152" fill="none" stroke="#34d399" stroke-width="3" stroke-linecap="round"/>
+  <rect x="150" y="220" width="100" height="8" rx="4" fill="#a5b4fc" opacity="0.8"/>
+  <rect x="160" y="236" width="80" height="6" rx="3" fill="#64748b" opacity="0.6"/>
+  <!-- Quad Camera Island on Back Reflected -->
+  <rect x="145" y="265" width="110" height="45" rx="14" fill="#1e1b4b" stroke="#818cf8" stroke-width="1.5"/>
+  <circle cx="170" cy="287" r="10" fill="#0f172a" stroke="#60a5fa" stroke-width="2"/>
+  <circle cx="200" cy="287" r="10" fill="#0f172a" stroke="#a855f7" stroke-width="2"/>
+  <circle cx="230" cy="287" r="10" fill="#0f172a" stroke="#34d399" stroke-width="2"/>
+</svg>

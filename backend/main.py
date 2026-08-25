@@ -19,11 +19,16 @@ from backend.review_manager import review_manager
 from backend.admin_agents import (
     price_manager_agent,
     inventory_manager_agent,
-    order_manager_agent,
-    refund_manager_agent,
+    order_management_agent,
+    finance_manager_agent,
     dispatcher_agent,
     review_feedback_agent,
-    admin_chat_agent
+    ceo_agent,
+    admin_chat_agent,
+    message_bus,
+    # Legacy aliases for backward compatibility
+    order_manager_agent,
+    refund_manager_agent
 )
 from backend.background_workers import background_worker
 
@@ -444,15 +449,7 @@ async def update_settings(req: SettingsRequest):
 # 👑 ADMIN PANEL & 24/7 AGENT FLEET ENDPOINTS
 # =====================================================================
 
-from backend.admin_agents import (
-    admin_chat_agent,
-    price_manager_agent,
-    inventory_manager_agent,
-    order_manager_agent,
-    refund_manager_agent,
-    dispatcher_agent,
-    review_feedback_agent
-)
+# Admin agent imports (already imported above at module level)
 from backend.background_workers import background_worker
 from backend.review_manager import review_manager
 
@@ -469,12 +466,14 @@ class AdminInventoryUpdateRequest(BaseModel):
     product_id: str
     stock: Optional[int] = None
     price: Optional[float] = None
+    base_price: Optional[float] = None
 
 class AdminProductAddRequest(BaseModel):
     PRODUCT_NAME: str
     PRODUCT_TYPE: str = "Accessories"
     PRODUCT_SIZE: str = "One Size"
     STOCK_REMAINING: int = 15
+    BASE_PRICE: Optional[float] = None
     PRICE: float = 49.99
     DESCRIPTION: str = ""
     IMAGE: Optional[str] = "/static/images/cyberflex_runner.svg"
@@ -582,27 +581,40 @@ async def update_admin_agent_interval(req: AdminAgentIntervalRequest):
     return res
 
 @app.get("/api/admin/agent-logs")
-async def get_agent_logs(limit: int = 50):
+async def get_admin_agent_logs(limit: int = 60):
     """Returns recent 24/7 autonomous agent audit log entries."""
-    logs_file = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "agent_logs.json"))
-    logs = []
-    if os.path.exists(logs_file):
-        try:
-            with open(logs_file, "r", encoding="utf-8") as f:
-                logs = json.load(f)
-        except Exception:
-            logs = []
-    return {"logs": logs[:limit]}
+    from backend.admin_agents import get_agent_logs as fetch_agent_logs
+    logs = fetch_agent_logs(limit=limit)
+    return {"logs": logs, "count": len(logs)}
+
+@app.get("/api/admin/agent-messages")
+async def get_admin_agent_messages(limit: int = 60):
+    """Returns recent inter-agent communications recorded on the persistent message bus."""
+    messages = message_bus.get_all_messages(limit=limit)
+    return {"messages": messages, "count": len(messages)}
 
 @app.post("/api/admin/inventory/update")
 async def admin_update_inventory(req: AdminInventoryUpdateRequest):
-    """Directly modifies stock or price for a product."""
+    """Directly modifies stock, price, or base_price for a product."""
     updated = {}
     if req.stock is not None:
         stock_res = inventory_manager.update_stock(req.product_id, req.stock)
         updated["stock"] = stock_res
-    if req.price is not None:
-        price_res = inventory_manager.update_price(req.product_id, req.price)
+    if req.base_price is not None and req.price is None:
+        # Only base_price sent — update BASE_PRICE floor without touching PRICE
+        price_res = inventory_manager.update_base_price(
+            product_id=req.product_id,
+            new_base_price=req.base_price
+        )
+        updated["price"] = price_res
+    elif req.price is not None:
+        # Both or price-only update — enforce base_price floor on PRICE
+        price_res = inventory_manager.update_price(
+            product_id=req.product_id,
+            new_price=req.price,
+            base_price=req.base_price,
+            enforce_base_price=True
+        )
         updated["price"] = price_res
     return {"success": True, "updated": updated}
 
@@ -671,9 +683,23 @@ async def admin_generate_review_summary(req: AdminGenerateReviewSummaryRequest):
         raise HTTPException(status_code=400, detail=res.get("error", "Summary generation failed"))
     return res
 
+@app.get("/api/admin/agent-messages")
+async def get_agent_messages(limit: int = 50):
+    """Returns the inter-agent message bus history for admin dashboard visibility."""
+    return {
+        "messages": message_bus.get_all_messages(limit=limit),
+        "inbox_snapshot": message_bus.get_inbox_snapshot()
+    }
+
+@app.get("/api/admin/ceo/report")
+async def get_ceo_report():
+    """Triggers the CEO Agent to generate an on-demand strategic report for the Owner."""
+    report = await ceo_agent.generate_owner_report()
+    return report
+
 @app.post("/api/admin/chat")
 async def admin_chat(req: AdminChatRequest):
-    """Omnipotent Store Owner Chatbot NLP command endpoint."""
+    """Owner Command Agent chatbot endpoint — routes through CEO awareness."""
     if not req.prompt.strip():
         raise HTTPException(status_code=400, detail="Prompt cannot be empty")
     

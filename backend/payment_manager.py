@@ -14,8 +14,8 @@ except ImportError:
     razorpay = None
 
 # Razorpay Keys — loaded from environment (set in .env, never hardcoded)
-DEFAULT_KEY_ID = os.environ.get("RAZORPAY_KEY_ID", "rzp_test_TTl8jOoD6EEpk6")
-DEFAULT_KEY_SECRET = os.environ.get("RAZORPAY_KEY_SECRET", "L9ye0vywnbiFvD195fPTzn4a")
+DEFAULT_KEY_ID = os.environ.get("RAZORPAY_KEY_ID", "rzp_test_TU4r5qh5d7sKDu")
+DEFAULT_KEY_SECRET = os.environ.get("RAZORPAY_KEY_SECRET", "zXoFlp61ZzytWF5Awo21rifw")
 
 class PaymentManager:
     def __init__(self, key_id: str = DEFAULT_KEY_ID, key_secret: str = DEFAULT_KEY_SECRET):
@@ -46,12 +46,13 @@ class PaymentManager:
 
     def create_order(self, amount_in_usd_or_inr: float, receipt_id: str, currency: str = "INR") -> Dict[str, Any]:
         """
-        Creates a Razorpay order. Amount is converted to smallest currency unit (paise: multiply by 100).
+        Creates a Razorpay order using real API credentials.
+        Amount is converted to smallest currency unit (paise: multiply by 100).
+        Always uses the real Razorpay API — no sandbox fallback.
         """
         amount_paise = int(round(amount_in_usd_or_inr * 100))
-        
-        # If live/test Razorpay API credentials are provided and client is initialized
-        if self.client and not self.key_id.startswith("rzp_test_growth_"):
+
+        if self.client:
             try:
                 data = {
                     "amount": amount_paise,
@@ -69,15 +70,18 @@ class PaymentManager:
                     "is_live_sdk": True
                 }
             except Exception as e:
-                print(f"Razorpay API call error (falling back to sandbox mode): {e}")
+                print(f"Razorpay API call error: {e}")
+                return {
+                    "success": False,
+                    "error": str(e),
+                    "key_id": self.key_id,
+                    "is_live_sdk": False
+                }
 
-        # Seamless Sandbox / Test mode fallback
-        mock_order_id = f"order_{uuid.uuid4().hex[:14]}"
+        # No Razorpay client initialised (missing razorpay package)
         return {
-            "success": True,
-            "razorpay_order_id": mock_order_id,
-            "amount": amount_paise,
-            "currency": currency,
+            "success": False,
+            "error": "Razorpay client not initialised. Please install razorpay: pip install razorpay",
             "key_id": self.key_id,
             "is_live_sdk": False
         }
@@ -90,12 +94,10 @@ class PaymentManager:
     ) -> bool:
         """
         Verifies the cryptographic HMAC SHA256 signature returned by Razorpay Checkout.
+        Uses real Razorpay API verification — no bypass accepted.
         """
-        if razorpay_signature == "sandbox_verified" or razorpay_signature == "card_verified":
-            return True
-
-        # If using real client and keys
-        if self.client and not self.key_id.startswith("rzp_test_growth_"):
+        # Try using Razorpay client's built-in verification first
+        if self.client:
             try:
                 self.client.utility.verify_payment_signature({
                     'razorpay_order_id': razorpay_order_id,
@@ -103,24 +105,21 @@ class PaymentManager:
                     'razorpay_signature': razorpay_signature
                 })
                 return True
-            except Exception as e:
-                # Fallback to local HMAC-SHA256 check
-                msg = f"{razorpay_order_id}|{razorpay_payment_id}".encode("utf-8")
-                gen_sig = hmac.new(self.key_secret.encode("utf-8"), msg, hashlib.sha256).hexdigest()
-                if hmac.compare_digest(gen_sig, razorpay_signature):
-                    return True
-                print(f"Razorpay signature verification failed: {e}")
-                return False
+            except Exception:
+                pass  # Fall through to HMAC fallback
 
-        # Standard HMAC SHA256 verification
-        msg = f"{razorpay_order_id}|{razorpay_payment_id}".encode("utf-8")
-        generated_signature = hmac.new(
-            self.key_secret.encode("utf-8"),
-            msg,
-            hashlib.sha256
-        ).hexdigest()
-
-        return hmac.compare_digest(generated_signature, razorpay_signature)
+        # Local HMAC SHA256 verification as fallback
+        try:
+            msg = f"{razorpay_order_id}|{razorpay_payment_id}".encode("utf-8")
+            generated_signature = hmac.new(
+                self.key_secret.encode("utf-8"),
+                msg,
+                hashlib.sha256
+            ).hexdigest()
+            return hmac.compare_digest(generated_signature, razorpay_signature)
+        except Exception as e:
+            print(f"Razorpay signature verification error: {e}")
+            return False
 
     def validate_card_details(
         self,
@@ -246,6 +245,7 @@ class PaymentManager:
         """
         Creates a Razorpay Order from the current shopping cart total and returns the payload
         with needs_razorpay_checkout: True so the frontend immediately opens the Razorpay Checkout popup.
+        Works without requiring AP2 authorization — any cart can be checked out.
         """
         from backend.cart_manager import cart_manager
         cart = cart_manager.get_cart(user_id)
@@ -260,7 +260,7 @@ class PaymentManager:
 
         rzp_order = self.create_order(total_amount, receipt_id, currency=currency)
         if not rzp_order.get("success"):
-            return {"success": False, "error": "Failed to create Razorpay Order for cart checkout."}
+            return {"success": False, "error": f"Failed to create Razorpay Order: {rzp_order.get('error', 'Unknown error')}"}
 
         user = cart_manager.get_user(user_id)
         user_name = user.get("name", "Valued Customer") if user else "Valued Customer"
@@ -276,10 +276,10 @@ class PaymentManager:
             "user_id": user_id,
             "prefill": {
                 "name": user_name,
-                "email": f"{user_id}@growthcommerce.ai",
+                "email": f"{user_id}@nova-store.ai",
                 "contact": "9999999999"
             },
-            "message": f"🛒 **Order Prepared!** Cart Total: **${total_amount:.2f}** ({cart.get('item_count', 0)} item(s)). Opening Razorpay Secure Checkout popup now..."
+            "message": f"🛒 **Order Ready!** Cart Total: **₹{total_amount:,.2f}** ({cart.get('item_count', 0)} item(s)). Opening Razorpay Secure Checkout popup now..."
         }
 
     def process_refund(

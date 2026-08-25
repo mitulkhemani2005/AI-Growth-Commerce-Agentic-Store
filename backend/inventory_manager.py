@@ -242,14 +242,18 @@ class InventoryManager:
                 "product": target
             }
 
-    def update_price(self, product_id: str, new_price: float) -> Dict[str, Any]:
-        """Directly sets PRICE for a product."""
+    def update_price(self, product_id: str, new_price: float, base_price: Optional[float] = None, enforce_base_price: bool = True) -> Dict[str, Any]:
+        """Directly sets PRICE for a product, ensuring it meets or exceeds BASE_PRICE floor if enforced."""
         with _lock:
             products = self._read_inventory()
             found = False
             for p in products:
                 if p.get("id") == product_id or p.get("PRODUCT_NAME", "").lower() == product_id.lower():
-                    p["PRICE"] = round(float(new_price), 2)
+                    if base_price is not None:
+                        p["BASE_PRICE"] = round(float(base_price), 2)
+                    
+                    floor = p.get("BASE_PRICE", 0.0) if enforce_base_price else 0.0
+                    p["PRICE"] = round(max(floor, float(new_price)), 2)
                     found = True
                     target = p
                     break
@@ -261,7 +265,32 @@ class InventoryManager:
 
             return {
                 "success": True,
-                "message": f"Updated price for '{target['PRODUCT_NAME']}' to ${target['PRICE']:.2f}.",
+                "message": f"Updated price for '{target['PRODUCT_NAME']}' to ${target['PRICE']:.2f} (Base: ${target.get('BASE_PRICE', target['PRICE']):.2f}).",
+                "product": target
+            }
+
+    def update_base_price(self, product_id: str, new_base_price: float) -> Dict[str, Any]:
+        """Sets the BASE_PRICE threshold for a product and adjusts current PRICE if below base."""
+        with _lock:
+            products = self._read_inventory()
+            found = False
+            for p in products:
+                if p.get("id") == product_id or p.get("PRODUCT_NAME", "").lower() == product_id.lower():
+                    p["BASE_PRICE"] = round(float(new_base_price), 2)
+                    if p.get("PRICE", 0.0) < p["BASE_PRICE"]:
+                        p["PRICE"] = p["BASE_PRICE"]
+                    found = True
+                    target = p
+                    break
+            if not found:
+                return {"success": False, "error": f"Product '{product_id}' not found."}
+
+            with open(self.file_path, "w", encoding="utf-8") as f:
+                json.dump(products, f, indent=2)
+
+            return {
+                "success": True,
+                "message": f"Updated BASE_PRICE for '{target['PRODUCT_NAME']}' to ${target['BASE_PRICE']:.2f}.",
                 "product": target
             }
 
@@ -291,18 +320,21 @@ class InventoryManager:
             }
 
     def add_product(self, product_data: Dict[str, Any]) -> Dict[str, Any]:
-        """Adds a brand new product to the catalog."""
+        """Adds a brand new product to the catalog with BASE_PRICE."""
         with _lock:
             products = self._read_inventory()
             import uuid
             new_id = product_data.get("id") or f"prod_{uuid.uuid4().hex[:6]}"
+            base_p = float(product_data.get("BASE_PRICE", product_data.get("PRICE", 49.99)))
+            price_p = max(base_p, float(product_data.get("PRICE", base_p)))
             new_prod = {
                 "id": new_id,
                 "PRODUCT_NAME": product_data.get("PRODUCT_NAME", "New Product"),
                 "PRODUCT_TYPE": product_data.get("PRODUCT_TYPE", "Accessories"),
                 "PRODUCT_SIZE": product_data.get("PRODUCT_SIZE", "One Size"),
                 "STOCK_REMAINING": max(0, int(product_data.get("STOCK_REMAINING", 10))),
-                "PRICE": round(float(product_data.get("PRICE", 49.99)), 2),
+                "BASE_PRICE": round(base_p, 2),
+                "PRICE": round(price_p, 2),
                 "RATING": float(product_data.get("RATING", 5.0)),
                 "DESCRIPTION": product_data.get("DESCRIPTION", "Premium product in the autonomous catalog."),
                 "IMAGE": product_data.get("IMAGE", "/static/images/cyberflex_runner.svg"),
@@ -314,14 +346,14 @@ class InventoryManager:
 
             return {
                 "success": True,
-                "message": f"Added product '{new_prod['PRODUCT_NAME']}' (ID: {new_prod['id']}).",
+                "message": f"Added product '{new_prod['PRODUCT_NAME']}' (ID: {new_prod['id']}, Base: ${new_prod['BASE_PRICE']}, Price: ${new_prod['PRICE']}).",
                 "product": new_prod
             }
 
     def bulk_price_adjustment(self, category: Optional[str] = None, percentage: float = 0.0) -> Dict[str, Any]:
         """
         Adjusts prices by percentage (+10 for +10%, -5 for -5% discount).
-        Optionally filters by product category.
+        Respects BASE_PRICE as the absolute minimum threshold.
         """
         with _lock:
             products = self._read_inventory()
@@ -332,7 +364,9 @@ class InventoryManager:
             for p in products:
                 if not cat_clean or cat_clean in p.get("PRODUCT_TYPE", "").lower():
                     current_price = p.get("PRICE", 10.0)
-                    new_price = max(1.0, round(current_price * multiplier, 2))
+                    base_price = p.get("BASE_PRICE", 1.0)
+                    # Enforce that price never falls below BASE_PRICE
+                    new_price = max(base_price, round(current_price * multiplier, 2))
                     p["PRICE"] = new_price
                     updated_count += 1
 
@@ -342,7 +376,7 @@ class InventoryManager:
             action = "increased" if percentage >= 0 else "discounted"
             return {
                 "success": True,
-                "message": f"Successfully {action} prices by {abs(percentage)}% across {updated_count} products.",
+                "message": f"Successfully {action} prices by {abs(percentage)}% across {updated_count} products (BASE_PRICE floor respected).",
                 "updated_count": updated_count,
                 "percentage": percentage
             }

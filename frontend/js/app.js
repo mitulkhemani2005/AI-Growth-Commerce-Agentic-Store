@@ -47,10 +47,21 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function setupEventListeners() {
-  // Search input
+  // Search input & clear button
   catalogSearchInput.addEventListener('input', () => {
+    if (searchClearBtn) {
+      searchClearBtn.style.display = catalogSearchInput.value ? 'block' : 'none';
+    }
     filterAndRenderCatalog();
   });
+
+  if (searchClearBtn) {
+    searchClearBtn.addEventListener('click', () => {
+      catalogSearchInput.value = '';
+      searchClearBtn.style.display = 'none';
+      filterAndRenderCatalog();
+    });
+  }
 
   // Category pills
   categoryPillsContainer.addEventListener('click', (e) => {
@@ -225,7 +236,8 @@ function filterAndRenderCatalog() {
       p.PRODUCT_NAME.toLowerCase().includes(query) ||
       p.PRODUCT_TYPE.toLowerCase().includes(query) ||
       p.PRODUCT_SIZE.toLowerCase().includes(query) ||
-      p.DESCRIPTION.toLowerCase().includes(query);
+      p.DESCRIPTION.toLowerCase().includes(query) ||
+      (Array.isArray(p.TAGS) && p.TAGS.some(t => t.toLowerCase().includes(query)));
     return matchesCategory && matchesQuery;
   });
 
@@ -236,9 +248,10 @@ function filterAndRenderCatalog() {
 function renderProductsGrid(products) {
   if (products.length === 0) {
     productsGrid.innerHTML = `
-      <div style="grid-column: 1/-1; text-align: center; padding: 3rem; color: var(--text-muted);">
-        <i data-lucide="package-x" style="width: 40px; height: 40px; margin-bottom: 0.5rem; opacity: 0.5;"></i>
-        <p>No products match your criteria.</p>
+      <div style="grid-column: 1/-1; text-align: center; padding: 3.5rem 1rem; color: var(--text-muted);">
+        <i data-lucide="package-x" style="width: 44px; height: 44px; margin-bottom: 0.75rem; opacity: 0.4;"></i>
+        <p style="font-size: 1rem; font-weight: 600; color: #cbd5e1;">No products found</p>
+        <p style="font-size: 0.8rem; margin-top: 4px;">Try adjusting your search terms or category filter.</p>
       </div>
     `;
     if (window.lucide) window.lucide.createIcons();
@@ -248,43 +261,56 @@ function renderProductsGrid(products) {
   productsGrid.innerHTML = products.map(prod => {
     const stock = prod.STOCK_REMAINING;
     let stockClass = 'in-stock';
-    let stockText = `In Stock: ${stock}`;
+    let stockText = `● In Stock: ${stock}`;
     if (stock <= 0) {
-      stockClass = 'out-of-stock';
+      stockClass = 'out-stock';
       stockText = 'Out of Stock';
-    } else if (stock <= 6) {
+    } else if (stock <= 5) {
       stockClass = 'low-stock';
-      stockText = `Low Stock: ${stock}`;
+      stockText = `⚠️ Low Stock: ${stock}`;
+    }
+
+    const basePrice = parseFloat(prod.BASE_PRICE || prod.PRICE || 0);
+    const sellingPrice = parseFloat(prod.PRICE || basePrice || 0);
+    const diff = sellingPrice - basePrice;
+    const pct = basePrice > 0 ? ((diff / basePrice) * 100) : 0;
+
+    let surgeTag = '';
+    if (diff > 0.01) {
+      surgeTag = `<span class="dynamic-surge-badge" title="Dynamic AI Surge Optimization">+${pct.toFixed(1)}% AI Surge</span>`;
+    } else {
+      surgeTag = `<span class="dynamic-surge-badge" style="color: #94a3b8;" title="Base Floor Price">🔒 Base Floor</span>`;
     }
 
     return `
       <div class="product-card" id="card-${prod.id}">
-        <div class="product-image-container">
+        <div class="product-image-frame">
           <img src="${prod.IMAGE}" alt="${prod.PRODUCT_NAME}" loading="lazy" />
-          <span class="product-type-badge">${prod.PRODUCT_TYPE}</span>
-          <span class="stock-status-pill ${stockClass}">
-            <span class="status-dot" style="background: currentColor;"></span>
+          <span class="product-category-tag">${prod.PRODUCT_TYPE}</span>
+          <span class="product-stock-tag ${stockClass}">
             ${stockText}
           </span>
         </div>
-        <div class="product-body">
-          <h3 class="product-title">${prod.PRODUCT_NAME}</h3>
-          <div class="product-meta-row">
-            <span class="size-indicator">Size: <strong>${prod.PRODUCT_SIZE}</strong></span>
-            <span class="rating-star">★ ${prod.RATING || '4.8'}</span>
-          </div>
-          <p class="product-desc">${prod.DESCRIPTION}</p>
-          <div class="product-footer">
-            <span class="product-price">$${Number(prod.PRICE).toFixed(2)}</span>
-            <div class="product-btn-group">
-              <button class="card-btn" onclick="handleAddToCart('${prod.id}', '${prod.PRODUCT_SIZE}')" ${stock <= 0 ? 'disabled' : ''}>
-                <i data-lucide="plus" style="width: 14px; height: 14px;"></i> Cart
-              </button>
-              <button class="card-btn buy-now" onclick="handleQuickBuy('${prod.id}', '${prod.PRODUCT_SIZE}')" ${stock <= 0 ? 'disabled' : ''}>
-                <i data-lucide="zap" style="width: 14px; height: 14px;"></i> Buy
-              </button>
+        <div class="product-card-body">
+          <div class="card-title-group">
+            <h3>${prod.PRODUCT_NAME}</h3>
+            <div class="card-meta-row" style="margin-top: 4px;">
+              <span class="size-badge">Size: <strong>${prod.PRODUCT_SIZE}</strong></span>
+              <span class="rating-pill">⭐ ${prod.RATING || '4.8'}</span>
             </div>
           </div>
+          <p class="card-description">${prod.DESCRIPTION}</p>
+          <div class="card-pricing-footer">
+            <div class="price-display-group">
+              <span class="current-selling-price">₹${sellingPrice.toFixed(2)}</span>
+              ${surgeTag}
+            </div>
+            <span class="tax-free-tag">0% TAX FREE</span>
+          </div>
+          <button class="add-to-cart-primary" onclick="handleAddToCart('${prod.id}', '${prod.PRODUCT_SIZE}')" ${stock <= 0 ? 'disabled' : ''} title="Add to Cart">
+            <i data-lucide="shopping-cart"></i>
+            <span>${stock <= 0 ? 'Out of Stock' : 'Add to Cart'}</span>
+          </button>
         </div>
       </div>
     `;
@@ -310,38 +336,38 @@ function renderCart(cart) {
 
   if (!cart.items || cart.items.length === 0) {
     cartItemsList.innerHTML = `
-      <div style="text-align: center; padding: 3rem 1rem; color: var(--text-muted);">
-        <i data-lucide="shopping-cart" style="width: 48px; height: 48px; opacity: 0.4; margin-bottom: 0.5rem;"></i>
-        <p>Your cart is empty.</p>
-        <p style="font-size: 0.78rem; margin-top: 4px;">Ask Nova in the prompt or click "+ Cart" to add items!</p>
+      <div style="text-align: center; padding: 4rem 1rem; color: var(--text-muted);">
+        <i data-lucide="shopping-cart" style="width: 48px; height: 48px; opacity: 0.35; margin-bottom: 0.75rem;"></i>
+        <p style="font-size: 0.95rem; font-weight: 600; color: #cbd5e1;">Your cart is empty</p>
+        <p style="font-size: 0.78rem; margin-top: 4px;">Ask Nova in prompt or click "+ Cart" to add items!</p>
       </div>
     `;
-    cartSubtotalText.innerText = '$0.00';
-    cartTaxText.innerText = '$0.00';
-    cartTotalText.innerText = '$0.00';
+    cartSubtotalText.innerText = '₹0.00';
+    cartTaxText.innerText = '₹0.00';
+    cartTotalText.innerText = '₹0.00';
     if (window.lucide) window.lucide.createIcons();
     return;
   }
 
   cartItemsList.innerHTML = cart.items.map(item => `
-    <div class="cart-item-card">
+    <div class="cart-item-row">
       <img src="${item.IMAGE}" alt="${item.PRODUCT_NAME}" class="cart-item-img" />
       <div class="cart-item-info">
-        <h4 class="cart-item-title">${item.PRODUCT_NAME}</h4>
-        <div class="cart-item-meta">Size: ${item.PRODUCT_SIZE} • Stock: ${item.STOCK_REMAINING}</div>
-        <div class="cart-item-price">$${Number(item.PRICE).toFixed(2)} × ${item.quantity} = $${Number(item.item_total).toFixed(2)}</div>
+        <h4>${item.PRODUCT_NAME}</h4>
+        <div class="cart-item-sub">Size: ${item.PRODUCT_SIZE} • Available Stock: ${item.STOCK_REMAINING}</div>
+        <div class="cart-item-price-calc">₹${Number(item.PRICE).toFixed(2)} × ${item.quantity} = ₹${Number(item.item_total).toFixed(2)}</div>
       </div>
-      <div class="cart-item-controls">
-        <button class="qty-btn" onclick="handleRemoveFromCart('${item.id}', 1)">-</button>
-        <span style="font-size: 0.85rem; font-weight: 600; min-width: 16px; text-align: center;">${item.quantity}</span>
-        <button class="qty-btn" onclick="handleAddToCart('${item.id}', '${item.PRODUCT_SIZE}')">+</button>
+      <div class="cart-item-stepper">
+        <button class="stepper-btn" onclick="handleRemoveFromCart('${item.id}', 1)" title="Decrease Quantity">-</button>
+        <span style="font-size: 0.85rem; font-weight: 700; min-width: 18px; text-align: center;">${item.quantity}</span>
+        <button class="stepper-btn" onclick="handleAddToCart('${item.id}', '${item.PRODUCT_SIZE}')" title="Increase Quantity">+</button>
       </div>
     </div>
   `).join('');
 
-  cartSubtotalText.innerText = `$${Number(cart.subtotal).toFixed(2)}`;
-  cartTaxText.innerText = `$${Number(cart.estimated_tax).toFixed(2)}`;
-  cartTotalText.innerText = `$${Number(cart.estimated_total).toFixed(2)}`;
+  cartSubtotalText.innerText = `₹${Number(cart.subtotal).toFixed(2)}`;
+  cartTaxText.innerText = `₹${Number(cart.estimated_tax || 0).toFixed(2)}`;
+  cartTotalText.innerText = `₹${Number(cart.estimated_total).toFixed(2)}`;
 
   if (window.lucide) window.lucide.createIcons();
 }
@@ -430,9 +456,12 @@ async function checkAP2Status() {
 }
 
 // 3. Checkout & Razorpay Gateway
+let pendingSimOrderData = null;
+let pendingSimAuthorizeMode = false;
+
 async function payWithRazorpay(authorizeMode = false) {
   try {
-    // 1. Request backend to create Razorpay Order
+    // 1. Create Razorpay order via backend
     const orderRes = await fetch('/api/payment/create-order', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -441,7 +470,7 @@ async function payWithRazorpay(authorizeMode = false) {
     const orderData = await orderRes.json();
 
     if (!orderData.success) {
-      alert(`Payment initialization failed: ${orderData.detail || 'Cart is empty'}`);
+      alert(`Payment initialization failed: ${orderData.error || orderData.detail || 'Cart is empty or Razorpay API error.'}`);
       return;
     }
 
@@ -449,54 +478,108 @@ async function payWithRazorpay(authorizeMode = false) {
     const rzpOrderId = orderData.razorpay_order_id;
     const amount = orderData.amount;
 
-    // If Razorpay JS SDK is loaded and we have active key
-    if (window.Razorpay) {
-      const options = {
-        key: keyId,
-        amount: amount,
-        currency: orderData.currency || 'INR',
-        name: 'AI Growth Commerce',
-        description: authorizeMode ? '🔐 AP2 Auto-Pay Authorization (One-time Setup)' : 'Autonomous E-Commerce Store Purchase',
-        image: '/static/images/cyberflex_runner.svg',
-        order_id: rzpOrderId,
-        handler: async function (response) {
-          // On Payment Success, verify with backend & save AP2 token
-          await verifyAndCompleteRazorpayPayment({
-            razorpay_order_id: response.razorpay_order_id || rzpOrderId,
-            razorpay_payment_id: response.razorpay_payment_id,
-            razorpay_signature: response.razorpay_signature || 'sandbox_verified'
-          }, authorizeMode);
-        },
-        prefill: {
-          name: activeUserName,
-          email: `${activeUserId}@growthcommerce.ai`,
-          contact: '9999999999'
-        },
-        theme: {
-          color: authorizeMode ? '#7c3aed' : '#2563eb'
-        },
-        modal: {
-          ondismiss: function () {
-            console.log('Razorpay Checkout closed by user.');
-          }
-        }
-      };
-      const rzp = new window.Razorpay(options);
-      rzp.open();
-    } else {
-      // Sandbox Instant Test Flow
-      const testPaymentId = `pay_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
-      await verifyAndCompleteRazorpayPayment({
-        razorpay_order_id: rzpOrderId,
-        razorpay_payment_id: testPaymentId,
-        razorpay_signature: 'sandbox_verified'
-      }, authorizeMode);
+    // Always launch real Razorpay Checkout
+    if (!window.Razorpay) {
+      alert('Razorpay SDK not loaded. Please check your internet connection and reload the page.');
+      return;
     }
+
+    const options = {
+      key: keyId,
+      amount: amount,
+      currency: orderData.currency || 'INR',
+      name: 'NOVA Store',
+      description: authorizeMode
+        ? '🔐 AP2 Auto-Pay Authorization (One-time Setup)'
+        : 'NOVA Official Store — Secure Checkout',
+      image: '/static/images/phone_flagship.svg',
+      order_id: rzpOrderId,
+      handler: async function (response) {
+        await verifyAndCompleteRazorpayPayment({
+          razorpay_order_id: response.razorpay_order_id || rzpOrderId,
+          razorpay_payment_id: response.razorpay_payment_id,
+          razorpay_signature: response.razorpay_signature
+        }, authorizeMode);
+      },
+      prefill: {
+        name: activeUserName,
+        email: `${activeUserId}@nova-store.ai`,
+        contact: '9876543210'
+      },
+      notes: {
+        store: 'NOVA Agentic E-Commerce Store',
+        user_id: activeUserId
+      },
+      theme: {
+        color: authorizeMode ? '#7c3aed' : '#2563eb'
+      },
+      modal: {
+        ondismiss: function () {
+          console.log('Razorpay Checkout dismissed by user.');
+        }
+      }
+    };
+
+    const rzp = new window.Razorpay(options);
+    rzp.on('payment.failed', function (response) {
+      console.error('Razorpay payment failed:', response.error);
+      alert(`Payment failed: ${response.error.description}`);
+    });
+    rzp.open();
+
   } catch (err) {
     console.error('Razorpay Checkout Error:', err);
-    alert('Payment error: ' + err);
+    alert('Payment error: ' + err.message);
   }
 }
+
+function openRazorpaySimulator(orderData, authorizeMode = false) {
+  pendingSimOrderData = orderData;
+  pendingSimAuthorizeMode = authorizeMode;
+
+  const simOverlay = document.getElementById('razorpaySimulatorModalOverlay');
+  const amountText = document.getElementById('rzpSimAmountText');
+  const btnText = document.getElementById('confirmRzpSimBtnText');
+
+  const inrAmount = (orderData.amount / 100).toFixed(2);
+  if (amountText) amountText.innerText = `₹${inrAmount}`;
+  if (btnText) {
+    btnText.innerText = authorizeMode 
+      ? `Authorize AP2 Auto-Pay (₹${inrAmount})` 
+      : `Pay & Confirm Order (₹${inrAmount})`;
+  }
+
+  if (simOverlay) simOverlay.classList.add('open');
+  if (window.lucide) window.lucide.createIcons();
+}
+
+window.selectRzpMethod = function(element) {
+  document.querySelectorAll('.rzp-sim-method').forEach(m => m.classList.remove('active'));
+  element.classList.add('active');
+};
+
+// Confirm simulator payment
+document.getElementById('confirmRzpSimPaymentBtn')?.addEventListener('click', async () => {
+  if (!pendingSimOrderData) return;
+  const simOverlay = document.getElementById('razorpaySimulatorModalOverlay');
+  if (simOverlay) simOverlay.classList.remove('open');
+
+  const testPaymentId = `pay_rzp_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+  await verifyAndCompleteRazorpayPayment({
+    razorpay_order_id: pendingSimOrderData.razorpay_order_id,
+    razorpay_payment_id: testPaymentId,
+    razorpay_signature: 'sandbox_verified',
+    payment_method: 'Razorpay Verified (Instant Settlement)'
+  }, pendingSimAuthorizeMode);
+
+  pendingSimOrderData = null;
+});
+
+document.getElementById('closeRazorpaySimBtn')?.addEventListener('click', () => {
+  const simOverlay = document.getElementById('razorpaySimulatorModalOverlay');
+  if (simOverlay) simOverlay.classList.remove('open');
+  pendingSimOrderData = null;
+});
 
 async function verifyAndCompleteRazorpayPayment(paymentPayload, authorizeMode = false) {
   try {
@@ -518,9 +601,6 @@ async function verifyAndCompleteRazorpayPayment(paymentPayload, authorizeMode = 
       await loadCatalog();
       await loadCart();
       await loadOrders();
-
-      // AP2 Protocol: Token is automatically saved server-side in /api/payment/verify
-      // Refresh AP2 status banner to reflect the new authorization
       await checkAP2Status();
 
       if (authorizeMode) {
@@ -530,28 +610,22 @@ async function verifyAndCompleteRazorpayPayment(paymentPayload, authorizeMode = 
 Your Razorpay payment has been verified and your card has been authorized for **fully autonomous agent payments**.
 
 - **Payment ID:** \`${verifyData.razorpay_payment_id}\`
-- **AP2 Token:** \`Saved ✅\`
+- **AP2 Protocol:** \`Active & Verified ✅\`
 
-**From now on**, when you ask me to order anything, I will:
-1. Search & add products to cart ⚡
-2. Pay automatically using your saved card 💳
-3. Confirm order without ANY checkout popup 🤖
-
-Try it: *"Find all accessories, add to cart and order them"*
+**From now on**, when you ask me to order anything, I will pay automatically using your saved card without ANY popup!
         `);
       } else {
         appendAgentMessage(`
 🎉 **Razorpay Payment Verified & Order Confirmed!**
 
 - **Payment ID:** \`${verifyData.razorpay_payment_id}\`
-- **Razorpay Order:** \`${paymentPayload.razorpay_order_id}\`
 - **Order ID:** \`${verifyData.order.order_id}\`
-- **Total Paid:** **$${verifyData.order.total.toFixed(2)}**
-- **Payment Method:** \`Razorpay Gateway (Online)\`
-- **Delivery To:** ${verifyData.order.shipping_address}
-${verifyData.ap2_token_saved ? '\n🔐 **AP2 Auto-Pay token saved** — agent can now pay autonomously for future orders!' : ''}
+- **Total Paid:** **₹${verifyData.order.total.toFixed(2)}**
+- **Payment Method:** \`Razorpay Gateway (Online Verified)\`
+- **Delivery Destination:** ${verifyData.order.shipping_address}
+- **Carrier Tracking:** \`${verifyData.order.tracking_number || 'Generated by Dispatcher'}\`
 
-*Inventory has been deducted in real-time in \`inventory.json\`!*
+*Inventory automatically deducted in real-time in \`inventory.json\`!*
         `);
       }
     } else {
@@ -559,9 +633,9 @@ ${verifyData.ap2_token_saved ? '\n🔐 **AP2 Auto-Pay token saved** — agent ca
     }
   } catch (err) {
     console.error('Verification error:', err);
+    alert('Payment verification error: ' + err);
   }
 }
-
 
 // 4. Order History
 async function loadOrders() {
@@ -579,9 +653,10 @@ async function loadOrders() {
 function renderOrdersModal(orders) {
   if (orders.length === 0) {
     ordersModalBody.innerHTML = `
-      <div style="text-align: center; padding: 3rem; color: var(--text-muted);">
-        <i data-lucide="package-open" style="width: 44px; height: 44px; opacity: 0.4; margin-bottom: 0.5rem;"></i>
-        <p>No past orders found for this account.</p>
+      <div style="text-align: center; padding: 3.5rem 1rem; color: var(--text-muted);">
+        <i data-lucide="package-open" style="width: 48px; height: 48px; opacity: 0.35; margin-bottom: 0.75rem;"></i>
+        <p style="font-size: 1rem; font-weight: 600; color: #cbd5e1;">No Orders Yet</p>
+        <p style="font-size: 0.8rem; margin-top: 4px;">Items purchased with Razorpay or AP2 will appear here in real time.</p>
       </div>
     `;
     if (window.lucide) window.lucide.createIcons();
@@ -589,60 +664,89 @@ function renderOrdersModal(orders) {
   }
 
   const dashboardBanner = `
-    <div class="razorpay-dashboard-banner">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
-        <strong style="color: #fff;"><i data-lucide="shield-alert" style="width: 14px; height: 14px; vertical-align: middle; color: var(--accent-primary);"></i> Razorpay Dashboard Integration Tip:</strong>
-        <span style="font-size: 0.7rem; background: rgba(59, 130, 246, 0.25); color: #93c5fd; padding: 0.15rem 0.5rem; border-radius: 4px;">Test Mode Active</span>
+    <div class="notice-box blue-notice" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+      <div style="display: flex; align-items: center; gap: 0.5rem;">
+        <i data-lucide="shield-check" style="width: 18px; height: 18px; color: #60a5fa; flex-shrink: 0;"></i>
+        <div>
+          <strong style="color: #fff; font-size: 0.82rem;">Razorpay Verified & 24/7 Dispatch Mesh:</strong>
+          <div style="font-size: 0.74rem; color: #93c5fd; margin-top: 2px;">Orders eligible for 1-click refund within 24 hours prior to carrier transit.</div>
+        </div>
       </div>
-      <p style="margin: 0; line-height: 1.4;">To view your live test transactions, log in to <a href="https://dashboard.razorpay.com" target="_blank" style="color: var(--accent-primary); text-decoration: underline;">dashboard.razorpay.com</a> and ensure the top toggle is switched to <strong>"Test Mode"</strong>. You can view <a href="https://dashboard.razorpay.com/app/orders" target="_blank" style="color: #93c5fd;">Orders</a>, <a href="https://dashboard.razorpay.com/app/payments" target="_blank" style="color: #93c5fd;">Payments</a>, and <a href="https://dashboard.razorpay.com/app/refunds" target="_blank" style="color: #93c5fd;">Refunds</a> in real-time.</p>
+      <span style="font-size: 0.68rem; background: rgba(59, 130, 246, 0.25); color: #93c5fd; padding: 0.2rem 0.5rem; border-radius: 4px; font-weight: 700;">INR Official</span>
     </div>
   `;
 
   const ordersCards = orders.map(ord => {
-    const dateStr = new Date(ord.created_at).toLocaleString();
-    const isRefunded = ord.status === 'Refunded';
+    const dateStr = new Date(ord.created_at || Date.now()).toLocaleString();
+    const isRefunded = (ord.status || '').toLowerCase() === 'refunded';
+    const statusClass = (ord.status || 'confirmed').toLowerCase();
     const refundDetails = ord.refund_details || {};
+    const trackingNo = ord.tracking_number || 'TRK-' + (ord.order_id || '1001').replace('ORD-', '') + 'A9B';
+    const paymentMethod = ord.payment_method || (ord.payment_id ? 'Razorpay Verified' : 'AP2 Protocol');
+    const shippingAddress = ord.shipping_address || (activeUserId === 'user_sarah' ? 'Sarah Chen, 102 Innovation Park, Hyderabad' : 'Alex Mercer, 742 Tech Hub, Bengaluru');
+
+    const itemsHtml = (ord.items || []).map(item => {
+      const pName = item.PRODUCT_NAME || item.product_name || item.name || 'NOVA Product';
+      const pSize = item.PRODUCT_SIZE || item.size || 'Standard';
+      const pQty = item.quantity || item.qty || 1;
+      const pPrice = Number(item.price || item.unit_price || 0);
+      const itemSubtotal = (pPrice * pQty).toFixed(2);
+
+      return `
+        <div class="order-item-chip">
+          <div class="order-item-left">
+            <span class="order-item-qty">${pQty}x</span>
+            <span class="order-item-name">${pName}</span>
+            <span class="order-item-specs">${pSize}</span>
+          </div>
+          <span class="order-item-price">₹${itemSubtotal}</span>
+        </div>
+      `;
+    }).join('');
 
     return `
       <div class="order-history-card">
-        <div class="order-card-header">
+        <div class="order-card-top">
           <div>
-            <span class="order-id">${ord.order_id}</span>
-            <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 2px;">${dateStr}</div>
+            <div class="order-id-code">${ord.order_id}</div>
+            <div class="order-date-text">${dateStr}</div>
           </div>
-          <div style="display: flex; align-items: center; gap: 0.5rem;">
-            <span class="order-status ${isRefunded ? 'refunded' : ''}">${ord.status}</span>
+          <div class="order-status-group">
+            <span class="status-badge-pill ${statusClass}">
+              ● ${ord.status || 'Confirmed'}
+            </span>
+            <span class="order-tracking-pill" title="Carrier Tracking Number">
+              <i data-lucide="truck"></i> ${trackingNo}
+            </span>
             ${!isRefunded ? `
-              <button class="refund-btn" onclick="handleOrderRefund('${ord.order_id}')" title="Issue Razorpay Refund & Restock Inventory">
-                <i data-lucide="rotate-ccw" style="width: 12px; height: 12px;"></i> Refund
+              <button class="order-refund-btn" onclick="handleOrderRefund('${ord.order_id}')" title="Issue Razorpay Refund & Restock Inventory">
+                <i data-lucide="rotate-ccw"></i> Refund
               </button>
             ` : ''}
           </div>
         </div>
-        <table class="order-items-table">
-          ${ord.items.map(item => `
-            <tr>
-              <td class="name">${item.quantity}x ${item.PRODUCT_NAME} <span style="font-size: 0.72rem; color: var(--text-muted);">(${item.PRODUCT_SIZE})</span></td>
-              <td class="price">$${Number(item.price * item.quantity).toFixed(2)}</td>
-            </tr>
-          `).join('')}
-        </table>
-        <div class="order-card-footer">
-          <div>
-            <span style="font-size: 0.72rem; color: var(--text-accent);">⚡ ${ord.payment_method}</span>
-            <div style="font-size: 0.72rem; color: var(--text-muted);">Ship to: ${ord.shipping_address}</div>
-            ${isRefunded ? `
-              <div class="refund-info-badge">
-                <i data-lucide="check-circle-2" style="width: 12px; height: 12px; vertical-align: middle;"></i> 
-                Refund ID: ${refundDetails.refund_id || 'Processed'} • Credited back to account
-              </div>
-            ` : ''}
+
+        <div class="order-items-grid">
+          ${itemsHtml}
+        </div>
+
+        <div class="order-card-bottom">
+          <div class="order-meta-info">
+            <span class="order-payment-method">⚡ ${paymentMethod}</span>
+            <span class="order-ship-address">📍 Ship to: ${shippingAddress}</span>
           </div>
-          <div style="text-align: right;">
-            <span style="font-size: 0.75rem; color: var(--text-muted);">Total: </span>
-            <span class="order-total-highlight ${isRefunded ? 'style="text-decoration: line-through; opacity: 0.6;"' : ''}">$${Number(ord.total).toFixed(2)}</span>
+          <div class="order-total-block">
+            <div class="order-total-label">Grand Total:</div>
+            <div class="order-total-value ${isRefunded ? 'is-refunded' : ''}">₹${Number(ord.total || 0).toFixed(2)}</div>
           </div>
         </div>
+
+        ${isRefunded ? `
+          <div class="order-refund-alert">
+            <i data-lucide="check-circle-2"></i>
+            <span><strong>Refund Completed:</strong> Refund ID: <code>${refundDetails.refund_id || 'Processed'}</code> • Amount ₹${Number(refundDetails.amount || ord.total || 0).toFixed(2)} credited back to account.</span>
+          </div>
+        ` : ''}
       </div>
     `;
   }).join('');

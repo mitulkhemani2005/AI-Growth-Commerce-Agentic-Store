@@ -67,9 +67,10 @@ class CartManager:
             "customer_name": user.get("name", "Valued Customer"),
             "items": enriched_items,
             "item_count": total_items,
+            "currency": "INR",
             "subtotal": round(subtotal, 2),
-            "estimated_tax": round(subtotal * 0.08, 2),
-            "estimated_total": round(subtotal * 1.08, 2)
+            "estimated_tax": 0.0,
+            "estimated_total": round(subtotal, 2)
         }
 
     def add_to_cart(self, user_id: str, product_identifier: str, quantity: int = 1, size: Optional[str] = None) -> Dict[str, Any]:

@@ -105,9 +105,9 @@ class OrderManager:
                 }
             deducted_items = deduct_res.get("deducted_items", [])
 
-        # Calculate totals
-        tax = round(subtotal * 0.08, 2)
-        total = round(subtotal + tax, 2)
+        # Calculate totals (0% Tax Free Storewide in INR)
+        tax = 0.0
+        total = round(subtotal, 2)
 
         order_id = f"ORD-{datetime.utcnow().strftime('%M%S')}-{uuid.uuid4().hex[:4].upper()}"
         new_order = {
@@ -119,8 +119,9 @@ class OrderManager:
             "delivery_estimate": "2-3 Business Days",
             "tracking_number": None,
             "items": order_items,
+            "currency": "INR",
             "subtotal": round(subtotal, 2),
-            "tax": tax,
+            "tax": 0.0,
             "total": total,
             "payment_method": payment_method,
             "payment_details": payment_details or {},
@@ -301,7 +302,7 @@ class OrderManager:
 
         # Restock inventory in inventory.json if it was deducted
         if order.get("inventory_deducted", True):
-            items_to_restore = [{"id": item["id"], "quantity": item.get("quantity", 1)} for item in order.get("items", [])]
+            items_to_restore = [{"id": item.get("id") or item.get("product_id", ""), "quantity": item.get("quantity", 1)} for item in order.get("items", [])]
             inventory_manager.restore_stock(items_to_restore)
             order["inventory_deducted"] = False
 

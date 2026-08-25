@@ -44,6 +44,7 @@ secrets.json
 
 # ---- Data Files (runtime-generated, can be large or sensitive) ----
 data/agent_logs.json
+data/agent_messages.json
 data/orders.json
 data/users.json
 data/reviews.json

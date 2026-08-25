@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+  <circle cx="200" cy="200" r="130" fill="#f59e0b" opacity="0.12"/>
+  <!-- Compact Mobile Charger Adapter -->
+  <rect x="135" y="120" width="130" height="130" rx="20" fill="#0f172a" stroke="#f59e0b" stroke-width="2.5"/>
+  <!-- Fast Charge Bolt Icon -->
+  <polygon points="205,145 190,185 205,185 195,220 215,180 200,180" fill="#fbbf24"/>
+  <!-- USB-C Fast Port -->
+  <rect x="175" y="225" width="50" height="12" rx="6" fill="#1e293b" stroke="#f59e0b" stroke-width="1.5"/>
+  <!-- Wall Prongs -->
+  <rect x="160" y="80" width="14" height="40" rx="3" fill="#94a3b8"/>
+  <rect x="226" y="80" width="14" height="40" rx="3" fill="#94a3b8"/>
+</svg>

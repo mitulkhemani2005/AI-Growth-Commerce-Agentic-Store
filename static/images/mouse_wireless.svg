@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+  <defs>
+    <linearGradient id="mouseBody" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+  </defs>
+  <circle cx="200" cy="200" r="130" fill="#6366f1" opacity="0.12"/>
+  <!-- Ergonomic Mouse Body -->
+  <path d="M140 180 C140 90, 260 90, 260 180 C260 280, 230 320, 200 320 C170 320, 140 280, 140 180 Z" fill="url(#mouseBody)" stroke="#818cf8" stroke-width="2.5"/>
+  <!-- Center Split Line -->
+  <line x1="200" y1="95" x2="200" y2="180" stroke="#475569" stroke-width="2"/>
+  <!-- Metallic Scroll Wheel -->
+  <rect x="193" y="120" width="14" height="35" rx="7" fill="#0f172a" stroke="#38bdf8" stroke-width="2"/>
+  <!-- Thumb Rest Wing with RGB Stripe -->
+  <path d="M140 200 C120 220, 120 270, 145 285" fill="none" stroke="#a855f7" stroke-width="3" stroke-linecap="round"/>
+</svg>

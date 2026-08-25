@@ -7,11 +7,14 @@ from typing import Dict, Any, Optional
 from backend.admin_agents import (
     price_manager_agent,
     inventory_manager_agent,
-    order_manager_agent,
-    refund_manager_agent,
+    order_management_agent,
+    finance_manager_agent,
     dispatcher_agent,
-    review_feedback_agent
+    review_feedback_agent,
+    ceo_agent,
+    message_bus
 )
+
 
 def format_interval_human(seconds: int) -> str:
     """Helper to format seconds into clean human-readable intervals (e.g. 2m, 5m, 2h)."""
@@ -29,75 +32,86 @@ class BackgroundAgentWorker:
     def __init__(self):
         self._running = False
         self._task = None
-        self.tick_sleep_seconds = 5  # Internal scheduler evaluation loop tick
+        self.tick_sleep_seconds = 2  # Evaluation loop tick every 2 seconds
 
-        # Per-agent independent schedule configurations (Loaded from .env with sensible defaults)
+        # Per-agent independent schedule configurations (Sensible collaborative intervals)
         self.agent_states: Dict[str, Dict[str, Any]] = {
             "dispatcher": {
                 "name": "Dispatcher Agent",
                 "status": "RUNNING 24/7",
                 "enabled": True,
-                "interval_seconds": int(os.environ.get("DISPATCHER_INTERVAL_SECONDS", "120")),  # 2 min
+                "interval_seconds": int(os.environ.get("DISPATCHER_INTERVAL_SECONDS", "15")),
                 "last_run": None,
                 "last_run_ts": 0.0,
                 "actions_count": 0,
                 "icon": "truck",
-                "description": "Packages confirmed orders, assigns tracking numbers (TRK-XXXXX), and dispatches logistics."
+                "description": "Packages confirmed orders, assigns tracking numbers (TRK-XXXXX), and dispatches logistics in real time."
             },
             "inventory_manager": {
                 "name": "Inventory Manager Agent",
                 "status": "RUNNING 24/7",
                 "enabled": True,
-                "interval_seconds": int(os.environ.get("INVENTORY_AGENT_INTERVAL_SECONDS", "300")),  # 5 min
+                "interval_seconds": int(os.environ.get("INVENTORY_AGENT_INTERVAL_SECONDS", "20")),
                 "last_run": None,
                 "last_run_ts": 0.0,
                 "actions_count": 0,
                 "icon": "package",
-                "description": "Audits warehouse stock and autonomously restocks SKUs falling below threshold."
+                "description": "Audits warehouse stock, restocks SKUs below threshold, signals high-demand to Price Manager, reports low-stock to CEO."
             },
-            "refund_manager": {
-                "name": "Refund Manager Agent",
+            "finance_manager": {
+                "name": "Finance Manager Agent",
                 "status": "RUNNING 24/7",
                 "enabled": True,
-                "interval_seconds": int(os.environ.get("REFUND_AGENT_INTERVAL_SECONDS", "3600")),  # 1 hour
+                "interval_seconds": int(os.environ.get("FINANCE_AGENT_INTERVAL_SECONDS", "30")),
                 "last_run": None,
                 "last_run_ts": 0.0,
                 "actions_count": 0,
-                "icon": "rotate-ccw",
-                "description": "Enforces 24h & non-shipped refund policy; autonomously processes Razorpay refunds & restocks."
+                "icon": "dollar-sign",
+                "description": "Monitors financial health (revenue, GMV, refund rate). Auto-approves refunds ≤24h & not Shipped/Delivered. Reports P&L to CEO."
             },
             "price_manager": {
                 "name": "Price Manager Agent",
                 "status": "RUNNING 24/7",
                 "enabled": True,
-                "interval_seconds": int(os.environ.get("PRICE_AGENT_INTERVAL_SECONDS", "120")),  # 2 min
+                "interval_seconds": int(os.environ.get("PRICE_AGENT_INTERVAL_SECONDS", "25")),
                 "last_run": None,
                 "last_run_ts": 0.0,
                 "actions_count": 0,
                 "icon": "tag",
-                "description": "Autonomously optimizes item prices based on demand and warehouse stock ratios."
+                "description": "Autonomously optimizes selling prices based on demand signals, inventory levels, and strict owner BASE_PRICE floors."
             },
             "order_manager": {
-                "name": "Order Manager Agent",
+                "name": "Order Management Agent",
                 "status": "RUNNING 24/7",
                 "enabled": True,
-                "interval_seconds": int(os.environ.get("ORDER_AGENT_INTERVAL_SECONDS", "1800")),  # 30 min
+                "interval_seconds": int(os.environ.get("ORDER_AGENT_INTERVAL_SECONDS", "20")),
                 "last_run": None,
                 "last_run_ts": 0.0,
                 "actions_count": 0,
                 "icon": "clipboard-list",
-                "description": "Monitors SLA adherence and audits lifetime order lifecycle states (Pending -> Delivered)."
+                "description": "Monitors SLA adherence, audits order lifecycle states (Pending→Delivered), receives dispatch reports from Inventory Manager."
             },
             "review_manager": {
-                "name": "Review & Feedback Manager",
+                "name": "Review & Feedback Agent",
                 "status": "RUNNING 24/7",
                 "enabled": True,
-                "interval_seconds": int(os.environ.get("REVIEW_AGENT_INTERVAL_SECONDS", "7200")),  # 2 hours
+                "interval_seconds": int(os.environ.get("REVIEW_AGENT_INTERVAL_SECONDS", "45")),
                 "last_run": None,
                 "last_run_ts": 0.0,
                 "actions_count": 0,
                 "icon": "star",
-                "description": "Analyzes customer sentiment via Groq LLM; auto-updates product listings with review summaries."
+                "description": "Analyzes customer sentiment via Groq LLM; auto-updates product listings with AI review summaries; alerts CEO on low-rated products."
+            },
+            "ceo": {
+                "name": "CEO Agent",
+                "status": "RUNNING 24/7",
+                "enabled": True,
+                "interval_seconds": int(os.environ.get("CEO_AGENT_INTERVAL_SECONDS", "30")),
+                "last_run": None,
+                "last_run_ts": 0.0,
+                "actions_count": 0,
+                "icon": "briefcase",
+                "description": "Head of all agents. Continuously processes inter-agent messages, makes strategic decisions, issues directives, and reports to Owner."
             }
         }
 
@@ -111,7 +125,7 @@ class BackgroundAgentWorker:
             self._task = loop.create_task(self._run_loop())
         except RuntimeError:
             pass
-        print("[24/7 Background Workers] Autonomous AI Agent Fleet successfully started with independent intervals!")
+        print("[24/7 Background Workers] Autonomous AI Agent Fleet (7 agents with per-agent API keys) started!", flush=True)
 
     def stop(self):
         self._running = False
@@ -132,18 +146,20 @@ class BackgroundAgentWorker:
 
     async def check_and_run_due_agents(self) -> Dict[str, Any]:
         """
-        Periodically checks each agent's individual schedule (2min, 5min, 2h, etc.)
-        and triggers execution only when its configured interval has elapsed.
+        Periodically checks each agent's individual schedule and triggers execution
+        only when its configured interval has elapsed.
+        Order matters: run specialized agents before CEO so CEO has fresh messages to process.
         """
         now_ts = time.time()
         results = {}
         agents_map = {
             "dispatcher": dispatcher_agent,
             "inventory_manager": inventory_manager_agent,
-            "refund_manager": refund_manager_agent,
+            "finance_manager": finance_manager_agent,
             "price_manager": price_manager_agent,
-            "order_manager": order_manager_agent,
-            "review_manager": review_feedback_agent
+            "order_manager": order_management_agent,
+            "review_manager": review_feedback_agent,
+            "ceo": ceo_agent  # CEO runs last so it can process all fresh messages
         }
 
         for key, agent_instance in agents_map.items():
@@ -166,7 +182,7 @@ class BackgroundAgentWorker:
                     results[key] = res
                 except Exception as e:
                     state["status"] = "ERROR"
-                    print(f"Error running autonomous agent {key}: {e}", flush=True)
+                    print(f"Error running autonomous agent '{key}': {e}", flush=True)
                     results[key] = {"error": str(e)}
 
         return results
@@ -176,10 +192,11 @@ class BackgroundAgentWorker:
         agents_map = {
             "dispatcher": dispatcher_agent,
             "inventory_manager": inventory_manager_agent,
-            "refund_manager": refund_manager_agent,
+            "finance_manager": finance_manager_agent,
             "price_manager": price_manager_agent,
-            "order_manager": order_manager_agent,
-            "review_manager": review_feedback_agent
+            "order_manager": order_management_agent,
+            "review_manager": review_feedback_agent,
+            "ceo": ceo_agent
         }
         if agent_key not in agents_map:
             return {"success": False, "error": f"Unknown agent '{agent_key}'"}
@@ -199,11 +216,11 @@ class BackgroundAgentWorker:
             return {"success": False, "error": str(e)}
 
     def update_agent_interval(self, agent_key: str, interval_seconds: int) -> Dict[str, Any]:
-        """Dynamically update an agent's execution interval (e.g. 120 for 2m, 300 for 5m, 7200 for 2h)."""
+        """Dynamically update an agent's execution interval."""
         if agent_key not in self.agent_states:
             return {"success": False, "error": f"Unknown agent '{agent_key}'"}
-        
-        interval_seconds = max(10, int(interval_seconds))
+
+        interval_seconds = max(1, int(interval_seconds))
         self.agent_states[agent_key]["interval_seconds"] = interval_seconds
         human_str = format_interval_human(interval_seconds)
         return {
@@ -215,7 +232,7 @@ class BackgroundAgentWorker:
         }
 
     def get_status(self) -> Dict[str, Any]:
-        """Returns live statuses, individual schedule intervals, and telemetry for all 6 agents."""
+        """Returns live statuses, individual schedule intervals, and telemetry for all 7 agents."""
         enriched_agents = {}
         now_ts = time.time()
         for k, v in self.agent_states.items():
@@ -230,8 +247,10 @@ class BackgroundAgentWorker:
 
         return {
             "is_running_24_7": self._running,
-            "agents": enriched_agents
+            "agents": enriched_agents,
+            "message_bus_snapshot": message_bus.get_inbox_snapshot()
         }
+
 
 # Global singleton
 background_worker = BackgroundAgentWorker()

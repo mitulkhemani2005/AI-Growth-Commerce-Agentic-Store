@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+  <defs>
+    <linearGradient id="foldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="50%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#3b82f6"/>
+    </linearGradient>
+  </defs>
+  <!-- Aura -->
+  <circle cx="200" cy="200" r="140" fill="#3b82f6" opacity="0.15"/>
+  <!-- Left Screen Half -->
+  <rect x="70" y="80" width="125" height="240" rx="16" fill="url(#foldGrad)" stroke="#60a5fa" stroke-width="2.5"/>
+  <!-- Right Screen Half -->
+  <rect x="205" y="80" width="125" height="240" rx="16" fill="url(#foldGrad)" stroke="#60a5fa" stroke-width="2.5"/>
+  <!-- Central Flexible Hinge -->
+  <rect x="193" y="76" width="14" height="248" rx="7" fill="#1e1b4b" stroke="#818cf8" stroke-width="2"/>
+  <!-- Wallpaper Art -->
+  <path d="M90 200 Q 140 140, 200 200 T 310 200" fill="none" stroke="#38bdf8" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="130" cy="150" r="18" fill="#a855f7" opacity="0.8"/>
+  <circle cx="270" cy="150" r="18" fill="#38bdf8" opacity="0.8"/>
+</svg>

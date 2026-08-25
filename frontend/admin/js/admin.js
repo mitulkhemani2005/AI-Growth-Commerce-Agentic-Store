@@ -4,7 +4,7 @@ let cachedProducts = [];
 let cachedOrders = [];
 let cachedReviews = [];
 let cachedAgents = {};
-let pollingInterval = null;
+let telemetryPollingInterval = null;
 
 document.addEventListener('DOMContentLoaded', () => {
   if (window.lucide) window.lucide.createIcons();
@@ -12,8 +12,8 @@ document.addEventListener('DOMContentLoaded', () => {
   setupEventListeners();
   loadAllAdminData();
   
-  // Auto-refresh telemetry every 8 seconds for live 24/7 view
-  pollingInterval = setInterval(loadAllAdminData, 8000);
+  // Calm background telemetry poll (every 10s) — only updates status counters/message bus without touching form tables
+  telemetryPollingInterval = setInterval(pollTelemetryData, 10000);
 });
 
 function setupNavigation() {
@@ -37,18 +37,41 @@ function switchTab(tabName) {
   if (activePane) activePane.classList.add('active');
 
   const titles = {
-    overview: { title: 'Store Overview', sub: 'Real-time telemetry, automated agent actions, and store health' },
-    agents: { title: '24/7 Autonomous Agent Fleet', sub: '6 Specialist agents monitoring, optimizing, and dispatching around the clock' },
+    overview: { title: 'Store Overview', sub: 'Real-time telemetry, automated agent actions, and store health (INR ₹, 0% Tax)' },
+    agents: { title: '24/7 Autonomous Agent Fleet', sub: '7 Autonomous agents collaborating in real time via Inter-Agent Message Bus' },
     orders: { title: 'Orders & Dispatch Pipeline', sub: 'Full order lifecycle from Pending to Delivered with live tracking' },
-    inventory: { title: 'Inventory & Pricing Studio', sub: 'Direct inline control over warehouse stock levels and catalog prices' },
+    inventory: { title: 'Inventory & Pricing Studio', sub: 'Owner-set Base Price floors and dynamic price optimization' },
     refunds: { title: 'Refunds & 24h Policy Engine', sub: 'Strict rule evaluation: Auto-approved if cancelled <= 24h & not shipped' },
     reviews: { title: 'AI Customer Sentiment & Reviews', sub: 'Groq LLM-powered review synthesis and catalog summary synchronization' },
-    chat: { title: 'Omnipotent Admin AI Command Center', sub: 'Direct executive natural language control over all 6 agents & databases' }
+    chat: { title: 'Omnipotent Admin AI Command Center', sub: 'Direct executive natural language control over all 7 agents & databases' }
   };
 
   if (titles[tabName]) {
     document.getElementById('pageTitle').innerText = titles[tabName].title;
     document.getElementById('pageSubtitle').innerText = titles[tabName].sub;
+  }
+
+  // Fetch fresh data for the selected tab on switch
+  if (tabName === 'inventory') {
+    fetch('/api/inventory').then(r => r.json()).then(d => {
+      cachedProducts = d.products || [];
+      renderInventoryTable(true);
+    });
+  } else if (tabName === 'orders') {
+    fetch('/api/orders').then(r => r.json()).then(d => {
+      cachedOrders = d.orders || [];
+      renderOrdersTable();
+    });
+  } else if (tabName === 'refunds') {
+    fetch('/api/orders').then(r => r.json()).then(d => {
+      cachedOrders = d.orders || [];
+      renderRefundsTable();
+    });
+  } else if (tabName === 'reviews') {
+    fetch('/api/admin/reviews').then(r => r.json()).then(d => {
+      cachedReviews = d.reviews || [];
+      renderReviewsTab();
+    });
   }
 
   if (window.lucide) window.lucide.createIcons();
@@ -67,7 +90,7 @@ function setupEventListeners() {
       triggerAllBtn.disabled = true;
       triggerAllBtn.innerHTML = `<i data-lucide="loader-2" class="spin"></i> Scanning Fleet...`;
       if (window.lucide) window.lucide.createIcons();
-      for (const agentKey of ['price_manager', 'inventory_manager', 'order_manager', 'refund_manager', 'dispatcher', 'review_manager']) {
+      for (const agentKey of ['price_manager', 'inventory_manager', 'order_manager', 'finance_manager', 'dispatcher', 'review_manager', 'ceo']) {
         await triggerAgentDirect(agentKey, false);
       }
       await loadAllAdminData();
@@ -85,6 +108,7 @@ function setupEventListeners() {
       PRODUCT_NAME: document.getElementById('newProdName').value.trim(),
       PRODUCT_TYPE: document.getElementById('newProdType').value,
       PRODUCT_SIZE: document.getElementById('newProdSize').value.trim(),
+      BASE_PRICE: parseFloat(document.getElementById('newProdBasePrice')?.value || document.getElementById('newProdPrice').value),
       PRICE: parseFloat(document.getElementById('newProdPrice').value),
       STOCK_REMAINING: parseInt(document.getElementById('newProdStock').value),
       DESCRIPTION: document.getElementById('newProdDesc').value.trim()
@@ -184,24 +208,29 @@ window.closeModal = function(id) {
   document.getElementById(id).classList.remove('open');
 };
 
-// Data Fetching
+// Data Fetching Helpers
+const fetchJson = async (url, fallback) => {
+  try {
+    const res = await fetch(url);
+    if (!res.ok) return fallback;
+    return await res.json();
+  } catch (e) {
+    return fallback;
+  }
+};
+
+// Full data load on startup / explicit Refresh button click
 async function loadAllAdminData() {
   try {
-    const [overviewRes, agentRes, ordersRes, invRes, reviewsRes, logsRes] = await Promise.all([
-      fetch('/api/admin/overview'),
-      fetch('/api/admin/agents/status'),
-      fetch('/api/orders'),
-      fetch('/api/inventory'),
-      fetch('/api/admin/reviews'),
-      fetch('/api/admin/agent-logs?limit=40')
+    const [overview, agents, ordersData, invData, reviewsData, logsData, msgsData] = await Promise.all([
+      fetchJson('/api/admin/overview', { kpis: {} }),
+      fetchJson('/api/admin/agents/status', { agents: {} }),
+      fetchJson('/api/orders', { orders: [] }),
+      fetchJson('/api/inventory', { products: [] }),
+      fetchJson('/api/admin/reviews', { reviews: [] }),
+      fetchJson('/api/admin/agent-logs?limit=60', { logs: [] }),
+      fetchJson('/api/admin/agent-messages?limit=60', { messages: [] })
     ]);
-
-    const overview = await overviewRes.json();
-    const agents = await agentRes.json();
-    const ordersData = await ordersRes.json();
-    const invData = await invRes.json();
-    const reviewsData = await reviewsRes.json();
-    const logsData = await logsRes.json();
 
     cachedOrders = ordersData.orders || [];
     cachedProducts = invData.products || [];
@@ -210,11 +239,13 @@ async function loadAllAdminData() {
 
     renderKPIs(overview.kpis || {});
     renderOverviewAgents(cachedAgents);
+    renderOverviewMessageBus(msgsData.messages || []);
     renderAuditLogs(logsData.logs || []);
     renderFullAgentsGrid(cachedAgents);
+    renderFullMessageBusTable(msgsData.messages || []);
     renderFullAgentLogsTable(logsData.logs || []);
     renderOrdersTable();
-    renderInventoryTable();
+    renderInventoryTable(true);
     renderRefundsTable();
     renderReviewsTab();
 
@@ -224,33 +255,62 @@ async function loadAllAdminData() {
   }
 }
 
+// Calm telemetry polling (only updates KPI metrics, agent statuses, and message bus ticker — NEVER touches form tables)
+async function pollTelemetryData() {
+  // Only poll if on overview, agents, or chat tab to save bandwidth
+  if (!['overview', 'agents', 'chat'].includes(currentTab)) return;
+
+  try {
+    const [overview, agents, msgsData] = await Promise.all([
+      fetchJson('/api/admin/overview', { kpis: {} }),
+      fetchJson('/api/admin/agents/status', { agents: {} }),
+      fetchJson('/api/admin/agent-messages?limit=30', { messages: [] })
+    ]);
+
+    cachedAgents = agents.agents || {};
+
+    renderKPIs(overview.kpis || {});
+    renderOverviewAgents(cachedAgents);
+    renderOverviewMessageBus(msgsData.messages || []);
+    renderFullAgentsGrid(cachedAgents);
+    renderFullMessageBusTable(msgsData.messages || []);
+
+    if (window.lucide) window.lucide.createIcons();
+  } catch (err) {
+    console.warn('Telemetry polling notice:', err);
+  }
+}
+
 function renderKPIs(kpis) {
-  document.getElementById('kpiRevenue').innerText = `$${(kpis.total_revenue || 0).toFixed(2)}`;
+  const rev = kpis.total_revenue || 0;
+  document.getElementById('kpiRevenue').innerText = `₹${rev.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   document.getElementById('kpiAgentActions').innerText = kpis.agent_autonomous_actions || 0;
   document.getElementById('kpiTotalOrders').innerText = kpis.total_orders || 0;
-  document.getElementById('kpiActiveOrdersSub').innerText = `${kpis.active_orders || 0} active in pipeline`;
+  document.getElementById('kpiActiveOrdersSub').innerText = `${kpis.active_orders || 0} active in pipeline (0% Tax)`;
   document.getElementById('kpiLowStock').innerText = kpis.low_stock_count || 0;
   document.getElementById('ordersCountBadge').innerText = kpis.total_orders || 0;
 }
 
+const AGENT_ICON_MAP = {
+  price_manager: 'tag',
+  inventory_manager: 'package',
+  order_manager: 'clipboard-list',
+  finance_manager: 'dollar-sign',
+  refund_manager: 'rotate-ccw',
+  dispatcher: 'truck',
+  review_manager: 'star',
+  ceo: 'briefcase'
+};
+
 function renderOverviewAgents(agents) {
   const container = document.getElementById('overviewAgentList');
   if (!container) return;
-  
-  const iconMap = {
-    price_manager: 'tag',
-    inventory_manager: 'package',
-    order_manager: 'clipboard-list',
-    refund_manager: 'rotate-ccw',
-    dispatcher: 'truck',
-    review_manager: 'star'
-  };
 
   container.innerHTML = Object.entries(agents).map(([key, a]) => `
     <div class="quick-agent-item">
       <div class="agent-info-left">
         <div class="agent-badge-icon">
-          <i data-lucide="${iconMap[key] || 'bot'}"></i>
+          <i data-lucide="${AGENT_ICON_MAP[key] || 'bot'}"></i>
         </div>
         <div class="agent-name-wrap">
           <strong>${a.name}</strong>
@@ -267,11 +327,39 @@ function renderOverviewAgents(agents) {
   `).join('');
 }
 
+function renderOverviewMessageBus(messages) {
+  const container = document.getElementById('overviewMessageBusLogs');
+  if (!container) return;
+  if (messages.length === 0) {
+    container.innerHTML = `<div style="color: var(--text-dim); text-align: center; padding: 2rem;">Awaiting inter-agent message traffic...</div>`;
+    return;
+  }
+  container.innerHTML = messages.map(m => {
+    const timeStr = m.timestamp ? new Date(m.timestamp).toLocaleTimeString() : '';
+    let payloadText = '';
+    try {
+      payloadText = typeof m.payload === 'string' ? m.payload : JSON.stringify(m.payload);
+    } catch (e) {
+      payloadText = String(m.payload);
+    }
+    return `
+      <div class="log-entry" style="border-left-color: #a855f7; background: rgba(168, 85, 247, 0.04);">
+        <span class="log-time">[${timeStr}]</span>
+        <strong style="color: #60a5fa;">${m.from}</strong>
+        <span style="color: #a855f7; font-weight: 700;">➔</span>
+        <strong style="color: #34d399;">${m.to}</strong>
+        <span class="status-tag pending" style="margin-left: 0.35rem; font-size: 0.68rem; padding: 0.1rem 0.4rem;">${m.subject}</span>
+        <div class="log-details" style="color: #e2e8f0; margin-top: 0.2rem; word-break: break-word;">${payloadText}</div>
+      </div>
+    `;
+  }).join('');
+}
+
 function renderAuditLogs(logs) {
   const container = document.getElementById('overviewAuditLogs');
   if (!container) return;
   if (logs.length === 0) {
-    container.innerHTML = `<div style="color: var(--text-dim); text-align: center; padding: 2rem;">No logs recorded yet.</div>`;
+    container.innerHTML = `<div style="color: var(--text-dim); text-align: center; padding: 2rem;">No decision logs recorded yet.</div>`;
     return;
   }
   container.innerHTML = logs.map(l => {
@@ -291,15 +379,6 @@ function renderFullAgentsGrid(agents) {
   const container = document.getElementById('fullAgentsGrid');
   if (!container) return;
 
-  const iconMap = {
-    price_manager: 'tag',
-    inventory_manager: 'package',
-    order_manager: 'clipboard-list',
-    refund_manager: 'rotate-ccw',
-    dispatcher: 'truck',
-    review_manager: 'star'
-  };
-
   container.innerHTML = Object.entries(agents).map(([key, a]) => {
     const lastRunStr = a.last_run ? new Date(a.last_run).toLocaleTimeString() : 'Awaiting cycle';
     return `
@@ -307,7 +386,7 @@ function renderFullAgentsGrid(agents) {
         <div class="card-top">
           <div class="card-icon-title">
             <div class="card-agent-icon">
-              <i data-lucide="${iconMap[key] || 'bot'}"></i>
+              <i data-lucide="${AGENT_ICON_MAP[key] || 'bot'}"></i>
             </div>
             <div>
               <h4 style="font-size: 1rem; font-weight: 700;">${a.name}</h4>
@@ -344,9 +423,40 @@ function renderFullAgentsGrid(agents) {
   }).join('');
 }
 
+function renderFullMessageBusTable(messages) {
+  const tbody = document.getElementById('fullMessageBusBody');
+  if (!tbody) return;
+  if (messages.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-dim); padding: 2rem;">No inter-agent messages recorded yet.</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = messages.map(m => {
+    const dt = m.timestamp ? new Date(m.timestamp).toLocaleString() : '';
+    let payloadStr = '';
+    try {
+      payloadStr = typeof m.payload === 'string' ? m.payload : JSON.stringify(m.payload, null, 2);
+    } catch (e) {
+      payloadStr = String(m.payload);
+    }
+    return `
+      <tr>
+        <td style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--text-dim);">${dt}</td>
+        <td><strong style="color: #60a5fa;">${m.from}</strong></td>
+        <td><strong style="color: #34d399;">${m.to}</strong></td>
+        <td><span class="status-tag pending">${m.subject}</span></td>
+        <td style="font-size: 0.78rem; font-family: 'JetBrains Mono', monospace; color: #e2e8f0; max-width: 500px; white-space: pre-wrap;">${payloadStr}</td>
+      </tr>
+    `;
+  }).join('');
+}
+
 function renderFullAgentLogsTable(logs) {
   const tbody = document.getElementById('fullAgentLogsBody');
   if (!tbody) return;
+  if (logs.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-dim); padding: 2rem;">No audit logs recorded yet.</td></tr>`;
+    return;
+  }
   tbody.innerHTML = logs.map(l => {
     const dt = l.timestamp ? new Date(l.timestamp).toLocaleString() : '';
     return `
@@ -355,7 +465,7 @@ function renderFullAgentLogsTable(logs) {
         <td><strong style="color: #c084fc;">${l.agent_name}</strong></td>
         <td><span class="status-tag dispatched">${l.action}</span></td>
         <td style="font-size: 0.82rem; color: #cbd5e1; max-width: 450px;">${l.details}</td>
-        <td><span class="status-tag delivered">Yes (24/7)</span></td>
+        <td><span class="status-tag delivered">${l.autonomous ? '24/7 Auto' : 'Manual'}</span></td>
       </tr>
     `;
   }).join('');
@@ -409,7 +519,7 @@ function renderOrdersTable() {
           <div style="font-size: 0.72rem; color: var(--text-dim);">${o.shipping_address || ''}</div>
         </td>
         <td style="font-size: 0.78rem; max-width: 250px;">${itemsSummary}</td>
-        <td><strong>$${(o.total || 0).toFixed(2)}</strong></td>
+        <td><strong>₹${(o.total || 0).toFixed(2)}</strong></td>
         <td><code style="font-size: 0.75rem; color: #38bdf8;">${trk}</code></td>
         <td>
           <select class="admin-select" style="font-size: 0.75rem; padding: 0.25rem 0.5rem;" onchange="updateOrderStatusInline('${o.order_id}', this.value)">
@@ -466,57 +576,148 @@ window.cancelOrderWith24hRule = async function(orderId) {
 };
 
 // Inventory Table Render
-function renderInventoryTable() {
+function renderInventoryTable(force = false) {
   const tbody = document.getElementById('inventoryTableBody');
   if (!tbody) return;
 
+  // Protect active user input from being overwritten while typing
+  if (!force && document.activeElement && tbody.contains(document.activeElement)) {
+    return;
+  }
+
   tbody.innerHTML = cachedProducts.map(p => {
     const isLow = p.STOCK_REMAINING <= 5;
+    const basePrice = parseFloat(p.BASE_PRICE || p.PRICE || 0);
+    const sellingPrice = parseFloat(p.PRICE || basePrice || 0);
+    const diff = sellingPrice - basePrice;
+    const pct = basePrice > 0 ? ((diff / basePrice) * 100) : 0;
+
+    let deltaBadge = '';
+    if (diff > 0.01) {
+      deltaBadge = `<span class="price-badge-selling" title="Dynamic AI Markup">+₹${diff.toFixed(2)} (+${pct.toFixed(1)}% AI Surge)</span>`;
+    } else {
+      deltaBadge = `<span style="font-size: 0.65rem; color: #94a3b8;">🔒 At Base Floor</span>`;
+    }
+
     return `
       <tr>
         <td>
-          <strong>${p.PRODUCT_NAME}</strong>
-          <div style="font-size: 0.7rem; color: var(--text-dim);">ID: ${p.id}</div>
+          <strong style="color: #fff; font-size: 0.92rem;">${p.PRODUCT_NAME}</strong>
+          <div style="font-size: 0.7rem; color: var(--text-dim); font-family: 'JetBrains Mono', monospace;">ID: ${p.id}</div>
         </td>
         <td><span class="status-tag pending">${p.PRODUCT_TYPE}</span></td>
-        <td>${p.PRODUCT_SIZE}</td>
+        <td style="font-weight: 500;">${p.PRODUCT_SIZE}</td>
         <td>
           <input type="number" class="inline-input" id="stock_input_${p.id}" value="${p.STOCK_REMAINING}" min="0">
-          ${isLow ? '<span style="color: #f59e0b; font-size: 0.7rem; display:block;">⚠️ Low stock</span>' : ''}
+          ${isLow ? '<span style="color: #f59e0b; font-size: 0.7rem; display:block; margin-top:2px;">⚠️ Low stock</span>' : ''}
         </td>
         <td>
-          <input type="number" step="0.01" class="inline-input" id="price_input_${p.id}" value="${p.PRICE}">
+          <div class="price-box-base">
+            <div style="display: flex; align-items: center; gap: 4px;">
+              <span style="color: #a5b4fc; font-weight: 700; font-family: 'JetBrains Mono', monospace;">₹</span>
+              <input type="number" step="0.01" class="inline-input price-input" id="base_price_input_${p.id}" value="${basePrice.toFixed(2)}" style="border-color: rgba(99,102,241,0.7); font-weight: 700; color: #a5b4fc; background: rgba(99,102,241,0.08);" title="Owner Base Price Floor (Agents cannot drop below this)">
+            </div>
+            <span class="price-badge-base">🔒 Owner Floor</span>
+          </div>
         </td>
-        <td>⭐ ${p.RATING || 5.0}</td>
         <td>
-          <button class="action-btn-sm" style="background: rgba(16,185,129,0.2); border-color: rgba(16,185,129,0.4);" onclick="saveInventoryInline('${p.id}')">
-            Save
-          </button>
-          <button class="action-btn-sm" onclick="quickRestockInline('${p.id}', 20)" title="Quick Restock +20 Units">
-            +20 Stock
-          </button>
+          <div class="price-box-selling">
+            <div style="display: flex; align-items: center; gap: 4px;">
+              <span style="color: #34d399; font-weight: 700; font-family: 'JetBrains Mono', monospace;">₹</span>
+              <input type="number" step="0.01" class="inline-input price-input" id="price_input_${p.id}" value="${sellingPrice.toFixed(2)}" style="font-weight: 700; color: #34d399; border-color: rgba(16,185,129,0.7); background: rgba(16,185,129,0.08);" title="Current Dynamic Selling Price set by AI Price Manager">
+            </div>
+            ${deltaBadge}
+          </div>
+        </td>
+        <td style="font-weight: 600; color: #facc15;">⭐ ${p.RATING || 5.0}</td>
+        <td>
+          <div style="display: flex; gap: 4px;">
+            <button class="action-btn-sm" style="background: rgba(16,185,129,0.25); border-color: rgba(16,185,129,0.5); color: #34d399; font-weight: 600;" onclick="saveInventoryInline('${p.id}')" title="Save Base Price & Selling Price">
+              Save
+            </button>
+            <button class="action-btn-sm" onclick="quickRestockInline('${p.id}', 20)" title="Quick Restock +20 Units">
+              +20 Stock
+            </button>
+          </div>
         </td>
       </tr>
     `;
   }).join('');
 }
 
+// Floating Toast Notification Helper
+function showAdminToast(message, type = 'success') {
+  let container = document.getElementById('adminToastContainer');
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'adminToastContainer';
+    container.className = 'admin-toast-container';
+    document.body.appendChild(container);
+  }
+
+  const toast = document.createElement('div');
+  toast.className = `admin-toast ${type === 'error' ? 'error' : ''}`;
+  toast.innerHTML = `
+    <span style="font-size: 1.1rem;">${type === 'error' ? '❌' : '✅'}</span>
+    <div>${message.replace(/\n/g, '<br/>')}</div>
+  `;
+  container.appendChild(toast);
+
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateX(40px)';
+    toast.style.transition = 'all 0.3s ease';
+    setTimeout(() => toast.remove(), 300);
+  }, 4000);
+}
+
 window.saveInventoryInline = async function(productId) {
-  const stock = parseInt(document.getElementById(`stock_input_${productId}`).value);
-  const price = parseFloat(document.getElementById(`price_input_${productId}`).value);
+  const stockEl = document.getElementById(`stock_input_${productId}`);
+  const basePriceEl = document.getElementById(`base_price_input_${productId}`);
+  const priceEl = document.getElementById(`price_input_${productId}`);
+  if (!stockEl || !basePriceEl || !priceEl) return;
+
+  const stock = parseInt(stockEl.value);
+  let basePrice = parseFloat(basePriceEl.value);
+  let price = parseFloat(priceEl.value);
+
+  if (isNaN(basePrice) || basePrice < 0) {
+    showAdminToast("Please enter a valid positive Base Price.", "error");
+    return;
+  }
+  if (isNaN(price) || price < basePrice) {
+    showAdminToast(`⚠️ Selling Price cannot be below Base Price floor. Setting Selling Price to ₹${basePrice.toFixed(2)}.`);
+    price = basePrice;
+    priceEl.value = price.toFixed(2);
+  }
 
   try {
     const res = await fetch('/api/admin/inventory/update', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ product_id: productId, stock: stock, price: price })
+      body: JSON.stringify({ product_id: productId, stock: stock, price: price, base_price: basePrice })
     });
     const data = await res.json();
     if (data.success) {
-      await loadAllAdminData();
-      alert(`✅ Updated SKU ${productId} (Stock: ${stock}, Price: $${price})`);
+      const p = cachedProducts.find(x => x.id === productId);
+      if (p) {
+        p.STOCK_REMAINING = stock;
+        p.BASE_PRICE = basePrice;
+        p.PRICE = price;
+      }
+      renderInventoryTable(true);
+      
+      const savedRow = document.getElementById(`stock_input_${productId}`)?.closest('tr');
+      if (savedRow) {
+        savedRow.classList.add('row-saved-highlight');
+        setTimeout(() => savedRow.classList.remove('row-saved-highlight'), 2000);
+      }
+
+      showAdminToast(`Updated SKU ${productId}: Base Floor ₹${basePrice.toLocaleString('en-IN')}, Selling Price ₹${price.toLocaleString('en-IN')}`);
+    } else {
+      showAdminToast(`Update failed: ${data.error || 'Unknown error'}`, 'error');
     }
-  } catch (err) { alert('Error updating inventory: ' + err); }
+  } catch (err) { showAdminToast('Error updating inventory: ' + err, 'error'); }
 };
 
 window.quickRestockInline = async function(productId, qty) {
@@ -528,8 +729,13 @@ window.quickRestockInline = async function(productId, qty) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ product_id: productId, stock: newStock })
     });
-    await loadAllAdminData();
-  } catch (err) { alert('Error restocking: ' + err); }
+    const data = await res.json();
+    if (data.success) {
+      if (p) p.STOCK_REMAINING = newStock;
+      renderInventoryTable(true);
+      showAdminToast(`Restocked SKU ${productId}: +${qty} units (New Stock: ${newStock})`);
+    }
+  } catch (err) { showAdminToast('Error restocking: ' + err, 'error'); }
 };
 
 // Refunds Table Render
@@ -557,7 +763,7 @@ function renderRefundsTable() {
             `<span class="status-tag cancelled">❌ Ineligible (${!isWithin24h ? '>24h' : 'Already Shipped'})</span>`
           }
         </td>
-        <td><strong>$${(o.total || 0).toFixed(2)}</strong></td>
+        <td><strong>₹${(o.total || 0).toFixed(2)}</strong></td>
         <td>
           ${!isRefunded ? `
             <button class="action-btn-sm" style="background: rgba(245,158,11,0.2); border-color: rgba(245,158,11,0.4);" onclick="cancelOrderWith24hRule('${o.order_id}')">
@@ -717,3 +923,80 @@ function formatMarkdown(text) {
     .replace(/`(.*?)`/g, '<code style="background:rgba(0,0,0,0.3); padding:2px 4px; border-radius:4px; font-family:JetBrains Mono;">$1</code>')
     .replace(/\n/g, '<br>');
 }
+
+// Modal Handlers
+window.openModal = function(modalId) {
+  const m = document.getElementById(modalId);
+  if (m) m.classList.add('open');
+};
+
+window.closeModal = function(modalId) {
+  const m = document.getElementById(modalId);
+  if (m) m.classList.remove('open');
+};
+
+document.getElementById('openAddProductModalBtn')?.addEventListener('click', () => openModal('addProductModal'));
+document.getElementById('openBulkPriceModalBtn')?.addEventListener('click', () => openModal('bulkPriceModal'));
+
+document.getElementById('addProductForm')?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const name = document.getElementById('newProdName').value;
+  const category = document.getElementById('newProdCategory').value;
+  const size = document.getElementById('newProdSize').value;
+  const basePrice = parseFloat(document.getElementById('newProdBasePrice').value);
+  const price = parseFloat(document.getElementById('newProdPrice').value);
+  const stock = parseInt(document.getElementById('newProdStock').value);
+  const desc = document.getElementById('newProdDesc').value;
+
+  if (price < basePrice) {
+    alert(`⚠️ Initial Selling Price (₹${price}) cannot be below the Owner Base Price floor (₹${basePrice}).`);
+    return;
+  }
+
+  try {
+    const res = await fetch('/api/admin/inventory/add', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        PRODUCT_NAME: name,
+        PRODUCT_TYPE: category,
+        PRODUCT_SIZE: size,
+        BASE_PRICE: basePrice,
+        PRICE: price,
+        STOCK_REMAINING: stock,
+        DESCRIPTION: desc,
+        IMAGE: `/static/images/${category === 'Mobiles' ? 'phone_flagship.svg' : category === 'Laptops' ? 'laptop_pro.svg' : category === 'Audio' ? 'earbuds_wireless.svg' : 'smartwatch.svg'}`
+      })
+    });
+    const data = await res.json();
+    if (data.success) {
+      closeModal('addProductModal');
+      await loadAllAdminData();
+      alert(`✅ Product "${name}" added to catalog with Owner Floor ₹${basePrice.toFixed(2)}.`);
+    }
+  } catch (err) {
+    alert('Error adding product: ' + err);
+  }
+});
+
+document.getElementById('bulkPriceForm')?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const category = document.getElementById('bulkCategory').value;
+  const pct = parseFloat(document.getElementById('bulkPercentage').value);
+
+  try {
+    const res = await fetch('/api/admin/inventory/bulk-price', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ category, percentage_change: pct })
+    });
+    const data = await res.json();
+    if (data.success) {
+      closeModal('bulkPriceModal');
+      await loadAllAdminData();
+      alert(`✅ Bulk adjusted ${data.updated_count || 0} products by ${pct > 0 ? '+' : ''}${pct}%. All prices strictly clamped to Owner Base Price floors.`);
+    }
+  } catch (err) {
+    alert('Error applying bulk price change: ' + err);
+  }
+});

@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+  <defs>
+    <linearGradient id="micMetal" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#334155"/>
+      <stop offset="50%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#1e1b4b"/>
+    </linearGradient>
+  </defs>
+  <circle cx="200" cy="180" r="130" fill="#c084fc" opacity="0.12"/>
+  <!-- Microphone Capsule Head Mesh -->
+  <rect x="165" y="80" width="70" height="90" rx="35" fill="url(#micMetal)" stroke="#c084fc" stroke-width="2.5"/>
+  <line x1="165" y1="125" x2="235" y2="125" stroke="#a855f7" stroke-width="2"/>
+  <!-- Mic Handle Body -->
+  <path d="M175 170 L180 260 L220 260 L225 170 Z" fill="#0f172a" stroke="#818cf8" stroke-width="2"/>
+  <!-- Shock Mount Rings -->
+  <circle cx="200" cy="210" r="45" fill="none" stroke="#60a5fa" stroke-width="2" stroke-dasharray="8 4"/>
+  <!-- XLR Base Connector -->
+  <rect x="188" y="260" width="24" height="25" rx="3" fill="#334155" stroke="#94a3b8" stroke-width="1.5"/>
+  <!-- XLR Cable -->
+  <path d="M200 285 Q 200 340, 240 360" fill="none" stroke="#c084fc" stroke-width="4" stroke-linecap="round"/>
+</svg>
