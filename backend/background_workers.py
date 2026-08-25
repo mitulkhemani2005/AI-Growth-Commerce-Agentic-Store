@@ -32,15 +32,15 @@ class BackgroundAgentWorker:
     def __init__(self):
         self._running = False
         self._task = None
-        self.tick_sleep_seconds = 2  # Evaluation loop tick every 2 seconds
+        self.tick_sleep_seconds = 1  # Evaluation loop tick every 1 second
 
-        # Per-agent independent schedule configurations (Sensible collaborative intervals)
+        # Per-agent independent schedule configurations (All agents operating every 1 second async & together)
         self.agent_states: Dict[str, Dict[str, Any]] = {
             "dispatcher": {
                 "name": "Dispatcher Agent",
                 "status": "RUNNING 24/7",
                 "enabled": True,
-                "interval_seconds": int(os.environ.get("DISPATCHER_INTERVAL_SECONDS", "15")),
+                "interval_seconds": int(os.environ.get("DISPATCHER_INTERVAL_SECONDS", "1")),
                 "last_run": None,
                 "last_run_ts": 0.0,
                 "actions_count": 0,
@@ -51,7 +51,7 @@ class BackgroundAgentWorker:
                 "name": "Inventory Manager Agent",
                 "status": "RUNNING 24/7",
                 "enabled": True,
-                "interval_seconds": int(os.environ.get("INVENTORY_AGENT_INTERVAL_SECONDS", "20")),
+                "interval_seconds": int(os.environ.get("INVENTORY_AGENT_INTERVAL_SECONDS", "1")),
                 "last_run": None,
                 "last_run_ts": 0.0,
                 "actions_count": 0,
@@ -62,7 +62,7 @@ class BackgroundAgentWorker:
                 "name": "Finance Manager Agent",
                 "status": "RUNNING 24/7",
                 "enabled": True,
-                "interval_seconds": int(os.environ.get("FINANCE_AGENT_INTERVAL_SECONDS", "30")),
+                "interval_seconds": int(os.environ.get("FINANCE_AGENT_INTERVAL_SECONDS", "1")),
                 "last_run": None,
                 "last_run_ts": 0.0,
                 "actions_count": 0,
@@ -73,7 +73,7 @@ class BackgroundAgentWorker:
                 "name": "Price Manager Agent",
                 "status": "RUNNING 24/7",
                 "enabled": True,
-                "interval_seconds": int(os.environ.get("PRICE_AGENT_INTERVAL_SECONDS", "25")),
+                "interval_seconds": int(os.environ.get("PRICE_AGENT_INTERVAL_SECONDS", "1")),
                 "last_run": None,
                 "last_run_ts": 0.0,
                 "actions_count": 0,
@@ -84,7 +84,7 @@ class BackgroundAgentWorker:
                 "name": "Order Management Agent",
                 "status": "RUNNING 24/7",
                 "enabled": True,
-                "interval_seconds": int(os.environ.get("ORDER_AGENT_INTERVAL_SECONDS", "20")),
+                "interval_seconds": int(os.environ.get("ORDER_AGENT_INTERVAL_SECONDS", "1")),
                 "last_run": None,
                 "last_run_ts": 0.0,
                 "actions_count": 0,
@@ -95,18 +95,18 @@ class BackgroundAgentWorker:
                 "name": "Review & Feedback Agent",
                 "status": "RUNNING 24/7",
                 "enabled": True,
-                "interval_seconds": int(os.environ.get("REVIEW_AGENT_INTERVAL_SECONDS", "45")),
+                "interval_seconds": int(os.environ.get("REVIEW_AGENT_INTERVAL_SECONDS", "1")),
                 "last_run": None,
                 "last_run_ts": 0.0,
                 "actions_count": 0,
                 "icon": "star",
-                "description": "Analyzes customer sentiment via Groq LLM; auto-updates product listings with AI review summaries; alerts CEO on low-rated products."
+                "description": "Analyzes customer sentiment via Ollama LLM; auto-updates product listings with AI review summaries; alerts CEO on low-rated products."
             },
             "ceo": {
                 "name": "CEO Agent",
                 "status": "RUNNING 24/7",
                 "enabled": True,
-                "interval_seconds": int(os.environ.get("CEO_AGENT_INTERVAL_SECONDS", "30")),
+                "interval_seconds": int(os.environ.get("CEO_AGENT_INTERVAL_SECONDS", "1")),
                 "last_run": None,
                 "last_run_ts": 0.0,
                 "actions_count": 0,
@@ -125,7 +125,7 @@ class BackgroundAgentWorker:
             self._task = loop.create_task(self._run_loop())
         except RuntimeError:
             pass
-        print("[24/7 Background Workers] Autonomous AI Agent Fleet (7 agents with per-agent API keys) started!", flush=True)
+        print("[24/7 Background Workers] Autonomous AI Agent Fleet (7 agents running async & together every second via Ollama gemma4:e2b-it-qat) started!", flush=True)
 
     def stop(self):
         self._running = False
@@ -133,8 +133,8 @@ class BackgroundAgentWorker:
             self._task.cancel()
 
     async def _run_loop(self):
-        # Initial warm-up delay
-        await asyncio.sleep(3)
+        # Initial brief warm-up
+        await asyncio.sleep(1)
         while self._running:
             try:
                 await self.check_and_run_due_agents()
@@ -146,12 +146,10 @@ class BackgroundAgentWorker:
 
     async def check_and_run_due_agents(self) -> Dict[str, Any]:
         """
-        Periodically checks each agent's individual schedule and triggers execution
-        only when its configured interval has elapsed.
-        Order matters: run specialized agents before CEO so CEO has fresh messages to process.
+        Periodically checks each agent's schedule and triggers execution
+        concurrently and asynchronously every second.
         """
         now_ts = time.time()
-        results = {}
         agents_map = {
             "dispatcher": dispatcher_agent,
             "inventory_manager": inventory_manager_agent,
@@ -159,18 +157,17 @@ class BackgroundAgentWorker:
             "price_manager": price_manager_agent,
             "order_manager": order_management_agent,
             "review_manager": review_feedback_agent,
-            "ceo": ceo_agent  # CEO runs last so it can process all fresh messages
+            "ceo": ceo_agent
         }
 
-        for key, agent_instance in agents_map.items():
+        async def _run_agent(key: str, agent_instance: Any):
             state = self.agent_states.get(key, {})
             if not state.get("enabled", True):
-                continue
+                return key, None
 
-            interval = state.get("interval_seconds", 300)
+            interval = state.get("interval_seconds", 1)
             last_ts = state.get("last_run_ts", 0.0)
 
-            # Check if interval has elapsed
             if (now_ts - last_ts) >= interval:
                 try:
                     state["status"] = "EXECUTING"
@@ -179,11 +176,25 @@ class BackgroundAgentWorker:
                     state["last_run_ts"] = time.time()
                     state["actions_count"] += 1
                     state["status"] = "RUNNING 24/7"
-                    results[key] = res
+                    return key, res
                 except Exception as e:
                     state["status"] = "ERROR"
                     print(f"Error running autonomous agent '{key}': {e}", flush=True)
-                    results[key] = {"error": str(e)}
+                    return key, {"error": str(e)}
+            return key, None
+
+        # Run all agents concurrently and asynchronously together
+        results_list = await asyncio.gather(
+            *[_run_agent(k, inst) for k, inst in agents_map.items()],
+            return_exceptions=True
+        )
+
+        results = {}
+        for item in results_list:
+            if isinstance(item, tuple) and len(item) == 2:
+                k, res = item
+                if res is not None:
+                    results[k] = res
 
         return results
 

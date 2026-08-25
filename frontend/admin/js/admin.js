@@ -12,8 +12,8 @@ document.addEventListener('DOMContentLoaded', () => {
   setupEventListeners();
   loadAllAdminData();
   
-  // Calm background telemetry poll (every 10s) — only updates status counters/message bus without touching form tables
-  telemetryPollingInterval = setInterval(pollTelemetryData, 10000);
+  // Live background telemetry poll (every 2s) — updates status counters & message bus in real-time
+  telemetryPollingInterval = setInterval(pollTelemetryData, 2000);
 });
 
 function setupNavigation() {
@@ -42,7 +42,7 @@ function switchTab(tabName) {
     orders: { title: 'Orders & Dispatch Pipeline', sub: 'Full order lifecycle from Pending to Delivered with live tracking' },
     inventory: { title: 'Inventory & Pricing Studio', sub: 'Owner-set Base Price floors and dynamic price optimization' },
     refunds: { title: 'Refunds & 24h Policy Engine', sub: 'Strict rule evaluation: Auto-approved if cancelled <= 24h & not shipped' },
-    reviews: { title: 'AI Customer Sentiment & Reviews', sub: 'Groq LLM-powered review synthesis and catalog summary synchronization' },
+    reviews: { title: 'AI Customer Sentiment & Reviews', sub: 'Ollama LLM-powered review synthesis and catalog summary synchronization' },
     chat: { title: 'Omnipotent Admin AI Command Center', sub: 'Direct executive natural language control over all 7 agents & databases' }
   };
 
@@ -784,7 +784,7 @@ function renderReviewsTab() {
 
   // Render Product AI Summaries
   summariesContainer.innerHTML = cachedProducts.map(p => {
-    const summary = p.AI_REVIEW_SUMMARY || 'No AI summary generated yet. Click below to analyze reviews with Groq LLM.';
+    const summary = p.AI_REVIEW_SUMMARY || 'No AI summary generated yet. Click below to analyze reviews with Ollama LLM.';
     return `
       <div class="product-summary-card">
         <div class="summary-card-header">

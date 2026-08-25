@@ -290,14 +290,44 @@ class PaymentManager:
     ) -> Dict[str, Any]:
         """
         Processes a full or partial refund on Razorpay Gateway and updates the customer order & inventory account.
+        Strictly enforces the return policy: orders that are 'Delivered' or 'Shipped' or >24h old are REJECTED.
         """
         from backend.order_manager import order_manager
         order = order_manager.get_order_by_id(order_id)
         if not order:
-            return {"success": False, "error": f"Order #{order_id} not found."}
+            return {"success": False, "approved": False, "error": f"Order #{order_id} not found."}
 
-        if order.get("status") == "Refunded":
-            return {"success": False, "error": f"Order #{order_id} has already been refunded."}
+        current_status = order.get("status", "Confirmed")
+        if current_status == "Refunded":
+            return {"success": False, "approved": False, "error": f"Order #{order_id} has already been refunded."}
+
+        is_owner_override = reason.startswith("[Owner Override]")
+
+        # 🔒 Strict Return Policy Check: Delivered or Shipped items cannot be refunded
+        if not is_owner_override:
+            if current_status in ["Delivered", "Shipped"]:
+                return {
+                    "success": False,
+                    "approved": False,
+                    "error": f"Refund REJECTED: Order #{order_id} has already been '{current_status}'. Delivered or in-transit items are final sale and non-refundable per store policy."
+                }
+
+            # 🔒 24-Hour Window Check
+            created_str = order.get("created_at")
+            if created_str:
+                try:
+                    created_dt = datetime.fromisoformat(created_str.replace("Z", "+00:00"))
+                    now_dt = datetime.now(timezone.utc)
+                    diff = now_dt - created_dt
+                    hours_elapsed = diff.total_seconds() / 3600.0
+                    if hours_elapsed > 24.0:
+                        return {
+                            "success": False,
+                            "approved": False,
+                            "error": f"Refund REJECTED: Order #{order_id} was placed {hours_elapsed:.1f} hours ago (exceeds the 24-hour return/cancellation window)."
+                        }
+                except Exception as e:
+                    print(f"Date parse warning in process_refund: {e}")
 
         refund_amount = amount if amount is not None else order.get("total", 0.0)
         amount_paise = int(round(refund_amount * 100))
@@ -351,7 +381,8 @@ class PaymentManager:
 
         return {
             "success": True,
-            "message": f"Refund of ${refund_amount:.2f} issued successfully via Razorpay (Refund ID: {refund_res_data['refund_id']}). The order #{order_id} is marked as Refunded and stock has been restored to inventory.",
+            "approved": True,
+            "message": f"Refund of ₹{refund_amount:,.2f} issued successfully via Razorpay (Refund ID: {refund_res_data['refund_id']}). Order #{order_id} is marked as Refunded and stock has been restored to inventory.",
             "refund_details": refund_res_data,
             "order": order_res.get("order")
         }

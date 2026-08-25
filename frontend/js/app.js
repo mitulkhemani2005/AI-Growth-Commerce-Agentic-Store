@@ -822,8 +822,13 @@ async function submitChatPrompt(prompt) {
     chatHistory.push({ role: 'user', content: prompt });
     chatHistory.push({ role: 'assistant', content: data.response });
 
-    // Render Agent response
-    appendAgentMessage(data.response, data.tool_calls);
+    // 🔑 KEY: If agent validated checkout / created Razorpay Order, save and trigger
+    if (data.checkout_payload && data.checkout_payload.needs_razorpay_checkout) {
+      window._lastCheckoutPayload = data.checkout_payload;
+    }
+
+    // Render Agent response with direct checkout CTA button if available
+    appendAgentMessage(data.response, data.tool_calls, data.checkout_payload);
 
     // Sync UI states if tools modified cart or orders
     if (data.cart) {
@@ -853,13 +858,12 @@ async function submitChatPrompt(prompt) {
       await checkAP2Status();
     }
 
-    // 🔑 KEY: If agent validated card details and created Razorpay Order, open the REAL Razorpay Checkout modal
-    // This ensures actual payment capture that shows as "Captured" in Razorpay Dashboard
+    // Launch official Razorpay Checkout popup
     if (data.checkout_payload && data.checkout_payload.needs_razorpay_checkout) {
       const cp = data.checkout_payload;
       setTimeout(() => {
         openRazorpayCheckoutFromAgent(cp);
-      }, 800);
+      }, 400);
     }
 
   } catch (err) {
@@ -876,80 +880,84 @@ async function submitChatPrompt(prompt) {
 /**
  * Opens the Razorpay Standard Checkout modal with a server-created order ID.
  * This generates a REAL payment that appears as "Captured" in the Razorpay Dashboard.
- * Handles both manual agent card payments and AP2 autonomous agent payments.
+ * Handles both customer chat checkouts and AP2 autonomous agent payments.
  */
 async function openRazorpayCheckoutFromAgent(checkoutPayload) {
+  const payload = checkoutPayload || window._lastCheckoutPayload;
+  if (!payload || !payload.needs_razorpay_checkout) {
+    console.warn('No active checkoutPayload provided to openRazorpayCheckoutFromAgent, falling back to active cart checkout');
+    return payWithRazorpay(false);
+  }
+
   const {
     razorpay_order_id, amount, currency, key_id, prefill,
     user_id: payUserId, ap2_autonomous_payment, stored_card, shipping_address
-  } = checkoutPayload;
+  } = payload;
 
   const isAP2 = !!ap2_autonomous_payment;
   const cardInfo = stored_card ? `${stored_card.card_network || 'Card'} ${stored_card.card_number_masked || '****'}` : 'your saved card';
-
-  if (isAP2) {
-    appendAgentMessage(
-      `🤖 **Nova has prepared your payment!**\n\n` +
-      `Razorpay Order \`${razorpay_order_id}\` is ready. ` +
-      `Complete the secure checkout using ${cardInfo} — ` +
-      `this payment will be visible in your Razorpay dashboard immediately.`
-    );
-  }
+  const effectiveKey = key_id || 'rzp_test_TU4r5qh5d7sKDu';
 
   if (window.Razorpay) {
-    const options = {
-      key: key_id,
-      amount: amount,
-      currency: currency || 'INR',
-      name: 'AI Growth Commerce',
-      description: isAP2
-        ? `🤖 Nova Agent Payment — ${cardInfo}`
-        : 'Agentic Store — Nova AI Checkout',
-      order_id: razorpay_order_id,
-      handler: async function (response) {
-        // Real payment captured by Razorpay — verify and finalize order
-        appendAgentMessage(`⏳ Payment received from Razorpay. Verifying and confirming order...`);
-        await verifyAndCompleteRazorpayPayment({
-          razorpay_order_id: response.razorpay_order_id || razorpay_order_id,
-          razorpay_payment_id: response.razorpay_payment_id,
-          razorpay_signature: response.razorpay_signature,
-          shipping_address: shipping_address
-        }, false);
-      },
-      prefill: prefill || {
-        name: activeUserName,
-        email: `${activeUserId}@growthcommerce.ai`,
-        contact: '9999999999'
-      },
-      notes: {
-        user_id: payUserId || activeUserId,
-        store: 'AI Growth Commerce Agentic Store',
-        ap2_agent_payment: isAP2 ? 'true' : 'false'
-      },
-      theme: {
-        color: isAP2 ? '#7c3aed' : '#2563eb'
-      },
-      modal: {
-        ondismiss: function () {
-          appendAgentMessage(
-            isAP2
-              ? `⚠️ AP2 Checkout closed. Your cart is still intact — just say "order my cart" to retry.`
-              : `⚠️ Razorpay Checkout was closed. Your cart is still intact — type "pay" to retry.`
-          );
+    try {
+      const options = {
+        key: effectiveKey,
+        amount: amount,
+        currency: currency || 'INR',
+        name: 'NOVA Store',
+        description: isAP2
+          ? `🤖 Nova Agent Payment — ${cardInfo}`
+          : 'NOVA Official Store — Secure Checkout',
+        image: '/static/images/phone_flagship.svg',
+        order_id: razorpay_order_id,
+        handler: async function (response) {
+          // Real payment captured by Razorpay — verify and finalize order
+          appendAgentMessage(`⏳ Payment received from Razorpay. Verifying and confirming order...`);
+          await verifyAndCompleteRazorpayPayment({
+            razorpay_order_id: response.razorpay_order_id || razorpay_order_id,
+            razorpay_payment_id: response.razorpay_payment_id,
+            razorpay_signature: response.razorpay_signature,
+            shipping_address: shipping_address
+          }, false);
+        },
+        prefill: prefill || {
+          name: activeUserName,
+          email: `${activeUserId}@nova-store.ai`,
+          contact: '9876543210'
+        },
+        notes: {
+          user_id: payUserId || activeUserId,
+          store: 'NOVA Agentic E-Commerce Store',
+          ap2_agent_payment: isAP2 ? 'true' : 'false'
+        },
+        theme: {
+          color: isAP2 ? '#7c3aed' : '#2563eb'
+        },
+        modal: {
+          ondismiss: function () {
+            appendAgentMessage(
+              isAP2
+                ? `⚠️ AP2 Checkout closed. Your cart is still intact — click the checkout button above to retry.`
+                : `⚠️ Razorpay Checkout was closed. Your cart is still intact — click the button above or type "checkout" to reopen.`
+            );
+          }
         }
-      }
-    };
-    const rzp = new window.Razorpay(options);
-    rzp.open();
+      };
+
+      const rzp = new window.Razorpay(options);
+      rzp.on('payment.failed', function (response) {
+        console.error('Razorpay payment failed:', response.error);
+        alert(`Payment failed: ${response.error.description}`);
+      });
+      rzp.open();
+    } catch (err) {
+      console.error('Failed to open Razorpay modal:', err);
+      openRazorpaySimulator(payload, false);
+    }
   } else {
-    // Razorpay.js not loaded — fallback verification with real order ID
-    appendAgentMessage(`⚠️ Razorpay.js SDK not loaded. Attempting direct order confirmation...`);
-    await verifyAndCompleteRazorpayPayment({
-      razorpay_order_id: razorpay_order_id,
-      razorpay_payment_id: `pay_${Date.now().toString(16)}`,
-      razorpay_signature: 'sandbox_verified',
-      shipping_address: shipping_address
-    }, false);
+    // Razorpay.js SDK not available, use built-in simulator fallback
+    console.warn('Razorpay.js not loaded, opening simulator checkout...');
+    openRazorpaySimulator(payload, false);
   }
 }
 
@@ -965,7 +973,7 @@ function appendUserMessage(text) {
   scrollChatToBottom();
 }
 
-function appendAgentMessage(markdownText, toolCalls = []) {
+function appendAgentMessage(markdownText, toolCalls = [], checkoutPayload = null) {
   const bubble = document.createElement('div');
   bubble.className = 'chat-bubble agent';
 
@@ -979,6 +987,20 @@ function appendAgentMessage(markdownText, toolCalls = []) {
     `).join('');
   }
 
+  const cp = checkoutPayload || (toolCalls && toolCalls.some(t => t.name === 'trigger_razorpay_checkout') ? window._lastCheckoutPayload : null);
+  let ctaHtml = '';
+  if (cp && cp.needs_razorpay_checkout) {
+    const amtStr = cp.amount ? (cp.amount / 100).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '';
+    ctaHtml = `
+      <div style="margin-top: 10px;">
+        <button class="btn btn-primary chat-checkout-btn" onclick="openRazorpayCheckoutFromAgent(window._lastCheckoutPayload)" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 600; padding: 10px 14px; border-radius: 8px; background: linear-gradient(135deg, #2563eb, #7c3aed); color: #fff; border: none; cursor: pointer; box-shadow: 0 4px 12px rgba(37,99,235,0.35);">
+          <i data-lucide="credit-card" style="width: 16px; height: 16px;"></i>
+          <span>💳 Open Razorpay Checkout ${amtStr ? `(₹${amtStr})` : ''}</span>
+        </button>
+      </div>
+    `;
+  }
+
   const formattedHtml = parseSimpleMarkdown(markdownText);
 
   bubble.innerHTML = `
@@ -986,6 +1008,7 @@ function appendAgentMessage(markdownText, toolCalls = []) {
     <div class="bubble-content">
       ${toolsHtml}
       <div class="markdown-body">${formattedHtml}</div>
+      ${ctaHtml}
     </div>
   `;
   chatMessages.appendChild(bubble);

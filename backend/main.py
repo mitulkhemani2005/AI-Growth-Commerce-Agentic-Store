@@ -677,7 +677,7 @@ async def admin_add_review(req: AdminReviewAddRequest):
 
 @app.post("/api/admin/reviews/generate-summary")
 async def admin_generate_review_summary(req: AdminGenerateReviewSummaryRequest):
-    """Triggers Groq AI review summary generation for a product."""
+    """Triggers Ollama AI review summary generation for a product."""
     res = await review_manager.generate_ai_review_summary(req.product_id)
     if not res.get("success"):
         raise HTTPException(status_code=400, detail=res.get("error", "Summary generation failed"))

@@ -4,27 +4,28 @@ import threading
 import uuid
 from datetime import datetime, timezone
 from typing import List, Dict, Any, Optional
-from groq import AsyncGroq
+from openai import AsyncOpenAI
 from backend.inventory_manager import inventory_manager
 
 REVIEWS_FILE = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "reviews.json"))
 _lock = threading.RLock()
 
-DEFAULT_GROQ_API_KEY = os.environ.get("ADMIN_GROQ_API_KEY", os.environ.get("GROQ_API_KEY"))  # Set in .env
-DEFAULT_MODEL = os.environ.get("GROQ_ADMIN_MODEL", "qwen/qwen3.6-27b")
+OLLAMA_BASE_URL = os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434/v1")
+DEFAULT_MODEL = os.environ.get("REVIEW_MANAGER_MODEL", os.environ.get("OLLAMA_MODEL", "gemma4:e2b-it-qat"))
 
 class ReviewManager:
-    def __init__(self, file_path: str = REVIEWS_FILE, api_key: str = DEFAULT_GROQ_API_KEY, model: str = DEFAULT_MODEL):
+    def __init__(self, file_path: str = REVIEWS_FILE, base_url: str = OLLAMA_BASE_URL, api_key: str = "ollama", model: str = DEFAULT_MODEL):
         self.file_path = file_path
-        self.api_key = api_key
+        self.base_url = base_url
+        self.api_key = api_key or "ollama"
         self.model = model
         self._init_client()
 
     def _init_client(self):
         try:
-            self.client = AsyncGroq(api_key=self.api_key)
+            self.client = AsyncOpenAI(base_url=self.base_url, api_key=self.api_key)
         except Exception as e:
-            print(f"ReviewManager Groq client warning: {e}")
+            print(f"ReviewManager Ollama client warning: {e}")
             self.client = None
 
 
@@ -98,7 +99,7 @@ class ReviewManager:
 
     async def generate_ai_review_summary(self, product_id_or_name: str) -> Dict[str, Any]:
         """
-        Uses Groq LLM to analyze all customer reviews for an item, synthesize key strengths,
+        Uses local Ollama LLM to analyze all customer reviews for an item, synthesize key strengths,
         complaints, sentiment, and updates the product catalog with the summary.
         """
         # Find target product
@@ -152,7 +153,8 @@ Format with clear bullet points and bold highlights. Keep it under 150 words."""
 
         summary_text = ""
         if self.client:
-            for model_candidate in ["openai/gpt-oss-20b", "openai/gpt-oss-120b", "qwen/qwen3.6-27b"]:
+            models_to_try = list(dict.fromkeys([self.model, "gemma4:e2b-it-qat", "gemma4:e4b", "qwen2.5:7b"]))
+            for model_candidate in models_to_try:
                 try:
                     chat_resp = await self.client.chat.completions.create(
                         model=model_candidate,
@@ -161,15 +163,15 @@ Format with clear bullet points and bold highlights. Keep it under 150 words."""
                             {"role": "user", "content": prompt}
                         ],
                         temperature=0.3,
-                        max_tokens=400
+                        max_tokens=1000
                     )
-                    raw_text = chat_resp.choices[0].message.content
+                    raw_text = chat_resp.choices[0].message.content or ""
                     import re
                     summary_text = re.sub(r'<think>.*?</think>', '', raw_text, flags=re.DOTALL).strip()
                     if summary_text:
                         break
                 except Exception as e:
-                    print(f"Groq review summary model {model_candidate} warning: {e}")
+                    print(f"Ollama review summary model {model_candidate} warning: {e}")
 
         if not summary_text:
             summary_text = f"🌟 **Overall Rating ({avg_rating}/5)**: Based on {len(reviews)} reviews. Customers praise the build quality and performance. Highly recommended in the {prod.get('PRODUCT_TYPE')} collection."

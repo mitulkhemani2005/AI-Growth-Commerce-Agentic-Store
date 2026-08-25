@@ -8,7 +8,7 @@ sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 if __name__ == "__main__":
     print("=" * 60)
     print("  AI Growth Commerce Agentic Store")
-    print("  Powered by Groq / MiniMax LLM & Autonomous Tools")
+    print("  Powered by Ollama (Gemma 4 e2b) & Autonomous Tools")
     print("=" * 60)
     print("  - Web Storefront & Prompt Interface: http://127.0.0.1:8000")
     print("  - API Documentation: http://127.0.0.1:8000/docs")

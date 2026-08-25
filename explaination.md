@@ -5,7 +5,7 @@
 
 ## 📖 1. Executive Summary & Vision
 
-**AI Growth Commerce Agentic Store** is a next-generation autonomous e-commerce enterprise built with state-of-the-art multi-agent AI architecture. Unlike traditional e-commerce platforms that rely on static databases and manual administrative tasks, this platform operates **24/7 autonomously** with a collaborative fleet of specialized AI agents running on dedicated Groq LLMs.
+**AI Growth Commerce Agentic Store** is a next-generation autonomous e-commerce enterprise built with state-of-the-art multi-agent AI architecture. Unlike traditional e-commerce platforms that rely on static databases and manual administrative tasks, this platform operates **24/7 autonomously** with a collaborative fleet of specialized AI agents running on locally installed Ollama LLM (`gemma4:e2b-it-qat`).
 
 ### Core Pillars
 1. **Autonomous Multi-Agent Fleet**: 7 specialized agents communicating in a closed-loop message bus to audit inventory, dynamically optimize prices, fulfill orders, process refunds, and report to the CEO.
@@ -44,9 +44,9 @@
 |                        (backend/background_workers.py)                        |
 |                                                                               |
 |  [Price Mgr]   [Inventory Mgr]   [Order Mgr]   [Finance Mgr]   [Dispatcher]   |
-|  (gpt-oss-20b) (gpt-oss-20b)     (gpt-oss-20b) (gpt-oss-20b)   (gpt-oss-20b)  |
+| (gemma4:e2b)   (gemma4:e2b)      (gemma4:e2b)  (gemma4:e2b)    (gemma4:e2b)   |
 |                                                                               |
-|               [Review Mgr] (gpt-oss-20b)    [CEO Agent] (qwen3.6-27b)        |
+|           [Review Mgr] (gemma4:e2b)     [CEO Agent] (gemma4:e2b)              |
 +-------------------------------------------------------------------------------+
                                     ^
                                     | (JSON Message Bus)
@@ -61,7 +61,7 @@
 
 ## 🤖 3. The 7 Autonomous Specialist Agents
 
-Each agent runs on an independent asynchronous schedule with its own dedicated Groq API credentials to prevent rate limiting:
+Each agent runs on an independent asynchronous schedule powered by local Ollama (`gemma4:e2b-it-qat`):
 
 ### 1. 🏷️ Price Manager Agent (`openai/gpt-oss-20b`)
 - **Interval**: 25 seconds

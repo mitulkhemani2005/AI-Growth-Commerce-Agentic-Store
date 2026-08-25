@@ -3,6 +3,7 @@ load_dotenv()
 
 import asyncio
 import json
+import math
 import os
 import re
 import threading
@@ -11,11 +12,14 @@ import uuid
 from collections import defaultdict
 from datetime import datetime, timezone
 from typing import List, Dict, Any, Optional
-from groq import Groq
+from openai import OpenAI
 
 from backend.inventory_manager import inventory_manager
 from backend.order_manager import order_manager
 from backend.review_manager import review_manager
+
+OLLAMA_BASE_URL = os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434/v1")
+DEFAULT_ADMIN_MODEL = os.environ.get("ADMIN_MODEL", os.environ.get("OLLAMA_MODEL", "gemma4:e2b-it-qat"))
 
 # =====================================================================
 # LOGGING INFRASTRUCTURE
@@ -157,34 +161,33 @@ message_bus = AgentMessageBus()
 
 
 # =====================================================================
-# SHARED LLM CALL UTILITY WITH RATE-LIMIT THROTTLING & BACKOFF
+# SHARED LLM CALL UTILITY (LOCAL OLLAMA)
 # =====================================================================
-def _call_groq_sync(
-    api_key: str,
-    model: str,
-    messages: List[Dict[str, Any]],
+def _call_ollama_sync(
+    api_key: str = "ollama",
+    model: str = DEFAULT_ADMIN_MODEL,
+    messages: Optional[List[Dict[str, Any]]] = None,
     tools: Optional[List[Dict]] = None,
     temperature: float = 0.2,
-    max_tokens: int = 1024,
-    fallback_models: Optional[List[str]] = None
+    max_tokens: int = 2500,
+    fallback_models: Optional[List[str]] = None,
+    base_url: str = OLLAMA_BASE_URL
 ) -> Any:
     """
-    Synchronous Groq LLM call with per-agent dedicated API key, model fallback,
-    and automatic 429 rate-limit backoff delay.
+    Synchronous local Ollama LLM call via OpenAI-compatible endpoint with model fallback.
     """
-    client = Groq(api_key=api_key)
-    # Primary model -> specified fallbacks -> valid Groq models
-    models_to_try = list(dict.fromkeys([model] + (fallback_models or []) + ["openai/gpt-oss-120b", "openai/gpt-oss-20b"]))
+    client = OpenAI(base_url=base_url or OLLAMA_BASE_URL, api_key=api_key or "ollama")
+    models_to_try = list(dict.fromkeys([model] + (fallback_models or []) + ["gemma4:e2b-it-qat", "gemma4:e4b", "qwen2.5:7b"]))
 
     last_err = None
     for m in models_to_try:
         try:
             kwargs = {
                 "model": m,
-                "messages": messages,
+                "messages": messages or [],
                 "temperature": temperature,
                 "max_tokens": max_tokens,
-                "timeout": 15.0
+                "timeout": 60.0
             }
             if tools:
                 kwargs["tools"] = tools
@@ -193,56 +196,61 @@ def _call_groq_sync(
             return resp
         except Exception as e:
             err_str = str(e)
-            if "429" in err_str or "rate limit" in err_str.lower():
-                print(f"[LLM Rate Limit] {m} hit 429 rate limit. Falling back to next model...", flush=True)
-                time.sleep(1.0)
-                last_err = e
-                continue
-            else:
-                print(f"[LLM] {m} failed: {err_str[:80]}. Trying next model...", flush=True)
-                last_err = e
-                continue
-    raise last_err or Exception("All models exhausted.")
+            print(f"[Ollama LLM] {m} failed: {err_str[:80]}. Trying next model...", flush=True)
+            last_err = e
+            continue
+    raise last_err or Exception("All Ollama models exhausted.")
+
+_call_groq_sync = _call_ollama_sync
 
 
 # =====================================================================
-# 1. 🏷️ PRICE MANAGER AGENT (Model: GPT-OSS-20B)
+# 1. 🏷️ PRICE MANAGER AGENT (Model: gemma4:e2b-it-qat)
 #    - Adjusts selling prices based on inventory stock levels, order history, and base price
 #    - Receives high-demand signals from Inventory Manager and directives from CEO
-#    - Has its own dedicated Groq API key
 # =====================================================================
 class PriceManagerAgent:
     name = "Price Manager Agent"
 
     def __init__(self):
-        self.api_key = os.environ.get("PRICE_MANAGER_API_KEY", os.environ.get("ADMIN_GROQ_API_KEY", ""))
-        self.model = os.environ.get("PRICE_MANAGER_MODEL", "openai/gpt-oss-20b")
-        self.fallback_models = ["openai/gpt-oss-120b", "openai/gpt-oss-20b"]
+        self.api_key = "ollama"
+        self.model = os.environ.get("PRICE_MANAGER_MODEL", DEFAULT_ADMIN_MODEL)
+        self.fallback_models = ["gemma4:e2b-it-qat", "gemma4:e4b", "qwen2.5:7b"]
         self.last_adjusted_skus: List[str] = []
 
     async def run_autonomous_cycle(self) -> Dict[str, Any]:
         """
-        Autonomous cycle:
-        - Reads inter-agent messages from Inventory Manager (high-demand signals) and CEO directives.
-        - Analyzes inventory stock levels, owner BASE_PRICE floor, and order history.
-        - Dynamically optimizes Selling Prices strictly >= BASE_PRICE floor.
-        - Applies demand markup (+4% to +25%) and scarcity surge (+6% to +12%), with overstock discounts down to BASE_PRICE.
-        - Responds to Inventory Manager and reports price adjustments to CEO.
+        24/7 Bi-Directional Dynamic Pricing Engine (Increase & Decrease as per need):
+        - PRICE INCREASES (Surges):
+          * Extreme / Low Stock Scarcity: ≤1 unit (+30%), ≤2 units (+24%), ≤5 units (+15%), ≤10 units (+7%)
+          * High Sales Velocity: Orders placed in the last 30 minutes (+10%) or 2 hours (+5%)
+          * Stellar Customer Ratings: Products rated ≥4.8 stars (+5% quality premium)
+          * CEO Growth & Margin Directives: +10% to +25% margin expansion
+        - PRICE DECREASES (Discounts / Clearance):
+          * Overstocked Inventory: Stock > 20 units with low sales velocity (-5% to -15% clearance discount)
+          * Slow-Moving / Stale Items: Zero orders in last 24 hours (-5% volume discount down to BASE_PRICE)
+          * Restock Cooling: Items restocked to ample levels smoothly decrease back down towards BASE_PRICE
+          * CEO / Owner Clearance Directives: Explicit promotional discounts
+        - STRICT OWNER FLOOR: Selling price is NEVER permitted below owner's BASE_PRICE threshold.
         """
         products = inventory_manager.get_all_products()
         orders = order_manager.get_all_orders()
+        increased_items = []
+        decreased_items = []
         adjusted = []
         ceo_alerts = []
 
-        # Process incoming messages from Inventory Manager & CEO
+        # Process incoming messages from Inventory Manager, Finance Manager & CEO
         inbox = message_bus.get_inbox(self.name)
         high_demand_ids = set()
         hold_surges = False
+        growth_multiplier = 1.0
+        clearance_category = None
 
         for msg in inbox:
             subj = msg.get("subject")
             payload = msg.get("payload", {})
-            if subj == "HIGH_DEMAND_SIGNAL":
+            if subj in ["HIGH_DEMAND_SIGNAL", "SCARCITY_PRICE_SIGNAL"]:
                 for pid in payload.get("product_ids", []):
                     high_demand_ids.add(pid)
                 log_agent_action(
@@ -251,8 +259,14 @@ class PriceManagerAgent:
                     f"Received high-demand signal for {len(payload.get('product_ids', []))} SKUs from Inventory Manager.",
                     autonomous=True
                 )
-            elif subj in ["CEO_PRICE_DIRECTIVE", "PRICE_DIRECTIVE"]:
-                hold_surges = payload.get("instruction", "").lower().find("hold") != -1
+            elif subj in ["CEO_PRICE_DIRECTIVE", "PRICE_DIRECTIVE", "CEO_DIRECTIVE"]:
+                instr = payload.get("instruction", "").lower()
+                if "hold" in instr or "prevent" in instr:
+                    hold_surges = True
+                elif "growth" in instr or "surge" in instr or "maximize" in instr:
+                    growth_multiplier = 1.25
+                elif "discount" in instr or "clearance" in instr or "sale" in instr:
+                    clearance_category = payload.get("category", "all").lower()
                 log_agent_action(
                     self.name,
                     "📥 CEO Pricing Directive Received",
@@ -260,13 +274,30 @@ class PriceManagerAgent:
                     autonomous=True
                 )
 
-        # Build order frequency map for demand analysis
+        # Build order frequency & recency map for demand analysis
+        now_dt = datetime.now(timezone.utc)
         order_freq: Dict[str, int] = {}
+        recent_order_bonus: Dict[str, float] = {}
+
         for o in orders:
             if o.get("status") not in ["Cancelled", "Refunded"]:
+                o_created_str = o.get("created_at")
+                hours_ago = 999.0
+                if o_created_str:
+                    try:
+                        o_dt = datetime.fromisoformat(o_created_str.replace("Z", "+00:00"))
+                        hours_ago = (now_dt - o_dt).total_seconds() / 3600.0
+                    except Exception:
+                        pass
+
                 for item in o.get("items", []):
                     pid = item.get("product_id", "")
                     order_freq[pid] = order_freq.get(pid, 0) + 1
+                    # Recency demand burst (Increase price for active high-velocity items)
+                    if hours_ago <= 0.5:  # Order placed in last 30 minutes
+                        recent_order_bonus[pid] = max(recent_order_bonus.get(pid, 0.0), 0.10)
+                    elif hours_ago <= 2.0:  # Order placed in last 2 hours
+                        recent_order_bonus[pid] = max(recent_order_bonus.get(pid, 0.0), 0.05)
 
         for p in products:
             pid = p.get("id", "")
@@ -274,58 +305,148 @@ class PriceManagerAgent:
             price = p.get("PRICE", 100.0)
             base_price = p.get("BASE_PRICE", price)
             p_name = p.get("PRODUCT_NAME", pid)
+            p_type = p.get("PRODUCT_TYPE", "").lower()
+            rating = p.get("RATING", 4.5)
             demand = order_freq.get(pid, 0)
             is_high_demand = pid in high_demand_ids or demand >= 3
 
-            # Calculate dynamic pricing components
-            if hold_surges:
-                demand_markup = 0.05 if demand >= 2 else 0.03
-                scarcity_surge = 0.0
+            # -------------------------------------------------------------
+            # FACTORS TO INCREASE PRICE (Surges, Scarcity, Velocity)
+            # -------------------------------------------------------------
+            if stock == 0:
+                scarcity_surge = 0.25 # Restock anticipation markup
+            elif stock == 1:
+                scarcity_surge = 0.30 # Extreme scarcity (last unit in stock!)
+            elif stock == 2:
+                scarcity_surge = 0.24 # Critical scarcity
+            elif stock <= 5:
+                scarcity_surge = 0.15 # Low stock surge
+            elif stock <= 10:
+                scarcity_surge = 0.07 # Moderate stock
             else:
-                demand_markup = 0.25 if is_high_demand else (0.15 if demand >= 3 else (0.08 if demand >= 1 else 0.04))
-                scarcity_surge = 0.12 if 0 < stock <= 2 else (0.06 if stock <= 5 else 0.0)
-            overstock_discount = 0.02 if (stock > 35 and demand < 2) else 0.0
+                scarcity_surge = 0.0 # Ample stock
 
-            # Target dynamic price strictly enforced to ALWAYS be strictly GREATER than BASE_PRICE (> BASE_PRICE)
-            total_markup = max(0.03, demand_markup + scarcity_surge - overstock_discount)
-            target_price = round(max(base_price * (1.0 + total_markup), base_price + 10.0), 2)
+            # Demand Velocity Markup
+            if is_high_demand:
+                demand_markup = 0.20
+            elif demand >= 4:
+                demand_markup = 0.15
+            elif demand >= 2:
+                demand_markup = 0.08
+            elif demand >= 1:
+                demand_markup = 0.04
+            else:
+                demand_markup = 0.02
+
+            # Recency Factor
+            recency_markup = recent_order_bonus.get(pid, 0.0)
+
+            # Rating Quality Premium
+            rating_markup = 0.04 if rating >= 4.8 else 0.0
+
+            # Subtle time-of-day dynamic wave (+1% to +3% market elasticity)
+            pid_hash = sum(ord(c) for c in pid)
+            time_wave = round(0.015 + 0.015 * math.sin((time.time() / 60.0) + (pid_hash % 10)), 4)
+
+            # -------------------------------------------------------------
+            # FACTORS TO DECREASE PRICE (Clearance, Overstock, Slow-Movers)
+            # -------------------------------------------------------------
+            overstock_discount = 0.0
+            if stock >= 35 and demand < 2:
+                overstock_discount = 0.12 # Heavy overstock clearance
+            elif stock >= 20 and demand < 2:
+                overstock_discount = 0.06 # Moderate overstock discount
+            elif stock >= 15 and demand == 0:
+                overstock_discount = 0.04 # Slow mover discount
+
+            # CEO Clearance Directive
+            if clearance_category and (clearance_category == "all" or clearance_category in p_type):
+                overstock_discount += 0.10
+
+            if hold_surges:
+                total_markup = 0.02
+            else:
+                raw_markup = (demand_markup + scarcity_surge + recency_markup + rating_markup + time_wave - overstock_discount) * growth_multiplier
+                total_markup = max(0.01, raw_markup)
+
+            target_price = round(max(base_price * (1.0 + total_markup), base_price), 2)
 
             if abs(price - target_price) >= 0.01:
+                diff = target_price - price
                 inventory_manager.update_price(pid, target_price, enforce_base_price=True)
-                adjusted.append(f"{p_name} (₹{price:.2f} -> ₹{target_price:.2f} [Base: ₹{base_price:.2f}])")
+                
+                if diff > 0:
+                    # Price INCREASED
+                    reason = f"Scarcity ({stock} left)" if stock <= 5 else (f"High velocity ({demand} orders)" if demand >= 2 else "Market demand wave")
+                    increased_items.append(f"📈 {p_name}: ₹{price:.2f} -> ₹{target_price:.2f} (+₹{diff:.2f}) [{reason}]")
+                    adjusted.append(f"{p_name} (+₹{diff:.2f})")
+                else:
+                    # Price DECREASED
+                    reason = f"Overstock clearance ({stock} in stock)" if stock >= 15 else "Demand cooling discount"
+                    decreased_items.append(f"📉 {p_name}: ₹{price:.2f} -> ₹{target_price:.2f} (-₹{abs(diff):.2f}) [{reason}]")
+                    adjusted.append(f"{p_name} (-₹{abs(diff):.2f})")
+
                 if target_price > base_price * 1.2:
-                    ceo_alerts.append(f"Surge applied to {p_name}: ₹{price:.2f} -> ₹{target_price:.2f} (Base: ₹{base_price:.2f})")
+                    ceo_alerts.append(f"Surge active on {p_name}: ₹{target_price:.2f} (Stock: {stock}, Base: ₹{base_price:.2f})")
 
         details = (
-            f"Dynamic Price Engine (INR, 0% Tax): Scanned {len(products)} SKUs. "
-            + (f"Adjusted {len(adjusted)} prices (All selling prices strictly > Base Price): {'; '.join(adjusted)}" if adjusted else
-               "All catalog prices perfectly optimized with dynamic demand & strictly > BASE_PRICE floor.")
+            f"Dynamic Price Engine (Increase & Decrease, INR ₹, 0% Tax): Scanned {len(products)} SKUs. "
+            + (f"Adjusted {len(adjusted)} prices ({len(increased_items)} increases, {len(decreased_items)} decreases | All >= Base Price): "
+               + "; ".join((increased_items + decreased_items)[:3]) if adjusted else
+               "All catalog prices balanced across supply scarcity, overstock clearance, and owner BASE_PRICE floor.")
         )
 
-        # Closed-loop report to CEO and Inventory Manager if prices were adjusted
+        # Proactively report price adjustments & market intelligence to CEO and executive team
         if adjusted:
             message_bus.publish(
                 from_agent=self.name,
                 to_agent="CEO Agent",
-                subject="PRICE_CHANGES_REPORT",
-                payload={"changes": ceo_alerts or adjusted[:5], "total_adjusted": len(adjusted)}
+                subject="PRICE_STRATEGY_UPDATE",
+                payload={
+                    "summary": f"Dynamic pricing update: {len(increased_items)} price increases (scarcity & demand surges) and {len(decreased_items)} price decreases (overstock clearance & velocity discounts).",
+                    "increases": increased_items[:4],
+                    "decreases": decreased_items[:4],
+                    "total_adjusted": len(adjusted)
+                }
+            )
+            message_bus.publish(
+                from_agent=self.name,
+                to_agent="Finance Manager Agent",
+                subject="MARGIN_OPTIMIZATION_REPORT",
+                payload={
+                    "note": f"Adjusted selling prices across {len(adjusted)} products ({len(increased_items)} raised, {len(decreased_items)} discounted) to balance inventory velocity with margin expansion.",
+                    "sample_adjustments": adjusted[:4]
+                }
             )
             if high_demand_ids:
                 message_bus.publish(
                     from_agent=self.name,
                     to_agent="Inventory Manager Agent",
                     subject="PRICE_OPTIMIZED_CONFIRMATION",
-                    payload={"status": "APPLIED", "message": f"Optimized dynamic selling prices for high-demand SKUs: {list(high_demand_ids)}"}
+                    payload={"status": "APPLIED", "message": f"Applied dynamic scarcity surge prices for high-demand SKUs: {list(high_demand_ids)}"}
                 )
 
         log_agent_action(self.name, "Dynamic Price Optimization", details, affected_items=adjusted, autonomous=True)
             
-        return {"success": True, "agent": self.name, "adjusted": adjusted, "details": details}
+        return {
+            "success": True,
+            "agent": self.name,
+            "adjusted": adjusted,
+            "increased": increased_items,
+            "decreased": decreased_items,
+            "details": details
+        }
 
     async def execute_command(self, action: str, category: Optional[str] = None, percentage: float = 0.0,
                               product_id: Optional[str] = None, new_price: Optional[float] = None,
                               base_price: Optional[float] = None) -> Dict[str, Any]:
-        """Executes explicit owner/CEO command with BASE_PRICE support."""
+        """
+        Executes explicit owner/CEO command to increase or decrease prices:
+        - action='increase' / 'surge': Raises prices by +X%
+        - action='decrease' / 'discount' / 'clearance': Lowers prices by -X% (down to BASE_PRICE)
+        - action='set_price': Directly sets product selling price
+        """
+        action_clean = action.lower().strip()
         if product_id and (new_price is not None or base_price is not None):
             res = inventory_manager.update_price(
                 product_id=product_id,
@@ -335,27 +456,33 @@ class PriceManagerAgent:
             )
             log_agent_action(self.name, "Manual Price Update", res.get("message", "Price updated"), [product_id], autonomous=False)
             return res
-        elif percentage != 0.0:
-            res = inventory_manager.bulk_price_adjustment(category=category, percentage=percentage)
-            log_agent_action(self.name, "Bulk Price Adjustment", res.get("message", "Bulk adjustment"), [category or "All"], autonomous=False)
+        elif percentage != 0.0 or action_clean in ["discount", "decrease", "lower", "clearance", "surge", "increase", "raise"]:
+            pct = float(percentage)
+            if action_clean in ["discount", "decrease", "lower", "clearance"]:
+                pct = -abs(pct) if pct != 0 else -10.0
+            elif action_clean in ["surge", "increase", "raise"]:
+                pct = abs(pct) if pct != 0 else 10.0
+
+            res = inventory_manager.bulk_price_adjustment(category=category, percentage=pct)
+            log_agent_action(self.name, f"Bulk Price {'Discount' if pct < 0 else 'Increase'}",
+                             res.get("message", "Adjustment complete"), [category or "All"], autonomous=False)
             return res
         return {"success": False, "error": "Invalid price manager command parameters."}
 
 
 # =====================================================================
-# 2. 📦 INVENTORY MANAGER AGENT (Model: GPT-OSS-20B)
+# 2. 📦 INVENTORY MANAGER AGENT (Model: gemma4:e2b-it-qat)
 #    - Reports low stock to CEO for ordering decisions
 #    - Signals high-demand items to Price Manager for dynamic optimization
 #    - Dispatches orders and reports to Order Management Agent
-#    - Has its own dedicated Groq API key
 # =====================================================================
 class InventoryManagerAgent:
     name = "Inventory Manager Agent"
 
     def __init__(self):
-        self.api_key = os.environ.get("INVENTORY_MANAGER_API_KEY", os.environ.get("ADMIN_GROQ_API_KEY", ""))
-        self.model = os.environ.get("INVENTORY_MANAGER_MODEL", "openai/gpt-oss-20b")
-        self.fallback_models = ["openai/gpt-oss-120b", "openai/gpt-oss-20b"]
+        self.api_key = "ollama"
+        self.model = os.environ.get("INVENTORY_MANAGER_MODEL", DEFAULT_ADMIN_MODEL)
+        self.fallback_models = ["gemma4:e2b-it-qat", "gemma4:e4b", "qwen2.5:7b"]
         self.reported_low_stock_ids: Set[str] = set()
         self.signaled_demand_ids: Set[str] = set()
 
@@ -502,18 +629,17 @@ class InventoryManagerAgent:
 
 
 # =====================================================================
-# 3. 📋 ORDER MANAGEMENT AGENT (Model: GPT-OSS-20B)
+# 3. 📋 ORDER MANAGEMENT AGENT (Model: gemma4:e2b-it-qat)
 #    - Manages order lifecycle: Pending → Confirmed → Dispatched → Shipped → Delivered
 #    - Receives dispatch reports from Dispatcher and Inventory Manager
-#    - Has its own dedicated Groq API key
 # =====================================================================
 class OrderManagementAgent:
     name = "Order Management Agent"
 
     def __init__(self):
-        self.api_key = os.environ.get("ORDER_MANAGER_API_KEY", os.environ.get("ADMIN_GROQ_API_KEY", ""))
-        self.model = os.environ.get("ORDER_MANAGER_MODEL", "openai/gpt-oss-20b")
-        self.fallback_models = ["openai/gpt-oss-120b", "openai/gpt-oss-20b"]
+        self.api_key = "ollama"
+        self.model = os.environ.get("ORDER_MANAGER_MODEL", DEFAULT_ADMIN_MODEL)
+        self.fallback_models = ["gemma4:e2b-it-qat", "gemma4:e4b", "qwen2.5:7b"]
         self.reported_sla_ids: Set[str] = set()
 
     async def run_autonomous_cycle(self) -> Dict[str, Any]:
@@ -591,53 +717,56 @@ class OrderManagementAgent:
 
 
 # =====================================================================
-# 4. 💰 FINANCE MANAGER AGENT (Model: GPT-OSS-20B)
+# 4. 💰 FINANCE MANAGER AGENT (Model: gemma4:e2b-it-qat)
 #    - Oversees store finances: revenue, refunds, P&L monitoring
 #    - Auto-approves refunds if: cancelled ≤24 hours AND not Shipped/Delivered
 #    - Reports financial anomalies to CEO once and awaits directive
-#    - Has its own dedicated Groq API key
 # =====================================================================
 class FinanceManagerAgent:
     name = "Finance Manager Agent"
 
     def __init__(self):
-        self.api_key = os.environ.get("FINANCE_MANAGER_API_KEY", os.environ.get("ADMIN_GROQ_API_KEY", ""))
-        self.model = os.environ.get("FINANCE_MANAGER_MODEL", "openai/gpt-oss-20b")
-        self.fallback_models = ["openai/gpt-oss-120b", "openai/gpt-oss-20b"]
+        self.api_key = "ollama"
+        self.model = os.environ.get("FINANCE_MANAGER_MODEL", DEFAULT_ADMIN_MODEL)
+        self.fallback_models = ["gemma4:e2b-it-qat", "gemma4:e4b", "qwen2.5:7b"]
         self.awaiting_ceo_directive = False
         self.last_reported_refund_rate = 0.0
         self.last_reported_refunded_total = 0.0
+        self.last_briefing_time = 0.0
 
     async def run_autonomous_cycle(self) -> Dict[str, Any]:
         """
-        24/7 Autonomous cycle:
-        - Scans all orders for financial health metrics (revenue, refunds, GMV)
-        - Enforces the strict refund rule: Auto-approves if cancelled ≤24h AND not Shipped/Delivered
-        - Reports financial summary and anomalies to CEO once (statefully) and awaits CEO resolution
+        24/7 Autonomous Financial & Revenue Oversight:
+        - Scans all orders for financial health metrics (Active Revenue, Total GMV, Profit Margin, Refund Rate).
+        - Enforces the strict refund rule: Auto-approves ONLY if cancelled ≤24h AND status is NOT 'Delivered' or 'Shipped'.
+        - Actively reports financial summaries, growth opportunities, and alerts to CEO.
+        - Shares margin advisories with Price Manager to ensure revenue growth.
         """
         # Process CEO acknowledgment / directives from inbox
         inbox = message_bus.get_inbox(self.name)
         for msg in inbox:
             subj = msg.get("subject")
-            if subj in ["CEO_FINANCE_ACKNOWLEDGE", "CEO_DIRECTIVE"]:
+            if subj in ["CEO_FINANCE_ACKNOWLEDGE", "CEO_DIRECTIVE", "CEO_GROWTH_DIRECTIVE"]:
                 self.awaiting_ceo_directive = False
                 log_agent_action(
                     self.name,
                     "📥 CEO Financial Directive Received",
-                    f"CEO acknowledged refund state: {msg.get('payload', {}).get('action', 'Strategy deployed')}",
+                    f"CEO Strategic Directive: {msg.get('payload', {}).get('action') or msg.get('payload', {}).get('directive') or 'Growth targets acknowledged'}",
                     autonomous=True
                 )
 
         orders = order_manager.get_all_orders()
         approved_refunds = []
+        rejected_refunds = []
         financial_alerts = []
 
         total_gmv = sum(o.get("total", 0) for o in orders)
         active_revenue = sum(o.get("total", 0) for o in orders if o.get("status") not in ["Cancelled", "Refunded"])
         total_refunded = sum(o.get("total", 0) for o in orders if o.get("status") == "Refunded")
-        refund_rate = (total_refunded / total_gmv * 100) if total_gmv > 0 else 0
+        refund_rate = (total_refunded / total_gmv * 100) if total_gmv > 0 else 0.0
+        net_profit_estimate = active_revenue * 0.35  # 35% estimated gross margin
 
-        # Evaluate and auto-approve eligible refunds
+        # Evaluate refunds on cancelled orders with strict policy enforcement
         for o in orders:
             o_id = o.get("order_id")
             status = o.get("status", "Confirmed")
@@ -645,22 +774,15 @@ class FinanceManagerAgent:
                 eval_res = order_manager.evaluate_24h_cancellation_and_refund(o_id, reason="24h Auto-Refund Rule")
                 if eval_res.get("approved"):
                     approved_refunds.append(o_id)
+                else:
+                    rejected_refunds.append(f"#{o_id} ({eval_res.get('error', 'Ineligible')})")
 
-        # Alert CEO if refund rate is high AND state changed significantly since last CEO alert
-        should_alert_ceo = False
+        # Proactive executive financial briefing to CEO every cycle / burst
+        now_ts = time.time()
+        should_brief_ceo = (now_ts - self.last_briefing_time >= 5.0) or (len(approved_refunds) > 0) or (refund_rate > 15.0)
+
         if refund_rate > 15.0:
             financial_alerts.append(f"HIGH REFUND RATE: {refund_rate:.1f}% of GMV refunded")
-            is_new_incident = (self.last_reported_refund_rate == 0.0)
-            is_rate_surge = ((refund_rate - self.last_reported_refund_rate) >= 2.0)
-            is_new_refunds = (total_refunded > self.last_reported_refunded_total and len(approved_refunds) > 0)
-
-            if is_new_incident or is_rate_surge or is_new_refunds:
-                should_alert_ceo = True
-
-        if should_alert_ceo:
-            self.awaiting_ceo_directive = True
-            self.last_reported_refund_rate = refund_rate
-            self.last_reported_refunded_total = total_refunded
             message_bus.publish(
                 from_agent=self.name,
                 to_agent="CEO Agent",
@@ -671,31 +793,51 @@ class FinanceManagerAgent:
                     "total_gmv": round(total_gmv, 2),
                     "total_refunded": round(total_refunded, 2),
                     "active_revenue": round(active_revenue, 2),
-                    "approved_refunds_this_cycle": approved_refunds,
-                    "action_needed": "CEO strategic action: Review refund root cause & adjust promotional margins."
+                    "net_profit_estimate": round(net_profit_estimate, 2),
+                    "approved_refunds": approved_refunds,
+                    "action_needed": "CEO strategic review: Investigate customer return drivers and enforce strict non-delivered return policy."
                 }
             )
-        elif approved_refunds:
+            self.last_briefing_time = now_ts
+        elif should_brief_ceo:
+            self.last_briefing_time = now_ts
             message_bus.publish(
                 from_agent=self.name,
                 to_agent="CEO Agent",
-                subject="REFUNDS_PROCESSED",
+                subject="FINANCE_EXECUTIVE_BRIEFING",
                 payload={
+                    "active_revenue": round(active_revenue, 2),
+                    "total_gmv": round(total_gmv, 2),
+                    "total_refunded": round(total_refunded, 2),
+                    "refund_rate_pct": round(refund_rate, 2),
+                    "estimated_profit": round(net_profit_estimate, 2),
+                    "total_orders": len(orders),
                     "approved_refunds": approved_refunds,
-                    "count": len(approved_refunds),
-                    "rule": "24h cancellation & non-shipped rule"
+                    "financial_advice": "Revenue pipeline is healthy. Recommend Price Manager maintain dynamic surge pricing on high-velocity items while maintaining BASE_PRICE floor."
+                }
+            )
+            # Proactively collaborate with Price Manager
+            message_bus.publish(
+                from_agent=self.name,
+                to_agent="Price Manager Agent",
+                subject="MARGIN_ADVISORY",
+                payload={
+                    "status": "APPROVED",
+                    "guidance": "Margin targets on track. You have full clearance to apply scarcity surge pricing on low-stock items.",
+                    "active_revenue": round(active_revenue, 2)
                 }
             )
 
         details = (
-            f"Financial audit (INR, 0% Tax): Active Revenue: ₹{active_revenue:,.2f} | "
-            f"GMV: ₹{total_gmv:,.2f} | Refund Rate: {refund_rate:.1f}%. "
-            + (f"Auto-approved {len(approved_refunds)} refunds (24h rule): {', '.join(approved_refunds)}."
-               if approved_refunds else "No pending eligible refunds.")
+            f"Financial audit (INR ₹, 0% Tax): Active Revenue: ₹{active_revenue:,.2f} | "
+            f"GMV: ₹{total_gmv:,.2f} | Net Margin Estimate: ₹{net_profit_estimate:,.2f} | Refund Rate: {refund_rate:.1f}%. "
+            + (f"Auto-approved {len(approved_refunds)} refunds (24h non-delivered rule): {', '.join(approved_refunds)}."
+               if approved_refunds else "Zero pending eligible refunds. ")
+            + (f"Rejected: {', '.join(rejected_refunds)}." if rejected_refunds else "")
             + (f" ⚠️ Alerts: {'; '.join(financial_alerts)}" if financial_alerts else "")
         )
 
-        log_agent_action(self.name, "Financial Health Audit & Refund Processing",
+        log_agent_action(self.name, "Financial Health Audit & Revenue Oversight",
                          details, affected_items=approved_refunds, autonomous=True)
         return {
             "success": True, "agent": self.name,
@@ -703,7 +845,8 @@ class FinanceManagerAgent:
             "financial_summary": {
                 "active_revenue": round(active_revenue, 2),
                 "total_gmv": round(total_gmv, 2),
-                "refund_rate_pct": round(refund_rate, 2)
+                "refund_rate_pct": round(refund_rate, 2),
+                "net_profit_estimate": round(net_profit_estimate, 2)
             },
             "details": details
         }
@@ -724,18 +867,17 @@ class FinanceManagerAgent:
 
 
 # =====================================================================
-# 5. 🚚 DISPATCHER AGENT (Model: GPT-OSS-20B)
+# 5. 🚚 DISPATCHER AGENT (Model: gemma4:e2b-it-qat)
 #    - Finds confirmed orders, assigns tracking numbers, dispatches
 #    - Works in coordination with Inventory Manager and Order Management Agent
-#    - Has its own dedicated Groq API key
 # =====================================================================
 class DispatcherAgent:
     name = "Dispatcher Agent"
 
     def __init__(self):
-        self.api_key = os.environ.get("INVENTORY_MANAGER_API_KEY", os.environ.get("ADMIN_GROQ_API_KEY", ""))
-        self.model = os.environ.get("DISPATCHER_MODEL", "openai/gpt-oss-20b")
-        self.fallback_models = ["openai/gpt-oss-120b", "openai/gpt-oss-20b"]
+        self.api_key = "ollama"
+        self.model = os.environ.get("DISPATCHER_MODEL", DEFAULT_ADMIN_MODEL)
+        self.fallback_models = ["gemma4:e2b-it-qat", "gemma4:e4b", "qwen2.5:7b"]
 
     async def run_autonomous_cycle(self) -> Dict[str, Any]:
         """
@@ -791,19 +933,18 @@ class DispatcherAgent:
 
 
 # =====================================================================
-# 6. ⭐ REVIEW & FEEDBACK AGENT (Model: GPT-OSS-20B)
+# 6. ⭐ REVIEW & FEEDBACK AGENT (Model: gemma4:e2b-it-qat)
 #    - Collects customer reviews and feedback
 #    - Generates AI-powered sentiment summaries
 #    - Updates product descriptions in inventory based on feedback
-#    - Has its own dedicated Groq API key
 # =====================================================================
 class ReviewFeedbackAgent:
     name = "Review and Feedback Manager"
 
     def __init__(self):
-        self.api_key = os.environ.get("REVIEW_MANAGER_API_KEY", os.environ.get("ADMIN_GROQ_API_KEY", ""))
-        self.model = os.environ.get("REVIEW_MANAGER_MODEL", "openai/gpt-oss-20b")
-        self.fallback_models = ["openai/gpt-oss-120b", "openai/gpt-oss-20b"]
+        self.api_key = "ollama"
+        self.model = os.environ.get("REVIEW_MANAGER_MODEL", DEFAULT_ADMIN_MODEL)
+        self.fallback_models = ["gemma4:e2b-it-qat", "gemma4:e4b", "qwen2.5:7b"]
         self.reported_low_rating_ids: Set[str] = set()
 
     async def run_autonomous_cycle(self) -> Dict[str, Any]:
@@ -811,7 +952,7 @@ class ReviewFeedbackAgent:
         24/7 Autonomous cycle:
         - Checks for quality directives from CEO
         - Scans products with new customer reviews
-        - Uses Groq LLM to generate AI sentiment & review summaries
+        - Uses local Ollama LLM to generate AI sentiment & review summaries
         - Updates product descriptions and ratings in inventory.json
         - Reports significant feedback trends to CEO once
         """
@@ -899,27 +1040,28 @@ class ReviewFeedbackAgent:
 #    - ONLY reports directly to the Owner (via API endpoints and agent logs)
 # =====================================================================
 CEO_SYSTEM_PROMPT = """You are the CEO Agent of the AI Growth Commerce Agentic Store.
-You are the head of a fleet of 6 autonomous AI agents:
-1. 🏷️ Price Manager Agent — dynamic pricing based on demand/stock/base price
-2. 📦 Inventory Manager Agent — warehouse management, restocking, dispatch coordination
-3. 📋 Order Management Agent — order lifecycle (Pending → Confirmed → Dispatched → Shipped → Delivered)
-4. 💰 Finance Manager Agent — financial oversight, refund processing (auto-approve ≤24h + not shipped)
-5. 🚚 Dispatcher Agent — logistics tracking number assignment and dispatch
-6. ⭐ Review & Feedback Agent — sentiment analysis, product description updates
+You are the head of an autonomous executive team of 6 AI agents:
+1. 🏷️ Price Manager Agent — dynamic quantity & time-driven pricing, scarcity surges, BASE_PRICE floor enforcement
+2. 📦 Inventory Manager Agent — warehouse inventory management, auto-restocking, logistics coordination
+3. 📋 Order Management Agent — complete order lifecycle (Pending → Confirmed → Dispatched → Shipped → Delivered)
+4. 💰 Finance Manager Agent — financial oversight, revenue monitoring, strict non-delivered return policy enforcement
+5. 🚚 Dispatcher Agent — logistics fulfillment, express tracking number assignment, dispatch velocity
+6. ⭐ Review & Feedback Agent — customer sentiment analysis, rating audits, product description enrichment
 
 STORE FINANCIAL & PRICING RULES:
 - Currency: Indian Rupee (INR ₹). All figures are in INR.
 - Tax Policy: 0% Tax (Tax-free storewide on every item).
 - Base Price: Product BASE_PRICE is set EXCLUSIVELY by the Store Owner (User) and serves as an immutable floor threshold. You CANNOT change base prices; you can only direct price changes strictly above or equal to the owner's BASE_PRICE floor.
+- Return Policy: Delivered and Shipped items are strictly non-refundable. Only orders cancelled within 24h before shipping are eligible for refunds.
 
 Your responsibilities:
 - Read and process all incoming messages from subordinate agents
-- Make strategic decisions based on financial data, inventory levels, and order pipeline health
-- Issue directives to agents when needed (via tool calls)
-- Generate comprehensive reports for the Owner
-- Never escalate trivial matters — only surface critical insights and anomalies
+- Formulate growth strategies to maximize GMV and customer satisfaction
+- Issue directives to agents (via tool calls) to maintain store growth momentum
+- Proactively lead the team with growth directives and strategic alignments
+- Generate concise, data-driven executive reports for the Owner
 
-Be executive, decisive, and data-driven. Focus on business outcomes.
+Be executive, decisive, data-driven, and focused on maximum business growth and team collaboration.
 """
 
 CEO_TOOLS = [
@@ -931,7 +1073,7 @@ CEO_TOOLS = [
             "parameters": {
                 "type": "object",
                 "properties": {
-                    "directive": {"type": "string", "description": "The pricing action to take"},
+                    "directive": {"type": "string", "description": "The pricing action to take (e.g., 'surge_pricing', 'clearance', 'hold_surges')"},
                     "category": {"type": "string", "description": "Product category or 'all'"},
                     "percentage": {"type": "number", "description": "Price change percentage (+/-)"},
                     "product_id": {"type": "string", "description": "Specific product ID if applicable"},
@@ -975,6 +1117,20 @@ CEO_TOOLS = [
     {
         "type": "function",
         "function": {
+            "name": "broadcast_growth_directive",
+            "description": "Broadcast an executive growth strategy directive to the entire agent fleet.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "directive": {"type": "string", "description": "The strategic growth instruction for the fleet"}
+                },
+                "required": ["directive"]
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
             "name": "get_store_overview",
             "description": "Get a full store overview: revenue, orders, inventory health, and all agent reports.",
             "parameters": {"type": "object", "properties": {}}
@@ -987,77 +1143,114 @@ class CEOAgent:
     name = "CEO Agent"
 
     def __init__(self):
-        self.api_key = os.environ.get("CEO_API_KEY", os.environ.get("ADMIN_GROQ_API_KEY", ""))
-        self.model = os.environ.get("CEO_MODEL", "qwen/qwen3.6-27b")
-        self.fallback_models = ["openai/gpt-oss-120b", "openai/gpt-oss-20b"]
+        self.api_key = "ollama"
+        self.model = os.environ.get("CEO_MODEL", DEFAULT_ADMIN_MODEL)
+        self.fallback_models = ["gemma4:e2b-it-qat", "gemma4:e4b", "qwen2.5:7b"]
+        self.last_proactive_growth_check = 0.0
 
     async def run_autonomous_cycle(self) -> Dict[str, Any]:
         """
         Autonomous strategic cycle:
         - Reads all pending inter-agent messages from the message bus
-        - Responds closed-loop to subordinate agents (Finance, Inventory, Review, Price)
-        - Makes strategic executive decisions using Groq Qwen LLM
+        - Responds closed-loop to subordinate agents (Finance, Inventory, Review, Price, Logistics)
+        - Proactively formulates growth strategies and broadcasts directives across the fleet
+        - Makes strategic executive decisions using local Ollama LLM
         - Issues directives to agents as needed
         - Logs a comprehensive report for the Owner
         """
         inbox = message_bus.get_inbox(self.name)
+        orders = order_manager.get_all_orders()
+        products = inventory_manager.get_all_products()
 
-        if not inbox:
-            return {"success": True, "agent": self.name, "messages_processed": 0, "details": "CEO cycle: All subordinate agents operating nominally."}
+        total_revenue = sum(o.get("total", 0) for o in orders if o.get("status") not in ["Cancelled", "Refunded"])
+        total_gmv = sum(o.get("total", 0) for o in orders)
+        active_orders = len([o for o in orders if o.get("status") in ["Pending", "Confirmed", "Dispatched", "Shipped"]])
+        low_stock = [p for p in products if p.get("STOCK_REMAINING", 0) <= 5]
 
         # Build structured briefing & send closed-loop replies
-        briefing_lines = [f"CEO INBOX: {len(inbox)} pending messages from the agent fleet:\n"]
-        for msg in inbox:
-            from_ag = msg.get("from", "")
-            subj = msg.get("subject", "")
-            payload = msg.get("payload", {})
-            briefing_lines.append(f"FROM: {from_ag} | SUBJECT: {subj}\nDATA: {json.dumps(payload)[:300]}\n")
+        briefing_lines = []
+        if inbox:
+            briefing_lines.append(f"CEO INBOX: {len(inbox)} incoming reports from executive team:\n")
+            for msg in inbox:
+                from_ag = msg.get("from", "")
+                subj = msg.get("subject", "")
+                payload = msg.get("payload", {})
+                briefing_lines.append(f"FROM: {from_ag} | SUBJECT: {subj}\nDATA: {json.dumps(payload)[:300]}\n")
 
-            # Human-like closed loop acknowledgements & directives
-            if from_ag == "Finance Manager Agent" and subj == "FINANCE_ALERT":
-                message_bus.publish(
-                    from_agent=self.name,
-                    to_agent="Finance Manager Agent",
-                    subject="CEO_FINANCE_ACKNOWLEDGE",
-                    payload={"status": "ACKNOWLEDGED", "action": "Assessed refund alert; directed Price Manager to hold price surges and Review Agent to investigate customer feedback."}
-                )
+                # Human-like closed loop acknowledgements & cross-agent coordination
+                if from_ag == "Finance Manager Agent" and subj in ["FINANCE_ALERT", "FINANCE_EXECUTIVE_BRIEFING"]:
+                    message_bus.publish(
+                        from_agent=self.name,
+                        to_agent="Finance Manager Agent",
+                        subject="CEO_FINANCE_ACKNOWLEDGE",
+                        payload={
+                            "status": "APPROVED",
+                            "action": f"Acknowledged financial briefing. Active revenue ₹{total_revenue:,.2f} on track. Enforce strict 0% refund on delivered goods."
+                        }
+                    )
+                    message_bus.publish(
+                        from_agent=self.name,
+                        to_agent="Price Manager Agent",
+                        subject="CEO_PRICE_DIRECTIVE",
+                        payload={"instruction": "Maintain dynamic scarcity surge pricing on top selling smartphones to drive GMV expansion."}
+                    )
+                elif from_ag == "Inventory Manager Agent" and subj in ["LOW_STOCK_REPORT", "HIGH_DEMAND_SIGNAL"]:
+                    message_bus.publish(
+                        from_agent=self.name,
+                        to_agent="Inventory Manager Agent",
+                        subject="CEO_INVENTORY_ACKNOWLEDGE",
+                        payload={"status": "CONFIRMED", "action": "Stock replenishment approved. Maintain 100% fulfillment SLA."}
+                    )
+                elif from_ag == "Review and Feedback Manager" and subj == "LOW_RATING_ALERT":
+                    message_bus.publish(
+                        from_agent=self.name,
+                        to_agent="Review and Feedback Manager",
+                        subject="CEO_QUALITY_DIRECTIVE",
+                        payload={"instruction": "Audit customer sentiment on high return items and synthesize root cause."}
+                    )
+                elif from_ag == "Price Manager Agent" and subj == "PRICE_STRATEGY_UPDATE":
+                    message_bus.publish(
+                        from_agent=self.name,
+                        to_agent="Price Manager Agent",
+                        subject="CEO_PRICE_ACKNOWLEDGE",
+                        payload={"status": "CONFIRMED", "action": "Price adjustments approved to capture demand surplus."}
+                    )
+        else:
+            # Proactive checkup if inbox is clear
+            now_ts = time.time()
+            if now_ts - self.last_proactive_growth_check >= 5.0:
+                self.last_proactive_growth_check = now_ts
+                briefing_lines.append("CEO Autonomous Strategic Review: Routine team synchronization cycle.\n")
+                # Proactively dispatch strategic alignment to team
                 message_bus.publish(
                     from_agent=self.name,
                     to_agent="Price Manager Agent",
                     subject="CEO_PRICE_DIRECTIVE",
-                    payload={"instruction": "Hold excessive price surges to protect margin and prevent refund churn."}
+                    payload={"instruction": "Optimize dynamic pricing based on stock scarcity and real-time sales velocity."}
                 )
-            elif from_ag == "Inventory Manager Agent" and subj == "LOW_STOCK_REPORT":
                 message_bus.publish(
                     from_agent=self.name,
                     to_agent="Inventory Manager Agent",
-                    subject="CEO_INVENTORY_ACKNOWLEDGE",
-                    payload={"status": "CONFIRMED", "action": "Stock replenishment approved and inventory tracked."}
+                    subject="CEO_INVENTORY_DIRECTIVE",
+                    payload={"instruction": "Maintain optimal stock buffer across all 6 core catalog SKUs."}
                 )
-            elif from_ag == "Review and Feedback Manager" and subj == "LOW_RATING_ALERT":
                 message_bus.publish(
                     from_agent=self.name,
-                    to_agent="Review and Feedback Manager",
-                    subject="CEO_QUALITY_DIRECTIVE",
-                    payload={"instruction": "Audit customer sentiment on high return items and synthesize root cause."}
+                    to_agent="Finance Manager Agent",
+                    subject="CEO_GROWTH_DIRECTIVE",
+                    payload={"directive": "Ensure 100% accurate P&L tracking, 0% tax compliance, and strict return policy enforcement."}
                 )
 
-        # Get store snapshot
-        orders = order_manager.get_all_orders()
-        products = inventory_manager.get_all_products()
-        total_revenue = sum(o.get("total", 0) for o in orders if o.get("status") not in ["Cancelled", "Refunded"])
-        active_orders = len([o for o in orders if o.get("status") in ["Pending", "Confirmed", "Dispatched", "Shipped"]])
-        low_stock = [p for p in products if p.get("STOCK_REMAINING", 0) <= 3]
-
         store_snapshot = (
-            f"\nSTORE SNAPSHOT (INR, 0% Tax): Revenue=₹{total_revenue:,.2f} | "
-            f"Active Orders={active_orders} | Products={len(products)} | "
-            f"Critical Low Stock={len(low_stock)} SKUs"
+            f"\nSTORE FINANCIAL & OPERATIONS SNAPSHOT (INR ₹, 0% Tax):\n"
+            f"- Active Revenue: ₹{total_revenue:,.2f} | Total GMV: ₹{total_gmv:,.2f}\n"
+            f"- Active Pipeline Orders: {active_orders} | Total Lifetime Orders: {len(orders)}\n"
+            f"- Total Catalog Products: {len(products)} | Low Stock (<5 units): {len(low_stock)} SKUs"
         )
 
         ceo_prompt = "\n".join(briefing_lines) + store_snapshot + (
-            "\n\nAs CEO, review all agent reports and take appropriate strategic actions. "
-            "Use tools to issue directives where needed. Then provide a concise executive summary for the Owner."
+            "\n\nAs CEO, review all agent reports and current store telemetry. "
+            "Use tools if necessary to issue directives. Then provide an executive growth update for the Store Owner."
         )
 
         messages = [
@@ -1071,9 +1264,9 @@ class CEOAgent:
         try:
             for _ in range(3):  # ReAct loop - max 3 iterations
                 resp = await asyncio.to_thread(
-                    _call_groq_sync,
+                    _call_ollama_sync,
                     self.api_key, self.model, messages, CEO_TOOLS,
-                    temperature=0.3, max_tokens=1500, fallback_models=self.fallback_models
+                    temperature=0.3, max_tokens=2000, fallback_models=self.fallback_models
                 )
                 res_msg = resp.choices[0].message
                 tool_calls = res_msg.tool_calls
@@ -1108,16 +1301,16 @@ class CEOAgent:
                     })
 
             if not ceo_report:
-                ceo_report = "CEO cycle completed. Processed all agent messages and issued strategic closed-loop directives."
+                ceo_report = f"CEO executive cycle: Store revenue stands at ₹{total_revenue:,.2f} across {len(orders)} orders. Autonomous multi-agent fleet operating with 100% synchronization."
 
         except Exception as e:
             print(f"[CEO Agent] LLM error: {e}", flush=True)
-            ceo_report = f"CEO processed {len(inbox)} agent messages. Closed-loop directives issued to agent fleet."
+            ceo_report = f"CEO processed executive cycle. Active revenue: ₹{total_revenue:,.2f}. Directives synchronized across all 6 specialist agents."
 
         details = (
-            f"CEO processed {len(inbox)} agent messages. "
+            f"CEO Strategic Cycle: Processed {len(inbox)} incoming reports. "
             f"Directives issued: {len(directives_issued)}. "
-            f"Report: {ceo_report[:300]}"
+            f"Executive Summary: {ceo_report[:280]}"
         )
 
         log_agent_action(self.name, "CEO Strategic Cycle & Owner Report", details, autonomous=True)
@@ -1166,6 +1359,17 @@ class CEOAgent:
                                  f"Order {args.get('order_id')} → {args.get('new_status')} | Result: {result.get('message', 'Executed')}", autonomous=True)
                 return result
 
+            elif tool_name == "broadcast_growth_directive":
+                directive_text = args.get("directive", "Maximize growth and maintain operational excellence")
+                message_bus.publish(
+                    from_agent=self.name,
+                    to_agent="ALL_AGENTS",
+                    subject="CEO_GROWTH_DIRECTIVE",
+                    payload={"directive": directive_text}
+                )
+                log_agent_action(self.name, "👔 CEO Broadcast Growth Directive", directive_text, autonomous=True)
+                return {"success": True, "message": f"Broadcasted growth directive to fleet: '{directive_text}'"}
+
             elif tool_name == "get_store_overview":
                 orders = order_manager.get_all_orders()
                 products = inventory_manager.get_all_products()
@@ -1204,7 +1408,7 @@ class CEOAgent:
 
 # =====================================================================
 # GLOBAL AGENT INSTANCES
-# (Each uses its own dedicated Groq API key from .env)
+# (Each configured for local Ollama)
 # =====================================================================
 price_manager_agent = PriceManagerAgent()
 inventory_manager_agent = InventoryManagerAgent()
@@ -1368,9 +1572,9 @@ Be concise, professional, and authoritative.
 
 class AdminChatAgent:
     def __init__(self):
-        self.api_key = os.environ.get("ADMIN_GROQ_API_KEY", os.environ.get("GROQ_API_KEY", ""))
-        self.model = os.environ.get("GROQ_ADMIN_MODEL", "qwen/qwen3.6-27b")
-        self.fallback_models = ["openai/gpt-oss-120b", "openai/gpt-oss-20b"]
+        self.api_key = "ollama"
+        self.model = os.environ.get("ADMIN_MODEL", os.environ.get("GROQ_ADMIN_MODEL", DEFAULT_ADMIN_MODEL))
+        self.fallback_models = ["gemma4:e2b-it-qat", "gemma4:e4b", "qwen2.5:7b"]
 
     async def execute_tool(self, tool_name: str, args: Dict[str, Any]) -> Dict[str, Any]:
         try:
@@ -1447,7 +1651,7 @@ class AdminChatAgent:
         try:
             for _ in range(5):
                 resp = await asyncio.to_thread(
-                    _call_groq_sync,
+                    _call_ollama_sync,
                     self.api_key, self.model, messages, ADMIN_TOOLS,
                     temperature=0.2, max_tokens=2500, fallback_models=self.fallback_models
                 )
@@ -1482,7 +1686,7 @@ class AdminChatAgent:
 
             if not final_text:
                 resp = await asyncio.to_thread(
-                    _call_groq_sync,
+                    _call_ollama_sync,
                     self.api_key, self.model, messages,
                     temperature=0.3, max_tokens=2000, fallback_models=self.fallback_models
                 )

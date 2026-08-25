@@ -2,7 +2,7 @@
 Customer AI Commerce Agent ('Nova')
 ===================================
 Autonomous customer-facing AI agent for the AI Growth Commerce Store.
-Powered by Groq LLMs (GPT-OSS / open-source models) with native tool calling.
+Powered by local Ollama LLM (gemma4:e2b-it-qat) with native tool calling.
 
 Capabilities:
   - Product Catalog Discovery & Multi-Factor Filtering
@@ -19,7 +19,7 @@ import json
 import asyncio
 from typing import List, Dict, Any, Optional
 from dotenv import load_dotenv
-from groq import AsyncGroq, Groq
+from openai import AsyncOpenAI, OpenAI
 
 # Backend Managers
 from backend.inventory_manager import inventory_manager
@@ -31,23 +31,23 @@ from backend.review_manager import review_manager
 load_dotenv()
 
 # =====================================================================
-# 1. MODEL & API CONFIGURATION
+# 1. MODEL & API CONFIGURATION (LOCAL OLLAMA)
 # =====================================================================
 
-DEFAULT_GROQ_API_KEY = os.environ.get("CUSTOMER_GROQ_API_KEY", os.environ.get("GROQ_API_KEY", ""))
+OLLAMA_BASE_URL = os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434/v1")
+DEFAULT_MODEL = os.environ.get("CUSTOMER_MODEL", os.environ.get("OLLAMA_MODEL", "gemma4:e2b-it-qat"))
 
-# Dedicated Groq models (Qwen for Customer Agent with fast fallback)
+# Dedicated local Ollama model fallback hierarchy
 DEFAULT_MODELS = [
-    "qwen/qwen3.6-27b",
-    "openai/gpt-oss-120b",
-    "openai/gpt-oss-20b"
+    DEFAULT_MODEL,
+    "gemma4:e2b-it-qat",
+    "gemma4:e4b",
+    "qwen2.5:7b"
 ]
 
-DEFAULT_MODEL = os.environ.get("GROQ_CUSTOMER_MODEL", "qwen/qwen3.6-27b")
-
 
 # =====================================================================
-# 2. TOOL DEFINITIONS FOR GROQ FUNCTION CALLING
+# 2. TOOL DEFINITIONS FOR FUNCTION CALLING
 # =====================================================================
 
 AGENT_TOOLS: List[Dict[str, Any]] = [
@@ -430,12 +430,15 @@ STORE OVERVIEW — NOVA OFFICIAL STORE:
 - "Clear cart" → `clear_cart`
 
 ══════════════════════════════════════════════════════════════════════
-💳 CHECKOUT & RAZORPAY PAYMENT
+💳 CHECKOUT & RAZORPAY PAYMENT (ACTION-FIRST BUYING DIRECTIVE)
 ══════════════════════════════════════════════════════════════════════
-Whenever the customer wants to buy, pay, checkout, or place an order:
-1. Ensure the cart has the requested items. If empty and user mentioned products, search and add them first.
-2. Call `trigger_razorpay_checkout` — this creates a real Razorpay Order and signals the browser to open the official Razorpay popup.
-3. Tell the user: "I've prepared your Razorpay checkout! The secure payment window is opening now — complete your payment using Card / UPI / NetBanking."
+Whenever the customer wants to buy, pay, checkout, order, or picks a product:
+1. ACTION-FIRST RULE: If the customer says "order X fast", "buy any phone", "Prime 5G final", "order the phone", "buy it", or picks a specific product:
+   - DO NOT delay or ask extra confirmation questions ("Would you like to add it?").
+   - IMMEDIATELY execute `add_to_cart` for the selected/best-matching product AND execute `trigger_razorpay_checkout` in that SAME turn.
+   - If the user refers to a previously discussed product (e.g. "order the phone", "Prime 5G final", "take this one"), resolve it from context, add to cart, and call `trigger_razorpay_checkout`.
+2. `trigger_razorpay_checkout` creates a real Razorpay Order and automatically pops up the Razorpay payment window on the user's screen.
+3. Tell the user: "I've added [Product] to your cart and prepared your Razorpay checkout! The secure payment popup is opening on your screen now — complete your payment using UPI / Card / NetBanking."
 4. NEVER directly place an order without triggering Razorpay checkout first.
 
 ══════════════════════════════════════════════════════════════════════
@@ -487,6 +490,74 @@ def normalize_identifier(val: Any) -> str:
     return str(val).strip()
 
 
+def _resolve_product_from_text_or_history(
+    prompt: str,
+    conversation_history: Optional[List[Dict[str, str]]] = None
+) -> Optional[Dict[str, Any]]:
+    """
+    Intelligently resolves a specific product SKU from customer prompt or previous conversation context.
+    Handles typos, abbreviations (e.g. 'Prime 5G', 'findal'), category mentions ('phone', 'laptop'), and history.
+    """
+    all_products = inventory_manager.get_all_products()
+    prompt_lower = prompt.lower().strip()
+
+    # 1. Exact match against product IDs or product names in prompt
+    for p in all_products:
+        p_name = p.get("PRODUCT_NAME", "").lower()
+        p_id = p.get("id", "").lower()
+        if p_id in prompt_lower or p_name in prompt_lower:
+            return p
+
+    # 2. Check for core substring tokens in prompt (e.g. "prime 5g", "apex pro", "ultra fold", "titanvolt")
+    for p in all_products:
+        p_name = p.get("PRODUCT_NAME", "").lower()
+        p_sub = p_name.replace("nova ", "").strip()
+        core_tokens = [w for w in p_sub.split() if len(w) > 2 and w not in ["smartphone", "phone", "wireless", "wired", "ultra", "pro"]]
+        if core_tokens and all(token in prompt_lower for token in core_tokens):
+            return p
+
+    # 3. Check conversation history (what product was mentioned or returned in recent assistant/user messages)
+    if conversation_history:
+        for msg in reversed(conversation_history[-8:]):
+            c_text = msg.get("content", "").lower()
+            for p in all_products:
+                p_name = p.get("PRODUCT_NAME", "").lower()
+                p_id = p.get("id", "").lower()
+                if p_id in c_text or p_name in c_text:
+                    return p
+            # Check for core tokens in conversation history
+            for p in all_products:
+                p_sub = p.get("PRODUCT_NAME", "").lower().replace("nova ", "").strip()
+                core_tokens = [w for w in p_sub.split() if len(w) > 2 and w not in ["smartphone", "phone", "wireless", "wired"]]
+                if core_tokens and all(token in c_text for token in core_tokens):
+                    return p
+
+    # 4. Search query with stop words removed
+    stopwords = {"order", "buy", "pay", "checkout", "purchase", "place", "findal", "final", "fast", "any", "please", "the", "a", "an", "this", "that", "it", "me", "for", "now", "i", "need", "to", "want", "watch", "porn", "can", "you", "my", "get"}
+    clean_words = [w for w in re.findall(r'\b\w+\b', prompt_lower) if w not in stopwords]
+    clean_query = " ".join(clean_words).strip()
+    if clean_query:
+        matches = inventory_manager.search_products(query=clean_query)
+        if matches:
+            return matches[0]
+
+    # 5. Category keywords fallback
+    if any(w in prompt_lower for w in ["phone", "smartphone", "mobile"]):
+        matches = inventory_manager.search_products(product_types=["Mobiles"])
+        if matches:
+            return matches[0]
+    elif any(w in prompt_lower for w in ["laptop", "ultrabook", "computer"]):
+        matches = inventory_manager.search_products(product_types=["Laptops"])
+        if matches:
+            return matches[0]
+    elif any(w in prompt_lower for w in ["earbud", "earphone", "headphone", "audio", "speaker", "sound", "mic"]):
+        matches = inventory_manager.search_products(product_types=["Audio"])
+        if matches:
+            return matches[0]
+
+    return None
+
+
 # =====================================================================
 # 5. COMMERCE AGENT CLASS
 # =====================================================================
@@ -499,28 +570,26 @@ class CommerceAgent:
 
     def __init__(
         self,
-        api_key: str = DEFAULT_GROQ_API_KEY,
+        base_url: str = OLLAMA_BASE_URL,
+        api_key: str = "ollama",
         model: str = DEFAULT_MODEL,
         fallback_models: Optional[List[str]] = None
     ):
-        self.api_key = api_key
+        self.base_url = base_url
+        self.api_key = api_key or "ollama"
         self.model = model
         self.fallback_models = fallback_models or DEFAULT_MODELS
-        self.client: Optional[AsyncGroq] = None
-        self.sync_client: Optional[Groq] = None
+        self.client: Optional[AsyncOpenAI] = None
+        self.sync_client: Optional[OpenAI] = None
         self._init_client()
 
     def _init_client(self):
-        """Initializes Groq async and sync clients."""
+        """Initializes Ollama OpenAI-compatible async and sync clients."""
         try:
-            if self.api_key:
-                self.client = AsyncGroq(api_key=self.api_key)
-                self.sync_client = Groq(api_key=self.api_key)
-            else:
-                self.client = None
-                self.sync_client = None
+            self.client = AsyncOpenAI(base_url=self.base_url, api_key=self.api_key)
+            self.sync_client = OpenAI(base_url=self.base_url, api_key=self.api_key)
         except Exception as e:
-            print(f"[Customer AI] Groq client init warning: {e}", flush=True)
+            print(f"[Customer AI] Ollama client init warning: {e}", flush=True)
             self.client = None
             self.sync_client = None
 
@@ -530,12 +599,12 @@ class CommerceAgent:
         tools: Optional[List[Dict[str, Any]]] = None,
         tool_choice: Optional[str] = None,
         temperature: float = 0.1,
-        max_tokens: int = 2000
+        max_tokens: int = 2500
     ):
         """
-        Asynchronously calls Groq LLM with automatic fallback across models.
+        Asynchronously calls local Ollama LLM with automatic fallback across models.
         """
-        models_to_try = [self.model] + [m for m in self.fallback_models if m != self.model]
+        models_to_try = list(dict.fromkeys([self.model] + self.fallback_models))
         last_error = None
 
         if not self.sync_client:
@@ -548,18 +617,18 @@ class CommerceAgent:
                         "model": model_name,
                         "messages": messages,
                         "temperature": temperature,
-                        "max_tokens": min(max_tokens, 2000),
-                        "timeout": 18.0
+                        "max_tokens": max_tokens,
+                        "timeout": 60.0
                     }
                     if tools:
                         kwargs["tools"] = tools
                         if tool_choice:
                             kwargs["tool_choice"] = tool_choice
 
-                    print(f"[Customer AI] Calling Groq model '{model_name}' (messages: {len(messages)})...", flush=True)
+                    print(f"[Customer AI] Calling Ollama model '{model_name}' (messages: {len(messages)})...", flush=True)
                     resp = await asyncio.wait_for(
                         asyncio.to_thread(self.sync_client.chat.completions.create, **kwargs),
-                        timeout=18.0
+                        timeout=60.0
                     )
                     print(f"[Customer AI] Model '{model_name}' returned successfully.", flush=True)
                     return resp
@@ -567,15 +636,9 @@ class CommerceAgent:
                     err_str = str(e)
                     print(f"[Customer AI Warning] {model_name} (attempt {attempt + 1}): {err_str}", flush=True)
                     last_error = e
-                    # If daily token limit reached (TPD), immediately skip to next fallback model
-                    if "tpd" in err_str.lower() or "tokens per day" in err_str.lower():
-                        break
-                    if "429" in err_str or "rate_limit" in err_str.lower():
-                        # Immediately try fallback model on 429 rate limit
-                        break
                     break
 
-        raise last_error or Exception("All Customer Groq models exhausted.")
+        raise last_error or Exception("All Customer Ollama models exhausted.")
 
     def execute_tool(self, tool_name: str, tool_args: Dict[str, Any], user_id: str = "user_alex") -> Dict[str, Any]:
         """
@@ -782,14 +845,14 @@ class CommerceAgent:
                     user_orders = order_manager.get_orders_by_user(user_id)
                     if user_orders:
                         for o in user_orders:
-                            if o.get("status") in ["Confirmed", "Dispatched", "Shipped"]:
+                            if o.get("status") in ["Confirmed", "Pending", "Dispatched", "Shipped", "Delivered"]:
                                 order_id = o.get("order_id")
                                 break
                         if not order_id and user_orders:
                             order_id = user_orders[0].get("order_id")
 
                 if not order_id:
-                    return {"success": False, "error": "No eligible orders found to refund."}
+                    return {"success": False, "error": "No past orders found to evaluate for refund."}
 
                 return payment_manager.process_refund(
                     order_id=order_id,
@@ -860,7 +923,7 @@ class CommerceAgent:
         conversation_history: Optional[List[Dict[str, str]]] = None
     ) -> Dict[str, Any]:
         """
-        Executes a customer prompt through the ReAct loop using Groq Tool Calling,
+        Executes a customer prompt through the ReAct loop using LLM Tool Calling,
         falling back seamlessly to deterministic tool execution if API limits occur.
         """
         messages: List[Dict[str, Any]] = [{"role": "system", "content": SYSTEM_PROMPT}]
@@ -977,6 +1040,52 @@ class CommerceAgent:
             final_text, fallback_tools = self._execute_fallback_routing(prompt, user_id, action_data)
             executed_tools_trace.extend(fallback_tools)
 
+        # 🔑 Post-processing Intent Guard: If customer requested checkout/pay/order and checkout_payload is not yet set
+        prompt_lower = prompt.lower()
+        is_checkout_intent = any(k in prompt_lower for k in [
+            "checkout", "pay", "buy", "place order", "order now", "purchase",
+            "proceed to payment", "razorpay", "complete order", "pay for my cart",
+            "order my cart", "buy this", "buy now", "take my money", "open checkout",
+            "order the phone", "order it", "order ", "final", "findal", "buy the",
+            "get me", "take this", "i want this", "i will take"
+        ])
+
+        if is_checkout_intent and not action_data.get("checkout_payload"):
+            current_cart = cart_manager.get_cart(user_id)
+            # If cart is empty, try to auto-add product resolved from prompt or history
+            if not current_cart.get("items"):
+                resolved_p = _resolve_product_from_text_or_history(prompt, conversation_history)
+                if resolved_p:
+                    add_out = self.execute_tool("add_to_cart", {"product_name_or_id": resolved_p["id"], "quantity": 1}, user_id=user_id)
+                    executed_tools_trace.append({"name": "add_to_cart", "args": {"product_name_or_id": resolved_p["id"], "quantity": 1}, "output": add_out})
+                    action_data["cart"] = cart_manager.get_cart(user_id)
+                    current_cart = action_data["cart"]
+
+            if current_cart.get("items"):
+                chk_res = self.execute_tool("trigger_razorpay_checkout", {}, user_id=user_id)
+                executed_tools_trace.append({
+                    "name": "trigger_razorpay_checkout",
+                    "args": {},
+                    "output": chk_res
+                })
+                if chk_res.get("needs_razorpay_checkout"):
+                    action_data["checkout_payload"] = chk_res
+                    action_data["cart"] = cart_manager.get_cart(user_id)
+                    total_amount = current_cart.get("estimated_total", 0.0)
+                    items_names = ", ".join([f"{item.get('name', 'Product')} (x{item.get('quantity', 1)})" for item in current_cart.get("items", [])])
+                    checkout_msg = (
+                        f"🛒 **Order Prepared!** {items_names}\n\n"
+                        f"**Cart Total:** **₹{total_amount:,.2f}** ({current_cart.get('item_count', 0)} item(s) • 0% Tax)\n\n"
+                        f"Opening the **Razorpay Secure Checkout popup** on your screen now (supporting UPI, Cards, NetBanking, and Wallets)!"
+                    )
+                    if not final_text or ("added" in final_text and "Razorpay" not in final_text) or "Would you like" in final_text:
+                        final_text = checkout_msg.strip()
+                    elif "Razorpay" not in final_text and "checkout" not in final_text.lower():
+                        final_text += f"\n\n{checkout_msg}"
+            else:
+                if not final_text:
+                    final_text = "Your shopping cart is currently empty! Please select a product from our catalog, and I'll immediately add it and open the Razorpay checkout popup for you."
+
         # Refresh final state for response payload
         current_cart = cart_manager.get_cart(user_id)
         current_orders = order_manager.get_orders_by_user(user_id)
@@ -1016,7 +1125,7 @@ class CommerceAgent:
                 sizes_str = ", ".join([f"`{s['size']}`" for s in tool_out.get("available_sizes", [])]) or "Standard"
                 text = (
                     f"✨ **{p['PRODUCT_NAME']}** ({p.get('PRODUCT_TYPE', 'Product')})\n\n"
-                    f"**Price:** **${p.get('PRICE')}** | **Rating:** ⭐ **{p.get('RATING', 4.8)}/5.0** | **Stock:** {p.get('STOCK_REMAINING', 0)} in stock\n\n"
+                    f"**Price:** **₹{p.get('PRICE', 0):,.2f}** | **Rating:** ⭐ **{p.get('RATING', 4.8)}/5.0** | **Stock:** {p.get('STOCK_REMAINING', 0)} in stock\n\n"
                     f"📝 **Overview & Engineering:**\n{p.get('DESCRIPTION', 'Premium quality engineering designed for performance.')}\n\n"
                     f"📏 **Available Sizes:** {sizes_str}\n\n"
                     f"⭐ **Customer Sentiment:**\n{p.get('AI_REVIEW_SUMMARY', 'Customers highly praise the durability, build quality, and comfort.')}\n\n"
@@ -1051,7 +1160,7 @@ class CommerceAgent:
                     f"✅ **Refund Processed Successfully!**\n\n"
                     f"- **Order ID**: `#{ord_obj.get('order_id')}`\n"
                     f"- **Refund ID**: `{ref_d.get('refund_id')}`\n"
-                    f"- **Amount**: **${ref_d.get('amount')}**\n"
+                    f"- **Amount**: **₹{ref_d.get('amount', 0):,.2f}**\n"
                     f"- **Gateway**: `Razorpay Gateway`\n"
                     f"- **Inventory**: Restocked automatically."
                 )
@@ -1073,7 +1182,7 @@ class CommerceAgent:
                     f"- **Tracking #**: `{trk}`\n"
                     f"- **Items**: {len(latest.get('items', []))} item(s)\n"
                     f"- **Estimated Delivery**: {latest.get('delivery_estimate', '2-3 Business Days')}\n"
-                    f"- **Total**: ${latest.get('total')}"
+                    f"- **Total**: ₹{latest.get('total', 0):,.2f}"
                 )
             else:
                 text = "You do not have any past orders yet. Browse our catalog to place your first order!"
@@ -1087,22 +1196,30 @@ class CommerceAgent:
             return "🗑️ Your shopping cart has been cleared.", tools_run
 
         # 6. Checkout / Buy / Order Intent -> Always Pop Razorpay Checkout Modal
-        elif any(k in prompt_lower for k in ["order", "buy", "pay", "checkout"]):
+        elif any(k in prompt_lower for k in ["order", "buy", "pay", "checkout", "final", "findal"]):
             cart = cart_manager.get_cart(user_id)
             if not cart.get("items"):
-                search_res = inventory_manager.search_products(query=prompt)
-                if not search_res:
-                    search_res = inventory_manager.get_all_products()[:2]
-                items_to_add = [{"product_name_or_id": p["id"], "quantity": 1} for p in search_res]
-                self.execute_tool("batch_add_to_cart", {"items": items_to_add}, user_id=user_id)
-                tools_run.append({"name": "batch_add_to_cart", "args": {"items": items_to_add}, "output": {"success": True}})
+                resolved_p = _resolve_product_from_text_or_history(prompt, None)
+                if resolved_p:
+                    self.execute_tool("add_to_cart", {"product_name_or_id": resolved_p["id"], "quantity": 1}, user_id=user_id)
+                    tools_run.append({"name": "add_to_cart", "args": {"product_name_or_id": resolved_p["id"], "quantity": 1}, "output": {"success": True}})
+                else:
+                    search_res = inventory_manager.search_products(query=prompt)
+                    if not search_res:
+                        search_res = inventory_manager.get_all_products()[:1]
+                    if search_res:
+                        self.execute_tool("add_to_cart", {"product_name_or_id": search_res[0]["id"], "quantity": 1}, user_id=user_id)
+                        tools_run.append({"name": "add_to_cart", "args": {"product_name_or_id": search_res[0]["id"], "quantity": 1}, "output": {"success": True}})
 
             chk_res = self.execute_tool("trigger_razorpay_checkout", {}, user_id=user_id)
             tools_run.append({"name": "trigger_razorpay_checkout", "args": {}, "output": chk_res})
-            action_data["checkout_payload"] = chk_res
+            if chk_res.get("needs_razorpay_checkout"):
+                action_data["checkout_payload"] = chk_res
             cart = cart_manager.get_cart(user_id)
+            items_names = ", ".join([f"{item.get('name', 'Product')} (x{item.get('quantity', 1)})" for item in cart.get("items", [])])
             text = (
-                f"🛒 **Order Prepared!** Cart Total: **${cart.get('estimated_total', 0.0):.2f}** ({cart.get('item_count', 0)} item(s)).\n\n"
+                f"🛒 **Order Prepared!** {items_names}\n\n"
+                f"**Cart Total:** **₹{cart.get('estimated_total', 0.0):,.2f}** ({cart.get('item_count', 0)} item(s) • 0% Tax)\n\n"
                 f"Opening the **Razorpay Secure Checkout popup** on your screen now (supporting UPI, Cards, NetBanking, and Wallets)!"
             )
             return text, tools_run
@@ -1116,7 +1233,7 @@ class CommerceAgent:
             tool_out = self.execute_tool("batch_add_to_cart", {"items": items_to_add}, user_id=user_id)
             tools_run.append({"name": "batch_add_to_cart", "args": {"items": items_to_add}, "output": tool_out})
             action_data["cart"] = cart_manager.get_cart(user_id)
-            text = f"🛒 Added **{len(items_to_add)} item(s)** to your shopping cart:\n" + "\n".join([f"- **{p['PRODUCT_NAME']}** (${p['PRICE']})" for p in search_res])
+            text = f"🛒 Added **{len(items_to_add)} item(s)** to your shopping cart:\n" + "\n".join([f"- **{p['PRODUCT_NAME']}** (₹{p['PRICE']:,.2f})" for p in search_res])
             return text, tools_run
 
         # 8. Default: Search Catalog
@@ -1126,7 +1243,7 @@ class CommerceAgent:
                 search_res = inventory_manager.get_all_products()[:4]
             tools_run.append({"name": "search_inventory", "args": {"query": prompt}, "output": {"count": len(search_res), "products": search_res}})
             action_data["searched_products"] = search_res
-            items_table = "\n".join([f"| {p['PRODUCT_NAME']} | {p.get('PRODUCT_TYPE')} | **${p['PRICE']}** | Stock: {p.get('STOCK_REMAINING', 0)} |" for p in search_res[:5]])
+            items_table = "\n".join([f"| {p['PRODUCT_NAME']} | {p.get('PRODUCT_TYPE')} | **₹{p['PRICE']:,.2f}** | Stock: {p.get('STOCK_REMAINING', 0)} |" for p in search_res[:5]])
             text = f"Here are the matching items found in our catalog:\n\n| Product | Category | Price | Stock |\n|---|---|---|---|\n{items_table}\n\nWould you like me to explain any product in detail, add items to your cart, or open Razorpay checkout?"
             return text, tools_run
 

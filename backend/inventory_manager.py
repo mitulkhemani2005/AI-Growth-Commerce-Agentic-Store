@@ -1,6 +1,7 @@
 import json
 import os
 import threading
+import time
 from typing import List, Dict, Any, Optional
 
 INVENTORY_FILE = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "inventory.json"))
@@ -15,13 +16,29 @@ class InventoryManager:
         with _lock:
             if not os.path.exists(self.file_path):
                 return []
-            with open(self.file_path, "r", encoding="utf-8") as f:
-                return json.load(f)
+            for _ in range(5):
+                try:
+                    with open(self.file_path, "r", encoding="utf-8") as f:
+                        return json.load(f)
+                except Exception:
+                    time.sleep(0.02)
+            return []
 
     def _write_inventory(self, data: List[Dict[str, Any]]) -> None:
         with _lock:
-            with open(self.file_path, "w", encoding="utf-8") as f:
-                json.dump(data, f, indent=2)
+            tmp_file = f"{self.file_path}.{os.getpid()}.{threading.get_ident()}.tmp"
+            try:
+                with open(tmp_file, "w", encoding="utf-8") as f:
+                    json.dump(data, f, indent=2)
+                os.replace(tmp_file, self.file_path)
+            except Exception:
+                if os.path.exists(tmp_file):
+                    try:
+                        os.remove(tmp_file)
+                    except Exception:
+                        pass
+                with open(self.file_path, "w", encoding="utf-8") as f:
+                    json.dump(data, f, indent=2)
 
     def get_all_products(self) -> List[Dict[str, Any]]:
         """Returns all products in inventory."""
@@ -30,7 +47,7 @@ class InventoryManager:
     def get_product_by_id(self, product_id: str) -> Optional[Dict[str, Any]]:
         products = self._read_inventory()
         for p in products:
-            if p.get("id") == product_id:
+            if p.get("id") == product_id or p.get("PRODUCT_NAME", "").lower() == product_id.lower():
                 return p
         return None
 
@@ -59,98 +76,86 @@ class InventoryManager:
 
         for p in products:
             p_name = p.get("PRODUCT_NAME", "").lower()
-            p_type = p.get("PRODUCT_TYPE", "").lower()
-            p_size = p.get("PRODUCT_SIZE", "").lower()
             p_desc = p.get("DESCRIPTION", "").lower()
+            p_type = p.get("PRODUCT_TYPE", "").lower()
             p_tags = [t.lower() for t in p.get("TAGS", [])]
-            stock = p.get("STOCK_REMAINING", 0)
-            price = p.get("PRICE", 0.0)
+            p_price = p.get("PRICE", 0.0)
+            p_stock = p.get("STOCK_REMAINING", 0)
+            p_size = p.get("PRODUCT_SIZE", "")
 
-            # In stock filter
-            if in_stock_only and stock <= 0:
-                continue
-
-            # Price filter
-            if min_price is not None and price < min_price:
-                continue
-            if max_price is not None and price > max_price:
-                continue
-
-            # Size filter
-            if size:
-                size_clean = size.lower().strip()
-                if size_clean not in p_size and p_size not in size_clean:
-                    continue
-
-            # Product type filter (single or multiple)
+            # Filter by multiple product types if specified
             if target_types:
-                match_type = any(t in p_type or p_type in t for t in target_types)
+                match_type = any(
+                    tt in p_type or tt in p_tags or any(tt in name_word for name_word in p_name.split())
+                    for tt in target_types
+                )
                 if not match_type:
                     continue
 
-            # Keyword query filter
+            # Filter by size
+            if size and size.lower() != "all":
+                if size.lower() not in p_size.lower():
+                    continue
+
+            # Filter by price range
+            if min_price is not None and p_price < min_price:
+                continue
+            if max_price is not None and p_price > max_price:
+                continue
+
+            # Filter by in-stock
+            if in_stock_only and p_stock <= 0:
+                continue
+
+            # Keyword query matching
             if query_terms:
-                full_text = f"{p_name} {p_type} {p_size} {p_desc} {' '.join(p_tags)}"
-                # If multiple search keywords, check if any or all match
-                match_query = all(term in full_text for term in query_terms) or any(term in full_text for term in query_terms)
-                if not match_query:
+                matched_all = True
+                for term in query_terms:
+                    term_match = (
+                        term in p_name
+                        or term in p_desc
+                        or term in p_type
+                        or any(term in tag for tag in p_tags)
+                        or term == p.get("id", "").lower()
+                    )
+                    if not term_match:
+                        matched_all = False
+                        break
+                if not matched_all:
                     continue
 
             results.append(p)
 
         return results
 
-    def check_stock(self, product_identifiers: List[str], size: Optional[str] = None) -> List[Dict[str, Any]]:
-        """
-        Checks real-time stock levels for one or multiple products.
-        """
+    def get_product_sizes(self, product_name: str) -> List[Dict[str, Any]]:
+        """Finds all available variants/sizes for a given product base name."""
         products = self._read_inventory()
-        stock_report = []
-        
-        for identifier in product_identifiers:
-            ident_clean = identifier.lower().strip()
-            found = False
-            for p in products:
-                p_id = p.get("id", "").lower()
-                p_name = p.get("PRODUCT_NAME", "").lower()
-                p_size = p.get("PRODUCT_SIZE", "").lower()
-
-                if ident_clean == p_id or ident_clean in p_name:
-                    if size and size.lower().strip() not in p_size:
-                        continue
-                    stock_report.append({
-                        "id": p.get("id"),
-                        "PRODUCT_NAME": p.get("PRODUCT_NAME"),
-                        "PRODUCT_TYPE": p.get("PRODUCT_TYPE"),
-                        "PRODUCT_SIZE": p.get("PRODUCT_SIZE"),
-                        "STOCK_REMAINING": p.get("STOCK_REMAINING"),
-                        "PRICE": p.get("PRICE"),
-                        "in_stock": p.get("STOCK_REMAINING", 0) > 0
-                    })
-                    found = True
-            if not found:
-                stock_report.append({
-                    "identifier": identifier,
-                    "found": False,
-                    "message": f"Product matching '{identifier}' was not found in catalog."
+        base_name = product_name.lower().strip()
+        variants = []
+        for p in products:
+            p_name = p.get("PRODUCT_NAME", "").lower()
+            if base_name in p_name or p_name in base_name:
+                variants.append({
+                    "id": p.get("id"),
+                    "name": p.get("PRODUCT_NAME"),
+                    "size": p.get("PRODUCT_SIZE", "Standard"),
+                    "stock": p.get("STOCK_REMAINING", 0),
+                    "price": p.get("PRICE", 0.0),
+                    "base_price": p.get("BASE_PRICE", p.get("PRICE", 0.0))
                 })
-        return stock_report
+        return variants
 
     def deduct_stock(self, items: List[Dict[str, Any]]) -> Dict[str, Any]:
         """
-        Atomically decrements STOCK_REMAINING for given items.
-        Items format: [{'id': 'prod_001', 'quantity': 1}, ...]
-        Returns success status and updated products or error.
+        Atomically decrements STOCK_REMAINING for a list of items upon order placement.
+        Items format: [{'id': 'prod_001', 'quantity': 2}, ...]
         """
         with _lock:
-            if not os.path.exists(self.file_path):
-                return {"success": False, "error": "Inventory database not found."}
-
-            with open(self.file_path, "r", encoding="utf-8") as f:
-                products = json.load(f)
+            products = self._read_inventory()
+            products_map = {p["id"]: p for p in products}
 
             # First validate all items have sufficient stock
-            products_map = {p["id"]: p for p in products}
             for item in items:
                 p_id = item.get("id")
                 qty = item.get("quantity", 1)
@@ -177,9 +182,8 @@ class InventoryManager:
                     "new_stock": products_map[p_id]["STOCK_REMAINING"]
                 })
 
-            # Save updated inventory to JSON
-            with open(self.file_path, "w", encoding="utf-8") as f:
-                json.dump(products, f, indent=2)
+            # Save updated inventory atomically
+            self._write_inventory(products)
 
             return {
                 "success": True,
@@ -192,12 +196,7 @@ class InventoryManager:
         Items format: [{'id': 'prod_001', 'quantity': 1}, ...]
         """
         with _lock:
-            if not os.path.exists(self.file_path):
-                return {"success": False, "error": "Inventory database not found."}
-
-            with open(self.file_path, "r", encoding="utf-8") as f:
-                products = json.load(f)
-
+            products = self._read_inventory()
             products_map = {p["id"]: p for p in products}
             restored_items = []
             for item in items:
@@ -211,8 +210,7 @@ class InventoryManager:
                         "new_stock": products_map[p_id]["STOCK_REMAINING"]
                     })
 
-            with open(self.file_path, "w", encoding="utf-8") as f:
-                json.dump(products, f, indent=2)
+            self._write_inventory(products)
 
             return {
                 "success": True,
@@ -224,6 +222,7 @@ class InventoryManager:
         with _lock:
             products = self._read_inventory()
             found = False
+            target = None
             for p in products:
                 if p.get("id") == product_id or p.get("PRODUCT_NAME", "").lower() == product_id.lower():
                     p["STOCK_REMAINING"] = max(0, int(new_stock))
@@ -233,8 +232,7 @@ class InventoryManager:
             if not found:
                 return {"success": False, "error": f"Product '{product_id}' not found."}
 
-            with open(self.file_path, "w", encoding="utf-8") as f:
-                json.dump(products, f, indent=2)
+            self._write_inventory(products)
 
             return {
                 "success": True,
@@ -247,6 +245,7 @@ class InventoryManager:
         with _lock:
             products = self._read_inventory()
             found = False
+            target = None
             for p in products:
                 if p.get("id") == product_id or p.get("PRODUCT_NAME", "").lower() == product_id.lower():
                     if base_price is not None:
@@ -260,12 +259,11 @@ class InventoryManager:
             if not found:
                 return {"success": False, "error": f"Product '{product_id}' not found."}
 
-            with open(self.file_path, "w", encoding="utf-8") as f:
-                json.dump(products, f, indent=2)
+            self._write_inventory(products)
 
             return {
                 "success": True,
-                "message": f"Updated price for '{target['PRODUCT_NAME']}' to ${target['PRICE']:.2f} (Base: ${target.get('BASE_PRICE', target['PRICE']):.2f}).",
+                "message": f"Updated price for '{target['PRODUCT_NAME']}' to ₹{target['PRICE']:,.2f} (Base: ₹{target.get('BASE_PRICE', target['PRICE']):,.2f}).",
                 "product": target
             }
 
@@ -274,6 +272,7 @@ class InventoryManager:
         with _lock:
             products = self._read_inventory()
             found = False
+            target = None
             for p in products:
                 if p.get("id") == product_id or p.get("PRODUCT_NAME", "").lower() == product_id.lower():
                     p["BASE_PRICE"] = round(float(new_base_price), 2)
@@ -285,12 +284,11 @@ class InventoryManager:
             if not found:
                 return {"success": False, "error": f"Product '{product_id}' not found."}
 
-            with open(self.file_path, "w", encoding="utf-8") as f:
-                json.dump(products, f, indent=2)
+            self._write_inventory(products)
 
             return {
                 "success": True,
-                "message": f"Updated BASE_PRICE for '{target['PRODUCT_NAME']}' to ${target['BASE_PRICE']:.2f}.",
+                "message": f"Updated BASE_PRICE for '{target['PRODUCT_NAME']}' to ₹{target['BASE_PRICE']:,.2f}.",
                 "product": target
             }
 
@@ -310,8 +308,7 @@ class InventoryManager:
             if not found:
                 return {"success": False, "error": f"Product '{product_identifier}' not found."}
 
-            with open(self.file_path, "w", encoding="utf-8") as f:
-                json.dump(products, f, indent=2)
+            self._write_inventory(products)
 
             return {
                 "success": True,
@@ -341,12 +338,11 @@ class InventoryManager:
                 "TAGS": product_data.get("TAGS", ["new", "store"])
             }
             products.append(new_prod)
-            with open(self.file_path, "w", encoding="utf-8") as f:
-                json.dump(products, f, indent=2)
+            self._write_inventory(products)
 
             return {
                 "success": True,
-                "message": f"Added product '{new_prod['PRODUCT_NAME']}' (ID: {new_prod['id']}, Base: ${new_prod['BASE_PRICE']}, Price: ${new_prod['PRICE']}).",
+                "message": f"Added product '{new_prod['PRODUCT_NAME']}' (ID: {new_prod['id']}, Base: ₹{new_prod['BASE_PRICE']:,.2f}, Price: ₹{new_prod['PRICE']:,.2f}).",
                 "product": new_prod
             }
 
@@ -365,13 +361,11 @@ class InventoryManager:
                 if not cat_clean or cat_clean in p.get("PRODUCT_TYPE", "").lower():
                     current_price = p.get("PRICE", 10.0)
                     base_price = p.get("BASE_PRICE", 1.0)
-                    # Enforce that price never falls below BASE_PRICE
                     new_price = max(base_price, round(current_price * multiplier, 2))
                     p["PRICE"] = new_price
                     updated_count += 1
 
-            with open(self.file_path, "w", encoding="utf-8") as f:
-                json.dump(products, f, indent=2)
+            self._write_inventory(products)
 
             action = "increased" if percentage >= 0 else "discounted"
             return {
@@ -396,8 +390,7 @@ class InventoryManager:
             if not target:
                 return {"success": False, "error": f"Product '{product_id}' not found."}
 
-            with open(self.file_path, "w", encoding="utf-8") as f:
-                json.dump(products, f, indent=2)
+            self._write_inventory(products)
 
             return {
                 "success": True,
@@ -412,4 +405,3 @@ class InventoryManager:
 
 # Global singleton
 inventory_manager = InventoryManager()
-
