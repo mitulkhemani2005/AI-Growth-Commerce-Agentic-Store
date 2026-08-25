@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="100%" height="100%">
+  <defs>
+    <linearGradient id="sgBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#451a03"/>
+      <stop offset="100%" stop-color="#18181b"/>
+    </linearGradient>
+    <linearGradient id="lensGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f59e0b"/>
+      <stop offset="40%" stop-color="#ef4444"/>
+      <stop offset="100%" stop-color="#8b5cf6"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="300" rx="16" fill="url(#sgBg)"/>
+  <ellipse cx="200" cy="255" rx="130" ry="15" fill="#000000" opacity="0.5"/>
+  <g transform="translate(60, 90)">
+    <!-- Frame Bar -->
+    <path d="M 20 50 Q 140 25 260 50" stroke="#09090b" stroke-width="12" fill="none" stroke-linecap="round"/>
+    <path d="M 20 50 Q 140 25 260 50" stroke="#d97706" stroke-width="4" fill="none" stroke-linecap="round"/>
+    <!-- Left Lens -->
+    <path d="M 25 52 L 125 52 Q 130 115 80 120 Q 30 115 25 52 Z" fill="url(#lensGrad)" stroke="#1c1917" stroke-width="4"/>
+    <!-- Right Lens -->
+    <path d="M 155 52 L 255 52 Q 250 115 200 120 Q 150 115 155 52 Z" fill="url(#lensGrad)" stroke="#1c1917" stroke-width="4"/>
+    <!-- Bridge -->
+    <path d="M 125 55 Q 140 45 155 55" stroke="#d97706" stroke-width="5" fill="none"/>
+    <!-- Glare Reflex -->
+    <path d="M 35 60 L 65 60 L 50 100 L 40 100 Z" fill="#ffffff" opacity="0.3"/>
+    <path d="M 165 60 L 195 60 L 180 100 L 170 100 Z" fill="#ffffff" opacity="0.3"/>
+  </g>
+  <text x="30" y="40" fill="#f59e0b" font-family="system-ui, sans-serif" font-size="12" font-weight="700" letter-spacing="2">PRISM POLARIZED SHIELD</text>
+</svg>

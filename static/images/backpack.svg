@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bpBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#022c22"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <linearGradient id="bpBody" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="50%" stop-color="#334155"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="300" rx="16" fill="url(#bpBg)"/>
+  <ellipse cx="200" cy="265" rx="100" ry="15" fill="#000000" opacity="0.5"/>
+  <g transform="translate(125, 45)">
+    <!-- Top Handle -->
+    <path d="M 55 35 C 55 10 95 10 95 35" stroke="#475569" stroke-width="8" fill="none" stroke-linecap="round"/>
+    <!-- Main Body -->
+    <rect x="15" y="35" width="120" height="175" rx="28" fill="url(#bpBody)" stroke="#64748b" stroke-width="2"/>
+    <!-- Front Compartment -->
+    <rect x="25" y="105" width="100" height="95" rx="16" fill="#1e293b" stroke="#475569" stroke-width="1.5"/>
+    <!-- Front Zipper -->
+    <line x1="35" y1="120" x2="115" y2="120" stroke="#10b981" stroke-width="2" stroke-dasharray="4,2"/>
+    <circle cx="115" cy="120" r="4" fill="#34d399"/>
+    <!-- Buckles & Straps -->
+    <rect x="40" y="65" width="8" height="35" fill="#0f172a"/>
+    <rect x="102" y="65" width="8" height="35" fill="#0f172a"/>
+    <rect x="36" y="80" width="16" height="8" rx="2" fill="#10b981"/>
+    <rect x="98" y="80" width="16" height="8" rx="2" fill="#10b981"/>
+  </g>
+  <text x="30" y="40" fill="#34d399" font-family="system-ui, sans-serif" font-size="12" font-weight="700" letter-spacing="2">STEALTH COMMUTER BACKPACK</text>
+</svg>

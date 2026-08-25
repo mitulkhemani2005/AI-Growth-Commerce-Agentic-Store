@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>👑 Store Owner Command Center | 24/7 AI Autonomous Admin</title>
+  
+  <!-- Modern Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <!-- Admin Styles -->
+  <link rel="stylesheet" href="/frontend/admin/css/admin.css">
+</head>
+<body class="admin-body">
+  
+  <!-- App Container -->
+  <div class="admin-container">
+    
+    <!-- Sidebar Navigation -->
+    <aside class="admin-sidebar">
+      <div class="sidebar-header">
+        <div class="logo-badge">
+          <i data-lucide="crown" class="crown-icon"></i>
+        </div>
+        <div class="logo-text">
+          <h2>COMMAND CENTER</h2>
+          <span>24/7 Autonomous Store</span>
+        </div>
+      </div>
+
+      <div class="live-fleet-indicator">
+        <span class="pulsing-dot"></span>
+        <div class="fleet-text">
+          <strong>6 AI AGENTS ACTIVE</strong>
+          <span>Running 24/7 Autonomously</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <button class="nav-item active" data-tab="overview">
+          <i data-lucide="layout-dashboard"></i>
+          <span>Overview</span>
+        </button>
+        <button class="nav-item" data-tab="agents">
+          <i data-lucide="bot"></i>
+          <span>24/7 Agent Fleet</span>
+          <span class="badge green" id="agentCountBadge">6 Active</span>
+        </button>
+        <button class="nav-item" data-tab="orders">
+          <i data-lucide="shopping-cart"></i>
+          <span>Orders & Dispatch</span>
+          <span class="badge blue" id="ordersCountBadge">0</span>
+        </button>
+        <button class="nav-item" data-tab="inventory">
+          <i data-lucide="package"></i>
+          <span>Inventory & Pricing</span>
+        </button>
+        <button class="nav-item" data-tab="refunds">
+          <i data-lucide="rotate-ccw"></i>
+          <span>Refunds & 24h Policy</span>
+        </button>
+        <button class="nav-item" data-tab="reviews">
+          <i data-lucide="star"></i>
+          <span>AI Reviews & Feedback</span>
+        </button>
+        <button class="nav-item highlight" data-tab="chat">
+          <i data-lucide="sparkles"></i>
+          <span>Admin AI Chatbot</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <a href="/" target="_blank" class="storefront-link">
+          <i data-lucide="external-link"></i>
+          <span>Open Live Storefront</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="admin-main">
+      
+      <!-- Top Header Bar -->
+      <header class="admin-header">
+        <div class="header-left">
+          <h1 id="pageTitle">Store Overview</h1>
+          <p id="pageSubtitle">Real-time telemetry, automated agent actions, and store health</p>
+        </div>
+        <div class="header-right">
+          <button class="refresh-btn" id="refreshDataBtn" title="Sync Live Data">
+            <i data-lucide="refresh-cw"></i>
+            <span>Live Sync</span>
+          </button>
+          <div class="server-status-badge">
+            <span class="status-dot"></span>
+            <span>Razorpay Connected</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- TAB 1: OVERVIEW -->
+      <section class="tab-pane active" id="tab-overview">
+        <!-- KPI Cards Grid -->
+        <div class="kpi-grid">
+          <div class="kpi-card gradient-emerald">
+            <div class="kpi-icon"><i data-lucide="dollar-sign"></i></div>
+            <div class="kpi-meta">
+              <span class="kpi-label">Total Revenue (Realized)</span>
+              <h3 class="kpi-value" id="kpiRevenue">$0.00</h3>
+              <span class="kpi-subtext">Online captured payments</span>
+            </div>
+          </div>
+
+          <div class="kpi-card gradient-purple">
+            <div class="kpi-icon"><i data-lucide="zap"></i></div>
+            <div class="kpi-meta">
+              <span class="kpi-label">24/7 Autonomous Actions</span>
+              <h3 class="kpi-value" id="kpiAgentActions">0</h3>
+              <span class="kpi-subtext">Executed without owner approval</span>
+            </div>
+          </div>
+
+          <div class="kpi-card gradient-blue">
+            <div class="kpi-icon"><i data-lucide="package-check"></i></div>
+            <div class="kpi-meta">
+              <span class="kpi-label">Total Orders</span>
+              <h3 class="kpi-value" id="kpiTotalOrders">0</h3>
+              <span class="kpi-subtext" id="kpiActiveOrdersSub">0 active pipeline</span>
+            </div>
+          </div>
+
+          <div class="kpi-card gradient-amber">
+            <div class="kpi-icon"><i data-lucide="alert-triangle"></i></div>
+            <div class="kpi-meta">
+              <span class="kpi-label">Low Stock Alerts</span>
+              <h3 class="kpi-value" id="kpiLowStock">0</h3>
+              <span class="kpi-subtext">SKUs needing restock</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2 Column Section: Quick Agent Status & Live Audit Log -->
+        <div class="dashboard-grid-2col">
+          <!-- 6 Agents Quick Grid -->
+          <div class="panel-card">
+            <div class="panel-header">
+              <div class="panel-title">
+                <i data-lucide="cpu" class="panel-icon"></i>
+                <h3>Autonomous Agent Fleet Status</h3>
+              </div>
+              <button class="action-btn-sm" onclick="switchTab('agents')">View Hub →</button>
+            </div>
+            <div class="quick-agent-list" id="overviewAgentList">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+
+          <!-- Live Audit Log Feed -->
+          <div class="panel-card">
+            <div class="panel-header">
+              <div class="panel-title">
+                <i data-lucide="terminal" class="panel-icon"></i>
+                <h3>24/7 Agent Activity Log</h3>
+              </div>
+              <span class="live-pulse-badge">LIVE STREAM</span>
+            </div>
+            <div class="audit-log-terminal" id="overviewAuditLogs">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 2: 24/7 AGENT FLEET HUB -->
+      <section class="tab-pane" id="tab-agents">
+        <div class="section-intro">
+          <div class="intro-text">
+            <h2>Autonomous Agent Fleet (24/7 Execution)</h2>
+            <p>Each agent executes continuous monitoring cycles. All 6 agents are empowered with <strong>direct commit power</strong> to adjust prices, restock items, assign logistics tracking, and auto-refund eligible orders.</p>
+          </div>
+          <button class="action-btn primary" id="triggerAllAgentsBtn">
+            <i data-lucide="play-circle"></i>
+            <span>Trigger Full Fleet Scan</span>
+          </button>
+        </div>
+
+        <div class="agents-cards-grid" id="fullAgentsGrid">
+          <!-- 6 Detailed Agent Cards Rendered via JS -->
+        </div>
+
+        <div class="panel-card" style="margin-top: 1.5rem;">
+          <div class="panel-header">
+            <div class="panel-title">
+              <i data-lucide="list-checks" class="panel-icon"></i>
+              <h3>Full Agent Execution Audit Trail</h3>
+            </div>
+          </div>
+          <div class="full-log-table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Timestamp</th>
+                  <th>Agent Name</th>
+                  <th>Action</th>
+                  <th>Details & Changes Committed</th>
+                  <th>Autonomous</th>
+                </tr>
+              </thead>
+              <tbody id="fullAgentLogsBody">
+                <!-- Rendered via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 3: ORDERS & DISPATCH -->
+      <section class="tab-pane" id="tab-orders">
+        <div class="section-intro">
+          <div class="intro-text">
+            <h2>Orders & Dispatch Pipeline</h2>
+            <p>Lifecycle state transitions: <code>Pending</code> ➔ <code>Confirmed</code> (Stock Deducted) ➔ <code>Dispatched</code> ➔ <code>Shipped</code> ➔ <code>Delivered</code>.</p>
+          </div>
+          <div class="filter-controls">
+            <select id="orderStatusFilter" class="admin-select">
+              <option value="ALL">All Statuses</option>
+              <option value="Pending">Pending</option>
+              <option value="Confirmed">Confirmed</option>
+              <option value="Dispatched">Dispatched</option>
+              <option value="Shipped">Shipped</option>
+              <option value="Delivered">Delivered</option>
+              <option value="Cancelled">Cancelled</option>
+              <option value="Refunded">Refunded</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="panel-card">
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Order ID & Date</th>
+                  <th>Customer</th>
+                  <th>Items Purchased</th>
+                  <th>Total</th>
+                  <th>Tracking #</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="ordersTableBody">
+                <!-- Rendered via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 4: INVENTORY & PRICING STUDIO -->
+      <section class="tab-pane" id="tab-inventory">
+        <div class="section-intro">
+          <div class="intro-text">
+            <h2>Inventory & Dynamic Pricing Studio</h2>
+            <p>Direct non-agent controls to edit stock, prices, or execute bulk promotional adjustments.</p>
+          </div>
+          <div class="btn-group">
+            <button class="action-btn secondary" id="openBulkPriceModalBtn">
+              <i data-lucide="percent"></i>
+              <span>Bulk % Adjust Prices</span>
+            </button>
+            <button class="action-btn primary" id="openAddProductModalBtn">
+              <i data-lucide="plus-circle"></i>
+              <span>Add New Product</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="panel-card">
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th>Category</th>
+                  <th>Size</th>
+                  <th>Stock Remaining</th>
+                  <th>Price ($)</th>
+                  <th>Rating</th>
+                  <th>Inline Quick Actions</th>
+                </tr>
+              </thead>
+              <tbody id="inventoryTableBody">
+                <!-- Rendered via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 5: REFUNDS & 24H POLICY -->
+      <section class="tab-pane" id="tab-refunds">
+        <div class="section-intro">
+          <div class="intro-text">
+            <h2>Refunds & Cancellation Engine</h2>
+            <p>Strict Rule: Orders cancelled <strong>within 24 hours</strong> of creation AND <strong>not yet shipped</strong> are auto-approved for Razorpay refund + inventory restock.</p>
+          </div>
+        </div>
+
+        <div class="panel-card">
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Order ID</th>
+                  <th>Order Date</th>
+                  <th>Age (Hours)</th>
+                  <th>Status</th>
+                  <th>24h & Non-Shipped Rule</th>
+                  <th>Total</th>
+                  <th>Refund Action</th>
+                </tr>
+              </thead>
+              <tbody id="refundsTableBody">
+                <!-- Rendered via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 6: AI REVIEWS & FEEDBACK -->
+      <section class="tab-pane" id="tab-reviews">
+        <div class="section-intro">
+          <div class="intro-text">
+            <h2>AI Review & Feedback Synthesis</h2>
+            <p>Customer reviews with automated Groq LLM sentiment analysis, pro/con extraction, and live catalog summary synchronization.</p>
+          </div>
+        </div>
+
+        <div class="dashboard-grid-2col">
+          <!-- Product Summaries -->
+          <div class="panel-card">
+            <div class="panel-header">
+              <div class="panel-title">
+                <i data-lucide="sparkles" class="panel-icon"></i>
+                <h3>AI Generated Product Summaries</h3>
+              </div>
+            </div>
+            <div class="product-summaries-list" id="productSummariesList">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+
+          <!-- Customer Reviews List -->
+          <div class="panel-card">
+            <div class="panel-header">
+              <div class="panel-title">
+                <i data-lucide="message-square" class="panel-icon"></i>
+                <h3>Verified Customer Reviews</h3>
+              </div>
+              <button class="action-btn-sm" id="openAddReviewModalBtn">+ Add Review</button>
+            </div>
+            <div class="customer-reviews-feed" id="customerReviewsFeed">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 7: ADMIN AI CHATBOT (OMNIPOTENT COMMAND CENTER) -->
+      <section class="tab-pane" id="tab-chat">
+        <div class="chat-command-layout">
+          <!-- Chat Messages Window -->
+          <div class="admin-chat-window">
+            <div class="chat-window-header">
+              <div class="chat-agent-info">
+                <div class="chat-agent-avatar">👑</div>
+                <div>
+                  <h4>Omnipotent Store Owner AI Agent</h4>
+                  <span>Direct Executive Command over all 6 specialist agents & operations</span>
+                </div>
+              </div>
+              <span class="live-pulse-badge">GROQ RE-ACT POWERED</span>
+            </div>
+
+            <div class="admin-chat-messages" id="adminChatMessages">
+              <div class="chat-bubble agent">
+                <div class="bubble-avatar">👑</div>
+                <div class="bubble-content">
+                  <p>Welcome, Store Owner! I am your <strong>Omnipotent AI Command Agent</strong>. I have direct executive control over the 6 autonomous specialist agents and all store databases.</p>
+                  <p>You can order me to do anything:</p>
+                  <ul>
+                    <li><em>"Price Manager, discount all Footwear by 10%"</em></li>
+                    <li><em>"Inventory Manager, restock 25 units of SonicFlow Headphones"</em></li>
+                    <li><em>"Dispatcher, assign tracking numbers and dispatch all confirmed orders"</em></li>
+                    <li><em>"Refund Manager, check if ORD-1001 is eligible and refund it"</em></li>
+                    <li><em>"Review Manager, analyze sentiment and generate summary for Parka"</em></li>
+                    <li><em>"Change order ORD-2002 status to Shipped"</em></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <!-- Suggested Quick Chips -->
+            <div class="admin-prompt-chips">
+              <button class="admin-chip" data-cmd="Price manager, discount all Footwear by 10%">🏷️ Discount Footwear 10%</button>
+              <button class="admin-chip" data-cmd="Inventory manager, check low stock items and restock them">📦 Restock Low Inventory</button>
+              <button class="admin-chip" data-cmd="Dispatcher, dispatch and assign tracking to all confirmed orders">🚚 Dispatch Confirmed Orders</button>
+              <button class="admin-chip" data-cmd="Review manager, generate AI review summary for CyberFlex Apex Runner">⭐ Generate AI Review Summary</button>
+              <button class="admin-chip" data-cmd="Give me an executive store metrics summary">📊 Executive Metrics Summary</button>
+            </div>
+
+            <!-- Chat Input -->
+            <form class="admin-chat-form" id="adminChatForm">
+              <input 
+                type="text" 
+                id="adminChatInput" 
+                class="admin-prompt-input" 
+                placeholder="Give an order to any AI agent or store database..." 
+                autocomplete="off"
+              />
+              <button type="submit" class="admin-send-btn" id="adminSendBtn">
+                <i data-lucide="send"></i>
+              </button>
+            </form>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- MODALS -->
+
+  <!-- Add Product Modal -->
+  <div class="admin-modal-overlay" id="addProductModal">
+    <div class="admin-modal">
+      <div class="modal-header">
+        <h3><i data-lucide="plus-circle"></i> Add New Catalog Product</h3>
+        <button class="modal-close-btn" onclick="closeModal('addProductModal')"><i data-lucide="x"></i></button>
+      </div>
+      <form id="addProductForm" class="modal-form">
+        <div class="form-group">
+          <label>Product Name</label>
+          <input type="text" id="newProdName" required placeholder="e.g. Apex HyperLight Hoodie">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Category</label>
+            <select id="newProdType" class="admin-select">
+              <option value="Footwear">Footwear</option>
+              <option value="Outerwear">Outerwear</option>
+              <option value="Audio">Audio</option>
+              <option value="Smart Tech">Smart Tech</option>
+              <option value="Streetwear">Streetwear</option>
+              <option value="Accessories">Accessories</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Size</label>
+            <input type="text" id="newProdSize" value="One Size" placeholder="e.g. US 10, L, One Size">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Price ($ USD)</label>
+            <input type="number" step="0.01" id="newProdPrice" required placeholder="99.99">
+          </div>
+          <div class="form-group">
+            <label>Initial Stock Units</label>
+            <input type="number" id="newProdStock" value="20" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <textarea id="newProdDesc" rows="3" placeholder="Engineering details and materials..."></textarea>
+        </div>
+        <button type="submit" class="action-btn primary" style="width: 100%; justify-content: center;">Add Product to Inventory</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Bulk Price Adjustment Modal -->
+  <div class="admin-modal-overlay" id="bulkPriceModal">
+    <div class="admin-modal">
+      <div class="modal-header">
+        <h3><i data-lucide="percent"></i> Bulk Price Adjustment</h3>
+        <button class="modal-close-btn" onclick="closeModal('bulkPriceModal')"><i data-lucide="x"></i></button>
+      </div>
+      <form id="bulkPriceForm" class="modal-form">
+        <div class="form-group">
+          <label>Target Category</label>
+          <select id="bulkCategory" class="admin-select">
+            <option value="all">All Catalog Categories</option>
+            <option value="Footwear">Footwear</option>
+            <option value="Outerwear">Outerwear</option>
+            <option value="Audio">Audio</option>
+            <option value="Smart Tech">Smart Tech</option>
+            <option value="Streetwear">Streetwear</option>
+            <option value="Accessories">Accessories</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Percentage Change (+ for Increase, - for Discount)</label>
+          <input type="number" step="0.5" id="bulkPercentage" required placeholder="e.g. -10 for 10% discount, 5 for 5% raise">
+        </div>
+        <p style="font-size: 0.8rem; color: #94a3b8;">Example: entering <code>-15</code> applies a 15% discount across the target category.</p>
+        <button type="submit" class="action-btn primary" style="width: 100%; justify-content: center;">Apply Price Adjustments</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Add Review Modal -->
+  <div class="admin-modal-overlay" id="addReviewModal">
+    <div class="admin-modal">
+      <div class="modal-header">
+        <h3><i data-lucide="message-square"></i> Add Customer Review</h3>
+        <button class="modal-close-btn" onclick="closeModal('addReviewModal')"><i data-lucide="x"></i></button>
+      </div>
+      <form id="addReviewForm" class="modal-form">
+        <div class="form-group">
+          <label>Select Product</label>
+          <select id="reviewProdSelect" class="admin-select"></select>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Customer Name</label>
+            <input type="text" id="reviewCustomerName" required placeholder="e.g. Marcus Vance">
+          </div>
+          <div class="form-group">
+            <label>Rating (1 to 5 Stars)</label>
+            <select id="reviewRating" class="admin-select">
+              <option value="5">⭐⭐⭐⭐⭐ (5 Stars)</option>
+              <option value="4">⭐⭐⭐⭐ (4 Stars)</option>
+              <option value="3">⭐⭐⭐ (3 Stars)</option>
+              <option value="2">⭐⭐ (2 Stars)</option>
+              <option value="1">⭐ (1 Star)</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Review Text</label>
+          <textarea id="reviewText" rows="3" required placeholder="Customer feedback..."></textarea>
+        </div>
+        <button type="submit" class="action-btn primary" style="width: 100%; justify-content: center;">Submit Review & Recalculate Rating</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Admin Scripts -->
+  <script src="/frontend/admin/js/admin.js"></script>
+</body>
+</html>

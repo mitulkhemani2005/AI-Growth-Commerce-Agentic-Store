@@ -1,0 +1,261 @@
+[
+  {
+    "id": "prod_001",
+    "PRODUCT_NAME": "CyberFlex Apex Runner",
+    "PRODUCT_TYPE": "Footwear",
+    "PRODUCT_SIZE": "US 10",
+    "STOCK_REMAINING": 21,
+    "PRICE": 30.7,
+    "RATING": 4.7,
+    "DESCRIPTION": "Adaptive carbon-plate running shoes engineered with breathable dynamic mesh, energy-return nitrogen foam, and all-weather traction outsole.",
+    "IMAGE": "/static/images/cyberflex_runner.svg",
+    "TAGS": [
+      "shoes",
+      "running",
+      "footwear",
+      "sports",
+      "carbon plate"
+    ],
+    "AI_REVIEW_SUMMARY": "**Executive Summary \u2013 CyberFlex Apex Runner**\n\n- **Overall Sentiment & Rating Consensus**  \n  \u2022 3 reviews, 4.7/5 average \u2192 overwhelmingly positive, high customer satisfaction.  \n\n- **Key Praised Features**  \n  \u2022 **Carbon\u2011plate energy return** \u2013 \u201cunbelievable,\u201d 25\u2011second 5K time drop.  \n  \u2022 **Breathable, responsive upper** \u2013 \u201csuper comfortable,\u201d \u201cbest road running shoes.\u201d  \n\n- **Sizing / Constructive Feedback**  \n  \u2022 Minor toe\u2011box narrowness noted by one reviewer; may affect fit for wider feet.  \n\n- **Bottom\u2011Line Verdict**  \n  \u2022 Premium performance road shoe with exceptional speed\u2011boosting tech and comfort; ideal for serious runners, but consider sizing if you have a wide foot."
+  },
+  {
+    "id": "prod_002",
+    "PRODUCT_NAME": "CyberFlex Apex Runner",
+    "PRODUCT_TYPE": "Footwear",
+    "PRODUCT_SIZE": "US 9",
+    "STOCK_REMAINING": 5,
+    "PRICE": 117.28,
+    "RATING": 4.9,
+    "DESCRIPTION": "Adaptive carbon-plate running shoes engineered with breathable dynamic mesh, energy-return nitrogen foam, and all-weather traction outsole.",
+    "IMAGE": "/static/images/cyberflex_runner.svg",
+    "TAGS": [
+      "shoes",
+      "running",
+      "footwear",
+      "sports",
+      "carbon plate"
+    ],
+    "AI_REVIEW_SUMMARY": "\ud83c\udf1f **Customer Consensus**: Highly anticipated item in Footwear. Early customer reception highlights exceptional craftsmanship and design."
+  },
+  {
+    "id": "prod_003",
+    "PRODUCT_NAME": "CyberFlex Apex Runner",
+    "PRODUCT_TYPE": "Footwear",
+    "PRODUCT_SIZE": "US 11",
+    "STOCK_REMAINING": 5,
+    "PRICE": 117.28,
+    "RATING": 4.9,
+    "DESCRIPTION": "Adaptive carbon-plate running shoes engineered with breathable dynamic mesh, energy-return nitrogen foam, and all-weather traction outsole.",
+    "IMAGE": "/static/images/cyberflex_runner.svg",
+    "TAGS": [
+      "shoes",
+      "running",
+      "footwear",
+      "sports",
+      "carbon plate"
+    ]
+  },
+  {
+    "id": "prod_004",
+    "PRODUCT_NAME": "Quantum Shield Parka",
+    "PRODUCT_TYPE": "Outerwear",
+    "PRODUCT_SIZE": "L",
+    "STOCK_REMAINING": 21,
+    "PRICE": 229.0,
+    "RATING": 5.0,
+    "DESCRIPTION": "Ultra-lightweight weatherproof winter parka with 800-fill down insulation, magnetic storm flaps, and hydro-repellent GORE-weave shell.",
+    "IMAGE": "/static/images/quantum_parka.svg",
+    "TAGS": [
+      "jacket",
+      "outerwear",
+      "winter",
+      "waterproof",
+      "parka"
+    ],
+    "AI_REVIEW_SUMMARY": "**Executive Summary \u2013 Quantum Shield Parka**\n\n- **Overall Sentiment & Rating Consensus**  \n  \u2022 5\u2011star review; unanimous praise for performance and design.  \n\n- **Key Praised Features**  \n  \u2022 **All\u2011weather protection** \u2013 withstood heavy Seattle rain with no leakage.  \n  \u2022 **Smart design touches** \u2013 magnetic closures and fleece\u2011lined pockets enhance usability.  \n\n- **Sizing / Constructive Feedback**  \n  \u2022 No sizing or fit concerns reported; review implies a comfortable, true\u2011to\u2011size fit.  \n\n- **Bottom\u2011Line Verdict**  \n  \u2022 The Quantum Shield Parka delivers exceptional waterproof performance and thoughtful features, making it a top choice for rugged, stylish outerwear."
+  },
+  {
+    "id": "prod_005",
+    "PRODUCT_NAME": "Quantum Shield Parka",
+    "PRODUCT_TYPE": "Outerwear",
+    "PRODUCT_SIZE": "M",
+    "STOCK_REMAINING": 21,
+    "PRICE": 229.0,
+    "RATING": 4.8,
+    "DESCRIPTION": "Ultra-lightweight weatherproof winter parka with 800-fill down insulation, magnetic storm flaps, and hydro-repellent GORE-weave shell.",
+    "IMAGE": "/static/images/quantum_parka.svg",
+    "TAGS": [
+      "jacket",
+      "outerwear",
+      "winter",
+      "waterproof",
+      "parka"
+    ]
+  },
+  {
+    "id": "prod_006",
+    "PRODUCT_NAME": "SonicFlow ANC Pro Headphones",
+    "PRODUCT_TYPE": "Audio",
+    "PRODUCT_SIZE": "One Size",
+    "STOCK_REMAINING": 8,
+    "PRICE": 25.4,
+    "RATING": 4.9,
+    "DESCRIPTION": "Premium wireless over-ear headphones featuring Hybrid Active Noise Cancellation, 45-hour battery life, spatial audio, and memory foam ear cushions.",
+    "IMAGE": "/static/images/sonicflow_headphones.svg",
+    "TAGS": [
+      "audio",
+      "headphones",
+      "wireless",
+      "anc",
+      "bluetooth",
+      "music"
+    ]
+  },
+  {
+    "id": "prod_007",
+    "PRODUCT_NAME": "Nova Pulse Smartwatch",
+    "PRODUCT_TYPE": "Smart Tech",
+    "PRODUCT_SIZE": "44mm",
+    "STOCK_REMAINING": 18,
+    "PRICE": 279.0,
+    "RATING": 4.5,
+    "DESCRIPTION": "Next-gen titanium wearable with 1.9-inch AMOLED display, ECG heart-rate tracking, GPS route tracking, and 7-day battery life.",
+    "IMAGE": "/static/images/nova_watch.svg",
+    "TAGS": [
+      "smartwatch",
+      "wearable",
+      "tech",
+      "fitness",
+      "gps",
+      "ecg"
+    ],
+    "AI_REVIEW_SUMMARY": "**Executive Summary \u2013 Nova Pulse Smartwatch**\n\n- **Overall Sentiment & Rating Consensus**  \n  \u2022 4.5\u2011star average reflects strong customer approval.  \n  \u2022 Reviews highlight exceptional audio performance and battery endurance.\n\n- **Key Praised Features**  \n  \u2022 **Active Noise Cancellation** \u2013 eliminates NYC subway noise completely.  \n  \u2022 **Spatial Audio & Audio Resolution** \u2013 delivers immersive, crystal\u2011clear sound.  \n  \u2022 **40\u2011hour battery life** \u2013 sustains long gaming or commute sessions.\n\n- **Constructive Feedback / Caveats**  \n  \u2022 Ear\u2011cup **warmth** after 4+ hours of gaming noted; may affect comfort for prolonged wear.\n\n- **Bottom\u2011Line Verdict**  \n  The Nova Pulse Smartwatch excels as a premium audio\u2011centric wearable, offering industry\u2011leading ANC, spatial sound, and long battery life. A minor comfort issue with ear\u2011cups during extended use should be considered, but overall it delivers a standout user experience."
+  },
+  {
+    "id": "prod_008",
+    "PRODUCT_NAME": "Nova Pulse Smartwatch",
+    "PRODUCT_TYPE": "Smart Tech",
+    "PRODUCT_SIZE": "40mm",
+    "STOCK_REMAINING": 13,
+    "PRICE": 269.0,
+    "RATING": 4.7,
+    "DESCRIPTION": "Next-gen titanium wearable with 1.7-inch AMOLED display, ECG heart-rate tracking, GPS route tracking, and 7-day battery life.",
+    "IMAGE": "/static/images/nova_watch.svg",
+    "TAGS": [
+      "smartwatch",
+      "wearable",
+      "tech",
+      "fitness",
+      "gps",
+      "ecg"
+    ]
+  },
+  {
+    "id": "prod_009",
+    "PRODUCT_NAME": "AeroGrip Performance Hoodie",
+    "PRODUCT_TYPE": "Streetwear",
+    "PRODUCT_SIZE": "L",
+    "STOCK_REMAINING": 5,
+    "PRICE": 89.0,
+    "RATING": 4.6,
+    "DESCRIPTION": "Heavyweight 450GSM organic cotton tech fleece hoodie with hidden zippered kangaroo pocket and ergonomic raglan sleeves.",
+    "IMAGE": "/static/images/aerogrip_hoodie.svg",
+    "TAGS": [
+      "hoodie",
+      "streetwear",
+      "apparel",
+      "cotton",
+      "casual"
+    ]
+  },
+  {
+    "id": "prod_010",
+    "PRODUCT_NAME": "AeroGrip Performance Hoodie",
+    "PRODUCT_TYPE": "Streetwear",
+    "PRODUCT_SIZE": "XL",
+    "STOCK_REMAINING": 11,
+    "PRICE": 92.56,
+    "RATING": 4.6,
+    "DESCRIPTION": "Heavyweight 450GSM organic cotton tech fleece hoodie with hidden zippered kangaroo pocket and ergonomic raglan sleeves.",
+    "IMAGE": "/static/images/aerogrip_hoodie.svg",
+    "TAGS": [
+      "hoodie",
+      "streetwear",
+      "apparel",
+      "cotton",
+      "casual"
+    ]
+  },
+  {
+    "id": "prod_011",
+    "PRODUCT_NAME": "TitanVolt MagSafe PowerBank 20k",
+    "PRODUCT_TYPE": "Accessories",
+    "PRODUCT_SIZE": "20000mAh",
+    "STOCK_REMAINING": 5,
+    "PRICE": 64.99,
+    "RATING": 4.8,
+    "DESCRIPTION": "Fast-charging 65W PD wireless power bank with MagSafe snap alignment, smart LED power display, and anodized aluminum casing.",
+    "IMAGE": "/static/images/powerbank.svg",
+    "TAGS": [
+      "charger",
+      "powerbank",
+      "magsafe",
+      "battery",
+      "accessories"
+    ]
+  },
+  {
+    "id": "prod_012",
+    "PRODUCT_NAME": "Vortex Elite Mechanical Gaming Keyboard",
+    "PRODUCT_TYPE": "Smart Tech",
+    "PRODUCT_SIZE": "TKL (80%)",
+    "STOCK_REMAINING": 14,
+    "PRICE": 139.99,
+    "RATING": 4.9,
+    "DESCRIPTION": "Custom hot-swappable mechanical keyboard with lubricated linear switches, RGB per-key underglow, gasket mount, and PBT dye-sub keycaps.",
+    "IMAGE": "/static/images/gaming_keyboard.svg",
+    "TAGS": [
+      "gaming",
+      "keyboard",
+      "rgb",
+      "mechanical",
+      "pc"
+    ]
+  },
+  {
+    "id": "prod_013",
+    "PRODUCT_NAME": "Prism Polarized Shield Sunglasses",
+    "PRODUCT_TYPE": "Accessories",
+    "PRODUCT_SIZE": "One Size",
+    "STOCK_REMAINING": 77,
+    "PRICE": 3.67,
+    "RATING": 4.5,
+    "DESCRIPTION": "Aerodynamic UV400 polarized mirrored sunglasses with lightweight TR90 memory frames and hydrophobic anti-scratch coating.",
+    "IMAGE": "/static/images/sunglasses.svg",
+    "TAGS": [
+      "eyewear",
+      "sunglasses",
+      "polarized",
+      "accessories",
+      "uv400"
+    ]
+  },
+  {
+    "id": "prod_014",
+    "PRODUCT_NAME": "Stealth Urban Commuter Backpack",
+    "PRODUCT_TYPE": "Accessories",
+    "PRODUCT_SIZE": "28L",
+    "STOCK_REMAINING": 14,
+    "PRICE": 119.0,
+    "RATING": 4.8,
+    "DESCRIPTION": "Modular weatherproof commuter backpack with dedicated 16-inch TSA laptop compartment, hidden passport pocket, and Fidlock magnetic buckles.",
+    "IMAGE": "/static/images/backpack.svg",
+    "TAGS": [
+      "backpack",
+      "travel",
+      "bag",
+      "laptop",
+      "waterproof"
+    ]
+  }
+]

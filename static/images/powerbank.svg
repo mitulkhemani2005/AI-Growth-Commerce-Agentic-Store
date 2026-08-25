@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="100%" height="100%">
+  <defs>
+    <linearGradient id="pbBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#18181b"/>
+      <stop offset="100%" stop-color="#27272a"/>
+    </linearGradient>
+    <linearGradient id="pbBody" x1="0%" y1="0%" x2="100%" y2="50%">
+      <stop offset="0%" stop-color="#475569"/>
+      <stop offset="50%" stop-color="#334155"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="300" rx="16" fill="url(#pbBg)"/>
+  <ellipse cx="200" cy="255" rx="100" ry="15" fill="#000000" opacity="0.5"/>
+  <g transform="translate(130, 50)">
+    <!-- Main PowerBank Body -->
+    <rect x="10" y="20" width="120" height="170" rx="16" fill="url(#pbBody)" stroke="#64748b" stroke-width="2"/>
+    <!-- MagSafe Ring -->
+    <circle cx="70" cy="95" r="32" stroke="#38bdf8" stroke-width="4" stroke-dasharray="6,4" fill="none" opacity="0.9"/>
+    <circle cx="70" cy="95" r="8" fill="#38bdf8" opacity="0.6"/>
+    <!-- MagSafe alignment line -->
+    <line x1="70" y1="132" x2="70" y2="148" stroke="#38bdf8" stroke-width="4" stroke-linecap="round"/>
+    <!-- LED Battery Display -->
+    <rect x="35" y="32" width="70" height="22" rx="4" fill="#09090b"/>
+    <text x="70" y="48" fill="#22c55e" font-family="monospace" font-size="13" font-weight="700" text-anchor="middle">100% ⚡ 65W</text>
+    <!-- USB-C Port top -->
+    <rect x="45" y="10" width="20" height="8" rx="2" fill="#0f172a" stroke="#94a3b8" stroke-width="1"/>
+    <rect x="75" y="10" width="20" height="8" rx="2" fill="#0f172a" stroke="#94a3b8" stroke-width="1"/>
+  </g>
+  <text x="30" y="40" fill="#38bdf8" font-family="system-ui, sans-serif" font-size="12" font-weight="700" letter-spacing="2">TITANVOLT MAGSAFE 20K</text>
+</svg>

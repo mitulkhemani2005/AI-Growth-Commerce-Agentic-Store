@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="100%" height="100%">
+  <defs>
+    <linearGradient id="hBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#18181b"/>
+      <stop offset="100%" stop-color="#09090b"/>
+    </linearGradient>
+    <linearGradient id="metalGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#a1a1aa"/>
+      <stop offset="50%" stop-color="#e4e4e7"/>
+      <stop offset="100%" stop-color="#71717a"/>
+    </linearGradient>
+    <linearGradient id="cupGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6366f1"/>
+      <stop offset="100%" stop-color="#4338ca"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="300" rx="16" fill="url(#hBg)"/>
+  <ellipse cx="200" cy="255" rx="110" ry="15" fill="#000000" opacity="0.6"/>
+  <g transform="translate(100, 40)">
+    <!-- Headband -->
+    <path d="M 30 110 C 30 30 170 30 170 110" stroke="url(#metalGrad)" stroke-width="18" fill="none" stroke-linecap="round"/>
+    <path d="M 50 85 C 50 38 150 38 150 85" stroke="#27272a" stroke-width="22" fill="none" stroke-linecap="round"/>
+    <!-- Left Cup -->
+    <g transform="translate(10, 95)">
+      <rect x="0" y="0" width="42" height="68" rx="20" fill="url(#cupGrad)"/>
+      <rect x="22" y="6" width="18" height="56" rx="8" fill="#18181b"/>
+      <circle cx="15" cy="34" r="10" fill="#818cf8" opacity="0.8"/>
+      <circle cx="15" cy="34" r="4" fill="#ffffff"/>
+    </g>
+    <!-- Right Cup -->
+    <g transform="translate(148, 95)">
+      <rect x="0" y="0" width="42" height="68" rx="20" fill="url(#cupGrad)"/>
+      <rect x="2" y="6" width="18" height="56" rx="8" fill="#18181b"/>
+      <circle cx="27" cy="34" r="10" fill="#818cf8" opacity="0.8"/>
+      <circle cx="27" cy="34" r="4" fill="#ffffff"/>
+    </g>
+    <!-- Sound Waves -->
+    <path d="M 6 120 A 15 15 0 0 0 6 140" stroke="#818cf8" stroke-width="3" fill="none" opacity="0.7"/>
+    <path d="M 194 120 A 15 15 0 0 1 194 140" stroke="#818cf8" stroke-width="3" fill="none" opacity="0.7"/>
+  </g>
+  <text x="30" y="40" fill="#818cf8" font-family="system-ui, sans-serif" font-size="12" font-weight="700" letter-spacing="2">SONICFLOW ANC PRO</text>
+</svg>

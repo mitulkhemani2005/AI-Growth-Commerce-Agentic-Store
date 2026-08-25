@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="100%" height="100%">
+  <defs>
+    <linearGradient id="kbBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#1e1b4b"/>
+    </linearGradient>
+    <linearGradient id="rgbGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#f43f5e"/>
+      <stop offset="25%" stop-color="#fb923c"/>
+      <stop offset="50%" stop-color="#4ade80"/>
+      <stop offset="75%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#a855f7"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="300" rx="16" fill="url(#kbBg)"/>
+  <ellipse cx="200" cy="250" rx="150" ry="15" fill="#000000" opacity="0.6"/>
+  <g transform="translate(50, 75)">
+    <!-- Keyboard Chassis -->
+    <rect x="0" y="0" width="300" height="140" rx="12" fill="#09090b" stroke="url(#rgbGrad)" stroke-width="3"/>
+    <!-- Key Rows Simulation -->
+    <!-- Row 1: Function -->
+    <g fill="#1e293b" stroke="#334155" stroke-width="1">
+      <rect x="15" y="15" width="20" height="15" rx="3"/>
+      <rect x="40" y="15" width="20" height="15" rx="3"/>
+      <rect x="65" y="15" width="20" height="15" rx="3"/>
+      <rect x="90" y="15" width="20" height="15" rx="3"/>
+      <rect x="120" y="15" width="20" height="15" rx="3"/>
+      <rect x="145" y="15" width="20" height="15" rx="3"/>
+      <rect x="170" y="15" width="20" height="15" rx="3"/>
+      <rect x="195" y="15" width="20" height="15" rx="3"/>
+      <rect x="230" y="15" width="20" height="15" rx="3"/>
+      <rect x="255" y="15" width="30" height="15" rx="3" fill="#ec4899"/>
+    </g>
+    <!-- Row 2: Numbers -->
+    <g fill="#1e293b" stroke="#334155" stroke-width="1">
+      <rect x="15" y="38" width="18" height="18" rx="3"/>
+      <rect x="38" y="38" width="18" height="18" rx="3"/>
+      <rect x="61" y="38" width="18" height="18" rx="3"/>
+      <rect x="84" y="38" width="18" height="18" rx="3"/>
+      <rect x="107" y="38" width="18" height="18" rx="3"/>
+      <rect x="130" y="38" width="18" height="18" rx="3"/>
+      <rect x="153" y="38" width="18" height="18" rx="3"/>
+      <rect x="176" y="38" width="18" height="18" rx="3"/>
+      <rect x="199" y="38" width="18" height="18" rx="3"/>
+      <rect x="222" y="38" width="18" height="18" rx="3"/>
+      <rect x="245" y="38" width="40" height="18" rx="3" fill="#6366f1"/>
+    </g>
+    <!-- Row 3: QWERTY (WASD highlighted) -->
+    <g fill="#1e293b" stroke="#334155" stroke-width="1">
+      <rect x="15" y="62" width="26" height="18" rx="3"/>
+      <rect x="46" y="62" width="18" height="18" rx="3"/>
+      <rect x="69" y="62" width="18" height="18" rx="3" fill="#38bdf8" stroke="#7dd3fc"/> <!-- W -->
+      <rect x="92" y="62" width="18" height="18" rx="3"/>
+      <rect x="115" y="62" width="18" height="18" rx="3"/>
+      <rect x="138" y="62" width="18" height="18" rx="3"/>
+      <rect x="161" y="62" width="18" height="18" rx="3"/>
+      <rect x="184" y="62" width="18" height="18" rx="3"/>
+      <rect x="207" y="62" width="18" height="18" rx="3"/>
+      <rect x="230" y="62" width="18" height="18" rx="3"/>
+      <rect x="253" y="62" width="32" height="18" rx="3"/>
+    </g>
+    <!-- Row 4: ASDF -->
+    <g fill="#1e293b" stroke="#334155" stroke-width="1">
+      <rect x="15" y="86" width="32" height="18" rx="3"/>
+      <rect x="52" y="86" width="18" height="18" rx="3" fill="#38bdf8" stroke="#7dd3fc"/> <!-- A -->
+      <rect x="75" y="86" width="18" height="18" rx="3" fill="#38bdf8" stroke="#7dd3fc"/> <!-- S -->
+      <rect x="98" y="86" width="18" height="18" rx="3" fill="#38bdf8" stroke="#7dd3fc"/> <!-- D -->
+      <rect x="121" y="86" width="18" height="18" rx="3"/>
+      <rect x="144" y="86" width="18" height="18" rx="3"/>
+      <rect x="167" y="86" width="18" height="18" rx="3"/>
+      <rect x="190" y="86" width="18" height="18" rx="3"/>
+      <rect x="213" y="86" width="18" height="18" rx="3"/>
+      <rect x="236" y="86" width="49" height="18" rx="3" fill="#10b981"/>
+    </g>
+    <!-- Row 5: Spacebar -->
+    <g fill="#1e293b" stroke="#334155" stroke-width="1">
+      <rect x="15" y="110" width="36" height="18" rx="3"/>
+      <rect x="56" y="110" width="24" height="18" rx="3"/>
+      <rect x="85" y="110" width="120" height="18" rx="3" fill="#4f46e5" stroke="#818cf8"/>
+      <rect x="210" y="110" width="24" height="18" rx="3"/>
+      <rect x="239" y="110" width="46" height="18" rx="3"/>
+    </g>
+  </g>
+  <text x="30" y="40" fill="#a855f7" font-family="system-ui, sans-serif" font-size="12" font-weight="700" letter-spacing="2">VORTEX ELITE MECHANICAL</text>
+</svg>

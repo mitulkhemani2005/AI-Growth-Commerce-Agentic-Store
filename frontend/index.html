@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Growth Commerce | Autonomous Agentic Store</title>
+  <meta name="description" content="AI Growth Commerce Agentic Store featuring multi-product search, instant inventory checks, and autonomous Razorpay Gateway ordering." />
+  <link rel="stylesheet" href="/frontend/css/styles.css" />
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Razorpay Official Checkout SDK -->
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</head>
+<body>
+
+  <!-- Top App Header -->
+  <header class="app-header">
+    <div class="brand-container">
+      <div class="brand-icon">
+        <i data-lucide="bot"></i>
+      </div>
+      <div class="brand-text">
+        <h1>GROWTH COMMERCE AI</h1>
+        <p>Autonomous Agentic Store • Razorpay Gateway</p>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <!-- Admin Panel Link -->
+      <a href="/admin" class="action-btn" title="Open Store Owner Admin Panel" style="border-color: rgba(139, 92, 246, 0.5); text-decoration: none; color: #c4b5fd; display: inline-flex; align-items: center; gap: 6px;">
+        <i data-lucide="crown" style="width: 18px; height: 18px; color: #f59e0b;"></i>
+        <span>Admin</span>
+      </a>
+
+      <!-- Razorpay Keys Configuration Button -->
+      <button class="action-btn" id="openRazorpayConfigBtn" title="Configure Razorpay API Keys & Settings" style="border-color: rgba(59, 130, 246, 0.4);">
+        <i data-lucide="credit-card" style="width: 18px; height: 18px; color: #60a5fa;"></i>
+        <span>Razorpay</span>
+      </button>
+
+      <!-- Active User Profile Switcher -->
+      <div class="user-selector" id="userSelectorBtn" title="Switch User Profile">
+        <div class="user-avatar" id="userAvatarText">AR</div>
+        <span id="userNameText">Alex Rivera</span>
+        <i data-lucide="chevron-down" style="width: 14px; height: 14px;"></i>
+      </div>
+
+      <!-- Orders Button -->
+      <button class="action-btn" id="openOrdersBtn" title="View Order History">
+        <i data-lucide="package-check" style="width: 18px; height: 18px;"></i>
+        <span>Orders</span>
+        <span class="badge-pill" id="ordersCountBadge">1</span>
+      </button>
+
+      <!-- Cart Button -->
+      <button class="action-btn primary" id="openCartBtn" title="View Shopping Cart">
+        <i data-lucide="shopping-bag" style="width: 18px; height: 18px;"></i>
+        <span>Cart</span>
+        <span class="badge-pill" id="cartCountBadge">0</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="main-container">
+
+    <!-- Left: Storefront & Live Catalog Panel -->
+    <section class="catalog-panel">
+      <div class="catalog-header">
+        <div class="catalog-header-top">
+          <h2>
+            <i data-lucide="grid" style="width: 20px; height: 20px; color: var(--accent-primary);"></i>
+            Product Catalog
+            <span class="item-count-badge" id="catalogCountBadge">0 Products</span>
+          </h2>
+          <div class="stock-sync-indicator" style="font-size: 0.75rem; color: #34d399; display: flex; align-items: center; gap: 4px;">
+            <span class="status-dot"></span> Live JSON Sync
+          </div>
+        </div>
+
+        <!-- Search and Category Filter -->
+        <div class="search-filter-bar">
+          <div class="search-input-wrapper">
+            <i data-lucide="search" class="search-icon" style="width: 16px; height: 16px;"></i>
+            <input type="text" id="catalogSearchInput" class="catalog-search-input" placeholder="Search catalog (e.g. Apex, shoes, parka, audio)..." />
+          </div>
+        </div>
+
+        <!-- Category Filter Pills -->
+        <div class="category-pills" id="categoryPillsContainer">
+          <button class="cat-pill active" data-category="ALL">All Items</button>
+          <button class="cat-pill" data-category="Footwear">Footwear</button>
+          <button class="cat-pill" data-category="Outerwear">Outerwear</button>
+          <button class="cat-pill" data-category="Audio">Audio</button>
+          <button class="cat-pill" data-category="Smart Tech">Smart Tech</button>
+          <button class="cat-pill" data-category="Streetwear">Streetwear</button>
+          <button class="cat-pill" data-category="Accessories">Accessories</button>
+        </div>
+      </div>
+
+      <!-- Products Grid -->
+      <div class="products-scrollable">
+        <div class="products-grid" id="productsGrid">
+          <!-- Dynamically populated products -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Right: AI Agent Copilot & Prompt Interface -->
+    <section class="agent-panel">
+      <div class="agent-header">
+        <div class="agent-identity">
+          <div class="agent-avatar">
+            <i data-lucide="sparkles" style="width: 20px; height: 20px;"></i>
+          </div>
+          <div class="agent-title">
+            <h3>Nova AI Agent</h3>
+            <div class="agent-status-badge">
+              <span class="status-dot"></span> Online & Autonomous
+            </div>
+          </div>
+        </div>
+        <div class="model-tag" id="agentModelTag">Groq • GPT-OSS 20B</div>
+      </div>
+
+      <!-- Chat Stream -->
+      <div class="chat-messages" id="chatMessages">
+        <!-- Initial Welcome Message -->
+        <div class="chat-bubble agent">
+          <div class="bubble-avatar"><i data-lucide="bot" style="width: 16px; height: 16px;"></i></div>
+          <div class="bubble-content">
+            <p><strong>Hello Alex! I am Nova, your Autonomous Commerce Agent.</strong></p>
+            <p style="margin-top: 4px; color: var(--text-secondary);">I can help you search across multiple products, answer technical questions, manage your cart, and place orders directly with <strong>Razorpay Gateway</strong>.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Suggested Quick Prompt Chips -->
+      <div class="prompt-chips-container">
+        <button class="prompt-chip" data-prompt="Find all Accessories and add to my cart and order them autonomously">🤖 AP2 Auto-Order Accessories</button>
+        <button class="prompt-chip" data-prompt="Find SonicFlow Headphones, add to my cart and order them">🎧 Find Headphones &amp; Order</button>
+        <button class="prompt-chip" data-prompt="Pay with card 4111 1111 1111 1111, exp 12/30, cvv 123, Alex Rivera">💳 Pay with Card (Razorpay)</button>
+        <button class="prompt-chip" data-prompt="Show my past orders and refund my last order">🔄 Refund Last Order</button>
+        <button class="prompt-chip" data-prompt="Show me all Footwear and Outerwear in stock">👟 Footwear &amp; Outerwear Search</button>
+        <button class="prompt-chip" data-prompt="Show my past orders and status">📦 View My Orders</button>
+      </div>
+
+      <!-- Input Prompt Bar -->
+      <form class="agent-input-wrapper" id="chatForm">
+        <input 
+          type="text" 
+          id="chatPromptInput" 
+          class="agent-prompt-input" 
+          placeholder="Ask Nova anything (e.g. 'Find shoes and headphones', 'Add to cart', 'Pay with Razorpay')..." 
+          autocomplete="off"
+        />
+        <button type="submit" class="send-btn" id="sendPromptBtn" title="Send Prompt">
+          <i data-lucide="arrow-up" style="width: 18px; height: 18px;"></i>
+        </button>
+      </form>
+    </section>
+
+  </main>
+
+  <!-- Shopping Cart Slide-Over Drawer -->
+  <div class="cart-drawer-overlay" id="cartDrawerOverlay">
+    <div class="cart-drawer">
+      <div class="cart-drawer-header">
+        <h3>
+          <i data-lucide="shopping-bag" style="width: 20px; height: 20px; vertical-align: middle; color: var(--accent-primary);"></i>
+          Shopping Cart
+        </h3>
+        <button class="close-btn" id="closeCartBtn">
+          <i data-lucide="x" style="width: 20px; height: 20px;"></i>
+        </button>
+      </div>
+
+      <div class="cart-items-list" id="cartItemsList">
+        <!-- Cart items rendered here -->
+      </div>
+
+      <div class="cart-footer">
+        <!-- AP2 Authorization Status Banner -->
+        <div id="ap2StatusBanner" class="auto-pay-banner" style="background: rgba(59, 130, 246, 0.12); border-color: rgba(59, 130, 246, 0.3);">
+          <div class="auto-pay-text" style="color: #60a5fa;">
+            <i data-lucide="bot" style="width: 16px; height: 16px;"></i>
+            <span id="ap2StatusText">Checking AP2 Auto-Pay status...</span>
+          </div>
+          <span id="ap2StatusSub" style="font-size: 0.75rem; color: #93c5fd;">Razorpay • AP2 Protocol</span>
+        </div>
+
+        <div class="cart-totals-row">
+          <span>Subtotal</span>
+          <span id="cartSubtotalText">$0.00</span>
+        </div>
+        <div class="cart-totals-row">
+          <span>Estimated Tax (8%)</span>
+          <span id="cartTaxText">$0.00</span>
+        </div>
+        <div class="cart-totals-row final">
+          <span>Total</span>
+          <span id="cartTotalText">$0.00</span>
+        </div>
+
+        <div>
+          <!-- AP2 Authorize Button (shows when not authorized) -->
+          <button class="action-btn" id="authorizeAutoPayBtn" style="width: 100%; justify-content: center; padding: 0.95rem; font-size: 1rem; background: linear-gradient(135deg, #7c3aed, #4f46e5); border-color: rgba(124,58,237,0.4); margin-bottom: 0.75rem; display: none;">
+            <i data-lucide="shield" style="width: 20px; height: 20px;"></i>
+            🔐 Authorize Auto-Pay (One-time Setup)
+          </button>
+          <!-- Razorpay Standard Checkout Button -->
+          <button class="action-btn primary" id="razorpayCheckoutBtn" style="width: 100%; justify-content: center; padding: 0.95rem; font-size: 1rem; background: linear-gradient(135deg, #0284c7, #2563eb);">
+            <i data-lucide="credit-card" style="width: 20px; height: 20px;"></i>
+            Pay with Razorpay Gateway
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Order History Modal -->
+  <div class="modal-overlay" id="ordersModalOverlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>
+          <i data-lucide="clipboard-list" style="width: 22px; height: 22px; vertical-align: middle; color: var(--accent-primary);"></i>
+          Order History & Tracking
+        </h3>
+        <button class="close-btn" id="closeOrdersModalBtn">
+          <i data-lucide="x" style="width: 20px; height: 20px;"></i>
+        </button>
+      </div>
+
+      <div class="modal-body" id="ordersModalBody">
+        <!-- Dynamic Orders List -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Razorpay Settings & Setup Modal -->
+  <div class="modal-overlay" id="razorpayModalOverlay">
+    <div class="modal-content" style="max-width: 520px;">
+      <div class="modal-header">
+        <h3 style="display: flex; align-items: center; gap: 8px;">
+          <i data-lucide="credit-card" style="width: 20px; height: 20px; color: #60a5fa;"></i>
+          Razorpay Gateway Setup
+        </h3>
+        <button class="close-btn" id="closeRazorpayModalBtn">
+          <i data-lucide="x" style="width: 20px; height: 20px;"></i>
+        </button>
+      </div>
+      <div class="modal-body" style="padding: 1rem 0;">
+        <div style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.25); border-radius: 8px; padding: 0.85rem; margin-bottom: 1rem; font-size: 0.8rem; line-height: 1.5; color: #93c5fd;">
+          <strong>⚡ Ready-to-Use Sandbox Mode:</strong><br/>
+          The store is pre-configured to process seamless test payments. You can also paste your own Razorpay <strong>Key ID</strong> and <strong>Key Secret</strong> from the Razorpay Dashboard below.
+        </div>
+
+        <form id="razorpaySettingsForm" style="display: flex; flex-direction: column; gap: 0.85rem;">
+          <div>
+            <label style="display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 4px; color: var(--text-secondary);">Razorpay Key ID (e.g. rzp_test_...):</label>
+            <input type="text" id="rzpKeyIdInput" class="catalog-search-input" style="padding-left: 0.85rem;" placeholder="rzp_test_..." />
+          </div>
+          <div>
+            <label style="display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 4px; color: var(--text-secondary);">Razorpay Key Secret:</label>
+            <input type="password" id="rzpKeySecretInput" class="catalog-search-input" style="padding-left: 0.85rem;" placeholder="Your Razorpay Key Secret" />
+          </div>
+          <button type="submit" class="action-btn primary" style="justify-content: center; padding: 0.75rem; margin-top: 0.5rem;">
+            Save Razorpay Credentials
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- User Switch Modal -->
+  <div class="modal-overlay" id="userModalOverlay">
+    <div class="modal-content" style="max-width: 440px;">
+      <div class="modal-header">
+        <h3>Switch User Profile</h3>
+        <button class="close-btn" id="closeUserModalBtn">
+          <i data-lucide="x" style="width: 20px; height: 20px;"></i>
+        </button>
+      </div>
+      <div class="modal-body" style="display: flex; flex-direction: column; gap: 0.75rem; padding: 1rem 0;">
+        <button class="action-btn" style="justify-content: flex-start; padding: 0.85rem;" onclick="switchUser('user_alex', 'Alex Rivera', 'AR')">
+          <div class="user-avatar" style="margin-right: 0.5rem;">AR</div>
+          <div style="text-align: left;">
+            <div style="font-weight: 600;">Alex Rivera (Default)</div>
+            <div style="font-size: 0.75rem; color: var(--text-secondary);">alex.rivera@growthcommerce.ai</div>
+          </div>
+        </button>
+        <button class="action-btn" style="justify-content: flex-start; padding: 0.85rem;" onclick="switchUser('user_sarah', 'Sarah Chen', 'SC')">
+          <div class="user-avatar" style="margin-right: 0.5rem; background: linear-gradient(135deg, #10b981, #06b6d4);">SC</div>
+          <div style="text-align: left;">
+            <div style="font-weight: 600;">Sarah Chen</div>
+            <div style="font-size: 0.75rem; color: var(--text-secondary);">sarah.chen@techventures.io</div>
+          </div>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/frontend/js/app.js"></script>
+</body>
+</html>

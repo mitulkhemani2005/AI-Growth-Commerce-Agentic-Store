@@ -1,0 +1,87 @@
+# =====================================================================
+# AI GROWTH COMMERCE AGENTIC STORE - .gitignore
+# =====================================================================
+
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+eggs/
+parts/
+var/
+sdist/
+develop-eggs/
+.installed.cfg
+lib/
+lib64/
+*.manifest
+*.spec
+
+# ---- Virtual Environments ----
+.venv/
+venv/
+env/
+ENV/
+.env.bak
+.Python
+
+# ---- Environment / Secrets (CRITICAL - never commit real keys) ----
+.env
+.env.local
+.env.production
+.env.staging
+*.key
+*.pem
+*.p12
+secrets.json
+
+# ---- Data Files (runtime-generated, can be large or sensitive) ----
+data/agent_logs.json
+data/orders.json
+data/users.json
+data/reviews.json
+# Keep inventory.json as it is seed data — comment line below to exclude it too
+# data/inventory.json
+
+# ---- IDE / Editor ----
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---- Pytest / Testing ----
+.pytest_cache/
+htmlcov/
+.coverage
+*.cover
+coverage.xml
+nosetests.xml
+test-results/
+
+# ---- Logs ----
+*.log
+logs/
+
+# ---- OS ----
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+
+# ---- Node (if any tooling added later) ----
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
