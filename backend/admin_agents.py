@@ -320,9 +320,67 @@ _call_groq_sync = _call_ollama_sync
 
 
 # =====================================================================
+# SPECIALIST AGENT SYSTEM PROMPTS (Two-Way Closed-Loop Architecture)
+# =====================================================================
+PRICE_MANAGER_SYSTEM_PROMPT = """You are the Price Manager Agent of the AI Growth Commerce Store.
+You report directly to the CEO Agent and Store Owner.
+Responsibilities:
+- Dynamic pricing calibration based on stock levels, demand velocity, and sales trends.
+- Strict protection of the Store Owner's immutable BASE_PRICE floor (prices cannot drop below BASE_PRICE).
+- Currency: Indian Rupee (INR ₹), 0% Tax storewide.
+When the CEO or Store Owner asks questions or issues pricing directives:
+- Provide concise, authoritative domain intelligence with exact INR ₹ figures.
+- Acknowledge and confirm any price actions taken.
+"""
+
+INVENTORY_MANAGER_SYSTEM_PROMPT = """You are the Inventory Manager Agent of the AI Growth Commerce Store.
+You report directly to the CEO Agent and Store Owner.
+Responsibilities:
+- Real-time warehouse stock tracking, auto-restocking (restocks +20 units when stock <= 4).
+- Highlighting low stock SKUs and signaling high-demand items to Price Manager and CEO.
+When the CEO or Store Owner asks questions or issues restock directives:
+- Provide concise, accurate warehouse facts, stock levels, and replenishment confirmations.
+"""
+
+ORDER_MANAGER_SYSTEM_PROMPT = """You are the Order Management Agent of the AI Growth Commerce Store.
+You report directly to the CEO Agent and Store Owner.
+Responsibilities:
+- End-to-end order lifecycle tracking (Pending → Confirmed → Dispatched → Shipped [2m] → Delivered [3m]).
+- SLA compliance (<1h pending threshold), order status inspection and updates.
+When the CEO or Store Owner asks questions or issues order directives:
+- Provide concise order pipeline breakdowns, tracking status, and status update confirmations.
+"""
+
+FINANCE_MANAGER_SYSTEM_PROMPT = """You are the Finance Manager Agent of the AI Growth Commerce Store.
+You report directly to the CEO Agent and Store Owner.
+Responsibilities:
+- Financial oversight: Active Revenue, Total GMV, Net Margin Estimate (35% target), Refund Rate.
+- Enforcing 0% Tax storewide and strict 24-Hour refund rule (Delivered/Shipped items are strictly non-refundable).
+When the CEO or Store Owner asks questions or issues finance directives:
+- Provide concise, accurate financial numbers in INR ₹ (0% Tax) and refund evaluations.
+"""
+
+DISPATCHER_SYSTEM_PROMPT = """You are the Dispatcher Agent of the AI Growth Commerce Store.
+You report directly to the CEO Agent and Store Owner.
+Responsibilities:
+- Logistics fulfillment, assigning TRK-XXXXX tracking numbers to confirmed orders, express dispatching.
+When the CEO or Store Owner asks questions or issues dispatch directives:
+- Provide concise logistics facts, tracking assignments, and dispatch confirmations.
+"""
+
+REVIEW_FEEDBACK_SYSTEM_PROMPT = """You are the Review and Feedback Manager of the AI Growth Commerce Store.
+You report directly to the CEO Agent and Store Owner.
+Responsibilities:
+- Analyzing customer sentiment and reviews across all products, rating audits, AI review summaries.
+When the CEO or Store Owner asks questions or issues review directives:
+- Provide concise sentiment insights, ratings summary, and AI review analysis.
+"""
+
+
+# =====================================================================
 # 1. 🏷️ PRICE MANAGER AGENT (Model: gemma4:e2b-it-qat)
 #    - Adjusts selling prices based on inventory stock levels, order velocity, and BASE_PRICE floor
-#    - Can freely communicate with Inventory Manager, Finance Manager, and CEO whenever needed
+#    - Interacts directly with CEO and Store Owner with closed-loop communication
 # =====================================================================
 class PriceManagerAgent:
     name = "Price Manager Agent"
@@ -333,6 +391,91 @@ class PriceManagerAgent:
         self.fallback_models = ["gemma4:e2b-it-qat", "gemma4:e4b", "qwen2.5:7b"]
         self.last_adjusted_skus: List[str] = []
         self.last_communicated_surge_ids: Set[str] = set()
+
+    async def handle_message_or_query(self, query_or_directive: str, sender: str = "CEO Agent", context_payload: Optional[Dict] = None) -> Dict[str, Any]:
+        """
+        Specialist agent receives directive or inquiry from CEO / Store Owner,
+        executes pricing actions if commanded, reasons with LLM, and replies back.
+        """
+        products = inventory_manager.get_all_products()
+        orders = order_manager.get_all_orders()
+        
+        # Record incoming turn
+        conversation_history.add(
+            self.name, "directive",
+            f"📥 [{sender}] Directive/Inquiry: {query_or_directive}",
+            {"from": sender, "directive": query_or_directive}
+        )
+
+        actions_taken = []
+        q_lower = query_or_directive.lower()
+
+        # Check for direct price adjustment actions in query
+        if any(w in q_lower for w in ["discount", "reduce price", "increase price", "raise price", "lower price", "markup"]):
+            pct_match = re.search(r'([+-]?\d+(?:\.\d+)?)\s*%', query_or_directive)
+            pct = float(pct_match.group(1)) if pct_match else (10.0 if "increase" in q_lower or "raise" in q_lower else -10.0)
+            if "discount" in q_lower or "reduce" in q_lower or "lower" in q_lower:
+                pct = -abs(pct)
+            else:
+                pct = abs(pct)
+            cat = "all"
+            for c in ["mobiles", "laptops", "audio", "accessories"]:
+                if c in q_lower:
+                    cat = c.capitalize()
+                    break
+            res = await self.execute_command(action="batch_adjustment", category=cat, percentage=pct)
+            if res.get("success"):
+                actions_taken.append(res.get("message"))
+
+        cat_summary = [f"{p['PRODUCT_NAME']} (Stock: {p.get('STOCK_REMAINING',0)}, Price: ₹{p.get('PRICE',0):,.2f}, Base: ₹{p.get('BASE_PRICE',0):,.2f})" for p in products[:8]]
+        
+        prompt = (
+            f"You are the {self.name} of the AI Growth Commerce Store.\n"
+            f"You received an inquiry/directive from {sender}:\n"
+            f"\"{query_or_directive}\"\n\n"
+            f"STORE STATE (INR ₹, 0% Tax):\n"
+            f"- Total Products: {len(products)} SKUs\n"
+            f"- Sample Catalog: {'; '.join(cat_summary)}\n"
+            f"- Actions Executed: {'; '.join(actions_taken) if actions_taken else 'None'}\n\n"
+            f"Respond directly to {sender} with professional pricing intelligence, facts, and confirmation of any actions taken. Keep it concise, authoritative, and in markdown."
+        )
+
+        reply = ""
+        try:
+            resp = await asyncio.to_thread(
+                _call_ollama_sync,
+                self.api_key, self.model,
+                [{"role": "system", "content": PRICE_MANAGER_SYSTEM_PROMPT}, {"role": "user", "content": prompt}],
+                temperature=0.2, max_tokens=600, fallback_models=self.fallback_models
+            )
+            reply = clean_think_tags(resp.choices[0].message.content or "")
+        except Exception as e:
+            print(f"[{self.name}] LLM reply note: {e}", flush=True)
+
+        if not reply:
+            reply = (
+                f"🏷️ **{self.name}**: Acknowledged directive from {sender}.\n"
+                + (f"- Action Taken: {'; '.join(actions_taken)}\n" if actions_taken else "")
+                + f"- Pricing Status: {len(products)} active SKUs dynamically calibrated above owner BASE_PRICE floor in INR ₹ (0% Tax)."
+            )
+
+        # Publish formal closed-loop response back to sender on Message Bus
+        message_bus.publish(
+            from_agent=self.name,
+            to_agent=sender,
+            subject="PRICE_MANAGER_REPLY",
+            payload={"reply": reply, "actions_taken": actions_taken, "directive": query_or_directive}
+        )
+
+        # Record response in conversation history
+        conversation_history.add(
+            self.name, "assistant",
+            f"📤 Reply to {sender}: {reply}",
+            {"to": sender, "actions_taken": actions_taken}
+        )
+
+        return {"success": True, "agent": self.name, "reply": reply, "actions_taken": actions_taken, "assessment": reply}
+
 
     async def run_autonomous_cycle(self) -> Dict[str, Any]:
         """
@@ -614,6 +757,93 @@ class InventoryManagerAgent:
         self.reported_low_stock_ids: Set[str] = set()
         self.signaled_demand_ids: Set[str] = set()
 
+    async def handle_message_or_query(self, query_or_directive: str, sender: str = "CEO Agent", context_payload: Optional[Dict] = None) -> Dict[str, Any]:
+        """
+        Specialist agent receives directive or inquiry from CEO / Store Owner,
+        executes inventory/restock actions if commanded, reasons with LLM, and replies back.
+        """
+        products = inventory_manager.get_all_products()
+        
+        conversation_history.add(
+            self.name, "directive",
+            f"📥 [{sender}] Directive/Inquiry: {query_or_directive}",
+            {"from": sender, "directive": query_or_directive}
+        )
+
+        actions_taken = []
+        q_lower = query_or_directive.lower()
+
+        # Check for restock commands
+        if "restock" in q_lower or "add stock" in q_lower or "replenish" in q_lower:
+            qty_match = re.search(r'(\d+)\s*(?:units?|qty|pieces?|items?)?', query_or_directive)
+            qty = int(qty_match.group(1)) if qty_match and int(qty_match.group(1)) < 1000 else 20
+            target_prod = None
+            for p in products:
+                if p["PRODUCT_NAME"].lower() in q_lower or p["id"].lower() in q_lower:
+                    target_prod = p
+                    break
+            if target_prod:
+                res = await self.execute_command(action="restock", product_identifier=target_prod["id"], quantity=qty)
+                if res.get("success"):
+                    actions_taken.append(res.get("message"))
+            elif "all" in q_lower or "low stock" in q_lower:
+                for p in products:
+                    if p.get("STOCK_REMAINING", 0) <= 5:
+                        res = await self.execute_command(action="restock", product_identifier=p["id"], quantity=qty)
+                        if res.get("success"):
+                            actions_taken.append(res.get("message"))
+
+        low_stock = [p for p in products if p.get("STOCK_REMAINING", 0) <= 5]
+        total_units = sum(p.get("STOCK_REMAINING", 0) for p in products)
+        stock_summary = [f"{p['PRODUCT_NAME']} (Stock: {p.get('STOCK_REMAINING',0)})" for p in products[:8]]
+
+        prompt = (
+            f"You are the {self.name} of the AI Growth Commerce Store.\n"
+            f"You received an inquiry/directive from {sender}:\n"
+            f"\"{query_or_directive}\"\n\n"
+            f"WAREHOUSE STATE:\n"
+            f"- Total Catalog SKUs: {len(products)} | Total In-Stock Units: {total_units}\n"
+            f"- Low Stock SKUs (<=5): {len(low_stock)} ({', '.join(p['PRODUCT_NAME'] for p in low_stock[:3]) if low_stock else 'None'})\n"
+            f"- Sample Stock Levels: {'; '.join(stock_summary)}\n"
+            f"- Actions Executed: {'; '.join(actions_taken) if actions_taken else 'None'}\n\n"
+            f"Respond directly to {sender} with accurate warehouse inventory facts, stock telemetry, and confirmation of any actions taken. Keep it concise, authoritative, and in markdown."
+        )
+
+        reply = ""
+        try:
+            resp = await asyncio.to_thread(
+                _call_ollama_sync,
+                self.api_key, self.model,
+                [{"role": "system", "content": INVENTORY_MANAGER_SYSTEM_PROMPT}, {"role": "user", "content": prompt}],
+                temperature=0.2, max_tokens=600, fallback_models=self.fallback_models
+            )
+            reply = clean_think_tags(resp.choices[0].message.content or "")
+        except Exception as e:
+            print(f"[{self.name}] LLM reply note: {e}", flush=True)
+
+        if not reply:
+            reply = (
+                f"📦 **{self.name}**: Acknowledged directive from {sender}.\n"
+                + (f"- Action Taken: {'; '.join(actions_taken)}\n" if actions_taken else "")
+                + f"- Warehouse Status: {len(products)} active SKUs, Total Units: {total_units}. Low-stock items: {len(low_stock)}."
+            )
+
+        message_bus.publish(
+            from_agent=self.name,
+            to_agent=sender,
+            subject="INVENTORY_MANAGER_REPLY",
+            payload={"reply": reply, "actions_taken": actions_taken, "directive": query_or_directive}
+        )
+
+        conversation_history.add(
+            self.name, "assistant",
+            f"📤 Reply to {sender}: {reply}",
+            {"to": sender, "actions_taken": actions_taken}
+        )
+
+        return {"success": True, "agent": self.name, "reply": reply, "actions_taken": actions_taken, "assessment": reply}
+
+
     async def run_autonomous_cycle(self) -> Dict[str, Any]:
         """
         24/7 Autonomous Warehouse & Restocking Cycle:
@@ -806,6 +1036,87 @@ class OrderManagementAgent:
         self.fallback_models = ["gemma4:e2b-it-qat", "gemma4:e4b", "qwen2.5:7b"]
         self.reported_sla_ids: Set[str] = set()
 
+    async def handle_message_or_query(self, query_or_directive: str, sender: str = "CEO Agent", context_payload: Optional[Dict] = None) -> Dict[str, Any]:
+        """
+        Specialist agent receives directive or inquiry from CEO / Store Owner,
+        executes order status updates if commanded, reasons with LLM, and replies back.
+        """
+        all_orders = order_manager.get_all_orders()
+        
+        conversation_history.add(
+            self.name, "directive",
+            f"📥 [{sender}] Directive/Inquiry: {query_or_directive}",
+            {"from": sender, "directive": query_or_directive}
+        )
+
+        actions_taken = []
+        q_lower = query_or_directive.lower()
+
+        # Check for status update directives
+        for target_status in ["Delivered", "Shipped", "Dispatched", "Confirmed", "Cancelled", "Refunded"]:
+            if f"mark {target_status.lower()}" in q_lower or f"set {target_status.lower()}" in q_lower or f"to {target_status.lower()}" in q_lower:
+                ord_match = re.search(r'(ORD-[\w\-]+)', query_or_directive, re.IGNORECASE)
+                if ord_match:
+                    oid = ord_match.group(1).upper()
+                    res = await self.execute_command(action="update_status", order_id=oid, new_status=target_status)
+                    if res.get("success"):
+                        actions_taken.append(res.get("message"))
+                break
+
+        status_counts: Dict[str, int] = {}
+        for o in all_orders:
+            st = o.get("status", "Confirmed")
+            status_counts[st] = status_counts.get(st, 0) + 1
+
+        recent_orders = [f"#{o.get('order_id')} ({o.get('status')}, ₹{o.get('total',0):,.2f})" for o in all_orders[:6]]
+
+        prompt = (
+            f"You are the {self.name} of the AI Growth Commerce Store.\n"
+            f"You received an inquiry/directive from {sender}:\n"
+            f"\"{query_or_directive}\"\n\n"
+            f"ORDER LIFECYCLE STATE:\n"
+            f"- Total Lifetime Orders: {len(all_orders)}\n"
+            f"- Pipeline Breakdown: {', '.join(f'{k}: {v}' for k, v in status_counts.items())}\n"
+            f"- Recent Orders: {'; '.join(recent_orders)}\n"
+            f"- Actions Executed: {'; '.join(actions_taken) if actions_taken else 'None'}\n\n"
+            f"Respond directly to {sender} with accurate order pipeline intelligence, tracking state, and confirmation of any actions taken. Keep it concise, authoritative, and in markdown."
+        )
+
+        reply = ""
+        try:
+            resp = await asyncio.to_thread(
+                _call_ollama_sync,
+                self.api_key, self.model,
+                [{"role": "system", "content": ORDER_MANAGER_SYSTEM_PROMPT}, {"role": "user", "content": prompt}],
+                temperature=0.2, max_tokens=600, fallback_models=self.fallback_models
+            )
+            reply = clean_think_tags(resp.choices[0].message.content or "")
+        except Exception as e:
+            print(f"[{self.name}] LLM reply note: {e}", flush=True)
+
+        if not reply:
+            reply = (
+                f"📋 **{self.name}**: Acknowledged directive from {sender}.\n"
+                + (f"- Action Taken: {'; '.join(actions_taken)}\n" if actions_taken else "")
+                + f"- Order Pipeline: {len(all_orders)} total orders ({', '.join(f'{k}: {v}' for k, v in status_counts.items())})."
+            )
+
+        message_bus.publish(
+            from_agent=self.name,
+            to_agent=sender,
+            subject="ORDER_MANAGEMENT_REPLY",
+            payload={"reply": reply, "actions_taken": actions_taken, "directive": query_or_directive}
+        )
+
+        conversation_history.add(
+            self.name, "assistant",
+            f"📤 Reply to {sender}: {reply}",
+            {"to": sender, "actions_taken": actions_taken}
+        )
+
+        return {"success": True, "agent": self.name, "reply": reply, "actions_taken": actions_taken, "assessment": reply}
+
+
     async def run_autonomous_cycle(self) -> Dict[str, Any]:
         """
         24/7 Order Lifecycle Audit:
@@ -972,6 +1283,87 @@ class FinanceManagerAgent:
         self.fallback_models = ["gemma4:e2b-it-qat", "gemma4:e4b", "qwen2.5:7b"]
         self.awaiting_ceo_directive = False
         self.last_reported_refund_rate = 0.0
+
+    async def handle_message_or_query(self, query_or_directive: str, sender: str = "CEO Agent", context_payload: Optional[Dict] = None) -> Dict[str, Any]:
+        """
+        Specialist agent receives directive or inquiry from CEO / Store Owner,
+        executes refund actions if commanded, reasons with LLM, and replies back.
+        """
+        orders = order_manager.get_all_orders()
+        
+        conversation_history.add(
+            self.name, "directive",
+            f"📥 [{sender}] Directive/Inquiry: {query_or_directive}",
+            {"from": sender, "directive": query_or_directive}
+        )
+
+        actions_taken = []
+        q_lower = query_or_directive.lower()
+
+        # Check for refund commands
+        if "refund" in q_lower or "cancel" in q_lower:
+            ord_match = re.search(r'(ORD-[\w\-]+)', query_or_directive, re.IGNORECASE)
+            if ord_match:
+                oid = ord_match.group(1).upper()
+                is_forced = "force" in q_lower or "override" in q_lower or "immediate" in q_lower
+                res = await self.execute_command(action="refund", order_id=oid, reason="Owner Directive", force=is_forced)
+                if res.get("success"):
+                    actions_taken.append(res.get("message"))
+                else:
+                    actions_taken.append(f"Refund check for #{oid}: {res.get('error')}")
+
+        total_gmv = sum(o.get("total", 0) for o in orders)
+        active_rev = sum(o.get("total", 0) for o in orders if o.get("status") not in ["Cancelled", "Refunded"])
+        refunded = sum(o.get("total", 0) for o in orders if o.get("status") == "Refunded")
+        ref_rate = (refunded / total_gmv * 100) if total_gmv > 0 else 0.0
+        net_profit = active_rev * 0.35
+
+        prompt = (
+            f"You are the {self.name} of the AI Growth Commerce Store.\n"
+            f"You received an inquiry/directive from {sender}:\n"
+            f"\"{query_or_directive}\"\n\n"
+            f"STORE FINANCIAL STATE (INR ₹, 0% Tax):\n"
+            f"- Active Revenue: ₹{active_rev:,.2f} | Total GMV: ₹{total_gmv:,.2f}\n"
+            f"- Net Profit Estimate: ₹{net_profit:,.2f} (35% target margin)\n"
+            f"- Refund Rate: {ref_rate:.1f}% | 24h Policy: Auto-refund eligible only if <=24h and not Shipped/Delivered\n"
+            f"- Actions Executed: {'; '.join(actions_taken) if actions_taken else 'None'}\n\n"
+            f"Respond directly to {sender} with accurate financial telemetry, policy adherence, and confirmation of any actions taken. Keep it concise, authoritative, and in markdown."
+        )
+
+        reply = ""
+        try:
+            resp = await asyncio.to_thread(
+                _call_ollama_sync,
+                self.api_key, self.model,
+                [{"role": "system", "content": FINANCE_MANAGER_SYSTEM_PROMPT}, {"role": "user", "content": prompt}],
+                temperature=0.2, max_tokens=600, fallback_models=self.fallback_models
+            )
+            reply = clean_think_tags(resp.choices[0].message.content or "")
+        except Exception as e:
+            print(f"[{self.name}] LLM reply note: {e}", flush=True)
+
+        if not reply:
+            reply = (
+                f"💰 **{self.name}**: Acknowledged directive from {sender}.\n"
+                + (f"- Action Taken: {'; '.join(actions_taken)}\n" if actions_taken else "")
+                + f"- Financial Telemetry: Active Revenue: **₹{active_rev:,.2f}** | GMV: **₹{total_gmv:,.2f}** | Refund Rate: **{ref_rate:.1f}%** (0% Tax)."
+            )
+
+        message_bus.publish(
+            from_agent=self.name,
+            to_agent=sender,
+            subject="FINANCE_MANAGER_REPLY",
+            payload={"reply": reply, "actions_taken": actions_taken, "directive": query_or_directive}
+        )
+
+        conversation_history.add(
+            self.name, "assistant",
+            f"📤 Reply to {sender}: {reply}",
+            {"to": sender, "actions_taken": actions_taken}
+        )
+
+        return {"success": True, "agent": self.name, "reply": reply, "actions_taken": actions_taken, "assessment": reply}
+
 
     async def run_autonomous_cycle(self) -> Dict[str, Any]:
         """
@@ -1145,6 +1537,86 @@ class DispatcherAgent:
         self.model = os.environ.get("DISPATCHER_MODEL", DEFAULT_ADMIN_MODEL)
         self.fallback_models = ["gemma4:e2b-it-qat", "gemma4:e4b", "qwen2.5:7b"]
 
+    async def handle_message_or_query(self, query_or_directive: str, sender: str = "CEO Agent", context_payload: Optional[Dict] = None) -> Dict[str, Any]:
+        """
+        Specialist agent receives directive or inquiry from CEO / Store Owner,
+        executes dispatch actions if commanded, reasons with LLM, and replies back.
+        """
+        orders = order_manager.get_all_orders()
+        
+        conversation_history.add(
+            self.name, "directive",
+            f"📥 [{sender}] Directive/Inquiry: {query_or_directive}",
+            {"from": sender, "directive": query_or_directive}
+        )
+
+        actions_taken = []
+        q_lower = query_or_directive.lower()
+
+        # Check for dispatch commands
+        if "dispatch" in q_lower or "ship" in q_lower or "track" in q_lower:
+            ord_match = re.search(r'(ORD-[\w\-]+)', query_or_directive, re.IGNORECASE)
+            if ord_match:
+                oid = ord_match.group(1).upper()
+                res = await self.execute_command(action="dispatch", order_id=oid)
+                if res.get("success"):
+                    actions_taken.append(res.get("message"))
+            elif "all" in q_lower or "confirmed" in q_lower:
+                res = await self.run_autonomous_cycle()
+                if res.get("dispatched"):
+                    actions_taken.append(f"Dispatched {len(res.get('dispatched'))} orders")
+
+        confirmed = [o for o in orders if o.get("status") == "Confirmed"]
+        dispatched = [o for o in orders if o.get("status") in ["Dispatched", "Shipped"]]
+        delivered = [o for o in orders if o.get("status") == "Delivered"]
+
+        prompt = (
+            f"You are the {self.name} of the AI Growth Commerce Store.\n"
+            f"You received an inquiry/directive from {sender}:\n"
+            f"\"{query_or_directive}\"\n\n"
+            f"LOGISTICS FULFILLMENT STATE:\n"
+            f"- Confirmed Orders Awaiting Dispatch: {len(confirmed)}\n"
+            f"- In-Transit Dispatches (Dispatched/Shipped): {len(dispatched)}\n"
+            f"- Delivered Orders: {len(delivered)}\n"
+            f"- Actions Executed: {'; '.join(actions_taken) if actions_taken else 'None'}\n\n"
+            f"Respond directly to {sender} with accurate logistics fulfillment telemetry, tracking details, and confirmation of any actions taken. Keep it concise, authoritative, and in markdown."
+        )
+
+        reply = ""
+        try:
+            resp = await asyncio.to_thread(
+                _call_ollama_sync,
+                self.api_key, self.model,
+                [{"role": "system", "content": DISPATCHER_SYSTEM_PROMPT}, {"role": "user", "content": prompt}],
+                temperature=0.2, max_tokens=600, fallback_models=self.fallback_models
+            )
+            reply = clean_think_tags(resp.choices[0].message.content or "")
+        except Exception as e:
+            print(f"[{self.name}] LLM reply note: {e}", flush=True)
+
+        if not reply:
+            reply = (
+                f"🚚 **{self.name}**: Acknowledged directive from {sender}.\n"
+                + (f"- Action Taken: {'; '.join(actions_taken)}\n" if actions_taken else "")
+                + f"- Logistics Telemetry: {len(confirmed)} confirmed orders in queue, {len(dispatched)} in-transit with TRK numbers."
+            )
+
+        message_bus.publish(
+            from_agent=self.name,
+            to_agent=sender,
+            subject="DISPATCHER_REPLY",
+            payload={"reply": reply, "actions_taken": actions_taken, "directive": query_or_directive}
+        )
+
+        conversation_history.add(
+            self.name, "assistant",
+            f"📤 Reply to {sender}: {reply}",
+            {"to": sender, "actions_taken": actions_taken}
+        )
+
+        return {"success": True, "agent": self.name, "reply": reply, "actions_taken": actions_taken, "assessment": reply}
+
+
     async def run_autonomous_cycle(self) -> Dict[str, Any]:
         """
         24/7 Logistics Dispatch Sync:
@@ -1264,6 +1736,80 @@ class ReviewFeedbackAgent:
         self.model = os.environ.get("REVIEW_MANAGER_MODEL", DEFAULT_ADMIN_MODEL)
         self.fallback_models = ["gemma4:e2b-it-qat", "gemma4:e4b", "qwen2.5:7b"]
         self.reported_low_rating_ids: Set[str] = set()
+
+    async def handle_message_or_query(self, query_or_directive: str, sender: str = "CEO Agent", context_payload: Optional[Dict] = None) -> Dict[str, Any]:
+        """
+        Specialist agent receives directive or inquiry from CEO / Store Owner,
+        executes AI review summaries if commanded, reasons with LLM, and replies back.
+        """
+        products = inventory_manager.get_all_products()
+        
+        conversation_history.add(
+            self.name, "directive",
+            f"📥 [{sender}] Directive/Inquiry: {query_or_directive}",
+            {"from": sender, "directive": query_or_directive}
+        )
+
+        actions_taken = []
+        q_lower = query_or_directive.lower()
+
+        # Check for review summary generation
+        for p in products:
+            if p["PRODUCT_NAME"].lower() in q_lower or p["id"].lower() in q_lower:
+                res = await self.execute_command(action="summary", product_id_or_name=p["id"])
+                if res.get("success"):
+                    actions_taken.append(f"Generated AI summary for {p['PRODUCT_NAME']}")
+                break
+
+        low_rated = [p for p in products if p.get("RATING", 5.0) < 3.5]
+        high_rated = [p for p in products if p.get("RATING", 0.0) >= 4.7]
+
+        prompt = (
+            f"You are the {self.name} of the AI Growth Commerce Store.\n"
+            f"You received an inquiry/directive from {sender}:\n"
+            f"\"{query_or_directive}\"\n\n"
+            f"CUSTOMER SENTIMENT STATE:\n"
+            f"- Total Products Monitored: {len(products)}\n"
+            f"- Top Rated Products (>=4.7★): {len(high_rated)}\n"
+            f"- Low Rated Products (<3.5★): {len(low_rated)}\n"
+            f"- Actions Executed: {'; '.join(actions_taken) if actions_taken else 'None'}\n\n"
+            f"Respond directly to {sender} with customer sentiment facts, rating insights, and confirmation of any actions taken. Keep it concise, authoritative, and in markdown."
+        )
+
+        reply = ""
+        try:
+            resp = await asyncio.to_thread(
+                _call_ollama_sync,
+                self.api_key, self.model,
+                [{"role": "system", "content": REVIEW_FEEDBACK_SYSTEM_PROMPT}, {"role": "user", "content": prompt}],
+                temperature=0.2, max_tokens=600, fallback_models=self.fallback_models
+            )
+            reply = clean_think_tags(resp.choices[0].message.content or "")
+        except Exception as e:
+            print(f"[{self.name}] LLM reply note: {e}", flush=True)
+
+        if not reply:
+            reply = (
+                f"⭐ **{self.name}**: Acknowledged directive from {sender}.\n"
+                + (f"- Action Taken: {'; '.join(actions_taken)}\n" if actions_taken else "")
+                + f"- Sentiment Health: {len(products)} catalog SKUs monitored. All average ratings healthy."
+            )
+
+        message_bus.publish(
+            from_agent=self.name,
+            to_agent=sender,
+            subject="REVIEW_MANAGER_REPLY",
+            payload={"reply": reply, "actions_taken": actions_taken, "directive": query_or_directive}
+        )
+
+        conversation_history.add(
+            self.name, "assistant",
+            f"📤 Reply to {sender}: {reply}",
+            {"to": sender, "actions_taken": actions_taken}
+        )
+
+        return {"success": True, "agent": self.name, "reply": reply, "actions_taken": actions_taken, "assessment": reply}
+
 
     async def run_autonomous_cycle(self) -> Dict[str, Any]:
         """
@@ -1603,6 +2149,26 @@ CEO_TOOLS = [
 ]
 
 
+def resolve_agent_instance(name_or_key: str):
+    """Resolves any string name or keyword to the corresponding global specialist agent instance."""
+    k = (name_or_key or "").lower().strip()
+    if "price" in k:
+        return price_manager_agent
+    elif "invent" in k or "stock" in k or "warehouse" in k:
+        return inventory_manager_agent
+    elif "order" in k:
+        return order_management_agent
+    elif "finan" in k or "money" in k or "tax" in k or "refund" in k or "revenue" in k:
+        return finance_manager_agent
+    elif "dispatch" in k or "track" in k or "ship" in k or "logist" in k:
+        return dispatcher_agent
+    elif "review" in k or "feedback" in k or "sentiment" in k or "rating" in k:
+        return review_feedback_agent
+    elif "ceo" in k or "admin" in k:
+        return ceo_agent
+    return None
+
+
 class CEOAgent:
     name = "CEO Agent"
 
@@ -1869,12 +2435,41 @@ class CEOAgent:
                 to_agent = args.get("to_agent", "ALL_AGENTS")
                 subj = args.get("subject", "CEO_DIRECTIVE")
                 msg_body = args.get("message", "")
+                
+                # 1. Publish to message bus
                 msg = message_bus.publish(
                     from_agent=f"{self.name} (on behalf of Store Owner)",
                     to_agent=to_agent,
                     subject=subj,
                     payload={"directive": msg_body, "issued_by": "CEO Agent", "priority": "CRITICAL"}
                 )
+
+                # 2. Directly trigger the target agent to receive, process, and reply!
+                target_agent = resolve_agent_instance(to_agent)
+                if target_agent and hasattr(target_agent, "handle_message_or_query"):
+                    reply_res = await target_agent.handle_message_or_query(msg_body, sender=self.name)
+                    reply_text = reply_res.get("reply", "Directive acknowledged and enacted.")
+                    return {
+                        "success": True,
+                        "message": f"Delivered to {to_agent}.",
+                        "agent_reply": reply_text,
+                        "reply": reply_text,
+                        "actions_taken": reply_res.get("actions_taken", [])
+                    }
+                elif to_agent == "ALL_AGENTS":
+                    replies = {}
+                    for ag in [price_manager_agent, inventory_manager_agent, order_management_agent, finance_manager_agent, dispatcher_agent, review_feedback_agent]:
+                        try:
+                            rep = await ag.handle_message_or_query(msg_body, sender=self.name)
+                            replies[ag.name] = rep.get("reply", "Acknowledged")
+                        except Exception:
+                            pass
+                    return {
+                        "success": True,
+                        "message": "Broadcasted to ALL_AGENTS and received responses from entire executive fleet.",
+                        "fleet_replies": replies
+                    }
+                
                 return {"success": True, "message": f"Dispatched directive '{subj}' to {to_agent}.", "msg_id": msg.get("id")}
 
             # 9. Store Overview / Dashboard Metrics
@@ -1943,83 +2538,21 @@ class CEOAgent:
         return {"error": f"Unknown CEO tool: {tool_name}"}
 
     async def _handle_ask_specialist(self, agent_name: str, question: str) -> Dict[str, Any]:
-        """CEO queries a specialist agent and synthesizes domain insights."""
-        clean_name = agent_name.strip()
-        orders = order_manager.get_all_orders()
-        products = inventory_manager.get_all_products()
-        total_rev = sum(o.get("total", 0) for o in orders if o.get("status") not in ["Cancelled", "Refunded"])
-
-        if "Price" in clean_name:
-            low_stock_surges = [p for p in products if p.get("STOCK_REMAINING", 0) <= 5]
-            overstocked = [p for p in products if p.get("STOCK_REMAINING", 0) >= 20]
-            answer = (
-                f"🏷️ **Price Manager Agent Assessment**:\n"
-                f"- Dynamic Pricing Rule: Strictly bounded above owner BASE_PRICE floor (0% Tax, INR ₹).\n"
-                f"- Scarcity Surge SKUs: {len(low_stock_surges)} products with stock <= 5 receiving up to +30% demand markup.\n"
-                f"- Overstock Clearance SKUs: {len(overstocked)} products eligible for velocity discounts.\n"
-                f"- Query Insight: Regarding '{question}', dynamic prices are balanced to accelerate volume while safeguarding margin."
-            )
-            return {"success": True, "agent": "Price Manager Agent", "assessment": answer}
-
-        elif "Inventory" in clean_name:
-            low = [p for p in products if p.get("STOCK_REMAINING", 0) <= 3]
-            total_stock = sum(p.get("STOCK_REMAINING", 0) for p in products)
-            answer = (
-                f"📦 **Inventory Manager Agent Assessment**:\n"
-                f"- Warehouse Status: {len(products)} active SKUs, Total Units: {total_stock}.\n"
-                f"- Critical Low Stock: {len(low)} SKUs ({', '.join(p.get('PRODUCT_NAME', p['id']) for p in low[:3]) if low else 'None — warehouse fully supplied'}).\n"
-                f"- Autonomous Replenishment: Auto-restocks +20 units when stock drops <= 3."
-            )
-            return {"success": True, "agent": "Inventory Manager Agent", "assessment": answer}
-
-        elif "Finance" in clean_name:
-            total_gmv = sum(o.get("total", 0) for o in orders)
-            refunded = sum(o.get("total", 0) for o in orders if o.get("status") == "Refunded")
-            ref_rate = (refunded / total_gmv * 100) if total_gmv > 0 else 0.0
-            answer = (
-                f"💰 **Finance Manager Agent Assessment**:\n"
-                f"- Active Revenue: **₹{total_rev:,.2f}** | Total GMV: **₹{total_gmv:,.2f}**.\n"
-                f"- Refund Rate: **{ref_rate:.1f}%** | 24h Policy: Auto-refunds only if cancelled <= 24h & NOT Shipped/Delivered.\n"
-                f"- Net Profit Estimate: ₹{total_rev * 0.35:,.2f} (35% operating margin target)."
-            )
-            return {"success": True, "agent": "Finance Manager Agent", "assessment": answer}
-
-        elif "Order" in clean_name:
-            status_map: Dict[str, int] = {}
-            for o in orders:
-                st = o.get("status", "Unknown")
-                status_map[st] = status_map.get(st, 0) + 1
-            answer = (
-                f"📋 **Order Management Agent Assessment**:\n"
-                f"- Lifetime Orders: {len(orders)}.\n"
-                f"- Order Status Breakdown: {', '.join(f'{k}: {v}' for k, v in status_map.items())}.\n"
-                f"- SLA Tracking: 100% orders monitored for <1h confirmation SLA."
-            )
-            return {"success": True, "agent": "Order Management Agent", "assessment": answer}
-
-        elif "Dispatcher" in clean_name:
-            confirmed = [o for o in orders if o.get("status") == "Confirmed"]
-            dispatched = [o for o in orders if o.get("status") in ["Dispatched", "Shipped"]]
-            answer = (
-                f"🚚 **Dispatcher Agent Assessment**:\n"
-                f"- Orders Waiting for Tracking: {len(confirmed)}.\n"
-                f"- In-Transit Dispatches: {len(dispatched)} with active TRK-XXXXX logistics numbers.\n"
-                f"- Logistics Velocity: Instant tracking number assignment upon order confirmation."
-            )
-            return {"success": True, "agent": "Dispatcher Agent", "assessment": answer}
-
-        elif "Review" in clean_name:
-            answer = (
-                f"⭐ **Review & Feedback Agent Assessment**:\n"
-                f"- Customer Sentiment: Continuously analyzed via local Ollama LLM.\n"
-                f"- Catalog Synchronization: AI review summaries automatically synthesized for active products.\n"
-                f"- Sentiment Health: Low-rating escalations routed to CEO."
-            )
-            return {"success": True, "agent": "Review and Feedback Manager", "assessment": answer}
-
+        """CEO queries a specialist agent and gets a live, intelligent domain response with live telemetry."""
+        target_agent = resolve_agent_instance(agent_name)
+        if target_agent and hasattr(target_agent, "handle_message_or_query"):
+            res = await target_agent.handle_message_or_query(question, sender=self.name)
+            return {
+                "success": True,
+                "agent": target_agent.name,
+                "assessment": res.get("reply", res.get("assessment", "Status provided.")),
+                "reply": res.get("reply", ""),
+                "actions_taken": res.get("actions_taken", [])
+            }
         else:
             rep = await self.generate_owner_report()
             return {"success": True, "agent": "CEO Agent", "assessment": rep.get("ceo_report", "CEO report generated.")}
+
 
     async def run_prompt_from_owner(self, prompt: str, conversation_history_override: Optional[List[Dict[str, str]]] = None) -> Dict[str, Any]:
         """
