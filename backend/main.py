@@ -691,6 +691,14 @@ async def get_agent_messages(limit: int = 50):
         "inbox_snapshot": message_bus.get_inbox_snapshot()
     }
 
+@app.get("/api/admin/agent-conversations")
+async def get_admin_agent_conversations(agent_name: Optional[str] = None, limit: int = 20):
+    """Returns conversation and instruction history for all agents or a specific specialist agent."""
+    from backend.admin_agents import conversation_history
+    if agent_name:
+        return {"agent": agent_name, "conversations": conversation_history.get(agent_name, limit=limit)}
+    return {"conversations": conversation_history.get_all(limit_per_agent=limit)}
+
 @app.get("/api/admin/ceo/report")
 async def get_ceo_report():
     """Triggers the CEO Agent to generate an on-demand strategic report for the Owner."""
@@ -699,7 +707,7 @@ async def get_ceo_report():
 
 @app.post("/api/admin/chat")
 async def admin_chat(req: AdminChatRequest):
-    """Owner Command Agent chatbot endpoint — routes through CEO awareness."""
+    """Owner Direct AI Command Center endpoint — directly consults and commands CEO Agent (No Middleman)."""
     if not req.prompt.strip():
         raise HTTPException(status_code=400, detail="Prompt cannot be empty")
     

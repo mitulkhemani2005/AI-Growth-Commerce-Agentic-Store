@@ -55,6 +55,10 @@ class ReviewManager:
                 matched.append(r)
         return matched
 
+    def get_product_reviews(self, product_id_or_name: str) -> List[Dict[str, Any]]:
+        """Alias for get_reviews_for_product."""
+        return self.get_reviews_for_product(product_id_or_name)
+
     def add_review(
         self,
         product_id: str,

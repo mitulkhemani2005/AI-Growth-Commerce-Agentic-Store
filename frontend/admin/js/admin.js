@@ -897,9 +897,30 @@ function appendAdminMessage(text, sender, toolCalls = []) {
 
   let toolTraceHtml = '';
   if (toolCalls && toolCalls.length > 0) {
+    const agentIcons = {
+      command_price_manager: '🏷️ Price Manager',
+      command_inventory_manager: '📦 Inventory Manager',
+      command_order_management: '📋 Order Management',
+      command_finance_manager: '💰 Finance Manager',
+      command_dispatcher: '🚚 Dispatcher Agent',
+      command_review_manager: '⭐ Review & Feedback',
+      get_ceo_report: '👔 CEO Strategic Briefing',
+      ask_specialist_agent: '💬 Agent Consultation',
+      send_agent_message: '⚡ Message Bus Broadcast',
+      get_inter_agent_messages: '📨 Inter-Agent Bus',
+      get_admin_dashboard_metrics: '📊 Store Telemetry',
+      trigger_agent_cycle: '⚡ Autonomous Cycle'
+    };
+
     toolTraceHtml = `
-      <div style="margin-top: 0.6rem; padding-top: 0.5rem; border-top: 1px solid rgba(255,255,255,0.06); font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: #34d399;">
-        ${toolCalls.map(tc => `<div>⚡ <strong>${tc.name}</strong>: ${JSON.stringify(tc.args)}</div>`).join('')}
+      <div style="margin-top: 0.75rem; padding-top: 0.6rem; border-top: 1px solid rgba(255,255,255,0.08); font-family: 'JetBrains Mono', monospace; font-size: 0.75rem;">
+        <div style="color: #94a3b8; margin-bottom: 4px; font-weight: 600;">⚡ Multi-Agent Execution Trace:</div>
+        ${toolCalls.map(tc => {
+          const label = agentIcons[tc.name] || tc.name;
+          return `<div style="background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.2); border-radius: 6px; padding: 4px 8px; margin-top: 4px; color: #34d399;">
+            <strong>${label}</strong>: <span style="color: #cbd5e1;">${JSON.stringify(tc.args || {})}</span>
+          </div>`;
+        }).join('')}
       </div>
     `;
   }
@@ -917,11 +938,15 @@ function appendAdminMessage(text, sender, toolCalls = []) {
 
 function formatMarkdown(text) {
   if (!text) return '';
-  return text
+  let formatted = text
+    .replace(/### (.*?)\n/g, '<h4 style="margin: 8px 0 4px 0; color: #93c5fd;">$1</h4>')
+    .replace(/## (.*?)\n/g, '<h3 style="margin: 10px 0 6px 0; color: #60a5fa;">$1</h3>')
     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
     .replace(/\*(.*?)\*/g, '<em>$1</em>')
     .replace(/`(.*?)`/g, '<code style="background:rgba(0,0,0,0.3); padding:2px 4px; border-radius:4px; font-family:JetBrains Mono;">$1</code>')
+    .replace(/^\s*[\-\*]\s+(.*)$/gm, '<li style="margin-left: 1rem;">$1</li>')
     .replace(/\n/g, '<br>');
+  return formatted;
 }
 
 // Modal Handlers

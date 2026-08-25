@@ -34,13 +34,13 @@ class BackgroundAgentWorker:
         self._task = None
         self.tick_sleep_seconds = 1  # Evaluation loop tick every 1 second
 
-        # Per-agent independent schedule configurations (All agents operating every 1 second async & together)
+        # Per-agent independent schedule configurations (Event-driven autonomous cycles)
         self.agent_states: Dict[str, Dict[str, Any]] = {
             "dispatcher": {
                 "name": "Dispatcher Agent",
                 "status": "RUNNING 24/7",
                 "enabled": True,
-                "interval_seconds": int(os.environ.get("DISPATCHER_INTERVAL_SECONDS", "1")),
+                "interval_seconds": int(os.environ.get("DISPATCHER_INTERVAL_SECONDS", "15")),
                 "last_run": None,
                 "last_run_ts": 0.0,
                 "actions_count": 0,
@@ -51,7 +51,7 @@ class BackgroundAgentWorker:
                 "name": "Inventory Manager Agent",
                 "status": "RUNNING 24/7",
                 "enabled": True,
-                "interval_seconds": int(os.environ.get("INVENTORY_AGENT_INTERVAL_SECONDS", "1")),
+                "interval_seconds": int(os.environ.get("INVENTORY_AGENT_INTERVAL_SECONDS", "15")),
                 "last_run": None,
                 "last_run_ts": 0.0,
                 "actions_count": 0,
@@ -62,7 +62,7 @@ class BackgroundAgentWorker:
                 "name": "Finance Manager Agent",
                 "status": "RUNNING 24/7",
                 "enabled": True,
-                "interval_seconds": int(os.environ.get("FINANCE_AGENT_INTERVAL_SECONDS", "1")),
+                "interval_seconds": int(os.environ.get("FINANCE_AGENT_INTERVAL_SECONDS", "20")),
                 "last_run": None,
                 "last_run_ts": 0.0,
                 "actions_count": 0,
@@ -73,7 +73,7 @@ class BackgroundAgentWorker:
                 "name": "Price Manager Agent",
                 "status": "RUNNING 24/7",
                 "enabled": True,
-                "interval_seconds": int(os.environ.get("PRICE_AGENT_INTERVAL_SECONDS", "1")),
+                "interval_seconds": int(os.environ.get("PRICE_AGENT_INTERVAL_SECONDS", "15")),
                 "last_run": None,
                 "last_run_ts": 0.0,
                 "actions_count": 0,
@@ -84,7 +84,7 @@ class BackgroundAgentWorker:
                 "name": "Order Management Agent",
                 "status": "RUNNING 24/7",
                 "enabled": True,
-                "interval_seconds": int(os.environ.get("ORDER_AGENT_INTERVAL_SECONDS", "1")),
+                "interval_seconds": int(os.environ.get("ORDER_AGENT_INTERVAL_SECONDS", "15")),
                 "last_run": None,
                 "last_run_ts": 0.0,
                 "actions_count": 0,
@@ -95,7 +95,7 @@ class BackgroundAgentWorker:
                 "name": "Review & Feedback Agent",
                 "status": "RUNNING 24/7",
                 "enabled": True,
-                "interval_seconds": int(os.environ.get("REVIEW_AGENT_INTERVAL_SECONDS", "1")),
+                "interval_seconds": int(os.environ.get("REVIEW_AGENT_INTERVAL_SECONDS", "30")),
                 "last_run": None,
                 "last_run_ts": 0.0,
                 "actions_count": 0,
@@ -106,12 +106,12 @@ class BackgroundAgentWorker:
                 "name": "CEO Agent",
                 "status": "RUNNING 24/7",
                 "enabled": True,
-                "interval_seconds": int(os.environ.get("CEO_AGENT_INTERVAL_SECONDS", "1")),
+                "interval_seconds": int(os.environ.get("CEO_AGENT_INTERVAL_SECONDS", "20")),
                 "last_run": None,
                 "last_run_ts": 0.0,
                 "actions_count": 0,
                 "icon": "briefcase",
-                "description": "Head of all agents. Continuously processes inter-agent messages, makes strategic decisions, issues directives, and reports to Owner."
+                "description": "Head of all agents. Oversees fleet discipline, processes inter-agent messages, makes strategic decisions, issues directives, and reports to Owner."
             }
         }
 
