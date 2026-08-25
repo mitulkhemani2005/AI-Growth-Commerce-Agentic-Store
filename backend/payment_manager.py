@@ -5,14 +5,17 @@ import hashlib
 import uuid
 from typing import Dict, Any, Optional
 
+from dotenv import load_dotenv
+load_dotenv()
+
 try:
     import razorpay
 except ImportError:
     razorpay = None
 
 # Razorpay Keys — loaded from environment (set in .env, never hardcoded)
-DEFAULT_KEY_ID = os.environ.get("RAZORPAY_KEY_ID")  # Set in .env
-DEFAULT_KEY_SECRET = os.environ.get("RAZORPAY_KEY_SECRET")  # Set in .env
+DEFAULT_KEY_ID = os.environ.get("RAZORPAY_KEY_ID", "rzp_test_TTl8jOoD6EEpk6")
+DEFAULT_KEY_SECRET = os.environ.get("RAZORPAY_KEY_SECRET", "L9ye0vywnbiFvD195fPTzn4a")
 
 class PaymentManager:
     def __init__(self, key_id: str = DEFAULT_KEY_ID, key_secret: str = DEFAULT_KEY_SECRET):
