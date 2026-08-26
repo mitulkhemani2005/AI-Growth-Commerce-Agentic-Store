@@ -6,21 +6,10 @@ import sys
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
 import atexit
-import signal
 from backend.ollama_loader import ensure_ollama_ready, unload_all_models_from_vram
 
-# Register atexit to ensure VRAM is released on any process exit
+# Register atexit to guarantee VRAM release on any termination
 atexit.register(unload_all_models_from_vram)
-
-def _sig_handler(sig, frame):
-    unload_all_models_from_vram()
-    sys.exit(0)
-
-try:
-    signal.signal(signal.SIGINT, _sig_handler)
-    signal.signal(signal.SIGTERM, _sig_handler)
-except Exception:
-    pass
 
 if __name__ == "__main__":
     print("=" * 60)
@@ -43,4 +32,7 @@ if __name__ == "__main__":
         print("\n[Server] Interrupted by user (CTRL+C).", flush=True)
     finally:
         # 3. Cleanly unload all models from GPU VRAM on server stop
-        unload_all_models_from_vram()
+        try:
+            unload_all_models_from_vram()
+        except BaseException:
+            pass

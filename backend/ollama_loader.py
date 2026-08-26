@@ -190,7 +190,7 @@ def ensure_ollama_ready(preferred_model: Optional[str] = None) -> bool:
     target = preferred_model or os.environ.get("ADMIN_MODEL", os.environ.get("OLLAMA_MODEL", "qwen2.5:7b"))
     
     # Preference matching: first try exact match, then tag match
-    preference_order = [target, "qwen2.5:7b", "gemma4:e2b-it-qat", "llama3:8b", "qwen2.5:14b"]
+    preference_order = [target, "qwen2.5:7b", "llama3.1:8b", "llama3:8b", "qwen2.5:14b", "gemma4:e2b-it-qat"]
     chosen_model = None
     
     # 1. Exact match pass
@@ -238,37 +238,41 @@ def unload_model_from_vram(model_name: str, host: Optional[str] = None) -> bool:
             data=json.dumps(payload).encode("utf-8"),
             headers={"Content-Type": "application/json", "User-Agent": "AgenticStoreLoader/1.0"}
         )
-        with urllib.request.urlopen(req, timeout=10) as resp:
+        with urllib.request.urlopen(req, timeout=3) as resp:
             return resp.status == 200
-    except Exception:
+    except BaseException:
         return False
 
 
 def unload_all_models_from_vram(host: Optional[str] = None) -> None:
     """
     Queries all currently loaded models in Ollama and frees all GPU VRAM.
-    Also unloads known default models as a safety fallback.
+    Fast and safe: only queries active VRAM models.
     """
-    host = host or get_base_host()
-    if not is_ollama_running(host):
-        return
+    try:
+        host = host or get_base_host()
+        if not is_ollama_running(host):
+            return
 
-    running = get_running_vram_models(host)
-    model_names = set(m.get("name") for m in running if m.get("name"))
-    
-    # Also add standard configured models as safety fallback
-    model_names.update(["qwen2.5:7b", "gemma4:e2b-it-qat", "llama3:8b", "qwen2.5:14b"])
-    target = os.environ.get("ADMIN_MODEL", os.environ.get("OLLAMA_MODEL"))
-    if target:
-        model_names.add(target)
+        running = get_running_vram_models(host)
+        if not running:
+            return
 
-    for m in model_names:
-        unload_model_from_vram(m, host)
+        for m in running:
+            name = m.get("name") or m.get("model")
+            if name:
+                unload_model_from_vram(name, host)
 
-    # Check remaining VRAM
-    remaining = get_running_vram_models(host)
-    if not remaining:
-        print("[Ollama Loader] All models unloaded. GPU VRAM successfully released (0 MB in use).", flush=True)
-    else:
-        print(f"[Ollama Loader] Models remaining in VRAM: {[m.get('name') for m in remaining]}", flush=True)
+        time.sleep(0.1)
+        remaining = get_running_vram_models(host)
+        if not remaining:
+            print("[Ollama Loader] Model unloaded. GPU VRAM successfully released (0 MB in use).", flush=True)
+        else:
+            for rem in remaining:
+                r_name = rem.get("name") or rem.get("model")
+                if r_name:
+                    unload_model_from_vram(r_name, host)
+    except BaseException:
+        pass
+
 

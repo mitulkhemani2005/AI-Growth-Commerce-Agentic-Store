@@ -41,7 +41,9 @@ DEFAULT_MODEL = os.environ.get("CUSTOMER_MODEL", os.environ.get("OLLAMA_MODEL", 
 DEFAULT_MODELS = [
     DEFAULT_MODEL,
     "qwen2.5:7b",
+    "llama3.1:8b",
     "llama3:8b",
+    "qwen2.5:14b",
     "gemma4:e2b-it-qat"
 ]
 

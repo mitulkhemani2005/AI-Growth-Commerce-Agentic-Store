@@ -297,8 +297,8 @@ def _call_ollama_sync(
     num_ctx=8192 prevents system prompt truncation during multi-step agentic loops.
     """
     client = OpenAI(base_url=base_url or OLLAMA_BASE_URL, api_key=api_key or "ollama")
-    # Fallback order: qwen2.5:7b (best tool-calling) -> llama3:8b -> gemma4:e2b-it-qat
-    models_to_try = list(dict.fromkeys([model] + (fallback_models or []) + ["qwen2.5:7b", "llama3:8b", "gemma4:e2b-it-qat"]))
+    # Fallback order: qwen2.5:7b -> llama3.1:8b -> llama3:8b -> qwen2.5:14b -> gemma4:e2b-it-qat
+    models_to_try = list(dict.fromkeys([model] + (fallback_models or []) + ["qwen2.5:7b", "llama3.1:8b", "llama3:8b", "qwen2.5:14b", "gemma4:e2b-it-qat"]))
 
     last_err = None
     for m in models_to_try:
