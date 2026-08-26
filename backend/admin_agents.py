@@ -309,7 +309,7 @@ def _call_ollama_sync(
                 "temperature": temperature,
                 "max_tokens": max_tokens,
                 "timeout": 120.0,  # qwen2.5:7b needs more time than the tiny gemma model
-                "extra_body": {"options": {"num_ctx": OLLAMA_NUM_CTX}}  # 8K context window
+                "extra_body": {"options": {"num_ctx": OLLAMA_NUM_CTX}, "keep_alive": -1}  # 8K context window & keep loaded in VRAM
             }
             if tools:
                 kwargs["tools"] = tools

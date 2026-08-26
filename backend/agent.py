@@ -619,7 +619,7 @@ class CommerceAgent:
                         "temperature": temperature,
                         "max_tokens": max_tokens,
                         "timeout": 120.0,
-                        "extra_body": {"options": {"num_ctx": 8192}}  # 8K ctx for qwen2.5:7b tool calling
+                        "extra_body": {"options": {"num_ctx": 8192}, "keep_alive": -1}  # 8K ctx & keep loaded in VRAM
                     }
                     if tools:
                         kwargs["tools"] = tools

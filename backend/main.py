@@ -31,14 +31,19 @@ from backend.admin_agents import (
     refund_manager_agent
 )
 from backend.background_workers import background_worker
+from backend.ollama_loader import ensure_ollama_ready, unload_all_models_from_vram
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    # Ensure Ollama daemon is active and primary model is in GPU VRAM
+    ensure_ollama_ready()
     # Start 24/7 autonomous background fleet
     background_worker.start()
     yield
     # Graceful shutdown
     background_worker.stop()
+    # Unload all models from GPU VRAM
+    unload_all_models_from_vram()
 
 app = FastAPI(title="AI Growth Commerce Agentic Store", version="1.0.0", lifespan=lifespan)
 

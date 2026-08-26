@@ -167,7 +167,8 @@ Format with clear bullet points and bold highlights. Keep it under 150 words."""
                             {"role": "user", "content": prompt}
                         ],
                         temperature=0.3,
-                        max_tokens=1000
+                        max_tokens=1000,
+                        extra_body={"keep_alive": -1}
                     )
                     raw_text = chat_resp.choices[0].message.content or ""
                     import re

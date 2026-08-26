@@ -46,11 +46,11 @@ secrets.json
 data/agent_logs.json
 data/agent_messages.json
 data/agent_conversations.json
+data/inventory.json
+inventory.json
 data/orders.json
 data/users.json
 data/reviews.json
-# Keep inventory.json as it is seed data — comment line below to exclude it too
-# data/inventory.json
 
 # ---- IDE / Editor ----
 .vscode/
