@@ -46,6 +46,8 @@ secrets.json
 data/agent_logs.json
 data/agent_messages.json
 data/agent_conversations.json
+data/agent_memory.json
+data/agent_rl.json
 data/inventory.json
 inventory.json
 data/orders.json
@@ -54,6 +56,7 @@ data/reviews.json
 data/agent_salaries.json
 data/buyer_agents.json
 data/treasury.json
+
 
 
 # ---- IDE / Editor ----

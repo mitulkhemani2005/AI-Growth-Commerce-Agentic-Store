@@ -15,6 +15,8 @@ from backend.order_manager import order_manager
 from backend.review_manager import review_manager
 from backend.treasury_manager import treasury_manager
 from backend.admin_agents import message_bus, log_agent_action, conversation_history
+from backend.agent_memory import memory_manager
+from backend.agent_rl import rl_manager
 
 BUYERS_FILE = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "buyer_agents.json"))
 USERS_FILE = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "users.json"))
@@ -380,6 +382,25 @@ class BuyerAgentsFleet:
         )
         log_agent_action(f"AI Buyer ({buyer['name']})", "Autonomous AP2 Purchase", details, [selected_product['id'], order_id], autonomous=True)
 
+        # Reinforcement Learning Step & Hybrid Memory Update for AI Buyer
+        reward = rl_manager.compute_buyer_reward(buyer_id, {"action": "BUY"})
+        rl_manager.record_step(
+            buyer_id,
+            {"buyer": buyer_id, "category": selected_product.get("CATEGORY", "General")},
+            "BUY",
+            reward,
+            {"orders_count": buyer.get("orders_count", 0)}
+        )
+        memory_manager.record_episode(
+            buyer_id,
+            action="purchase_and_review",
+            outcome=f"Bought {selected_product['PRODUCT_NAME']} (₹{order_total:.2f}) and left {rating}★ review.",
+            reward=reward,
+            metadata={"product_id": selected_product["id"], "order_id": order_id, "rating": rating}
+        )
+        memory_manager.update_structured(buyer_id, "total_spent", buyer.get("total_spent", 0.0))
+        memory_manager.update_structured(buyer_id, "orders_count", buyer.get("orders_count", 0))
+
         return {
             "success": True,
             "buyer_id": buyer_id,
@@ -390,6 +411,7 @@ class BuyerAgentsFleet:
             "total_spent": order_total,
             "rating": rating,
             "review": review_text,
+            "rl_reward": reward,
             "next_delay_seconds": next_delay,
             "details": details
         }

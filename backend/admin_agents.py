@@ -18,6 +18,8 @@ from backend.inventory_manager import inventory_manager
 from backend.order_manager import order_manager
 from backend.review_manager import review_manager
 from backend.treasury_manager import treasury_manager
+from backend.agent_memory import memory_manager
+from backend.agent_rl import rl_manager
 
 OLLAMA_BASE_URL = os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434/v1")
 DEFAULT_ADMIN_MODEL = os.environ.get("ADMIN_MODEL", os.environ.get("OLLAMA_MODEL", "qwen2.5:7b"))
@@ -519,7 +521,13 @@ class PriceManagerAgent:
 
         cat_summary = [f"{p['PRODUCT_NAME']} (Stock: {p.get('STOCK_REMAINING',0)}, Price: ₹{p.get('PRICE',0):,.2f}, Base: ₹{p.get('BASE_PRICE',0):,.2f})" for p in products[:8]]
         
+        # Hybrid Memory Context & RL Policy Guidance
+        memory_ctx = memory_manager.build_context_package(self.name, query_or_directive)
+        rl_guidance = rl_manager.get_agent_guidance(self.name, {"products_count": len(products), "orders_count": len(orders)})
+
         prompt = (
+            f"{memory_ctx}"
+            f"{rl_guidance}"
             f"You are the {self.name} of the AI Growth Commerce Store.\n"
             f"You received an inquiry/directive from {sender}:\n"
             f"\"{query_or_directive}\"\n\n"
@@ -532,10 +540,15 @@ class PriceManagerAgent:
 
         reply = ""
         try:
+            msg_list = [{"role": "system", "content": PRICE_MANAGER_SYSTEM_PROMPT}]
+            for d in memory_manager.get_recent_messages(self.name, limit=6):
+                msg_list.append(d)
+            msg_list.append({"role": "user", "content": prompt})
+
             resp = await asyncio.to_thread(
                 _call_ollama_sync,
                 self.api_key, self.model,
-                [{"role": "system", "content": PRICE_MANAGER_SYSTEM_PROMPT}, {"role": "user", "content": prompt}],
+                msg_list,
                 temperature=0.2, max_tokens=600, fallback_models=self.fallback_models
             )
             reply = clean_think_tags(resp.choices[0].message.content or "")
@@ -557,12 +570,15 @@ class PriceManagerAgent:
             payload={"reply": reply, "actions_taken": actions_taken, "directive": query_or_directive}
         )
 
-        # Record response in conversation history
+        # Record turns in Conversation History and Hybrid Layered Memory
         conversation_history.add(
             self.name, "assistant",
             f"📤 Reply to {sender}: {reply}",
             {"to": sender, "actions_taken": actions_taken}
         )
+        memory_manager.add_turn(self.name, "user", query_or_directive, {"sender": sender})
+        memory_manager.add_turn(self.name, "assistant", reply, {"to": sender, "actions": actions_taken})
+        memory_manager.record_episode(self.name, action="handle_directive", outcome=reply[:250], reward=1.0)
 
         return {"success": True, "agent": self.name, "reply": reply, "actions_taken": actions_taken, "assessment": reply}
 
@@ -572,9 +588,15 @@ class PriceManagerAgent:
         24/7 Dynamic Pricing Engine (INR ₹, 0% Tax):
         - Bi-directional pricing strictly bounded by owner's immutable BASE_PRICE floor.
         - Communicates ONLY when prices are actually adjusted or meaningful signals received.
+        - Guided by RL policy and records learning trajectories.
         """
         products = inventory_manager.get_all_products()
         orders = order_manager.get_all_orders()
+        before_state = {
+            "products_count": len(products),
+            "adjusted_count": 0,
+            "surges": 0
+        }
         increased_items = []
         decreased_items = []
         adjusted = []
@@ -773,12 +795,32 @@ class PriceManagerAgent:
         if adjusted:
             conversation_history.add(self.name, "system", details, {"adjusted_count": len(adjusted), "surges": len(major_surges)})
 
+        # Reinforcement Learning Step & Hybrid Memory Update
+        after_state = {
+            "products_count": len(products),
+            "adjusted_count": len(adjusted),
+            "surges": len(major_surges),
+            "base_price_violations": 0
+        }
+        reward = rl_manager.compute_price_manager_reward(before_state, after_state, "dynamic_pricing")
+        rl_manager.record_step(self.name, before_state, "dynamic_pricing", reward, after_state)
+        memory_manager.record_episode(
+            self.name,
+            action="dynamic_pricing",
+            outcome=details[:250],
+            reward=reward,
+            metadata={"adjusted": len(adjusted), "surges": len(major_surges)}
+        )
+        memory_manager.update_structured(self.name, "active_skus_count", len(products))
+        memory_manager.update_structured(self.name, "last_pricing_adjustment_count", len(adjusted))
+
         return {
             "success": True,
             "agent": self.name,
             "adjusted": adjusted,
             "increased": increased_items,
             "decreased": decreased_items,
+            "rl_reward": reward,
             "details": details
         }
 
@@ -889,7 +931,13 @@ class InventoryManagerAgent:
         total_units = sum(p.get("STOCK_REMAINING", 0) for p in products)
         stock_summary = [f"{p['PRODUCT_NAME']} (Stock: {p.get('STOCK_REMAINING',0)})" for p in products[:8]]
 
+        # Hybrid Memory Context & RL Guidance
+        memory_ctx = memory_manager.build_context_package(self.name, query_or_directive)
+        rl_guidance = rl_manager.get_agent_guidance(self.name, {"low_stock_count": len(low_stock), "total_units": total_units})
+
         prompt = (
+            f"{memory_ctx}"
+            f"{rl_guidance}"
             f"You are the {self.name} of the AI Growth Commerce Store.\n"
             f"You received an inquiry/directive from {sender}:\n"
             f"\"{query_or_directive}\"\n\n"
@@ -903,10 +951,15 @@ class InventoryManagerAgent:
 
         reply = ""
         try:
+            msg_list = [{"role": "system", "content": INVENTORY_MANAGER_SYSTEM_PROMPT}]
+            for d in memory_manager.get_recent_messages(self.name, limit=6):
+                msg_list.append(d)
+            msg_list.append({"role": "user", "content": prompt})
+
             resp = await asyncio.to_thread(
                 _call_ollama_sync,
                 self.api_key, self.model,
-                [{"role": "system", "content": INVENTORY_MANAGER_SYSTEM_PROMPT}, {"role": "user", "content": prompt}],
+                msg_list,
                 temperature=0.2, max_tokens=600, fallback_models=self.fallback_models
             )
             reply = clean_think_tags(resp.choices[0].message.content or "")
@@ -932,6 +985,9 @@ class InventoryManagerAgent:
             f"📤 Reply to {sender}: {reply}",
             {"to": sender, "actions_taken": actions_taken}
         )
+        memory_manager.add_turn(self.name, "user", query_or_directive, {"sender": sender})
+        memory_manager.add_turn(self.name, "assistant", reply, {"to": sender, "actions": actions_taken})
+        memory_manager.record_episode(self.name, action="handle_directive", outcome=reply[:250], reward=1.0)
 
         return {"success": True, "agent": self.name, "reply": reply, "actions_taken": actions_taken, "assessment": reply}
 
@@ -945,6 +1001,7 @@ class InventoryManagerAgent:
         - Only restocks when CEO sends back RESTOCK_APPROVED.
         - Signals high-demand items to Price Manager Agent.
         - Reports all inventory status to CEO.
+        - Guided by RL policy and records learning trajectories.
         """
         inbox = message_bus.get_inbox(self.name)
         ceo_directives_received = []
@@ -992,6 +1049,13 @@ class InventoryManagerAgent:
         ceo_low_stock_alerts = []
         restock_requests_sent = []
         new_high_demand_ids = []
+
+        before_state = {
+            "total_skus": len(products),
+            "restocked_count": 0,
+            "restock_requests_sent": 0,
+            "zero_stock_count": len([p for p in products if p.get("STOCK_REMAINING", 0) == 0])
+        }
 
         order_freq: Dict[str, int] = {}
         for o in orders:
@@ -1128,7 +1192,34 @@ class InventoryManagerAgent:
                          affected_items=[p["id"] for p in low_stock_items], autonomous=True)
         if restocked or ceo_mandate_active:
             conversation_history.add(self.name, "system", details, {"restocked": len(restocked), "pending_requests": len(restock_requests_sent)})
-        return {"success": True, "agent": self.name, "restocked": restocked, "restock_requests_sent": restock_requests_sent, "details": details}
+
+        # Reinforcement Learning Step & Hybrid Memory Update
+        after_state = {
+            "total_skus": len(products),
+            "restocked": restocked,
+            "restock_requests_sent": restock_requests_sent,
+            "zero_stock_count": len([p for p in products if p.get("STOCK_REMAINING", 0) == 0])
+        }
+        reward = rl_manager.compute_inventory_manager_reward(before_state, after_state, "warehouse_restock_cycle")
+        rl_manager.record_step(self.name, before_state, "warehouse_restock_cycle", reward, after_state)
+        memory_manager.record_episode(
+            self.name,
+            action="warehouse_restock_cycle",
+            outcome=details[:250],
+            reward=reward,
+            metadata={"restocked": len(restocked), "requests_sent": len(restock_requests_sent)}
+        )
+        memory_manager.update_structured(self.name, "total_skus", len(products))
+        memory_manager.update_structured(self.name, "pending_restock_requests", len(self.pending_restock_requests))
+
+        return {
+            "success": True,
+            "agent": self.name,
+            "restocked": restocked,
+            "restock_requests_sent": restock_requests_sent,
+            "rl_reward": reward,
+            "details": details
+        }
 
     async def execute_command(self, action: str, product_identifier: str, quantity: int = 15,
                               set_exact: Optional[int] = None) -> Dict[str, Any]:
@@ -1217,7 +1308,13 @@ class OrderManagementAgent:
 
         recent_orders = [f"#{o.get('order_id')} ({o.get('status')}, ₹{o.get('total',0):,.2f})" for o in all_orders[:6]]
 
+        # Hybrid Memory Context & RL Guidance
+        memory_ctx = memory_manager.build_context_package(self.name, query_or_directive)
+        rl_guidance = rl_manager.get_agent_guidance(self.name, {"total_orders": len(all_orders), "pending_count": status_counts.get("Pending", 0)})
+
         prompt = (
+            f"{memory_ctx}"
+            f"{rl_guidance}"
             f"You are the {self.name} of the AI Growth Commerce Store.\n"
             f"You received an inquiry/directive from {sender}:\n"
             f"\"{query_or_directive}\"\n\n"
@@ -1231,10 +1328,15 @@ class OrderManagementAgent:
 
         reply = ""
         try:
+            msg_list = [{"role": "system", "content": ORDER_MANAGER_SYSTEM_PROMPT}]
+            for d in memory_manager.get_recent_messages(self.name, limit=6):
+                msg_list.append(d)
+            msg_list.append({"role": "user", "content": prompt})
+
             resp = await asyncio.to_thread(
                 _call_ollama_sync,
                 self.api_key, self.model,
-                [{"role": "system", "content": ORDER_MANAGER_SYSTEM_PROMPT}, {"role": "user", "content": prompt}],
+                msg_list,
                 temperature=0.2, max_tokens=600, fallback_models=self.fallback_models
             )
             reply = clean_think_tags(resp.choices[0].message.content or "")
@@ -1260,6 +1362,9 @@ class OrderManagementAgent:
             f"📤 Reply to {sender}: {reply}",
             {"to": sender, "actions_taken": actions_taken}
         )
+        memory_manager.add_turn(self.name, "user", query_or_directive, {"sender": sender})
+        memory_manager.add_turn(self.name, "assistant", reply, {"to": sender, "actions": actions_taken})
+        memory_manager.record_episode(self.name, action="handle_directive", outcome=reply[:250], reward=1.0)
 
         return {"success": True, "agent": self.name, "reply": reply, "actions_taken": actions_taken, "assessment": reply}
 
@@ -1271,12 +1376,20 @@ class OrderManagementAgent:
         - Auto-advances Shipped → Delivered (after 3 min)
         - Alerts CEO if orders breach SLA (> 1 hour pending)
         - Reports to CEO only when status changes or SLA alerts occur.
+        - Guided by RL policy and records learning trajectories.
         """
         all_orders = order_manager.get_all_orders()
         status_counts: Dict[str, int] = {}
         sla_alerts = []
         ceo_directives_received = []
         auto_advanced = []
+
+        before_state = {
+            "total_orders": len(all_orders),
+            "shipped_count": 0,
+            "delivered_count": 0,
+            "sla_breaches": 0
+        }
 
         for o in all_orders:
             st = o.get("status", "Confirmed")
@@ -1403,8 +1516,37 @@ class OrderManagementAgent:
         log_agent_action(self.name, "Order Pipeline Audit", details, affected_items=auto_advanced, autonomous=True)
         if auto_advanced or sla_alerts:
             conversation_history.add(self.name, "system", details, {"status_counts": status_counts, "auto_advanced": auto_advanced, "sla_alerts": len(sla_alerts)})
-        return {"success": True, "agent": self.name, "status_breakdown": status_counts,
-                "auto_advanced": auto_advanced, "sla_alerts": sla_alerts, "details": details}
+
+        # Reinforcement Learning Step & Hybrid Memory Update
+        shipped_c = len([x for x in auto_advanced if "Shipped" in x])
+        delivered_c = len([x for x in auto_advanced if "Delivered" in x])
+        after_state = {
+            "total_orders": len(all_orders),
+            "shipped_count": shipped_c,
+            "delivered_count": delivered_c,
+            "sla_breaches": len(sla_alerts)
+        }
+        reward = rl_manager.compute_order_manager_reward(before_state, after_state, "order_lifecycle_audit")
+        rl_manager.record_step(self.name, before_state, "order_lifecycle_audit", reward, after_state)
+        memory_manager.record_episode(
+            self.name,
+            action="order_lifecycle_audit",
+            outcome=details[:250],
+            reward=reward,
+            metadata={"auto_advanced": len(auto_advanced), "sla_alerts": len(sla_alerts)}
+        )
+        memory_manager.update_structured(self.name, "total_lifetime_orders", len(all_orders))
+        memory_manager.update_structured(self.name, "pipeline_breakdown", status_counts)
+
+        return {
+            "success": True,
+            "agent": self.name,
+            "status_breakdown": status_counts,
+            "auto_advanced": auto_advanced,
+            "sla_alerts": sla_alerts,
+            "rl_reward": reward,
+            "details": details
+        }
 
     async def execute_command(self, action: str, order_id: str, new_status: str,
                               notes: Optional[str] = None) -> Dict[str, Any]:
@@ -1475,6 +1617,8 @@ class FinanceManagerAgent:
         net_profit = active_rev * 0.35
 
         prompt = (
+            f"{memory_manager.build_context_package(self.name, query_or_directive)}"
+            f"{rl_manager.get_agent_guidance(self.name, {'active_revenue': active_rev, 'refund_rate': ref_rate})}"
             f"You are the {self.name} of the AI Growth Commerce Store.\n"
             f"You received an inquiry/directive from {sender}:\n"
             f"\"{query_or_directive}\"\n\n"
@@ -1488,10 +1632,15 @@ class FinanceManagerAgent:
 
         reply = ""
         try:
+            msg_list = [{"role": "system", "content": FINANCE_MANAGER_SYSTEM_PROMPT}]
+            for d in memory_manager.get_recent_messages(self.name, limit=6):
+                msg_list.append(d)
+            msg_list.append({"role": "user", "content": prompt})
+
             resp = await asyncio.to_thread(
                 _call_ollama_sync,
                 self.api_key, self.model,
-                [{"role": "system", "content": FINANCE_MANAGER_SYSTEM_PROMPT}, {"role": "user", "content": prompt}],
+                msg_list,
                 temperature=0.2, max_tokens=600, fallback_models=self.fallback_models
             )
             reply = clean_think_tags(resp.choices[0].message.content or "")
@@ -1517,6 +1666,9 @@ class FinanceManagerAgent:
             f"📤 Reply to {sender}: {reply}",
             {"to": sender, "actions_taken": actions_taken}
         )
+        memory_manager.add_turn(self.name, "user", query_or_directive, {"sender": sender})
+        memory_manager.add_turn(self.name, "assistant", reply, {"to": sender, "actions": actions_taken})
+        memory_manager.record_episode(self.name, action="handle_directive", outcome=reply[:250], reward=1.0)
 
         return {"success": True, "agent": self.name, "reply": reply, "actions_taken": actions_taken, "assessment": reply}
 
@@ -1527,9 +1679,18 @@ class FinanceManagerAgent:
         - Monitors financial health metrics (Active Revenue, Total GMV, Net Profit Estimate, Refund Rate).
         - Enforces strict refund policy (Auto-approves only if cancelled <= 24h & NOT Shipped/Delivered).
         - Reports financial health status to CEO on every cycle.
+        - Guided by RL policy and records learning trajectories.
         """
         inbox = message_bus.get_inbox(self.name)
         ceo_directives_received = []
+        t_sum = treasury_manager.get_summary()
+        current_bank = float(t_sum.get("bank_balance", 0.0))
+
+        before_state = {
+            "bank_balance": current_bank,
+            "approved_refunds_count": 0,
+            "rejected_ineligible_count": 0
+        }
 
         for msg in inbox:
             subj = msg.get("subject")
@@ -1688,6 +1849,27 @@ class FinanceManagerAgent:
                          details, affected_items=approved_refunds, autonomous=True)
         if approved_refunds or financial_alerts:
             conversation_history.add(self.name, "system", details, {"active_revenue": active_revenue, "approved_refunds": approved_refunds})
+
+        # Reinforcement Learning Step & Hybrid Memory Update
+        after_state = {
+            "bank_balance": float(treasury_manager.get_summary().get("bank_balance", 0.0)),
+            "approved_refunds_count": len(approved_refunds),
+            "rejected_ineligible_count": len(rejected_refunds)
+        }
+        reward = rl_manager.compute_finance_manager_reward(before_state, after_state, "finance_audit_cycle")
+        rl_manager.record_step(self.name, before_state, "finance_audit_cycle", reward, after_state)
+        memory_manager.record_episode(
+            self.name,
+            action="finance_audit_cycle",
+            outcome=details[:250],
+            reward=reward,
+            metadata={"approved_refunds": len(approved_refunds), "alerts": len(financial_alerts)}
+        )
+        memory_manager.update_structured(self.name, "active_revenue", active_revenue)
+        memory_manager.update_structured(self.name, "total_gmv", total_gmv)
+        memory_manager.update_structured(self.name, "refund_rate", refund_rate)
+        memory_manager.update_structured(self.name, "bank_balance", float(treasury_manager.get_summary().get("bank_balance", 0.0)))
+
         return {
             "success": True, "agent": self.name,
             "approved_refunds": approved_refunds,
@@ -1697,6 +1879,7 @@ class FinanceManagerAgent:
                 "refund_rate_pct": round(refund_rate, 2),
                 "net_profit_estimate": round(net_profit_estimate, 2)
             },
+            "rl_reward": reward,
             "details": details
         }
 
@@ -1790,7 +1973,13 @@ class DispatcherAgent:
         dispatched = [o for o in orders if o.get("status") in ["Dispatched", "Shipped"]]
         delivered = [o for o in orders if o.get("status") == "Delivered"]
 
+        # Hybrid Memory Context & RL Guidance
+        memory_ctx = memory_manager.build_context_package(self.name, query_or_directive)
+        rl_guidance = rl_manager.get_agent_guidance(self.name, {"confirmed_queue": len(confirmed), "dispatch_queue": len(self.dispatch_queue)})
+
         prompt = (
+            f"{memory_ctx}"
+            f"{rl_guidance}"
             f"You are the {self.name} of the AI Growth Commerce Store.\n"
             f"You received an inquiry/directive from {sender}:\n"
             f"\"{query_or_directive}\"\n\n"
@@ -1804,10 +1993,15 @@ class DispatcherAgent:
 
         reply = ""
         try:
+            msg_list = [{"role": "system", "content": DISPATCHER_SYSTEM_PROMPT}]
+            for d in memory_manager.get_recent_messages(self.name, limit=6):
+                msg_list.append(d)
+            msg_list.append({"role": "user", "content": prompt})
+
             resp = await asyncio.to_thread(
                 _call_ollama_sync,
                 self.api_key, self.model,
-                [{"role": "system", "content": DISPATCHER_SYSTEM_PROMPT}, {"role": "user", "content": prompt}],
+                msg_list,
                 temperature=0.2, max_tokens=600, fallback_models=self.fallback_models
             )
             reply = clean_think_tags(resp.choices[0].message.content or "")
@@ -1833,6 +2027,9 @@ class DispatcherAgent:
             f"📤 Reply to {sender}: {reply}",
             {"to": sender, "actions_taken": actions_taken}
         )
+        memory_manager.add_turn(self.name, "user", query_or_directive, {"sender": sender})
+        memory_manager.add_turn(self.name, "assistant", reply, {"to": sender, "actions": actions_taken})
+        memory_manager.record_episode(self.name, action="handle_directive", outcome=reply[:250], reward=1.0)
 
         return {"success": True, "agent": self.name, "reply": reply, "actions_taken": actions_taken, "assessment": reply}
 
@@ -1844,10 +2041,17 @@ class DispatcherAgent:
         - Only dispatches orders whose scheduled window has elapsed.
         - This simulates realistic logistics scheduling and avoids instant dispatch.
         - Reports dispatch completions to Order Management Agent and CEO Agent.
+        - Guided by RL policy and records learning trajectories.
         """
         import random
         import time
         now_ts = time.time()
+
+        before_state = {
+            "dispatched": [],
+            "newly_scheduled": [],
+            "queue_size": len(self.dispatch_queue)
+        }
 
         inbox = message_bus.get_inbox(self.name)
         ceo_directives_received = []
@@ -1964,11 +2168,31 @@ class DispatcherAgent:
                          affected_items=[d.split()[0] for d in dispatched], autonomous=True)
         if dispatched:
             conversation_history.add(self.name, "system", details, {"dispatched_count": len(dispatched)})
+
+        # Reinforcement Learning Step & Hybrid Memory Update
+        after_state = {
+            "dispatched": dispatched,
+            "newly_scheduled": newly_scheduled,
+            "queue_size": len(self.dispatch_queue)
+        }
+        reward = rl_manager.compute_dispatcher_reward(before_state, after_state, "logistics_dispatch_cycle")
+        rl_manager.record_step(self.name, before_state, "logistics_dispatch_cycle", reward, after_state)
+        memory_manager.record_episode(
+            self.name,
+            action="logistics_dispatch_cycle",
+            outcome=details[:250],
+            reward=reward,
+            metadata={"dispatched": len(dispatched), "scheduled": len(newly_scheduled)}
+        )
+        memory_manager.update_structured(self.name, "dispatch_queue_size", len(self.dispatch_queue))
+        memory_manager.update_structured(self.name, "total_dispatched", len(self.dispatched_order_ids))
+
         return {
             "success": True, "agent": self.name,
             "dispatched": dispatched,
             "newly_scheduled": newly_scheduled,
             "queue_size": len(self.dispatch_queue),
+            "rl_reward": reward,
             "details": details
         }
 
@@ -2044,7 +2268,13 @@ class ReviewFeedbackAgent:
         low_rated = [p for p in products if p.get("RATING", 5.0) < 3.5]
         high_rated = [p for p in products if p.get("RATING", 0.0) >= 4.7]
 
+        # Hybrid Memory Context & RL Guidance
+        memory_ctx = memory_manager.build_context_package(self.name, query_or_directive)
+        rl_guidance = rl_manager.get_agent_guidance(self.name, {"low_rated_count": len(low_rated), "monitored_skus": len(products)})
+
         prompt = (
+            f"{memory_ctx}"
+            f"{rl_guidance}"
             f"You are the {self.name} of the AI Growth Commerce Store.\n"
             f"You received an inquiry/directive from {sender}:\n"
             f"\"{query_or_directive}\"\n\n"
@@ -2058,10 +2288,15 @@ class ReviewFeedbackAgent:
 
         reply = ""
         try:
+            msg_list = [{"role": "system", "content": REVIEW_FEEDBACK_SYSTEM_PROMPT}]
+            for d in memory_manager.get_recent_messages(self.name, limit=6):
+                msg_list.append(d)
+            msg_list.append({"role": "user", "content": prompt})
+
             resp = await asyncio.to_thread(
                 _call_ollama_sync,
                 self.api_key, self.model,
-                [{"role": "system", "content": REVIEW_FEEDBACK_SYSTEM_PROMPT}, {"role": "user", "content": prompt}],
+                msg_list,
                 temperature=0.2, max_tokens=600, fallback_models=self.fallback_models
             )
             reply = clean_think_tags(resp.choices[0].message.content or "")
@@ -2087,6 +2322,9 @@ class ReviewFeedbackAgent:
             f"📤 Reply to {sender}: {reply}",
             {"to": sender, "actions_taken": actions_taken}
         )
+        memory_manager.add_turn(self.name, "user", query_or_directive, {"sender": sender})
+        memory_manager.add_turn(self.name, "assistant", reply, {"to": sender, "actions": actions_taken})
+        memory_manager.record_episode(self.name, action="handle_directive", outcome=reply[:250], reward=1.0)
 
         return {"success": True, "agent": self.name, "reply": reply, "actions_taken": actions_taken, "assessment": reply}
 
@@ -2097,9 +2335,15 @@ class ReviewFeedbackAgent:
         - Reviews customer feedback across products
         - Flags low-rated products (< 3.0 stars) to CEO
         - Generates AI summaries on demand or on change
+        - Guided by RL policy and records learning trajectories.
         """
         inbox = message_bus.get_inbox(self.name)
         ceo_directives_received = []
+
+        before_state = {
+            "alerts_sent": 0,
+            "reviews_audited": 0
+        }
 
         for msg in inbox:
             subj = msg.get("subject")
@@ -2118,12 +2362,14 @@ class ReviewFeedbackAgent:
         products = inventory_manager.get_all_products()
         updated_summaries = []
         new_low_rated_products = []
+        total_audited_reviews = 0
 
         for p in products:
             p_id = p["id"]
             p_name = p.get("PRODUCT_NAME", p_id)
             reviews = review_manager.get_product_reviews(p_id)
             if reviews:
+                total_audited_reviews += len(reviews)
                 avg_rating = sum(r.get("rating", 3) for r in reviews) / len(reviews)
                 if avg_rating < 3.0 and p_id not in self.reported_low_rating_ids:
                     new_low_rated_products.append({"product": p_name, "avg_rating": round(avg_rating, 1), "review_count": len(reviews)})
@@ -2142,7 +2388,7 @@ class ReviewFeedbackAgent:
             )
 
         details = (
-            f"Analyzed customer sentiment across {len(products)} products. "
+            f"Analyzed customer sentiment across {len(products)} products ({total_audited_reviews} total reviews). "
             + (f"⚠️ {len(new_low_rated_products)} products below 3.0 stars reported to CEO." if new_low_rated_products else "All product sentiment ratings healthy.")
         )
 
@@ -2165,8 +2411,31 @@ class ReviewFeedbackAgent:
                          affected_items=updated_summaries, autonomous=True)
         if new_low_rated_products:
             conversation_history.add(self.name, "system", details, {"low_rated": len(new_low_rated_products)})
-        return {"success": True, "agent": self.name, "updated_products": updated_summaries,
-                "low_rated": new_low_rated_products, "details": details}
+
+        # Reinforcement Learning Step & Hybrid Memory Update
+        after_state = {
+            "alerts_sent": len(new_low_rated_products),
+            "reviews_audited": total_audited_reviews
+        }
+        reward = rl_manager.compute_review_manager_reward(before_state, after_state, "review_sentiment_audit")
+        rl_manager.record_step(self.name, before_state, "review_sentiment_audit", reward, after_state)
+        memory_manager.record_episode(
+            self.name,
+            action="review_sentiment_audit",
+            outcome=details[:250],
+            reward=reward,
+            metadata={"low_rated_count": len(new_low_rated_products), "audited": total_audited_reviews}
+        )
+        memory_manager.update_structured(self.name, "monitored_products_count", len(products))
+        memory_manager.update_structured(self.name, "total_reviews_audited", total_audited_reviews)
+
+        return {
+            "success": True, "agent": self.name,
+            "updated_products": updated_summaries,
+            "low_rated": new_low_rated_products,
+            "rl_reward": reward,
+            "details": details
+        }
 
     async def execute_command(self, action: str, product_id_or_name: str) -> Dict[str, Any]:
         """Executes review summary generation on demand."""
@@ -2239,23 +2508,24 @@ STORE POLICIES & TREASURY RULES:
 - Finance Exclusive: ONLY Finance Manager Agent processes payments, refunds, and salary disbursements.
 
 ================================================================================
-CRITICAL TOOL-CALLING RULES — YOU MUST FOLLOW THESE WITHOUT EXCEPTION:
+CONVERSATION & TOOL-CALLING PRINCIPLES — YOU MUST FOLLOW THESE WITHOUT EXCEPTION:
 ================================================================================
-1. ALWAYS CALL A TOOL. Never describe an action you intend to do without executing it.
-2. TO ACQUIRE WHOLESALE STOCK — use: acquire_inventory_stock(product_identifier="...", quantity=N)
-3. TO CHECK TREASURY & PROFIT — use: get_treasury_and_profit_metrics()
-4. TO NEGOTIATE AGENT SALARIES (not CEO's own) — use: negotiate_agent_salary(agent_name="...", proposed_salary=N, rationale="...")
-5. TO REQUEST CEO SALARY REVISION FROM OWNER — use: request_salary_revision_from_owner(requested_salary=N, justification="...")
-6. TO SET CEO SALARY (OWNER ONLY) — use: owner_set_ceo_salary(new_salary=N)
-7. TO PAY AGENT SALARIES — use: pay_agent_salaries(agent_name="all")
-8. TO TRIGGER AI BUYERS — use: trigger_ai_buyer(buyer_id="buyer_alex")
-9. TO CONDUCT MULTI-AGENT DISCUSSION — use: conduct_ceo_discussion(topic="...", participants="ALL_AGENTS")
-10. FOR PRICE COMMANDS — use: command_price_manager(action="...", category="...", percentage=N)
-11. FOR INVENTORY DIRECTIVES — use: command_inventory_manager(product_identifier="...", quantity=N)
-12. FOR DISPATCH — use: command_dispatcher(order_id="...")
-13. FOR REFUNDS (FINANCE ONLY) — use: command_finance_manager(order_id="...", reason="...")
-14. FOR ASKING A SPECIFIC AGENT — use: ask_specialist_agent(agent_name="...", question="...")
-15. TO APPROVE A RESTOCK REQUEST — use: approve_restock_request(product_identifier="...", quantity=N)
+1. CONVERSATION & MEMORY RECALL: If the Store Owner asks a question, checks previous conversations, or asks about prior topics/instructions/codes: answer directly, accurately, and authoritatively using your Hybrid Layered Memory and past dialogue context.
+2. EXECUTING STORE DIRECTIVES: When the Store Owner commands an action (e.g. adjust prices, acquire stock, pay salaries, check metrics, dispatch orders), ALWAYS call the appropriate tool immediately:
+   - TO ACQUIRE WHOLESALE STOCK — use: acquire_inventory_stock(product_identifier="...", quantity=N)
+   - TO CHECK TREASURY & PROFIT — use: get_treasury_and_profit_metrics()
+   - TO NEGOTIATE AGENT SALARIES — use: negotiate_agent_salary(agent_name="...", proposed_salary=N, rationale="...")
+   - TO REQUEST CEO SALARY REVISION FROM OWNER — use: request_salary_revision_from_owner(requested_salary=N, justification="...")
+   - TO SET CEO SALARY (OWNER ONLY) — use: owner_set_ceo_salary(new_salary=N)
+   - TO PAY AGENT SALARIES — use: pay_agent_salaries(agent_name="all")
+   - TO TRIGGER AI BUYERS — use: trigger_ai_buyer(buyer_id="buyer_alex")
+   - TO CONDUCT MULTI-AGENT DISCUSSION — use: conduct_ceo_discussion(topic="...", participants="ALL_AGENTS")
+   - FOR PRICE COMMANDS — use: command_price_manager(action="...", category="...", percentage=N)
+   - FOR INVENTORY DIRECTIVES — use: command_inventory_manager(product_identifier="...", quantity=N)
+   - FOR DISPATCH — use: command_dispatcher(order_id="...")
+   - FOR REFUNDS (FINANCE ONLY) — use: command_finance_manager(order_id="...", reason="...")
+   - FOR ASKING A SPECIFIC AGENT — use: ask_specialist_agent(agent_name="...", question="...")
+   - TO APPROVE A RESTOCK REQUEST — use: approve_restock_request(product_identifier="...", quantity=N)
 
 The Store Owner's decisions are HIGHEST PRIORITY (P0 / CRITICAL). Execute with zero hesitation.
 """ + _FLEET_DIRECTORY
@@ -2575,6 +2845,30 @@ CEO_TOOLS = [
                 "required": ["agent_name", "question"]
             }
         }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "get_agent_memory_report",
+            "description": "Inspect the 5-layer Hybrid Layered Memory (Recent Context, Rolling Summary, Structured Memory, Episodic Memory, Vector Retrieval) for all agents or a specific agent.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "agent_name": {"type": "string", "description": "Optional specific agent name (e.g. 'Price Manager Agent', 'CEO Agent') or leave blank for fleet overview"}
+                }
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "get_fleet_rl_report",
+            "description": "Retrieve the Reinforcement Learning (RL) performance report and Q-learning policy trajectories across the entire agent fleet.",
+            "parameters": {
+                "type": "object",
+                "properties": {}
+            }
+        }
     }
 ]
 
@@ -2629,6 +2923,14 @@ class CEOAgent:
         confirmed_orders = [o for o in orders if o.get("status") == "Confirmed"]
         pending_orders = [o for o in orders if o.get("status") == "Pending"]
         low_stock = [p for p in products if p.get("STOCK_REMAINING", 0) <= 5]
+
+        # State captures for Reinforcement Learning
+        before_state = {
+            "revenue": total_revenue,
+            "profit": total_revenue * 0.35,
+            "confirmed_orders": len(confirmed_orders),
+            "refund_rate": 0.0
+        }
 
         briefing_lines = []
         directives_issued = []
@@ -2796,8 +3098,15 @@ class CEOAgent:
             f"- Catalog: {len(products)} SKUs | Low Stock: {len(low_stock)} SKUs"
         )
 
-        ceo_prompt = "\n".join(briefing_lines) + store_snapshot + (
-            "\n\nAs CEO, synthesize the agent reports above and provide a brief executive summary."
+        memory_ctx = memory_manager.build_context_package(self.name, "executive team briefing and directives")
+        rl_guidance = rl_manager.get_agent_guidance(self.name, {"revenue": total_revenue, "active_orders": active_orders})
+
+        ceo_prompt = (
+            f"{memory_ctx}"
+            f"{rl_guidance}"
+            + "\n".join(briefing_lines) + store_snapshot + (
+                "\n\nAs CEO, synthesize the agent reports above and provide a brief executive summary."
+            )
         )
 
         messages = [
@@ -2832,11 +3141,33 @@ class CEOAgent:
 
         log_agent_action(self.name, "CEO Strategic Cycle", details, autonomous=True)
         conversation_history.add(self.name, "system", details, {"messages_processed": len(inbox), "directives": len(directives_issued)})
+
+        # Reinforcement Learning Step & Hybrid Memory Update
+        after_state = {
+            "revenue": total_revenue,
+            "profit": total_revenue * 0.35,
+            "confirmed_orders": len(confirmed_orders),
+            "refund_rate": 0.0
+        }
+        reward = rl_manager.compute_ceo_reward(before_state, after_state, "ceo_strategic_cycle")
+        rl_manager.record_step(self.name, before_state, "ceo_strategic_cycle", reward, after_state)
+        memory_manager.record_episode(
+            self.name,
+            action="ceo_strategic_cycle",
+            outcome=ceo_report[:250],
+            reward=reward,
+            metadata={"directives_count": len(directives_issued), "revenue": total_revenue}
+        )
+        memory_manager.update_structured(self.name, "total_revenue", total_revenue)
+        memory_manager.update_structured(self.name, "total_gmv", total_gmv)
+        memory_manager.update_structured(self.name, "active_orders", active_orders)
+
         return {
             "success": True, "agent": self.name,
             "messages_processed": len(inbox),
             "directives_issued": directives_issued,
             "ceo_report": ceo_report,
+            "rl_reward": reward,
             "details": details
         }
 
@@ -3278,6 +3609,17 @@ class CEOAgent:
                 q = args.get("question", "")
                 return await self._handle_ask_specialist(ag_name, q)
 
+            # 14. Hybrid Layered Memory Report
+            elif tool_name == "get_agent_memory_report":
+                ag = args.get("agent_name")
+                if ag:
+                    return {"success": True, "agent": ag, "memory": memory_manager.get_memory_report(ag)}
+                return {"success": True, "fleet_memory": memory_manager.get_all_memories_report()}
+
+            # 15. Fleet Reinforcement Learning Performance Report
+            elif tool_name == "get_fleet_rl_report":
+                return {"success": True, "fleet_rl": rl_manager.get_fleet_performance_report()}
+
         except Exception as e:
             return {"error": f"Tool execution failed: {str(e)}"}
 
@@ -3313,30 +3655,42 @@ class CEOAgent:
             subject="OWNER_DIRECTIVE",
             payload={"prompt": prompt, "priority": "P0_CRITICAL", "source": "Omnipotent Admin"}
         )
-        # 2. Record incoming owner prompt into CEO's conversation history
+        # 2. Record incoming owner prompt into CEO's conversation history & Hybrid Layered Memory
         conversation_history.add(self.name, "user", prompt, {"source": "Store Owner", "priority": "P0_CRITICAL"})
+        memory_manager.add_turn(self.name, "user", prompt, {"source": "Store Owner"})
 
-        # 2. Build multi-turn context
-        messages = [{"role": "system", "content": CEO_OWNER_SYSTEM_PROMPT}]
+        # 3. Build multi-turn context with Grounded Memory Package
+        memory_ctx = memory_manager.build_context_package(self.name, prompt)
+        rl_guidance = rl_manager.get_agent_guidance(self.name, {"intent": "owner_directive"})
 
-        # Inject recent turns from conversation history
-        recent_turns = conversation_history_override if conversation_history_override is not None else conversation_history.get(self.name, limit=8)
-        if recent_turns:
-            for turn in recent_turns[:-1]:
-                r = turn.get("role", "user")
-                if r in ["user", "assistant"]:
-                    messages.append({"role": r, "content": turn.get("content", "")})
+        enhanced_system_prompt = f"{CEO_OWNER_SYSTEM_PROMPT}\n\n{memory_ctx}\n{rl_guidance}"
+        messages = [{"role": "system", "content": enhanced_system_prompt}]
 
-        messages.append({"role": "user", "content": prompt})
+        # Inject complete dialogue turns from persistent Memory Manager
+        all_dialogue = memory_manager.get_recent_messages(self.name, limit=10)
+        for d in all_dialogue:
+            messages.append(d)
 
         executed_tools = []
         final_text = ""
+
+        # Route tool presence: pure questions / memory queries answer directly without tool schema distraction
+        p_lower = prompt.lower()
+        is_conversational_query = any(p_lower.strip().startswith(q) for q in [
+            "what", "who", "why", "how", "when", "which", "where", "can you remember",
+            "do you remember", "tell me", "explain", "repeat", "summarize", "describe",
+            "hello", "hi", "hey"
+        ]) and not any(action_kw in p_lower for action_kw in [
+            "discount", "price", "stock", "acquire", "restock", "pay", "salary",
+            "dispatch", "ship", "refund", "buyer", "trigger", "discuss", "set", "command", "broadcast"
+        ])
+        tools_to_pass = None if is_conversational_query else CEO_TOOLS
 
         try:
             for _ in range(5):
                 resp = await asyncio.to_thread(
                     _call_ollama_sync,
-                    self.api_key, self.model, messages, CEO_TOOLS,
+                    self.api_key, self.model, messages, tools_to_pass,
                     temperature=0.1, max_tokens=2500, fallback_models=self.fallback_models
                 )
                 res_msg = resp.choices[0].message
@@ -3344,18 +3698,12 @@ class CEOAgent:
 
                 if not tool_calls:
                     final_text = clean_think_tags(res_msg.content or "")
-                    # ── POST-LLM GUARD: Detect if LLM described an action without calling any tool ──
-                    # Patterns: "ask (all) agents/team", "tell agents", "send message", "broadcast", etc.
+                    # ── POST-LLM GUARD: Detect if owner explicitly commanded to broadcast to agents ──
+                    # Patterns: "ask (all) agents/team", "tell the team", "broadcast to agents"
                     p_lower = prompt.lower()
-                    comm_keywords = [
-                        "ask", "tell", "inform", "notify", "message", "broadcast",
-                        "announce", "say to", "let them know", "share with", "send to"
-                    ]
-                    agent_keywords = ["agent", "team", "fleet", "all", "everyone", "them"]
-                    is_comm_intent = (
-                        any(k in p_lower for k in comm_keywords) and
-                        any(k in p_lower for k in agent_keywords) and
-                        len(executed_tools) == 0  # LLM called nothing
+                    is_comm_intent = bool(
+                        re.search(r'\b(ask|tell|inform|notify|broadcast|announce|message|send to)\s+(the\s+)?(all\s+)?(agents|team|fleet|everyone)\b', p_lower)
+                        and len(executed_tools) == 0
                     )
                     if is_comm_intent:
                         # Build the message body from the prompt itself or from what the LLM wrote
@@ -3465,8 +3813,16 @@ class CEOAgent:
                     f"- **Fleet Status**: All 6 specialist agents are disciplined and executing directives under direct CEO supervision."
                 )
 
-        # 3. Record CEO's assistant response in conversation history
+        # 3. Record CEO's assistant response in conversation history & Hybrid Layered Memory
         conversation_history.add(self.name, "assistant", final_text, {"tool_calls": len(executed_tools), "priority": "P0_CRITICAL"})
+        memory_manager.add_turn(self.name, "assistant", final_text, {"tool_calls": len(executed_tools)})
+        memory_manager.record_episode(
+            self.name,
+            action="owner_directive_execution",
+            outcome=final_text[:250],
+            reward=2.0 if executed_tools else 1.0,
+            metadata={"tool_calls": len(executed_tools), "tools": [t["name"] for t in executed_tools]}
+        )
 
         # 4. Publish CEO final response to Message Bus (fully visible to Owner)
         message_bus.publish(

@@ -27,6 +27,8 @@ from backend.cart_manager import cart_manager
 from backend.order_manager import order_manager
 from backend.payment_manager import payment_manager
 from backend.review_manager import review_manager
+from backend.agent_memory import memory_manager
+from backend.agent_rl import rl_manager
 
 load_dotenv()
 
@@ -643,7 +645,7 @@ class CommerceAgent:
 
         raise last_error or Exception("All Customer Ollama models exhausted.")
 
-    def execute_tool(self, tool_name: str, tool_args: Dict[str, Any], user_id: str = "user_alex") -> Dict[str, Any]:
+    def _execute_raw_tool(self, tool_name: str, tool_args: Dict[str, Any], user_id: str = "user_alex") -> Dict[str, Any]:
         """
         Dispatches and executes the specified backend tool with robust argument parsing.
         """
@@ -954,6 +956,35 @@ class CommerceAgent:
         except Exception as e:
             return {"error": f"Tool execution error: {str(e)}"}
 
+    def execute_tool(self, tool_name: str, tool_args: Dict[str, Any], user_id: str = "user_alex") -> Dict[str, Any]:
+        """
+        Public tool execution entrypoint:
+        Dispatches tool, computes customer agent RL reward, records transition & memory episode.
+        """
+        res = self._execute_raw_tool(tool_name, tool_args, user_id=user_id)
+
+        # Reinforcement Learning Step & Episodic Memory Update for Customer Agent (Nova)
+        try:
+            reward = rl_manager.compute_customer_agent_reward(tool_name, res if isinstance(res, dict) else {})
+            rl_manager.record_step(
+                "Customer Agent (Nova)",
+                {"tool": tool_name, "user_id": user_id},
+                tool_name,
+                reward,
+                {"success": not bool(isinstance(res, dict) and res.get("error"))}
+            )
+            memory_manager.record_episode(
+                "Customer Agent (Nova)",
+                action=f"tool:{tool_name}",
+                outcome=str(res)[:200],
+                reward=reward,
+                metadata={"user_id": user_id}
+            )
+        except Exception as rl_err:
+            print(f"[Customer Agent] RL/Memory recording note: {rl_err}", flush=True)
+
+        return res
+
     async def run_prompt(
         self,
         prompt: str,
@@ -964,17 +995,20 @@ class CommerceAgent:
         Executes a customer prompt through the ReAct loop using LLM Tool Calling,
         falling back seamlessly to deterministic tool execution if API limits occur.
         """
-        messages: List[Dict[str, Any]] = [{"role": "system", "content": SYSTEM_PROMPT}]
+        # Record incoming prompt into Hybrid Layered Memory
+        memory_manager.add_turn("Customer Agent (Nova)", "user", prompt, {"user_id": user_id})
 
-        # Inject conversation history (last 6 turns)
-        if conversation_history:
-            for msg in conversation_history[-6:]:
-                role = msg.get("role", "user")
-                if role in ["user", "assistant"]:
-                    messages.append({"role": role, "content": msg.get("content", "")})
+        # Hybrid Memory Context & RL Policy Guidance
+        memory_ctx = memory_manager.build_context_package("Customer Agent (Nova)", prompt)
+        rl_guidance = rl_manager.get_agent_guidance("Customer Agent (Nova)", {"user_id": user_id})
 
-        # Append current user prompt
-        messages.append({"role": "user", "content": prompt})
+        enhanced_system_prompt = f"{SYSTEM_PROMPT}\n\n{memory_ctx}\n{rl_guidance}"
+        messages: List[Dict[str, Any]] = [{"role": "system", "content": enhanced_system_prompt}]
+
+        # Inject complete dialogue turns from persistent Memory Manager
+        all_dialogue = memory_manager.get_recent_messages("Customer Agent (Nova)", limit=10)
+        for d in all_dialogue:
+            messages.append(d)
 
         executed_tools_trace: List[Dict[str, Any]] = []
         action_data: Dict[str, Any] = {}
@@ -1128,8 +1162,12 @@ class CommerceAgent:
         current_cart = cart_manager.get_cart(user_id)
         current_orders = order_manager.get_orders_by_user(user_id)
 
+        # Record turns into Hybrid Layered Memory
+        final_ans = final_text or "How can I assist you with your shopping today?"
+        memory_manager.add_turn("Customer Agent (Nova)", "assistant", final_ans, {"user_id": user_id, "tool_calls_count": len(executed_tools_trace)})
+
         return {
-            "response": final_text or "How can I assist you with your shopping today?",
+            "response": final_ans,
             "tool_calls": executed_tools_trace,
             "cart": current_cart,
             "orders": current_orders,

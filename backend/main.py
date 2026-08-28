@@ -692,6 +692,23 @@ async def get_admin_agent_messages(limit: int = 60):
     messages = message_bus.get_all_messages(limit=limit)
     return {"messages": messages, "count": len(messages)}
 
+@app.get("/api/admin/agent-memory")
+async def get_admin_agent_memory(agent_name: Optional[str] = None):
+    """Returns the 5-layer Hybrid Layered Memory state for all agents or a specific agent."""
+    from backend.agent_memory import memory_manager
+    if agent_name:
+        return {"agent": agent_name, "memory": memory_manager.get_memory_report(agent_name)}
+    return {"fleet_memory": memory_manager.get_all_memories_report()}
+
+@app.get("/api/admin/agent-rl")
+async def get_admin_agent_rl(agent_name: Optional[str] = None):
+    """Returns the Reinforcement Learning (RL) performance report and Q-learning metrics."""
+    from backend.agent_rl import rl_manager
+    if agent_name:
+        pol = rl_manager.get_policy(agent_name)
+        return {"agent": agent_name, "policy": pol.to_dict()}
+    return {"fleet_rl": rl_manager.get_fleet_performance_report()}
+
 @app.post("/api/admin/inventory/update")
 async def admin_update_inventory(req: AdminInventoryUpdateRequest):
     """Directly modifies stock, price, or base_price for a product."""
@@ -969,8 +986,8 @@ async def reset_store_complete():
     # 3. Reset customer reviews
     review_manager._write_reviews([])
 
-    # 4. Reset treasury to 1000.0
-    treasury_manager.reset_treasury(new_balance=1000.0)
+    # 4. Reset treasury to 10000.0
+    treasury_manager.reset_treasury(new_balance=10000.0)
 
     # 5. Reset salaries
     salary_manager.reset_salaries()
@@ -996,7 +1013,7 @@ async def reset_store_complete():
 
     return {
         "success": True,
-        "bank_balance": 1000.0,
+        "bank_balance": 10000.0,
         "message": "Store successfully reset: All 27 products at 0 stock (Wholesale restock required), Orders & Reviews cleared, Bank Balance reset to ₹1,000.0, Staff Salaries reset to ₹50/100 cycles, and AI Shoppers staggered across 0–5 minutes."
     }
 
