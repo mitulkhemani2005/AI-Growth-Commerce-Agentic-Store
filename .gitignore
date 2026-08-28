@@ -51,6 +51,10 @@ inventory.json
 data/orders.json
 data/users.json
 data/reviews.json
+data/agent_salaries.json
+data/buyer_agents.json
+data/treasury.json
+
 
 # ---- IDE / Editor ----
 .vscode/

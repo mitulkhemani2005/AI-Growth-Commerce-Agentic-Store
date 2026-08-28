@@ -41,6 +41,7 @@ class BackgroundAgentWorker:
                 "status": "RUNNING 24/7",
                 "enabled": True,
                 "interval_seconds": int(os.environ.get("DISPATCHER_INTERVAL_SECONDS", "15")),
+                "effective_interval": int(os.environ.get("DISPATCHER_INTERVAL_SECONDS", "15")),
                 "last_run": None,
                 "last_run_ts": 0.0,
                 "actions_count": 0,
@@ -51,7 +52,8 @@ class BackgroundAgentWorker:
                 "name": "Inventory Manager Agent",
                 "status": "RUNNING 24/7",
                 "enabled": True,
-                "interval_seconds": int(os.environ.get("INVENTORY_AGENT_INTERVAL_SECONDS", "15")),
+                "interval_seconds": int(os.environ.get("INVENTORY_AGENT_INTERVAL_SECONDS", "20")),
+                "effective_interval": int(os.environ.get("INVENTORY_AGENT_INTERVAL_SECONDS", "20")),
                 "last_run": None,
                 "last_run_ts": 0.0,
                 "actions_count": 0,
@@ -62,7 +64,8 @@ class BackgroundAgentWorker:
                 "name": "Finance Manager Agent",
                 "status": "RUNNING 24/7",
                 "enabled": True,
-                "interval_seconds": int(os.environ.get("FINANCE_AGENT_INTERVAL_SECONDS", "20")),
+                "interval_seconds": int(os.environ.get("FINANCE_AGENT_INTERVAL_SECONDS", "30")),
+                "effective_interval": int(os.environ.get("FINANCE_AGENT_INTERVAL_SECONDS", "30")),
                 "last_run": None,
                 "last_run_ts": 0.0,
                 "actions_count": 0,
@@ -73,7 +76,8 @@ class BackgroundAgentWorker:
                 "name": "Price Manager Agent",
                 "status": "RUNNING 24/7",
                 "enabled": True,
-                "interval_seconds": int(os.environ.get("PRICE_AGENT_INTERVAL_SECONDS", "15")),
+                "interval_seconds": int(os.environ.get("PRICE_AGENT_INTERVAL_SECONDS", "20")),
+                "effective_interval": int(os.environ.get("PRICE_AGENT_INTERVAL_SECONDS", "20")),
                 "last_run": None,
                 "last_run_ts": 0.0,
                 "actions_count": 0,
@@ -84,7 +88,8 @@ class BackgroundAgentWorker:
                 "name": "Order Management Agent",
                 "status": "RUNNING 24/7",
                 "enabled": True,
-                "interval_seconds": int(os.environ.get("ORDER_AGENT_INTERVAL_SECONDS", "15")),
+                "interval_seconds": int(os.environ.get("ORDER_AGENT_INTERVAL_SECONDS", "20")),
+                "effective_interval": int(os.environ.get("ORDER_AGENT_INTERVAL_SECONDS", "20")),
                 "last_run": None,
                 "last_run_ts": 0.0,
                 "actions_count": 0,
@@ -95,7 +100,8 @@ class BackgroundAgentWorker:
                 "name": "Review & Feedback Agent",
                 "status": "RUNNING 24/7",
                 "enabled": True,
-                "interval_seconds": int(os.environ.get("REVIEW_AGENT_INTERVAL_SECONDS", "30")),
+                "interval_seconds": int(os.environ.get("REVIEW_AGENT_INTERVAL_SECONDS", "35")),
+                "effective_interval": int(os.environ.get("REVIEW_AGENT_INTERVAL_SECONDS", "35")),
                 "last_run": None,
                 "last_run_ts": 0.0,
                 "actions_count": 0,
@@ -106,12 +112,25 @@ class BackgroundAgentWorker:
                 "name": "CEO Agent",
                 "status": "RUNNING 24/7",
                 "enabled": True,
-                "interval_seconds": int(os.environ.get("CEO_AGENT_INTERVAL_SECONDS", "20")),
+                "interval_seconds": int(os.environ.get("CEO_AGENT_INTERVAL_SECONDS", "25")),
+                "effective_interval": int(os.environ.get("CEO_AGENT_INTERVAL_SECONDS", "25")),
                 "last_run": None,
                 "last_run_ts": 0.0,
                 "actions_count": 0,
                 "icon": "briefcase",
                 "description": "Head of all agents. Oversees fleet discipline, processes inter-agent messages, makes strategic decisions, issues directives, and reports to Owner."
+            },
+            "buyer_agents": {
+                "name": "5 AI Autonomous Shoppers Fleet",
+                "status": "RUNNING 24/7",
+                "enabled": str(os.environ.get("BUYER_SIMULATION_ENABLED", "true")).lower() == "true",
+                "interval_seconds": 1,
+                "effective_interval": 1,
+                "last_run": None,
+                "last_run_ts": 0.0,
+                "actions_count": 0,
+                "icon": "shopping-cart",
+                "description": "5 AI shoppers (Alex, Sophia, David, Elena, Marcus) autonomously browse catalog, checkout via AP2, post verified reviews, and test return policies with staggered 5-minute random timing."
             }
         }
 
@@ -125,7 +144,7 @@ class BackgroundAgentWorker:
             self._task = loop.create_task(self._run_loop())
         except RuntimeError:
             pass
-        print("[24/7 Background Workers] Autonomous AI Agent Fleet (7 agents running async & together every second via Ollama gemma4:e2b-it-qat) started!", flush=True)
+        print("[24/7 Background Workers] Autonomous AI Agent Fleet & 5 AI Shoppers running 24/7!", flush=True)
 
     def stop(self):
         self._running = False
@@ -147,8 +166,10 @@ class BackgroundAgentWorker:
     async def check_and_run_due_agents(self) -> Dict[str, Any]:
         """
         Periodically checks each agent's schedule and triggers execution
-        concurrently and asynchronously every second.
+        with organic randomness and event-driven responsiveness.
         """
+        import random
+        from backend.buyer_agents import buyer_agents_fleet
         now_ts = time.time()
         agents_map = {
             "dispatcher": dispatcher_agent,
@@ -165,10 +186,35 @@ class BackgroundAgentWorker:
             if not state.get("enabled", True):
                 return key, None
 
-            interval = state.get("interval_seconds", 1)
+            # Buyer fleet uses independent staggered 0-5m per-buyer scheduling
+            if key == "buyer_agents":
+                try:
+                    due_results = await buyer_agents_fleet.check_due_buyers()
+                    if due_results:
+                        state["last_run"] = datetime.now(timezone.utc).isoformat()
+                        state["last_run_ts"] = time.time()
+                        state["actions_count"] += len(due_results)
+                        return key, due_results
+                except Exception as e:
+                    print(f"Error checking due buyers: {e}", flush=True)
+                return key, None
+
+            base_interval = state.get("interval_seconds", 20)
+            effective_interval = state.get("effective_interval", base_interval)
             last_ts = state.get("last_run_ts", 0.0)
 
-            if (now_ts - last_ts) >= interval:
+            # Check if agent has pending messages on the bus (event-driven awaken)
+            agent_inst_name = getattr(agent_instance, "name", "")
+            has_pending_messages = False
+            if agent_inst_name:
+                pending_inbox = message_bus.peek_inbox(agent_inst_name)
+                has_pending_messages = len(pending_inbox) > 0
+
+            # Trigger if scheduled time arrived OR if unread messages arrived after minimum 4s cooldown
+            time_due = (now_ts - last_ts) >= effective_interval
+            event_due = has_pending_messages and (now_ts - last_ts) >= 4.0
+
+            if time_due or event_due:
                 try:
                     state["status"] = "EXECUTING"
                     res = await agent_instance.run_autonomous_cycle()
@@ -176,6 +222,9 @@ class BackgroundAgentWorker:
                     state["last_run_ts"] = time.time()
                     state["actions_count"] += 1
                     state["status"] = "RUNNING 24/7"
+                    # Calculate new organic interval with +/- 25% random jitter
+                    jitter_factor = random.uniform(0.75, 1.25)
+                    state["effective_interval"] = max(5, int(base_interval * jitter_factor))
                     return key, res
                 except Exception as e:
                     state["status"] = "ERROR"
@@ -183,9 +232,13 @@ class BackgroundAgentWorker:
                     return key, {"error": str(e)}
             return key, None
 
+        # Build list of run tasks including buyer agents fleet
+        tasks = [_run_agent(k, inst) for k, inst in agents_map.items()]
+        tasks.append(_run_agent("buyer_agents", buyer_agents_fleet))
+
         # Run all agents concurrently and asynchronously together
         results_list = await asyncio.gather(
-            *[_run_agent(k, inst) for k, inst in agents_map.items()],
+            *tasks,
             return_exceptions=True
         )
 
@@ -199,7 +252,8 @@ class BackgroundAgentWorker:
         return results
 
     async def trigger_agent(self, agent_key: str) -> Dict[str, Any]:
-        """Manually triggers an instant autonomous execution for a specific agent."""
+        """Manually triggers an instant autonomous execution for a specific agent or buyer fleet."""
+        from backend.buyer_agents import buyer_agents_fleet
         agents_map = {
             "dispatcher": dispatcher_agent,
             "inventory_manager": inventory_manager_agent,
@@ -209,6 +263,21 @@ class BackgroundAgentWorker:
             "review_manager": review_feedback_agent,
             "ceo": ceo_agent
         }
+
+        if agent_key in ["buyer_agents", "buyers", "all_buyers"]:
+            state = self.agent_states.get("buyer_agents", {})
+            state["status"] = "EXECUTING"
+            try:
+                res = await buyer_agents_fleet.run_all_buyers_step()
+                state["last_run"] = datetime.now(timezone.utc).isoformat()
+                state["last_run_ts"] = time.time()
+                state["actions_count"] += 1
+                state["status"] = "RUNNING 24/7"
+                return {"success": True, "agent": "buyer_agents", "result": res}
+            except Exception as e:
+                state["status"] = "ERROR"
+                return {"success": False, "error": str(e)}
+
         if agent_key not in agents_map:
             return {"success": False, "error": f"Unknown agent '{agent_key}'"}
 
@@ -225,6 +294,7 @@ class BackgroundAgentWorker:
         except Exception as e:
             state["status"] = "ERROR"
             return {"success": False, "error": str(e)}
+
 
     def update_agent_interval(self, agent_key: str, interval_seconds: int) -> Dict[str, Any]:
         """Dynamically update an agent's execution interval."""

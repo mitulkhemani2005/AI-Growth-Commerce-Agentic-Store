@@ -4,7 +4,11 @@ let cachedProducts = [];
 let cachedOrders = [];
 let cachedReviews = [];
 let cachedAgents = {};
+let cachedTreasury = {};
+let cachedSalaries = {};
+let cachedBuyers = [];
 let telemetryPollingInterval = null;
+
 
 document.addEventListener('DOMContentLoaded', () => {
   if (window.lucide) window.lucide.createIcons();
@@ -37,13 +41,15 @@ function switchTab(tabName) {
   if (activePane) activePane.classList.add('active');
 
   const titles = {
-    overview: { title: 'Store Overview', sub: 'Real-time telemetry, automated agent actions, and store health (INR ₹, 0% Tax)' },
+    overview: { title: 'Store Overview', sub: 'Real-time telemetry, automated agent actions, treasury P&L, and 5 AI buyers (INR ₹, 0% Tax)' },
+    treasury: { title: 'CEO Treasury & Agent Salaries', sub: 'Manage initial ₹500K bank balance, wholesale inventory acquisition at base price, and agent salaries' },
+    buyers: { title: '5 AI Autonomous Shoppers Fleet', sub: '5 Autonomous AI consumers with unlimited budgets browsing, purchasing, reviewing, and testing returns' },
     agents: { title: '24/7 Autonomous Agent Fleet', sub: '7 Autonomous agents collaborating in real time via Inter-Agent Message Bus' },
     orders: { title: 'Orders & Dispatch Pipeline', sub: 'Full order lifecycle from Pending to Delivered with live tracking' },
     inventory: { title: 'Inventory & Pricing Studio', sub: 'Owner-set Base Price floors and dynamic price optimization' },
     refunds: { title: 'Refunds & 24h Policy Engine', sub: 'Strict rule evaluation: Auto-approved if cancelled <= 24h & not shipped' },
     reviews: { title: 'AI Customer Sentiment & Reviews', sub: 'Ollama LLM-powered review synthesis and catalog summary synchronization' },
-    chat: { title: 'Omnipotent Admin AI Command Center', sub: 'Direct executive natural language control over all 7 agents & databases' }
+    chat: { title: 'CEO Command Center Chat', sub: 'Direct executive natural language control over all 7 agents, treasury & catalog' }
   };
 
   if (titles[tabName]) {
@@ -52,22 +58,28 @@ function switchTab(tabName) {
   }
 
   // Fetch fresh data for the selected tab on switch
-  if (tabName === 'inventory') {
+  if (tabName === 'treasury') {
+    loadTreasuryData();
+    loadSalariesData();
+  } else if (tabName === 'buyers') {
+    loadBuyersData();
+  } else if (tabName === 'inventory') {
     fetch('/api/inventory').then(r => r.json()).then(d => {
       cachedProducts = d.products || [];
       renderInventoryTable(true);
     });
   } else if (tabName === 'orders') {
-    fetch('/api/orders').then(r => r.json()).then(d => {
+    fetch('/api/admin/orders').then(r => r.json()).then(d => {
       cachedOrders = d.orders || [];
       renderOrdersTable();
     });
   } else if (tabName === 'refunds') {
-    fetch('/api/orders').then(r => r.json()).then(d => {
+    fetch('/api/admin/orders').then(r => r.json()).then(d => {
       cachedOrders = d.orders || [];
       renderRefundsTable();
     });
   } else if (tabName === 'reviews') {
+
     fetch('/api/admin/reviews').then(r => r.json()).then(d => {
       cachedReviews = d.reviews || [];
       renderReviewsTab();
@@ -76,6 +88,7 @@ function switchTab(tabName) {
 
   if (window.lucide) window.lucide.createIcons();
 }
+
 
 function setupEventListeners() {
   document.getElementById('refreshDataBtn').addEventListener('click', loadAllAdminData);
@@ -222,22 +235,29 @@ const fetchJson = async (url, fallback) => {
 // Full data load on startup / explicit Refresh button click
 async function loadAllAdminData() {
   try {
-    const [overview, agents, ordersData, invData, reviewsData, logsData, msgsData] = await Promise.all([
+    const [overview, agents, ordersData, invData, reviewsData, logsData, msgsData, treasuryData, salariesData, buyersData] = await Promise.all([
       fetchJson('/api/admin/overview', { kpis: {} }),
       fetchJson('/api/admin/agents/status', { agents: {} }),
-      fetchJson('/api/orders', { orders: [] }),
+      fetchJson('/api/admin/orders', { orders: [] }),
       fetchJson('/api/inventory', { products: [] }),
+
       fetchJson('/api/admin/reviews', { reviews: [] }),
       fetchJson('/api/admin/agent-logs?limit=60', { logs: [] }),
-      fetchJson('/api/admin/agent-messages?limit=60', { messages: [] })
+      fetchJson('/api/admin/agent-messages?limit=60', { messages: [] }),
+      fetchJson('/api/admin/treasury?limit=30', { bank_balance: 1000.0, total_sales_revenue: 0.0, net_profit: 0.0, transactions: [] }),
+      fetchJson('/api/admin/salaries', { salaries: [] }),
+      fetchJson('/api/admin/buyers', { buyers: [] })
     ]);
 
     cachedOrders = ordersData.orders || [];
     cachedProducts = invData.products || [];
     cachedReviews = reviewsData.reviews || [];
     cachedAgents = agents.agents || {};
+    cachedTreasury = treasuryData || {};
+    cachedSalaries = salariesData || {};
+    cachedBuyers = buyersData.buyers || [];
 
-    renderKPIs(overview.kpis || {});
+    renderKPIs(overview.kpis || {}, cachedTreasury);
     renderOverviewAgents(cachedAgents);
     renderOverviewMessageBus(msgsData.messages || []);
     renderAuditLogs(logsData.logs || []);
@@ -248,6 +268,9 @@ async function loadAllAdminData() {
     renderInventoryTable(true);
     renderRefundsTable();
     renderReviewsTab();
+    renderTreasuryTab(cachedTreasury);
+    renderSalariesTab(cachedSalaries);
+    renderBuyersTab(cachedBuyers);
 
     if (window.lucide) window.lucide.createIcons();
   } catch (err) {
@@ -255,25 +278,35 @@ async function loadAllAdminData() {
   }
 }
 
-// Calm telemetry polling (only updates KPI metrics, agent statuses, and message bus ticker — NEVER touches form tables)
+// Calm telemetry polling (updates KPI metrics, agent statuses, treasury, and message bus ticker in real-time)
 async function pollTelemetryData() {
-  // Only poll if on overview, agents, or chat tab to save bandwidth
-  if (!['overview', 'agents', 'chat'].includes(currentTab)) return;
+  // Only poll if on overview, agents, treasury, buyers, or chat tab
+  if (!['overview', 'agents', 'treasury', 'buyers', 'chat'].includes(currentTab)) return;
 
   try {
-    const [overview, agents, msgsData] = await Promise.all([
+    const [overview, agents, msgsData, treasuryData, buyersData] = await Promise.all([
       fetchJson('/api/admin/overview', { kpis: {} }),
       fetchJson('/api/admin/agents/status', { agents: {} }),
-      fetchJson('/api/admin/agent-messages?limit=30', { messages: [] })
+      fetchJson('/api/admin/agent-messages?limit=30', { messages: [] }),
+      fetchJson('/api/admin/treasury?limit=20', { bank_balance: 1000.0, total_sales_revenue: 0.0, net_profit: 0.0, transactions: [] }),
+      fetchJson('/api/admin/buyers', { buyers: [] })
     ]);
 
     cachedAgents = agents.agents || {};
+    cachedTreasury = treasuryData || {};
+    cachedBuyers = buyersData.buyers || [];
 
-    renderKPIs(overview.kpis || {});
+    renderKPIs(overview.kpis || {}, cachedTreasury);
     renderOverviewAgents(cachedAgents);
     renderOverviewMessageBus(msgsData.messages || []);
     renderFullAgentsGrid(cachedAgents);
     renderFullMessageBusTable(msgsData.messages || []);
+
+    if (currentTab === 'treasury') {
+      renderTreasuryTab(cachedTreasury);
+    } else if (currentTab === 'buyers') {
+      renderBuyersTab(cachedBuyers);
+    }
 
     if (window.lucide) window.lucide.createIcons();
   } catch (err) {
@@ -281,15 +314,45 @@ async function pollTelemetryData() {
   }
 }
 
-function renderKPIs(kpis) {
-  const rev = kpis.total_revenue || 0;
-  document.getElementById('kpiRevenue').innerText = `₹${rev.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-  document.getElementById('kpiAgentActions').innerText = kpis.agent_autonomous_actions || 0;
+function renderKPIs(kpis, treasury = {}) {
+  const bankBal = treasury.bank_balance !== undefined ? treasury.bank_balance : 1000.0;
+  const rev = treasury.total_sales_revenue !== undefined ? treasury.total_sales_revenue : (kpis.total_revenue || 0);
+  const profit = treasury.net_profit !== undefined ? treasury.net_profit : 0;
+  const stockSpend = treasury.total_wholesale_stock_spend !== undefined ? treasury.total_wholesale_stock_spend : 0;
+  const marginPct = treasury.gross_profit_margin_pct !== undefined ? treasury.gross_profit_margin_pct : 0;
+
+  const bankEl = document.getElementById('kpiBankBalance');
+  if (bankEl) bankEl.innerText = `₹${bankBal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+  const revEl = document.getElementById('kpiRevenue');
+  if (revEl) revEl.innerText = `₹${rev.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+  const profitEl = document.getElementById('kpiNetProfit');
+  if (profitEl) {
+    profitEl.innerText = `₹${profit.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    profitEl.style.color = profit >= 0 ? '#22c55e' : '#f43f5e';
+  }
+
+  const marginEl = document.getElementById('kpiProfitMargin');
+  if (marginEl) marginEl.innerText = `Margin: ${marginPct}%`;
+
+  const spendEl = document.getElementById('kpiInventorySpend');
+  if (spendEl) spendEl.innerText = `₹${stockSpend.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+  const zeroStockCount = cachedProducts ? cachedProducts.filter(p => (p.STOCK_REMAINING || 0) <= 5).length : (kpis.low_stock_count || 0);
+  const lowStockEl = document.getElementById('kpiLowStock');
+  if (lowStockEl) lowStockEl.innerText = zeroStockCount;
+
   document.getElementById('kpiTotalOrders').innerText = kpis.total_orders || 0;
-  document.getElementById('kpiActiveOrdersSub').innerText = `${kpis.active_orders || 0} active in pipeline (0% Tax)`;
-  document.getElementById('kpiLowStock').innerText = kpis.low_stock_count || 0;
+  document.getElementById('kpiActiveOrdersSub').innerText = `${kpis.active_orders || 0} active pipeline (0% Tax)`;
   document.getElementById('ordersCountBadge').innerText = kpis.total_orders || 0;
+
+  const treasuryBadge = document.getElementById('treasuryBadge');
+  if (treasuryBadge) {
+    treasuryBadge.innerText = bankBal >= 100000 ? `₹${(bankBal / 1000).toFixed(0)}K` : `₹${bankBal.toFixed(0)}`;
+  }
 }
+
 
 const AGENT_ICON_MAP = {
   price_manager: 'tag',
@@ -330,11 +393,15 @@ function renderOverviewAgents(agents) {
 function renderOverviewMessageBus(messages) {
   const container = document.getElementById('overviewMessageBusLogs');
   if (!container) return;
-  if (messages.length === 0) {
+  
+  // Message bus is strictly for internal Admin Specialist Agents (CEO, Price, Inventory, Order, Finance, Dispatcher, Review)
+  const adminMsgs = (messages || []).filter(m => !(m.from || '').startsWith('AI Buyer') && !(m.to || '').startsWith('AI Buyer'));
+
+  if (adminMsgs.length === 0) {
     container.innerHTML = `<div style="color: var(--text-dim); text-align: center; padding: 2rem;">Awaiting inter-agent message traffic...</div>`;
     return;
   }
-  container.innerHTML = messages.map(m => {
+  container.innerHTML = adminMsgs.map(m => {
     const timeStr = m.timestamp ? new Date(m.timestamp).toLocaleTimeString() : '';
     let payloadText = '';
     try {
@@ -354,6 +421,7 @@ function renderOverviewMessageBus(messages) {
     `;
   }).join('');
 }
+
 
 function renderAuditLogs(logs) {
   const container = document.getElementById('overviewAuditLogs');
@@ -426,11 +494,15 @@ function renderFullAgentsGrid(agents) {
 function renderFullMessageBusTable(messages) {
   const tbody = document.getElementById('fullMessageBusBody');
   if (!tbody) return;
-  if (messages.length === 0) {
+  
+  // Exclusively admin specialist agents (CEO, Price, Inventory, Order, Finance, Dispatcher, Review)
+  const adminMsgs = (messages || []).filter(m => !(m.from || '').startsWith('AI Buyer') && !(m.to || '').startsWith('AI Buyer'));
+
+  if (adminMsgs.length === 0) {
     tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-dim); padding: 2rem;">No inter-agent messages recorded yet.</td></tr>`;
     return;
   }
-  tbody.innerHTML = messages.map(m => {
+  tbody.innerHTML = adminMsgs.map(m => {
     const dt = m.timestamp ? new Date(m.timestamp).toLocaleString() : '';
     let payloadStr = '';
     try {
@@ -449,6 +521,7 @@ function renderFullMessageBusTable(messages) {
     `;
   }).join('');
 }
+
 
 function renderFullAgentLogsTable(logs) {
   const tbody = document.getElementById('fullAgentLogsBody');
@@ -492,21 +565,26 @@ window.triggerAgentDirect = async function(agentKey, reload = true) {
 // Orders Table Render
 function renderOrdersTable() {
   const tbody = document.getElementById('ordersTableBody');
-  const filter = document.getElementById('orderStatusFilter').value;
+  const filterEl = document.getElementById('orderStatusFilter');
+  const filter = filterEl ? filterEl.value : 'ALL';
   if (!tbody) return;
 
-  const filtered = filter === 'ALL' ? cachedOrders : cachedOrders.filter(o => o.status === filter);
+  const ordersList = cachedOrders || [];
+  const filtered = filter === 'ALL' ? ordersList : ordersList.filter(o => (o.status || '').toLowerCase() === filter.toLowerCase());
 
   if (filtered.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding: 2rem; color: var(--text-muted);">No orders matching filter.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding: 2.5rem; color: var(--text-muted);">No orders matching status filter '${filter}'.</td></tr>`;
     return;
   }
 
   tbody.innerHTML = filtered.map(o => {
-    const dateStr = new Date(o.created_at).toLocaleString();
-    const stClass = (o.status || 'confirmed').toLowerCase();
+    const dateStr = o.created_at ? new Date(o.created_at).toLocaleString() : 'Just now';
     const trk = o.tracking_number || '—';
-    const itemsSummary = o.items.map(i => `${i.quantity}x ${i.PRODUCT_NAME}`).join(', ');
+    const itemsList = o.items || [];
+    const itemsSummary = itemsList.map(i => `${i.quantity || 1}x ${i.PRODUCT_NAME || i.product_name || i.id || 'Product'}`).join(', ') || '1x Catalog Item';
+    const customer = o.customer_name || o.user_id || 'Customer';
+    const isBuyer = (o.user_id || '').startsWith('buyer_');
+    const totalVal = parseFloat(o.total) || 0.0;
 
     return `
       <tr>
@@ -515,11 +593,11 @@ function renderOrdersTable() {
           <div style="font-size: 0.7rem; color: var(--text-dim);">${dateStr}</div>
         </td>
         <td>
-          <strong>${o.customer_name || 'Customer'}</strong>
-          <div style="font-size: 0.72rem; color: var(--text-dim);">${o.shipping_address || ''}</div>
+          <strong>${customer}</strong> ${isBuyer ? '<span class="status-tag pending" style="font-size: 0.65rem; padding: 1px 4px; margin-left: 4px;">AI Shopper</span>' : ''}
+          <div style="font-size: 0.72rem; color: var(--text-dim);">${o.shipping_address || 'Online Delivery'}</div>
         </td>
         <td style="font-size: 0.78rem; max-width: 250px;">${itemsSummary}</td>
-        <td><strong>₹${(o.total || 0).toFixed(2)}</strong></td>
+        <td><strong style="color: #34d399; font-family: monospace;">₹${totalVal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</strong></td>
         <td><code style="font-size: 0.75rem; color: #38bdf8;">${trk}</code></td>
         <td>
           <select class="admin-select" style="font-size: 0.75rem; padding: 0.25rem 0.5rem;" onchange="updateOrderStatusInline('${o.order_id}', this.value)">
@@ -543,6 +621,7 @@ function renderOrdersTable() {
     `;
   }).join('');
 }
+
 
 window.updateOrderStatusInline = async function(orderId, newStatus) {
   try {
@@ -631,12 +710,12 @@ function renderInventoryTable(force = false) {
         </td>
         <td style="font-weight: 600; color: #facc15;">⭐ ${p.RATING || 5.0}</td>
         <td>
-          <div style="display: flex; gap: 4px;">
+          <div style="display: flex; gap: 4px; flex-wrap: wrap;">
             <button class="action-btn-sm" style="background: rgba(16,185,129,0.25); border-color: rgba(16,185,129,0.5); color: #34d399; font-weight: 600;" onclick="saveInventoryInline('${p.id}')" title="Save Base Price & Selling Price">
               Save
             </button>
-            <button class="action-btn-sm" onclick="quickRestockInline('${p.id}', 20)" title="Quick Restock +20 Units">
-              +20 Stock
+            <button class="action-btn-sm" style="background: rgba(6,182,212,0.2); border-color: rgba(6,182,212,0.5); color: #22d3ee; font-weight: 600;" onclick="openAcquireStockModal('${p.id}')" title="Acquire Wholesale Stock at BASE_PRICE">
+              📦 Buy Wholesale
             </button>
           </div>
         </td>
@@ -644,6 +723,7 @@ function renderInventoryTable(force = false) {
     `;
   }).join('');
 }
+
 
 // Floating Toast Notification Helper
 function showAdminToast(message, type = 'success') {
@@ -949,79 +1029,784 @@ function formatMarkdown(text) {
   return formatted;
 }
 
-// Modal Handlers
-window.openModal = function(modalId) {
-  const m = document.getElementById(modalId);
-  if (m) m.classList.add('open');
+// =====================================================================
+// 💰 TREASURY & WHOLESALE STOCK ACQUISITION FUNCTIONS
+// =====================================================================
+
+async function loadTreasuryData() {
+  try {
+    const data = await fetchJson('/api/admin/treasury?limit=30', {});
+    cachedTreasury = data;
+    renderTreasuryTab(data);
+  } catch (err) {
+    console.error('Error loading treasury:', err);
+  }
+}
+
+function renderTreasuryTab(treasury) {
+  const bankBal = treasury.bank_balance !== undefined ? treasury.bank_balance : 1000.0;
+  const salesRev = treasury.total_sales_revenue || 0.0;
+  const netProfit = treasury.net_profit || 0.0;
+  const stockSpend = treasury.total_wholesale_stock_spend || 0.0;
+  const salariesPaid = treasury.total_salary_expenses || 0.0;
+  const refundsPaid = treasury.total_refunds_issued || 0.0;
+  const roiPct = treasury.roi_pct || 0.0;
+  const marginPct = treasury.gross_profit_margin_pct || 0.0;
+
+  document.getElementById('treasuryBankBalance').innerText = `₹${bankBal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
+  document.getElementById('treasurySalesRevenue').innerText = `₹${salesRev.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
+  document.getElementById('treasurySalesCount').innerText = `${treasury.sales_transactions_count || 0} Sales`;
+
+  const profitEl = document.getElementById('treasuryNetProfit');
+  if (profitEl) {
+    profitEl.innerText = `₹${netProfit.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
+    profitEl.style.color = netProfit >= 0 ? '#22c55e' : '#f43f5e';
+  }
+  document.getElementById('treasuryMarginBadge').innerText = `${marginPct}% Margin`;
+  document.getElementById('treasuryRoiText').innerText = `ROI: ${roiPct}%`;
+
+  document.getElementById('treasuryStockSpend').innerText = `₹${stockSpend.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
+  document.getElementById('treasuryUnitsAcquired').innerText = `${treasury.inventory_units_acquired || 0} Units Acquired`;
+
+  document.getElementById('treasurySalariesPaid').innerText = `₹${salariesPaid.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
+  document.getElementById('treasuryRefunds').innerText = `₹${refundsPaid.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
+  document.getElementById('treasuryRefundCount').innerText = `${treasury.refund_transactions_count || 0} Refunds`;
+
+  // Populate Quick Acquisition Select
+  populateQuickAcquireSelect();
+
+  // Render Treasury Ledger Feed
+  renderTreasuryLedgerFeed(treasury.transactions || []);
+}
+
+function populateQuickAcquireSelect() {
+  const select = document.getElementById('quickAcquireSelect');
+  if (!select) return;
+  const currVal = select.value;
+  
+  select.innerHTML = cachedProducts.map(p => {
+    const isOut = (p.STOCK_REMAINING || 0) === 0;
+    const baseP = parseFloat(p.BASE_PRICE || p.PRICE || 0);
+    return `<option value="${p.id}" ${p.id === currVal ? 'selected' : ''}>${p.PRODUCT_NAME} (Stock: ${p.STOCK_REMAINING} | Base: ₹${baseP.toFixed(2)})${isOut ? ' ⚠️ OUT OF STOCK' : ''}</option>`;
+  }).join('');
+
+  onQuickAcquireProductChange();
+}
+
+window.onQuickAcquireProductChange = function() {
+  const select = document.getElementById('quickAcquireSelect');
+  if (!select) return;
+  const prodId = select.value;
+  const p = cachedProducts.find(x => x.id === prodId);
+  if (!p) return;
+
+  const baseP = parseFloat(p.BASE_PRICE || p.PRICE || 0);
+  const sellP = parseFloat(p.PRICE || baseP);
+  const unitMargin = sellP - baseP;
+  const isOut = (p.STOCK_REMAINING || 0) === 0;
+
+  const stockEl = document.getElementById('previewCurrentStock');
+  if (stockEl) {
+    stockEl.innerText = `${p.STOCK_REMAINING} Units ${isOut ? '(OUT OF STOCK - 0)' : ''}`;
+    stockEl.className = isOut ? 'highlight-red' : 'highlight-green';
+  }
+
+  document.getElementById('previewBasePrice').innerText = `₹${baseP.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
+  document.getElementById('previewSellingPrice').innerText = `₹${sellP.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
+  
+  const marginEl = document.getElementById('previewUnitMargin');
+  if (marginEl) {
+    marginEl.innerText = `+₹${unitMargin.toLocaleString('en-IN', { minimumFractionDigits: 2 })} (+${((unitMargin / baseP) * 100).toFixed(1)}%)`;
+  }
+
+  recalculateQuickAcquireCost();
 };
 
-window.closeModal = function(modalId) {
-  const m = document.getElementById(modalId);
-  if (m) m.classList.remove('open');
+window.recalculateQuickAcquireCost = function() {
+  const select = document.getElementById('quickAcquireSelect');
+  const qtyInput = document.getElementById('quickAcquireQty');
+  const costInput = document.getElementById('quickAcquireTotalCost');
+  const remainingBalEl = document.getElementById('previewRemainingBalance');
+  if (!select || !qtyInput || !costInput) return;
+
+  const prodId = select.value;
+  const p = cachedProducts.find(x => x.id === prodId);
+  const qty = parseInt(qtyInput.value) || 0;
+  const baseP = p ? parseFloat(p.BASE_PRICE || p.PRICE || 0) : 0;
+  const totalCost = qty * baseP;
+
+  costInput.value = `₹${totalCost.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
+
+  const currentBal = cachedTreasury.bank_balance !== undefined ? cachedTreasury.bank_balance : 1000.0;
+  const remBal = currentBal - totalCost;
+
+  if (remainingBalEl) {
+    remainingBalEl.innerText = `₹${remBal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
+    remainingBalEl.style.color = remBal >= 0 ? '#06b6d4' : '#f43f5e';
+  }
 };
 
-document.getElementById('openAddProductModalBtn')?.addEventListener('click', () => openModal('addProductModal'));
-document.getElementById('openBulkPriceModalBtn')?.addEventListener('click', () => openModal('bulkPriceModal'));
+window.submitQuickAcquire = async function() {
+  const select = document.getElementById('quickAcquireSelect');
+  const qtyInput = document.getElementById('quickAcquireQty');
+  if (!select || !qtyInput) return;
 
-document.getElementById('addProductForm')?.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const name = document.getElementById('newProdName').value;
-  const category = document.getElementById('newProdCategory').value;
-  const size = document.getElementById('newProdSize').value;
-  const basePrice = parseFloat(document.getElementById('newProdBasePrice').value);
-  const price = parseFloat(document.getElementById('newProdPrice').value);
-  const stock = parseInt(document.getElementById('newProdStock').value);
-  const desc = document.getElementById('newProdDesc').value;
+  const prodId = select.value;
+  const qty = parseInt(qtyInput.value) || 20;
 
-  if (price < basePrice) {
-    alert(`⚠️ Initial Selling Price (₹${price}) cannot be below the Owner Base Price floor (₹${basePrice}).`);
+  try {
+    const res = await fetch('/api/admin/treasury/acquire-stock', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ product_id: prodId, quantity: qty, actor: 'Store Owner' })
+    });
+    const data = await res.json();
+    if (data.success) {
+      showAdminToast(`✅ ${data.message}`);
+      await loadAllAdminData();
+    } else {
+      showAdminToast(`❌ Acquisition failed: ${data.error || 'Check bank balance'}`, 'error');
+    }
+  } catch (err) {
+    showAdminToast('Acquisition error: ' + err, 'error');
+  }
+};
+
+window.openAcquireStockModal = function(productId = null) {
+  const select = document.getElementById('modalAcquireProductSelect');
+  if (!select) return;
+
+  select.innerHTML = cachedProducts.map(p => {
+    const isOut = (p.STOCK_REMAINING || 0) === 0;
+    const baseP = parseFloat(p.BASE_PRICE || p.PRICE || 0);
+    return `<option value="${p.id}" ${p.id === productId ? 'selected' : ''}>${p.PRODUCT_NAME} (Stock: ${p.STOCK_REMAINING} | Base Floor: ₹${baseP.toFixed(2)})${isOut ? ' ⚠️ 0-STOCK' : ''}</option>`;
+  }).join('');
+
+  if (productId) select.value = productId;
+  onModalAcquireProductChange();
+  openModal('acquireStockModal');
+};
+
+window.onModalAcquireProductChange = function() {
+  const select = document.getElementById('modalAcquireProductSelect');
+  if (!select) return;
+  const prodId = select.value;
+  const p = cachedProducts.find(x => x.id === prodId);
+  if (!p) return;
+
+  const baseP = parseFloat(p.BASE_PRICE || p.PRICE || 0);
+  const sellP = parseFloat(p.PRICE || baseP);
+
+  document.getElementById('modalPreviewBasePrice').innerText = `₹${baseP.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
+  document.getElementById('modalPreviewCurrentStock').innerText = `${p.STOCK_REMAINING} Units`;
+  document.getElementById('modalPreviewSellingPrice').innerText = `₹${sellP.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
+
+  const currentBal = cachedTreasury.bank_balance !== undefined ? cachedTreasury.bank_balance : 1000.0;
+  document.getElementById('modalCurrentBankBalance').innerText = `₹${currentBal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
+
+  recalculateModalAcquireCost();
+};
+
+window.recalculateModalAcquireCost = function() {
+  const select = document.getElementById('modalAcquireProductSelect');
+  const qtyInput = document.getElementById('modalAcquireQty');
+  const costInput = document.getElementById('modalAcquireTotalCost');
+  if (!select || !qtyInput || !costInput) return;
+
+  const prodId = select.value;
+  const p = cachedProducts.find(x => x.id === prodId);
+  const qty = parseInt(qtyInput.value) || 0;
+  const baseP = p ? parseFloat(p.BASE_PRICE || p.PRICE || 0) : 0;
+  costInput.value = `₹${(qty * baseP).toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
+};
+
+window.submitModalAcquireStock = async function() {
+  const select = document.getElementById('modalAcquireProductSelect');
+  const qtyInput = document.getElementById('modalAcquireQty');
+  if (!select || !qtyInput) return;
+
+  const prodId = select.value;
+  const qty = parseInt(qtyInput.value) || 20;
+
+  try {
+    const res = await fetch('/api/admin/treasury/acquire-stock', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ product_id: prodId, quantity: qty, actor: 'Store Owner' })
+    });
+    const data = await res.json();
+    if (data.success) {
+      closeModal('acquireStockModal');
+      showAdminToast(`✅ ${data.message}`);
+      await loadAllAdminData();
+    } else {
+      showAdminToast(`❌ Acquisition failed: ${data.error || 'Insufficient treasury balance'}`, 'error');
+    }
+  } catch (err) {
+    showAdminToast('Acquisition error: ' + err, 'error');
+  }
+};
+
+function renderTreasuryLedgerFeed(transactions) {
+  const container = document.getElementById('treasuryLedgerFeed');
+  if (!container) return;
+
+  if (transactions.length === 0) {
+    container.innerHTML = `<div style="text-align: center; color: var(--text-dim); padding: 2rem;">No cash-flow transactions recorded yet.</div>`;
     return;
   }
 
+  container.innerHTML = transactions.map(t => {
+    const isPos = t.type === 'SALES_REVENUE';
+    const typeLabel = t.type.replace('_', ' ');
+    let typeClass = 'spend';
+    if (t.type === 'SALES_REVENUE') typeClass = 'sale';
+    else if (t.type === 'SALARY_PAYOUT') typeClass = 'salary';
+    else if (t.type === 'REFUND_DEDUCTION') typeClass = 'refund';
+
+    const timeStr = t.timestamp ? new Date(t.timestamp).toLocaleTimeString() : '';
+
+    return `
+      <div class="ledger-item">
+        <div class="ledger-item-left">
+          <span class="ledger-type-badge ${typeClass}">${typeLabel}</span>
+          <div>
+            <strong style="color: #f1f5f9;">${t.description}</strong>
+            <div style="font-size: 0.7rem; color: var(--text-dim);">[${timeStr}] Balance after: ₹${(t.balance_after || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</div>
+          </div>
+        </div>
+        <div class="ledger-amount ${isPos ? 'pos' : 'neg'}">
+          ${isPos ? '+' : '-'}₹${(t.amount || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+
+// =====================================================================
+// 💼 AGENT SALARY MANAGEMENT & INTERACTIVE NEGOTIATION FUNCTIONS
+// =====================================================================
+
+async function loadSalariesData() {
   try {
-    const res = await fetch('/api/admin/inventory/add', {
+    const data = await fetchJson('/api/admin/salaries', { salaries: [] });
+    cachedSalaries = data;
+    renderSalariesTab(data);
+  } catch (err) {
+    console.error('Error loading salaries:', err);
+  }
+}
+
+function renderSalariesTab(salariesData) {
+  const tbody = document.getElementById('salariesTableBody');
+  const label = document.getElementById('totalPayrollLabel');
+  if (!tbody) return;
+
+  const totalPayroll = salariesData.total_payroll_per_cycle || 300.0;
+  if (label) {
+    label.innerText = `Total Payroll: ₹${totalPayroll.toLocaleString('en-IN', { minimumFractionDigits: 2 })} / 100 cycles`;
+  }
+
+  const salariesList = salariesData.salaries || [];
+  if (salariesList.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: var(--text-dim); padding: 2rem;">No agent salary records found.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = salariesList.map(s => {
+    const scoreColor = s.performance_score >= 90 ? '#10b981' : s.performance_score >= 80 ? '#60a5fa' : '#f59e0b';
+    const statusClass = (s.negotiation_status || '').includes('Agreed') ? 'delivered' : 'pending';
+    const lastPaidStr = s.last_paid_at ? new Date(s.last_paid_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' (' + new Date(s.last_paid_at).toLocaleDateString() + ')' : 'Awaiting Disbursal';
+    const totalEarned = s.total_earned || 0.0;
+
+    return `
+      <tr>
+        <td>
+          <strong style="color: #fff; font-size: 0.92rem;">${s.agent_name}</strong>
+        </td>
+        <td><span class="status-tag pending" style="font-size: 0.72rem;">${s.role}</span></td>
+        <td>
+          <strong style="color: #38bdf8; font-size: 0.95rem; font-family: monospace;">₹${(s.salary_amount || 50).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</strong>
+          <span style="font-size: 0.7rem; color: var(--text-dim); display: block;">/ 100 cycles (min ₹50)</span>
+        </td>
+        <td>
+          <span class="salary-earned-pill">
+            <i data-lucide="check-circle-2" style="width: 12px; height: 12px;"></i>
+            ₹${totalEarned.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+          </span>
+        </td>
+        <td>
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <div style="flex: 1; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden; min-width: 50px;">
+              <div style="width: ${s.performance_score || 90}%; height: 100%; background: ${scoreColor};"></div>
+            </div>
+            <strong style="color: ${scoreColor}; font-size: 0.78rem;">${s.performance_score}/100</strong>
+          </div>
+        </td>
+        <td><span class="status-tag ${statusClass}" style="font-size: 0.72rem;">${s.negotiation_status || 'Agreed'}</span></td>
+        <td style="font-size: 0.75rem; color: var(--text-dim);">${lastPaidStr}</td>
+        <td>
+          <div style="display: flex; gap: 4px;">
+            <button class="action-btn-sm" style="background: rgba(168,85,247,0.2); border-color: rgba(168,85,247,0.5); color: #c084fc; font-weight: 600;" onclick="openNegotiateModal('${s.agent_name}')" title="Negotiate Salary with Agent">
+              <i data-lucide="message-circle" style="width: 12px; height: 12px;"></i> Negotiate
+            </button>
+            <button class="action-btn-sm" style="background: rgba(16,185,129,0.2); border-color: rgba(16,185,129,0.5); color: #34d399; font-weight: 600;" onclick="paySingleSalary('${s.agent_name}')" title="Pay Agent Salary from Treasury">
+              <i data-lucide="send" style="width: 12px; height: 12px;"></i> Pay
+            </button>
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join('');
+
+  if (window.lucide) window.lucide.createIcons();
+}
+
+window.openNegotiateModal = function(agentName) {
+  const salariesList = cachedSalaries.salaries || [];
+  const s = salariesList.find(x => x.agent_name === agentName);
+  if (!s) return;
+
+  document.getElementById('negAgentName').value = agentName;
+  document.getElementById('negProposedSalary').value = s.salary_amount || 50;
+
+  const header = document.getElementById('negModalAgentHeader');
+  header.innerHTML = `
+    <div>
+      <h4 style="font-weight: 700; color: #fff;">${s.agent_name}</h4>
+      <span style="font-size: 0.75rem; color: #94a3b8;">${s.role} | CEO Baseline Floor: ₹50.00 / 100 cycles</span>
+    </div>
+    <div style="text-align: right;">
+      <strong style="color: #38bdf8; font-size: 1.1rem;">₹${(s.salary_amount || 50).toLocaleString('en-IN')} / 100c</strong>
+      <div style="font-size: 0.72rem; color: #34d399;">Total Paid to Date: ₹${(s.total_earned || 0).toLocaleString('en-IN')}</div>
+    </div>
+  `;
+
+  const thread = document.getElementById('negChatThread');
+  thread.innerHTML = `
+    <div class="neg-message agent">
+      <strong>${s.agent_name}:</strong> Hello Store Owner & CEO! My current compensation is ₹${(s.salary_amount || 50).toLocaleString('en-IN')} per 100 cycles with a performance rating of ${s.performance_score}/100. Submit your proposed compensation (min ₹50 / 100 cycles) below to begin our salary discussion.
+    </div>
+  `;
+
+  openModal('negotiateSalaryModal');
+};
+
+let lastNegotiationResponse = null;
+
+window.submitSalaryProposal = async function() {
+  const agentName = document.getElementById('negAgentName').value;
+  const propSalary = parseFloat(document.getElementById('negProposedSalary').value);
+  const rationale = document.getElementById('negRationale').value.trim();
+  const thread = document.getElementById('negChatThread');
+  const submitBtn = document.getElementById('negSubmitBtn');
+
+  // Append user message
+  const userDiv = document.createElement('div');
+  userDiv.className = 'neg-message user';
+  userDiv.innerHTML = `<strong>Store Owner:</strong> Proposing ₹${propSalary.toLocaleString('en-IN')} / 100 cycles | Rationale: "${rationale}"`;
+  thread.appendChild(userDiv);
+
+  // Append typing indicator
+  const typingDiv = document.createElement('div');
+  typingDiv.className = 'neg-message agent';
+  typingDiv.id = 'negTyping';
+  typingDiv.innerHTML = `<em>${agentName} is analyzing performance metrics and formulating counter-proposal...</em>`;
+  thread.appendChild(typingDiv);
+  thread.scrollTop = thread.scrollHeight;
+
+  submitBtn.disabled = true;
+
+  try {
+    const res = await fetch('/api/admin/salaries/negotiate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        PRODUCT_NAME: name,
-        PRODUCT_TYPE: category,
-        PRODUCT_SIZE: size,
-        BASE_PRICE: basePrice,
-        PRICE: price,
-        STOCK_REMAINING: stock,
-        DESCRIPTION: desc,
-        IMAGE: `/static/images/${category === 'Mobiles' ? 'phone_flagship.svg' : category === 'Laptops' ? 'laptop_pro.svg' : category === 'Audio' ? 'earbuds_wireless.svg' : 'smartwatch.svg'}`
+        agent_name: agentName,
+        proposed_salary: propSalary,
+        rationale: rationale
       })
     });
     const data = await res.json();
-    if (data.success) {
-      closeModal('addProductModal');
-      await loadAllAdminData();
-      alert(`✅ Product "${name}" added to catalog with Owner Floor ₹${basePrice.toFixed(2)}.`);
-    }
-  } catch (err) {
-    alert('Error adding product: ' + err);
-  }
-});
+    lastNegotiationResponse = data;
 
-document.getElementById('bulkPriceForm')?.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const category = document.getElementById('bulkCategory').value;
-  const pct = parseFloat(document.getElementById('bulkPercentage').value);
+    const tEl = document.getElementById('negTyping');
+    if (tEl) tEl.remove();
+
+    const agentDiv = document.createElement('div');
+    agentDiv.className = 'neg-message agent';
+    agentDiv.innerHTML = `
+      <strong>${agentName} (${data.status}):</strong> ${data.agent_response || data.message}
+      <div style="margin-top: 6px; font-weight: 700; color: #34d399;">
+        Agreed / Counter Salary: ₹${(data.final_salary || propSalary).toLocaleString('en-IN', { minimumFractionDigits: 2 })} / 100 cycles
+      </div>
+    `;
+    thread.appendChild(agentDiv);
+    thread.scrollTop = thread.scrollHeight;
+
+    await loadSalariesData();
+  } catch (err) {
+    const tEl = document.getElementById('negTyping');
+    if (tEl) tEl.remove();
+    showAdminToast('Negotiation error: ' + err, 'error');
+  } finally {
+    submitBtn.disabled = false;
+  }
+};
+
+window.acceptCounterProposal = async function() {
+  if (!lastNegotiationResponse) {
+    showAdminToast('No active negotiation proposal to accept.');
+    return;
+  }
+  const agentName = document.getElementById('negAgentName').value;
+  const finalSal = lastNegotiationResponse.final_salary;
 
   try {
-    const res = await fetch('/api/admin/inventory/bulk-price', {
+    const res = await fetch('/api/admin/salaries/update', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ category, percentage_change: pct })
+      body: JSON.stringify({ agent_name: agentName, new_salary: finalSal, status: 'Agreed' })
     });
     const data = await res.json();
     if (data.success) {
-      closeModal('bulkPriceModal');
-      await loadAllAdminData();
-      alert(`✅ Bulk adjusted ${data.updated_count || 0} products by ${pct > 0 ? '+' : ''}${pct}%. All prices strictly clamped to Owner Base Price floors.`);
+      closeModal('negotiateSalaryModal');
+      showAdminToast(`🤝 Agreement Sealed with ${agentName} at ₹${finalSal.toLocaleString('en-IN')} / 100 cycles!`);
+      await loadSalariesData();
     }
   } catch (err) {
-    alert('Error applying bulk price change: ' + err);
+    showAdminToast('Error updating salary: ' + err, 'error');
   }
-});
+};
+
+window.paySingleSalary = async function(agentName) {
+  try {
+    const res = await fetch('/api/admin/salaries/pay', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ agent_name: agentName, actor: 'Store Owner' })
+    });
+    const data = await res.json();
+    if (data.success) {
+      showAdminToast(`✅ Paid salary to ${agentName}! New Bank Balance: ₹${(data.new_bank_balance || 0).toLocaleString('en-IN')}`);
+      await loadAllAdminData();
+    } else {
+      showAdminToast(`❌ Payment failed: ${data.error || 'Insufficient bank balance'}`, 'error');
+    }
+  } catch (err) {
+    showAdminToast('Payment error: ' + err, 'error');
+  }
+};
+
+window.disburseFullPayroll = async function() {
+  if (!confirm('Disburse FULL team payroll to all 6 specialist agents from CEO Treasury Bank Balance?')) return;
+  try {
+    const res = await fetch('/api/admin/salaries/pay', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ agent_name: 'all', actor: 'Store Owner' })
+    });
+    const data = await res.json();
+    if (data.success) {
+      showAdminToast(`✅ ${data.message}`);
+      await loadAllAdminData();
+    } else {
+      showAdminToast(`❌ Payroll failed: ${data.error || 'Insufficient bank balance'}`, 'error');
+    }
+  } catch (err) {
+    showAdminToast('Payroll error: ' + err, 'error');
+  }
+};
+
+
+// =====================================================================
+// 🛍️ 5 AI AUTONOMOUS SHOPPERS FLEET FUNCTIONS
+// =====================================================================
+
+async function loadBuyersData() {
+  try {
+    const data = await fetchJson('/api/admin/buyers', { buyers: [] });
+    cachedBuyers = data.buyers || [];
+    renderBuyersTab(cachedBuyers);
+  } catch (err) {
+    console.error('Error loading buyers:', err);
+  }
+}
+
+function renderBuyersTab(buyersList) {
+  const grid = document.getElementById('buyersCardsGrid');
+  const tbody = document.getElementById('buyersActivityTableBody');
+  if (!grid) return;
+
+  const buyerAvatars = {
+    buyer_alex: '💻',
+    buyer_sophia: '🏷️',
+    buyer_david: '🎧',
+    buyer_elena: '💎',
+    buyer_marcus: '⚡'
+  };
+
+  const nowSec = Date.now() / 1000;
+
+  grid.innerHTML = buyersList.map(b => {
+    const avatar = buyerAvatars[b.id] || '👤';
+    const totalSpent = b.total_spent || 0.0;
+    const ordersCount = b.orders_count || 0;
+    const reviewsCount = b.reviews_written || b.reviews_count || 0;
+    const returnsCount = b.returns_count || 0;
+    const nextTs = parseFloat(b.next_purchase_ts || 0);
+
+    let countdownText = 'Shopping anytime (0-5m)';
+    if (nextTs > nowSec) {
+      const diffSec = Math.max(0, Math.round(nextTs - nowSec));
+      const mins = Math.floor(diffSec / 60);
+      const secs = diffSec % 60;
+      countdownText = mins > 0 ? `Next order in ~${mins}m ${secs}s` : `Next order in ~${secs}s`;
+    } else if (nextTs > 0) {
+      countdownText = 'Ready to shop (evaluating)';
+    }
+
+    return `
+      <div class="buyer-card">
+        <div>
+          <div class="buyer-card-header">
+            <div class="buyer-avatar">${avatar}</div>
+            <div class="buyer-info">
+              <h4>${b.name}</h4>
+              <span class="buyer-persona-tag">${b.persona_title || b.persona || 'AI Shopper'}</span>
+            </div>
+          </div>
+          <p class="buyer-desc">${b.description}</p>
+          <div class="buyer-live-status" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <span class="pulsing-dot" style="width: 8px; height: 8px;"></span>
+              <span style="font-size: 0.78rem;">${b.status || 'Browsing catalog'}</span>
+            </div>
+            <span class="buyer-countdown-badge"><i data-lucide="clock" style="width: 11px; height: 11px;"></i> ${countdownText}</span>
+          </div>
+          <div class="buyer-metrics-row">
+            <div class="buyer-metric">
+              <span>Lifetime Spend</span>
+              <strong style="color: #34d399;">₹${totalSpent.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</strong>
+            </div>
+            <div class="buyer-metric">
+              <span>Orders Placed</span>
+              <strong>${ordersCount}</strong>
+            </div>
+            <div class="buyer-metric">
+              <span>Reviews / Returns</span>
+              <strong>${reviewsCount} / ${returnsCount}</strong>
+            </div>
+          </div>
+        </div>
+        <div class="buyer-card-actions">
+          <button class="action-btn primary" style="width: 100%; justify-content: center; font-size: 0.8rem;" onclick="triggerBuyer('${b.id}')">
+            <i data-lucide="shopping-cart"></i> ⚡ Quick Buy Now (AP2)
+          </button>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  // Render Activity Stream Table from Orders
+  if (tbody) {
+    const buyerOrders = cachedOrders.filter(o => o.user_id && o.user_id.startsWith('buyer_'));
+    if (buyerOrders.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: var(--text-dim); padding: 2rem;">No AI shopper orders placed yet. Trigger a shopping cycle above!</td></tr>`;
+    } else {
+      tbody.innerHTML = buyerOrders.map(o => {
+        const timeStr = o.created_at ? new Date(o.created_at).toLocaleString() : '';
+        const itemNames = (o.items || []).map(i => i.PRODUCT_NAME || i.product_id).join(', ');
+        return `
+          <tr>
+            <td><strong style="color: #c084fc;">${o.customer_name || o.user_id}</strong></td>
+            <td><span class="status-tag delivered">Purchase</span></td>
+            <td style="color: #fff;">${itemNames || 'Catalog Items'}</td>
+            <td style="font-weight: 700; color: #34d399; font-family: monospace;">₹${(o.total || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+            <td><span class="status-tag pending" style="font-size: 0.72rem;">AP2 1-Click Auto</span></td>
+            <td style="font-size: 0.75rem; color: #facc15;">⭐⭐⭐⭐⭐ Verified</td>
+            <td><span class="status-tag ${o.status === 'Delivered' ? 'delivered' : 'dispatched'}">${o.status}</span></td>
+            <td style="font-size: 0.72rem; color: var(--text-dim);">${timeStr}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+  }
+
+  if (window.lucide) window.lucide.createIcons();
+}
+
+window.triggerBuyer = async function(buyerId) {
+  try {
+    showAdminToast(`🛒 Triggering AI Buyer ${buyerId}...`);
+    const res = await fetch('/api/admin/buyers/trigger', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ buyer_id: buyerId })
+    });
+    const data = await res.json();
+    if (data.success) {
+      showAdminToast(`✅ ${data.shopper}: ${data.message}`);
+      await loadAllAdminData();
+    } else {
+      showAdminToast(`⚠️ ${data.error || 'Buyer evaluated catalog'}`, 'error');
+    }
+  } catch (err) {
+    showAdminToast('Buyer trigger error: ' + err, 'error');
+  }
+};
+
+window.triggerAllBuyers = async function() {
+  try {
+    showAdminToast('🛍️ Triggering all 5 AI Shoppers...');
+    const res = await fetch('/api/admin/buyers/trigger', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ buyer_id: 'all' })
+    });
+    const data = await res.json();
+    if (data.success) {
+      showAdminToast('✅ All 5 AI Shoppers completed catalog evaluation!');
+      await loadAllAdminData();
+    }
+  } catch (err) {
+    showAdminToast('Error triggering all buyers: ' + err, 'error');
+  }
+};
+
+window.toggleBuyersSimulation = async function() {
+  try {
+    const res = await fetch('/api/admin/buyers/toggle', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({})
+    });
+    const data = await res.json();
+    const btnText = document.getElementById('toggleBuyersText');
+    if (btnText) {
+      btnText.innerText = data.enabled ? 'Simulation: ACTIVE' : 'Simulation: PAUSED';
+    }
+    showAdminToast(data.message);
+  } catch (err) {
+    showAdminToast('Toggle error: ' + err, 'error');
+  }
+};
+
+
+// =====================================================================
+// 👔 CEO MULTI-AGENT ROUNDTABLE DISCUSSION ROOM
+// =====================================================================
+
+window.onMeetingPresetChange = function() {
+  const select = document.getElementById('meetingPresetSelect');
+  const input = document.getElementById('meetingTopicInput');
+  if (!select || !input) return;
+
+  const presets = {
+    restock: 'Wholesale inventory restock budget, base price margin calibration, and supplier lead times',
+    pricing: 'Dynamic pricing optimization, scarcity discounts, and protecting base price floors',
+    salaries: 'Specialist agent performance ratings, compensation proposals, and treasury budget review',
+    buyers: '5 AI Autonomous buyer traffic trends, AP2 checkout velocity, and 24h return policy SLA'
+  };
+
+  if (presets[select.value]) {
+    input.value = presets[select.value];
+  }
+};
+
+window.startCEOMeeting = async function() {
+  const input = document.getElementById('meetingTopicInput');
+  const box = document.getElementById('meetingTranscriptBox');
+  const btn = document.getElementById('conveneMeetingBtn');
+  if (!input || !box) return;
+
+  const topic = input.value.trim();
+  if (!topic) {
+    showAdminToast('Please enter a meeting agenda.');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = `<i data-lucide="loader-2" class="spin"></i> Convening Fleet...`;
+  if (window.lucide) window.lucide.createIcons();
+
+  box.innerHTML = `
+    <div style="text-align: center; padding: 2rem; color: #a855f7;">
+      <i data-lucide="loader-2" class="spin" style="width: 36px; height: 36px; margin-bottom: 0.5rem;"></i>
+      <p>CEO Agent is convening all 6 specialist agents (Price, Inventory, Order, Finance, Dispatcher, Review)...</p>
+    </div>
+  `;
+  if (window.lucide) window.lucide.createIcons();
+
+  try {
+    const res = await fetch('/api/admin/ceo/discussion', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ topic: topic, participants: 'ALL_AGENTS' })
+    });
+    const data = await res.json();
+
+    if (data.success && data.transcript) {
+      box.innerHTML = data.transcript.map(t => {
+        let speakerClass = 'ceo';
+        const spLower = t.speaker.toLowerCase();
+        if (spLower.includes('price')) speakerClass = 'price';
+        else if (spLower.includes('invent')) speakerClass = 'inventory';
+        else if (spLower.includes('finan')) speakerClass = 'finance';
+        else if (spLower.includes('order')) speakerClass = 'order';
+        else if (spLower.includes('dispatch')) speakerClass = 'dispatcher';
+        else if (spLower.includes('review')) speakerClass = 'review';
+
+        return `
+          <div class="transcript-bubble ${speakerClass}">
+            <div class="bubble-speaker">
+              ${t.speaker}
+              <span class="bubble-role">${t.role}</span>
+            </div>
+            <div class="bubble-text">${formatMarkdown(t.statement)}</div>
+          </div>
+        `;
+      }).join('');
+
+      showAdminToast('👔 CEO Executive Roundtable Concluded & Consensus Reached!');
+      await loadAllAdminData();
+    } else {
+      box.innerHTML = `<div style="color: #f43f5e; padding: 1rem;">Discussion error: ${data.error || 'Failed to convene meeting.'}</div>`;
+    }
+  } catch (err) {
+    box.innerHTML = `<div style="color: #f43f5e; padding: 1rem;">Meeting error: ${err}</div>`;
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = `<i data-lucide="play"></i> <span>Convene Meeting</span>`;
+    if (window.lucide) window.lucide.createIcons();
+  }
+};
+
+
+// =====================================================================
+// 🔄 STORE RESET TO INITIAL 0-STOCK STATE
+// =====================================================================
+
+window.openResetStoreConfirm = function() {
+  openModal('resetStoreConfirmModal');
+};
+
+window.confirmResetStoreComplete = async function() {
+  try {
+    closeModal('resetStoreConfirmModal');
+    showAdminToast('🔄 Resetting store to initial 0-stock state...');
+    const res = await fetch('/api/admin/reset-store', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' }
+    });
+    const data = await res.json();
+    if (data.success) {
+      showAdminToast(`✅ ${data.message}`);
+      await loadAllAdminData();
+    }
+  } catch (err) {
+    showAdminToast('Reset error: ' + err, 'error');
+  }
+};
+

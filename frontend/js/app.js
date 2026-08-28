@@ -44,7 +44,11 @@ document.addEventListener('DOMContentLoaded', () => {
   loadOrders();
   checkAP2Status();
   setupEventListeners();
+
+  // Periodic catalog refresh to reflect real-time CEO stock acquisitions and AI buyer sales
+  setInterval(loadCatalog, 4000);
 });
+
 
 function setupEventListeners() {
   // Search input & clear button
@@ -264,11 +268,12 @@ function renderProductsGrid(products) {
     let stockText = `● In Stock: ${stock}`;
     if (stock <= 0) {
       stockClass = 'out-stock';
-      stockText = 'Out of Stock';
+      stockText = '0 Stock (Awaiting CEO Restock)';
     } else if (stock <= 5) {
       stockClass = 'low-stock';
       stockText = `⚠️ Low Stock: ${stock}`;
     }
+
 
     const basePrice = parseFloat(prod.BASE_PRICE || prod.PRICE || 0);
     const sellingPrice = parseFloat(prod.PRICE || basePrice || 0);
@@ -435,9 +440,9 @@ async function checkAP2Status() {
         banner.style.background = 'rgba(16, 185, 129, 0.12)';
         banner.style.borderColor = 'rgba(16, 185, 129, 0.35)';
       }
-      const card = data.card_details || {};
-      statusText.innerHTML = `<span style="color:#34d399;">🤖 AP2 Auto-Pay Active — Agent pays autonomously!</span>`;
-      if (statusSub) statusSub.innerHTML = `<span style="color:#6ee7b7;">${card.card_network || 'Card'} ${card.card_number_masked || '****'} • No checkout popup needed</span>`;
+      const mandateId = data.mandate_id || 'Active';
+      statusText.innerHTML = `<span style="color:#34d399;">🤖 AP2 Spending Mandate Verified & Active</span>`;
+      if (statusSub) statusSub.innerHTML = `<span style="color:#6ee7b7;">${mandateId} • Google AP2 Protocol on Razorpay Execution Rail</span>`;
       if (authorizeBtn) authorizeBtn.style.display = 'none';
     } else {
       // AP2 not set up — show authorize button
@@ -446,9 +451,10 @@ async function checkAP2Status() {
         banner.style.borderColor = 'rgba(251, 191, 36, 0.3)';
       }
       statusText.innerHTML = `<span style="color:#fbbf24;">⚡ Authorize once to enable Agent Auto-Pay</span>`;
-      if (statusSub) statusSub.textContent = 'One-time Razorpay setup • AP2 Protocol';
+      if (statusSub) statusSub.textContent = 'One-time Razorpay Mandate Setup • Google AP2 Protocol';
       if (authorizeBtn) authorizeBtn.style.display = 'flex';
     }
+
     if (window.lucide) window.lucide.createIcons();
   } catch (e) {
     console.warn('AP2 status check failed:', e);

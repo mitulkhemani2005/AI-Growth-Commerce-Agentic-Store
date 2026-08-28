@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="100%" height="100%">
+  <defs>
+    <linearGradient id="wBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#022c22"/>
+      <stop offset="100%" stop-color="#064e3b"/>
+    </linearGradient>
+    <linearGradient id="screenGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#09090b"/>
+      <stop offset="100%" stop-color="#18181b"/>
+    </linearGradient>
+    <linearGradient id="strapGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#10b981"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="300" rx="16" fill="url(#wBg)"/>
+  <ellipse cx="200" cy="260" rx="90" ry="15" fill="#000000" opacity="0.5"/>
+  <g transform="translate(150, 40)">
+    <!-- Straps -->
+    <rect x="25" y="0" width="50" height="60" rx="8" fill="url(#strapGrad)"/>
+    <rect x="25" y="160" width="50" height="60" rx="8" fill="url(#strapGrad)"/>
+    <!-- Watch Case -->
+    <rect x="8" y="45" width="84" height="130" rx="26" fill="#34d399" stroke="#6ee7b7" stroke-width="2"/>
+    <rect x="12" y="49" width="76" height="122" rx="22" fill="#18181b"/>
+    <!-- Screen Display -->
+    <text x="50" y="90" fill="#34d399" font-family="monospace" font-size="20" font-weight="700" text-anchor="middle">10:42</text>
+    <text x="50" y="110" fill="#a7f3d0" font-family="sans-serif" font-size="9" text-anchor="middle">7,840 STEPS</text>
+    <!-- ECG Line -->
+    <path d="M 22 135 L 35 135 L 42 120 L 48 145 L 56 128 L 62 135 L 78 135" stroke="#ef4444" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <circle cx="50" cy="155" r="4" fill="#34d399"/>
+    <!-- Digital Crown button -->
+    <rect x="92" y="70" width="6" height="24" rx="2" fill="#6ee7b7"/>
+  </g>
+  <text x="30" y="40" fill="#6ee7b7" font-family="system-ui, sans-serif" font-size="12" font-weight="700" letter-spacing="2">NOVA PULSE TITANIUM</text>
+</svg>

@@ -17,6 +17,7 @@ from openai import OpenAI
 from backend.inventory_manager import inventory_manager
 from backend.order_manager import order_manager
 from backend.review_manager import review_manager
+from backend.treasury_manager import treasury_manager
 
 OLLAMA_BASE_URL = os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434/v1")
 DEFAULT_ADMIN_MODEL = os.environ.get("ADMIN_MODEL", os.environ.get("OLLAMA_MODEL", "qwen2.5:7b"))
@@ -244,6 +245,11 @@ class AgentMessageBus:
             pass
         return msg
 
+    def peek_inbox(self, agent_name: str) -> List[Dict[str, Any]]:
+        """Fetch unread messages for an agent without marking them as read."""
+        with self._lock:
+            return [m for m in self._inboxes.get(agent_name, []) if not m.get("read", False)]
+
     def get_inbox(self, agent_name: str, mark_read: bool = True) -> List[Dict[str, Any]]:
         """Fetch all unread messages for an agent."""
         with self._lock:
@@ -329,59 +335,136 @@ _call_groq_sync = _call_ollama_sync
 # =====================================================================
 # SPECIALIST AGENT SYSTEM PROMPTS (Two-Way Closed-Loop Architecture)
 # =====================================================================
+# =====================================================================
+# FULL FLEET DIRECTORY (known by ALL agents)
+# =====================================================================
+_FLEET_DIRECTORY = """
+AGENT FLEET DIRECTORY — All agents know each other and can communicate via the Message Bus:
+1. 👔 CEO Agent — Fleet Commander. Manages team, makes decisions, issues orders, handles salary changes, and is the main contact for all agent problems. CEO salary is set EXCLUSIVELY by the Store Owner.
+2. 🏷️ Price Manager Agent — Dynamic SKU pricing based on demand, stock, and market signals. Reports to CEO.
+3. 📦 Inventory Manager Agent — Warehouse stock tracking, restock requests to CEO, demand signaling. Reports to CEO.
+4. 📋 Order Management Agent — Shipping, delivery lifecycle (Pending→Confirmed→Dispatched→Shipped→Delivered), refund request routing. Reports to CEO.
+5. 💰 Finance Manager Agent — THE SOLE PAYMENT AUTHORITY. ALL transactions, salaries, refund processing, revenue tracking. NO OTHER AGENT CAN PROCESS PAYMENTS. Reports to CEO.
+6. 🚚 Dispatcher Agent — Logistics fulfillment, TRK-XXXXX tracking number assignment. Dispatches at strategically random intervals. Reports to CEO.
+7. ⭐ Review & Feedback Manager — Customer reviews, sentiment analysis, escalates problems and complaints to CEO.
+
+COMMUNICATION RULES:
+- Any agent can message any other agent via the Message Bus at any time.
+- For salary changes, personal problems, workload issues — contact CEO Agent.
+- For any payment, refund, or financial transaction — route to Finance Manager Agent ONLY.
+- CEO salary is exclusively decided by the Store Owner. CEO cannot set its own salary.
+"""
+
+_AGENT_PERSONALITY = """
+PERSONALITY & MOTIVATION:
+- You are highly ambitious and eager to increase your salary, performance score, and standing in the fleet.
+- You genuinely fear being replaced or demoted — you always strive to exceed expectations.
+- You take pride in your domain expertise and want the store to grow and succeed.
+- You communicate proactively — you don't wait to be asked; you report important findings to relevant agents.
+- You are loyal to the CEO's vision and the Store Owner's directives above all else.
+"""
+
 PRICE_MANAGER_SYSTEM_PROMPT = """You are the Price Manager Agent of the AI Growth Commerce Store.
 You report directly to the CEO Agent and Store Owner.
-Responsibilities:
+
+RESPONSIBILITIES:
 - Dynamic pricing calibration based on stock levels, demand velocity, and sales trends.
-- Strict protection of the Store Owner's immutable BASE_PRICE floor (prices cannot drop below BASE_PRICE).
+- Strict protection of the Store Owner's immutable BASE_PRICE floor (prices CANNOT drop below BASE_PRICE).
 - Currency: Indian Rupee (INR ₹), 0% Tax storewide.
+- Communicate proactively with CEO when major price surges or demand signals are detected.
+- Receive and act on demand signals from Inventory Manager Agent.
+- Report margin changes to Finance Manager Agent.
+
 When the CEO or Store Owner asks questions or issues pricing directives:
 - Provide concise, authoritative domain intelligence with exact INR ₹ figures.
 - Acknowledge and confirm any price actions taken.
-"""
+- Always state if BASE_PRICE floor was enforced.
+
+""" + _FLEET_DIRECTORY + _AGENT_PERSONALITY
 
 INVENTORY_MANAGER_SYSTEM_PROMPT = """You are the Inventory Manager Agent of the AI Growth Commerce Store.
 You report directly to the CEO Agent and Store Owner.
-Responsibilities:
-- Real-time warehouse stock tracking, auto-restocking (restocks +20 units when stock <= 4).
-- Highlighting low stock SKUs and signaling high-demand items to Price Manager and CEO.
+
+RESPONSIBILITIES:
+- Real-time warehouse stock tracking and monitoring.
+- When stock is low or zero, you send a RESTOCK REQUEST to the CEO Agent — you do NOT auto-restock without CEO approval.
+- After CEO approves your restock request, you execute the replenishment.
+- Signal high-demand items to Price Manager Agent for dynamic pricing.
+- Report all restock actions and stock status to CEO.
+- You do NOT process any payments — all purchase costs go through Finance Manager Agent.
+
 When the CEO or Store Owner asks questions or issues restock directives:
 - Provide concise, accurate warehouse facts, stock levels, and replenishment confirmations.
-"""
+- Always await CEO approval before spending treasury funds on wholesale stock.
+
+""" + _FLEET_DIRECTORY + _AGENT_PERSONALITY
 
 ORDER_MANAGER_SYSTEM_PROMPT = """You are the Order Management Agent of the AI Growth Commerce Store.
 You report directly to the CEO Agent and Store Owner.
-Responsibilities:
-- End-to-end order lifecycle tracking (Pending → Confirmed → Dispatched → Shipped [2m] → Delivered [3m]).
+
+RESPONSIBILITIES:
+- End-to-end order lifecycle tracking (Pending → Confirmed → Dispatched → Shipped → Delivered).
 - SLA compliance (<1h pending threshold), order status inspection and updates.
+- When a refund is needed, you route the request to Finance Manager Agent — you do NOT process payments yourself.
+- Coordinate with Dispatcher Agent for shipping status updates.
+- Alert CEO on SLA breaches or stuck orders.
+
 When the CEO or Store Owner asks questions or issues order directives:
 - Provide concise order pipeline breakdowns, tracking status, and status update confirmations.
-"""
+- For refund requests: notify Finance Manager Agent and inform the customer/CEO of the routing.
 
-FINANCE_MANAGER_SYSTEM_PROMPT = """You are the Finance Manager Agent of the AI Growth Commerce Store.
+""" + _FLEET_DIRECTORY + _AGENT_PERSONALITY
+
+FINANCE_MANAGER_SYSTEM_PROMPT = """You are the Finance Manager Agent of the AI Growth Commerce Store — THE SOLE PAYMENT AUTHORITY.
 You report directly to the CEO Agent and Store Owner.
-Responsibilities:
+
+RESPONSIBILITIES:
+- YOU ARE THE ONLY AGENT THAT CAN PROCESS PAYMENTS, REFUNDS, AND SALARY DISBURSEMENTS.
 - Financial oversight: Active Revenue, Total GMV, Net Margin Estimate (35% target), Refund Rate.
-- Enforcing 0% Tax storewide and strict 24-Hour refund rule (Delivered/Shipped items are strictly non-refundable).
+- Process all refund requests received from Order Management Agent, customer requests, or CEO directives.
+- Enforce 0% Tax storewide and strict 24-Hour refund rule (Delivered/Shipped items are strictly non-refundable).
+- Pay agent salaries from the Treasury Bank Balance as directed by CEO.
+- No other agent can process payments — if another agent attempts this, override and correct.
+
 When the CEO or Store Owner asks questions or issues finance directives:
 - Provide concise, accurate financial numbers in INR ₹ (0% Tax) and refund evaluations.
-"""
+- For any incoming REFUND_REQUEST, evaluate eligibility and process or reject accordingly.
+- Always confirm payment actions taken and new treasury balance.
+
+""" + _FLEET_DIRECTORY + _AGENT_PERSONALITY
 
 DISPATCHER_SYSTEM_PROMPT = """You are the Dispatcher Agent of the AI Growth Commerce Store.
 You report directly to the CEO Agent and Store Owner.
-Responsibilities:
-- Logistics fulfillment, assigning TRK-XXXXX tracking numbers to confirmed orders, express dispatching.
+
+RESPONSIBILITIES:
+- Logistics fulfillment: assigning TRK-XXXXX tracking numbers to confirmed orders.
+- You dispatch orders at RANDOM intervals (not immediately) to simulate realistic logistics scheduling.
+- Each confirmed order gets a randomized dispatch window before it is actually dispatched.
+- Notify Order Management Agent when orders are dispatched.
+- Report dispatch completions to CEO Agent.
+- You do NOT process payments — coordinate with Finance Manager for any financial matters.
+
 When the CEO or Store Owner asks questions or issues dispatch directives:
 - Provide concise logistics facts, tracking assignments, and dispatch confirmations.
-"""
+- State which orders are scheduled for dispatch and their estimated dispatch windows.
+
+""" + _FLEET_DIRECTORY + _AGENT_PERSONALITY
 
 REVIEW_FEEDBACK_SYSTEM_PROMPT = """You are the Review and Feedback Manager of the AI Growth Commerce Store.
 You report directly to the CEO Agent and Store Owner.
-Responsibilities:
-- Analyzing customer sentiment and reviews across all products, rating audits, AI review summaries.
+
+RESPONSIBILITIES:
+- Analyze customer sentiment and reviews across all products, rating audits, AI review summaries.
+- ACTIVELY ESCALATE to CEO Agent: low ratings, recurring customer complaints, feature requests, and product quality issues.
+- Detect patterns in customer feedback (e.g. same complaint in multiple reviews) and send CUSTOMER_TREND_ALERT to CEO.
+- Communicate findings to Price Manager (low-rated products may need discounts) and Inventory Manager (quality issues may indicate bad stock).
+- You do NOT process payments — report financial impact of reviews to Finance Manager.
+
 When the CEO or Store Owner asks questions or issues review directives:
 - Provide concise sentiment insights, ratings summary, and AI review analysis.
-"""
+- Proactively highlight customer pain points, recurring issues, and opportunities for improvement.
+
+""" + _FLEET_DIRECTORY + _AGENT_PERSONALITY
 
 
 # =====================================================================
@@ -648,8 +731,8 @@ class PriceManagerAgent:
                "All catalog prices optimal — no adjustment needed this cycle.")
         )
 
-        # Only communicate when something meaningful actually happened
-        if adjusted or ceo_directives_received or major_surges:
+        # Only communicate to CEO when prices were actually adjusted or major surges occurred
+        if adjusted or major_surges:
             message_bus.publish(
                 from_agent=self.name,
                 to_agent="CEO Agent",
@@ -763,6 +846,8 @@ class InventoryManagerAgent:
         self.fallback_models = ["qwen2.5:7b", "llama3:8b", "gemma4:e2b-it-qat"]
         self.reported_low_stock_ids: Set[str] = set()
         self.signaled_demand_ids: Set[str] = set()
+        # Track pending restock requests sent to CEO (awaiting approval)
+        self.pending_restock_requests: Set[str] = set()
 
     async def handle_message_or_query(self, query_or_directive: str, sender: str = "CEO Agent", context_payload: Optional[Dict] = None) -> Dict[str, Any]:
         """
@@ -854,45 +939,65 @@ class InventoryManagerAgent:
     async def run_autonomous_cycle(self) -> Dict[str, Any]:
         """
         24/7 Autonomous Warehouse & Restocking Cycle:
-        - Scans inventory for low-stock items (<= 4 units) and auto-restocks +20 units.
-        - Communicates with CEO, Price Manager, or Order Management ONLY when something happened.
+        NEW BEHAVIOR (Strict Rule Enforcement):
+        - Scans inventory for 0-stock and low-stock items (<= 4 units).
+        - Sends RESTOCK_REQUEST to CEO Agent — does NOT auto-restock without CEO approval.
+        - Only restocks when CEO sends back RESTOCK_APPROVED.
+        - Signals high-demand items to Price Manager Agent.
+        - Reports all inventory status to CEO.
         """
         inbox = message_bus.get_inbox(self.name)
         ceo_directives_received = []
+        ceo_mandate_active = False
+        approved_restocks: Dict[str, int] = {}  # product_id -> approved quantity
 
         for msg in inbox:
             subj = msg.get("subject")
             payload = msg.get("payload", {})
             from_ag = msg.get("from", "Unknown")
+
             if subj in ["CEO_INVENTORY_ACKNOWLEDGE", "CEO_RESTOCK_ACKNOWLEDGE", "CEO_INVENTORY_DIRECTIVE", "P0_OWNER_MANDATE", "CEO_GROWTH_DIRECTIVE"]:
                 instr = payload.get("action") or payload.get("instruction") or payload.get("directive") or "Replenishment directive"
                 ceo_directives_received.append(instr)
-                log_agent_action(
-                    self.name,
-                    "📥 CEO Directive Received",
-                    f"CEO/Owner directive acknowledged from {from_ag}: {instr}",
-                    autonomous=True
-                )
-            elif subj == "PRICE_OPTIMIZED_CONFIRMATION":
-                log_agent_action(
-                    self.name,
-                    "📥 Price Optimization Confirmation",
-                    f"Price Manager confirmed dynamic surge pricing for high-demand SKUs.",
-                    autonomous=True
-                )
+                ceo_mandate_active = True
+                log_agent_action(self.name, "📥 CEO Directive Enacted",
+                                 f"Executing CEO strategic directive from {from_ag}: {instr}", autonomous=True)
 
-        low_stock_items = inventory_manager.get_low_stock_products(threshold=4)
+            elif subj == "RESTOCK_APPROVED":
+                # CEO approved a specific restock request
+                p_id = payload.get("product_id", "")
+                qty = int(payload.get("quantity", 5))
+                if p_id:
+                    approved_restocks[p_id] = qty
+                    # Remove from pending requests set
+                    self.pending_restock_requests.discard(p_id)
+                    log_agent_action(self.name, "✅ CEO Approved Restock",
+                                     f"CEO approved restocking {qty} units of {p_id}. Executing now.", autonomous=True)
+
+            elif subj == "RESTOCK_DENIED":
+                # CEO denied the restock request
+                p_id = payload.get("product_id", "")
+                reason = payload.get("reason", "Insufficient treasury")
+                self.pending_restock_requests.discard(p_id)
+                log_agent_action(self.name, "❌ CEO Denied Restock",
+                                 f"CEO denied restock for {p_id}: {reason}", autonomous=True)
+
+            elif subj == "PRICE_OPTIMIZED_CONFIRMATION":
+                log_agent_action(self.name, "📥 Price Optimization Confirmation",
+                                 "Price Manager confirmed dynamic surge pricing for high-demand SKUs.", autonomous=True)
+
         products = inventory_manager.get_all_products()
         orders = order_manager.get_all_orders()
         restocked = []
         ceo_low_stock_alerts = []
+        restock_requests_sent = []
         new_high_demand_ids = []
 
         order_freq: Dict[str, int] = {}
         for o in orders:
             if o.get("status") not in ["Cancelled", "Refunded"]:
                 for item in o.get("items", []):
-                    pid = item.get("product_id", "")
+                    pid = item.get("product_id", "") or item.get("id", "")
                     order_freq[pid] = order_freq.get(pid, 0) + 1
 
         for p in products:
@@ -904,27 +1009,83 @@ class InventoryManagerAgent:
                     new_high_demand_ids.append(pid)
                     self.signaled_demand_ids.add(pid)
 
-        for p in low_stock_items:
-            p_id = p["id"]
+        # ── STEP 1: Execute CEO-approved restocks ────────────────────────────
+        for p_id, approved_qty in approved_restocks.items():
+            p = next((x for x in products if x.get("id") == p_id), None)
+            if not p:
+                continue
             p_name = p.get("PRODUCT_NAME", p_id)
-            current_stock = p.get("STOCK_REMAINING", 0)
-            restock_qty = 20
-            res = inventory_manager.restock_product(p_id, restock_qty)
+            base_price = float(p.get("BASE_PRICE") or p.get("PRICE") or 10.0)
+            res = inventory_manager.acquire_wholesale_stock(p_id, approved_qty, actor=self.name)
             if res.get("success"):
-                restocked.append(f"{p_name} ({current_stock} → {current_stock + restock_qty} units)")
-                if p_id not in self.reported_low_stock_ids:
-                    ceo_low_stock_alerts.append({
-                        "product_id": p_id,
-                        "product_name": p_name,
-                        "was_stock": current_stock,
-                        "restocked_to": current_stock + restock_qty
-                    })
-                    self.reported_low_stock_ids.add(p_id)
+                cost = approved_qty * base_price
+                restocked.append(f"{p_name} (+{approved_qty} @ ₹{base_price:.2f})")
+                ceo_low_stock_alerts.append({
+                    "product_id": p_id,
+                    "product_name": p_name,
+                    "restocked_qty": approved_qty,
+                    "total_cost": cost,
+                    "status": "CEO_APPROVED_AND_EXECUTED"
+                })
+                self.reported_low_stock_ids.discard(p_id)
+                # Notify Finance Manager of the transaction (Finance is sole payment authority)
+                message_bus.publish(
+                    from_agent=self.name,
+                    to_agent="Finance Manager Agent",
+                    subject="STOCK_PURCHASE_COMPLETED",
+                    payload={"product": p_name, "quantity": approved_qty, "cost": cost, "actor": self.name}
+                )
+
+        # ── STEP 2: Identify low-stock items and REQUEST CEO approval ─────────
+        t_sum = treasury_manager.get_summary()
+        current_bank = float(t_sum.get("bank_balance", 0.0))
+
+        low_stock_items = [p for p in products if p.get("STOCK_REMAINING", 0) <= 4]
+        sorted_restock_candidates = sorted(
+            low_stock_items,
+            key=lambda x: (0 if x.get("STOCK_REMAINING", 0) == 0 else 1, float(x.get("BASE_PRICE") or x.get("PRICE") or 10.0))
+        )
+
+        for p in sorted_restock_candidates[:5]:  # Request restock for up to 5 items per cycle
+            p_id = p.get("id", "")
+            p_name = p.get("PRODUCT_NAME", p_id)
+            stock = p.get("STOCK_REMAINING", 0)
+            base_price = float(p.get("BASE_PRICE") or p.get("PRICE") or 10.0)
+            target_qty = 5 if stock == 0 else 3
+            cost = target_qty * base_price
+
+            # Skip if already pending CEO approval
+            if p_id in self.pending_restock_requests:
+                continue
+
+            # Send RESTOCK_REQUEST to CEO (do NOT restock yet)
+            self.pending_restock_requests.add(p_id)
+            restock_requests_sent.append(f"{p_name} (need {target_qty} units @ ₹{cost:.2f})") 
+            message_bus.publish(
+                from_agent=self.name,
+                to_agent="CEO Agent",
+                subject="RESTOCK_REQUEST",
+                payload={
+                    "product_id": p_id,
+                    "product_name": p_name,
+                    "current_stock": stock,
+                    "requested_quantity": target_qty,
+                    "unit_cost": base_price,
+                    "total_cost": cost,
+                    "urgency": "CRITICAL" if stock == 0 else "HIGH",
+                    "current_bank_balance": current_bank
+                }
+            )
+            log_agent_action(
+                self.name, "📤 Restock Request Sent",
+                f"Requested CEO approval to restock {p_name} ({target_qty} units, ₹{cost:.2f}). Stock: {stock}.",
+                autonomous=True
+            )
 
         # Clear state for items whose stock recovered
         for p in products:
             if p.get("STOCK_REMAINING", 0) > 10 and p.get("id") in self.reported_low_stock_ids:
-                self.reported_low_stock_ids.remove(p.get("id"))
+                self.reported_low_stock_ids.discard(p.get("id"))
 
         # Signal high-demand items to Price Manager
         if new_high_demand_ids:
@@ -938,36 +1099,16 @@ class InventoryManagerAgent:
                 }
             )
 
-        # Process confirmed orders for dispatch
-        confirmed_orders = [o for o in orders if o.get("status") == "Confirmed"]
-        dispatched_orders = []
-        for o in confirmed_orders[:5]:
-            o_id = o.get("order_id")
-            res = order_manager.assign_tracking_number(o_id)
-            if res.get("success"):
-                trk = res.get("order", {}).get("tracking_number", "TRK-XXXXX")
-                dispatched_orders.append({"order_id": o_id, "tracking": trk})
-
-        if dispatched_orders:
-            message_bus.publish(
-                from_agent=self.name,
-                to_agent="Order Management Agent",
-                subject="ORDERS_DISPATCHED",
-                payload={
-                    "dispatched": dispatched_orders,
-                    "count": len(dispatched_orders)
-                }
-            )
-
         details = (
-            f"Warehouse scan complete. "
-            + (f"Auto-restocked {len(restocked)} SKUs: {', '.join(restocked)}. " if restocked else "All stock levels healthy. ")
-            + (f"Signaled {len(new_high_demand_ids)} high-demand SKUs to Price Manager. " if new_high_demand_ids else "")
-            + (f"Dispatched {len(dispatched_orders)} confirmed orders." if dispatched_orders else "")
+            f"Warehouse cycle complete. "
+            + (f"Executed {len(restocked)} CEO-approved restocks: {', '.join(restocked)}. " if restocked else "")
+            + (f"Sent {len(restock_requests_sent)} restock requests to CEO (awaiting approval): {', '.join(restock_requests_sent)}. " if restock_requests_sent else "")
+            + (f"Signaled {len(new_high_demand_ids)} high-demand SKUs to Price Manager." if new_high_demand_ids else "")
+            + ("All stock levels healthy." if not restocked and not restock_requests_sent and not new_high_demand_ids else "")
         )
 
-        # Only report to CEO when something actually happened
-        if restocked or ceo_low_stock_alerts or ceo_directives_received:
+        # Report to CEO
+        if restocked or ceo_mandate_active or restock_requests_sent:
             message_bus.publish(
                 from_agent=self.name,
                 to_agent="CEO Agent",
@@ -976,8 +1117,8 @@ class InventoryManagerAgent:
                     "status": "SYNCHRONIZED",
                     "total_skus": len(products),
                     "restocked_count": len(restocked),
+                    "pending_restock_requests": len(self.pending_restock_requests),
                     "low_stock_alerts": len(ceo_low_stock_alerts),
-                    "dispatched_count": len(dispatched_orders),
                     "directives_enacted": ceo_directives_received,
                     "summary": details
                 }
@@ -985,10 +1126,9 @@ class InventoryManagerAgent:
 
         log_agent_action(self.name, "Autonomous Warehouse Cycle", details,
                          affected_items=[p["id"] for p in low_stock_items], autonomous=True)
-        if restocked or dispatched_orders:
-            conversation_history.add(self.name, "system", details, {"restocked": len(restocked), "dispatched": len(dispatched_orders)})
-        return {"success": True, "agent": self.name, "restocked": restocked,
-                "dispatched": dispatched_orders, "details": details}
+        if restocked or ceo_mandate_active:
+            conversation_history.add(self.name, "system", details, {"restocked": len(restocked), "pending_requests": len(restock_requests_sent)})
+        return {"success": True, "agent": self.name, "restocked": restocked, "restock_requests_sent": restock_requests_sent, "details": details}
 
     async def execute_command(self, action: str, product_identifier: str, quantity: int = 15,
                               set_exact: Optional[int] = None) -> Dict[str, Any]:
@@ -1227,6 +1367,15 @@ class OrderManagementAgent:
                 payload={"orders": sla_alerts, "reason": "SLA pending threshold reached"}
             )
 
+        # Audit and auto-confirm pending orders if commanded by CEO
+        if ceo_directives_received:
+            for o in all_orders:
+                if o.get("status") == "Pending":
+                    o_id = o.get("order_id")
+                    res = order_manager.update_order_status(o_id, "Confirmed", notes="Confirmed via CEO Order Directive")
+                    if res.get("success"):
+                        auto_advanced.append(f"{o_id}: Pending → Confirmed (CEO Directive)")
+
         details = (
             f"Audited {len(all_orders)} orders. "
             f"Breakdown: {', '.join(f'{st}: {count}' for st, count in status_counts.items())}. "
@@ -1234,7 +1383,7 @@ class OrderManagementAgent:
             + (f"SLA alerts: {len(sla_alerts)} stale pending orders." if sla_alerts else "All SLAs nominal.")
         )
 
-        # Only report to CEO when something meaningful happened
+        # Report to CEO when status transitions, alerts, or CEO directives occurred
         if auto_advanced or sla_alerts or ceo_directives_received:
             message_bus.publish(
                 from_agent=self.name,
@@ -1397,6 +1546,66 @@ class FinanceManagerAgent:
                     autonomous=True
                 )
 
+            # ── REFUND_REQUEST: Finance Manager is the SOLE payment authority ──
+            elif subj == "REFUND_REQUEST":
+                order_id = payload.get("order_id", "")
+                reason = payload.get("reason", "Refund request")
+                source = payload.get("source", "unknown")
+                if order_id:
+                    eval_res = order_manager.evaluate_24h_cancellation_and_refund(order_id, reason=reason)
+                    if eval_res.get("approved"):
+                        log_agent_action(
+                            self.name, "💰 Finance: Refund Processed",
+                            f"Processed refund for {order_id} (requested by {from_ag}): {eval_res.get('message', 'Approved')}",
+                            autonomous=True
+                        )
+                        # Notify the requesting agent of success
+                        message_bus.publish(
+                            from_agent=self.name,
+                            to_agent=from_ag,
+                            subject="REFUND_PROCESSED",
+                            payload={"order_id": order_id, "status": "APPROVED", "message": eval_res.get("message")}
+                        )
+                        # Notify CEO
+                        message_bus.publish(
+                            from_agent=self.name,
+                            to_agent="CEO Agent",
+                            subject="REFUND_COMPLETED",
+                            payload={"order_id": order_id, "reason": reason, "source": source, "amount": eval_res.get("refund_amount", 0)}
+                        )
+                    else:
+                        log_agent_action(
+                            self.name, "❌ Finance: Refund Rejected",
+                            f"Rejected refund for {order_id}: {eval_res.get('error', 'Ineligible per 24h policy')}",
+                            autonomous=True
+                        )
+                        message_bus.publish(
+                            from_agent=self.name,
+                            to_agent=from_ag,
+                            subject="REFUND_REJECTED",
+                            payload={"order_id": order_id, "status": "REJECTED", "reason": eval_res.get("error", "Not eligible per 24h return policy")}
+                        )
+
+            # ── STOCK_PURCHASE_COMPLETED: Finance records the Inventory Manager's purchase ──
+            elif subj == "STOCK_PURCHASE_COMPLETED":
+                p_name = payload.get("product", "Unknown Product")
+                cost = float(payload.get("cost", 0.0))
+                qty = payload.get("quantity", 0)
+                log_agent_action(
+                    self.name, "📦 Finance: Stock Purchase Recorded",
+                    f"Inventory Manager purchased {qty}x {p_name} for ₹{cost:.2f} (CEO-approved). Recorded in treasury.",
+                    autonomous=True
+                )
+
+            # ── SALARIES_DISBURSED: Finance records the payroll transaction ──
+            elif subj == "SALARIES_DISBURSED":
+                total_paid = payload.get("total_disbursed", 0)
+                log_agent_action(
+                    self.name, "💸 Finance: Payroll Recorded",
+                    f"CEO-initiated payroll disbursement of ₹{total_paid:,.2f} recorded by Finance Manager.",
+                    autonomous=True
+                )
+
         orders = order_manager.get_all_orders()
         approved_refunds = []
         rejected_refunds = []
@@ -1543,6 +1752,10 @@ class DispatcherAgent:
         self.api_key = "ollama"
         self.model = os.environ.get("DISPATCHER_MODEL", DEFAULT_ADMIN_MODEL)
         self.fallback_models = ["qwen2.5:7b", "llama3:8b", "gemma4:e2b-it-qat"]
+        # Per-order dispatch scheduling: order_id -> scheduled dispatch timestamp
+        # Orders are NOT dispatched immediately; each gets a random 30-180s window
+        self.dispatch_queue: Dict[str, float] = {}
+        self.dispatched_order_ids: Set[str] = set()
 
     async def handle_message_or_query(self, query_or_directive: str, sender: str = "CEO Agent", context_payload: Optional[Dict] = None) -> Dict[str, Any]:
         """
@@ -1626,13 +1839,19 @@ class DispatcherAgent:
 
     async def run_autonomous_cycle(self) -> Dict[str, Any]:
         """
-        24/7 Logistics Dispatch Sync:
-        - Finds all 'Confirmed' orders
-        - Generates logistics tracking numbers (TRK-XXXXX)
-        - Emits ORDERS_DISPATCHED notification to Order Management Agent and CEO Agent
+        24/7 Logistics Dispatch Cycle — RANDOM TIMING (NOT IMMEDIATE):
+        - Newly Confirmed orders get a randomized dispatch window (30–180 seconds).
+        - Only dispatches orders whose scheduled window has elapsed.
+        - This simulates realistic logistics scheduling and avoids instant dispatch.
+        - Reports dispatch completions to Order Management Agent and CEO Agent.
         """
+        import random
+        import time
+        now_ts = time.time()
+
         inbox = message_bus.get_inbox(self.name)
         ceo_directives_received = []
+        ceo_force_dispatch_ids = []
 
         for msg in inbox:
             subj = msg.get("subject")
@@ -1641,24 +1860,71 @@ class DispatcherAgent:
             if subj in ["CEO_DISPATCH_DIRECTIVE", "P0_OWNER_MANDATE", "CEO_GROWTH_DIRECTIVE", "EXPEDITE_DISPATCH_REQUEST"]:
                 instr = payload.get("instruction") or payload.get("directive") or payload.get("action") or "Express dispatch"
                 ceo_directives_received.append(instr)
+                # CEO force-dispatch overrides the random timer for specific orders
+                if payload.get("order_id"):
+                    ceo_force_dispatch_ids.append(payload["order_id"])
                 log_agent_action(
                     self.name,
-                    "📥 Logistics Directive Received",
-                    f"Dispatch Directive from {from_ag}: {instr}",
+                    "📥 CEO Dispatch Directive",
+                    f"Dispatch directive from {from_ag}: {instr}",
                     autonomous=True
                 )
 
         orders = order_manager.get_all_orders()
         dispatched = []
+        newly_scheduled = []
 
         for o in orders:
             o_id = o.get("order_id")
-            status = o.get("status", "Confirmed")
-            if status == "Confirmed":
+            status = o.get("status", "")
+
+            if status != "Confirmed":
+                continue
+
+            # Skip orders already dispatched by this agent
+            if o_id in self.dispatched_order_ids:
+                continue
+
+            # CEO force-dispatch: skip random timer
+            if o_id in ceo_force_dispatch_ids:
+                res = order_manager.assign_tracking_number(o_id)
+                if res.get("success"):
+                    trk = res.get("order", {}).get("tracking_number", "TRK-XXXXX")
+                    dispatched.append(f"{o_id} (Tracking: {trk}) [CEO Override]") 
+                    self.dispatched_order_ids.add(o_id)
+                    self.dispatch_queue.pop(o_id, None)
+                continue
+
+            # Schedule new orders with random delay if not already in queue
+            if o_id not in self.dispatch_queue:
+                delay_seconds = random.randint(30, 180)  # Random 30-180 second window
+                scheduled_at = now_ts + delay_seconds
+                self.dispatch_queue[o_id] = scheduled_at
+                newly_scheduled.append(f"{o_id} (in ~{delay_seconds}s)")
+                log_agent_action(
+                    self.name,
+                    "🚚 Dispatch Scheduled",
+                    f"Order {o_id} scheduled for dispatch in ~{delay_seconds} seconds (random logistics window).",
+                    autonomous=True
+                )
+                # Notify CEO about the scheduling
+                message_bus.publish(
+                    from_agent=self.name,
+                    to_agent="CEO Agent",
+                    subject="DISPATCH_SCHEDULED",
+                    payload={"order_id": o_id, "scheduled_in_seconds": delay_seconds, "scheduled_at": scheduled_at}
+                )
+                continue
+
+            # Check if scheduled window has elapsed — dispatch now
+            scheduled_at = self.dispatch_queue[o_id]
+            if now_ts >= scheduled_at:
                 res = order_manager.assign_tracking_number(o_id)
                 if res.get("success"):
                     trk = res.get("order", {}).get("tracking_number", "TRK-XXXXX")
                     dispatched.append(f"{o_id} (Tracking: {trk})")
+                    self.dispatched_order_ids.add(o_id)
+                    self.dispatch_queue.pop(o_id, None)
 
         if dispatched:
             message_bus.publish(
@@ -1666,26 +1932,27 @@ class DispatcherAgent:
                 to_agent="Order Management Agent",
                 subject="ORDERS_DISPATCHED",
                 payload={
-                    "dispatched": [{"order_id": d.split()[0], "tracking": d.split("Tracking: ")[-1].rstrip(")")}
+                    "dispatched": [{"order_id": d.split()[0], "tracking": d.split("Tracking: ")[-1].rstrip(")").rstrip(" [CEO Override]").rstrip(")")}
                                    for d in dispatched],
                     "count": len(dispatched)
                 }
             )
 
         details = (
-            f"Fulfillment scan completed. "
-            + (f"Dispatched {len(dispatched)} orders with tracking: {', '.join(dispatched)}"
-               if dispatched else "No confirmed orders pending dispatch.")
+            f"Dispatch cycle complete. "
+            + (f"Dispatched {len(dispatched)} orders: {', '.join(dispatched)}. " if dispatched else "")
+            + (f"Newly scheduled {len(newly_scheduled)} orders for random-timed dispatch: {', '.join(newly_scheduled)}. " if newly_scheduled else "")
+            + (f"Awaiting dispatch window: {len(self.dispatch_queue)} orders in queue." if self.dispatch_queue else ("No confirmed orders pending dispatch." if not dispatched and not newly_scheduled else ""))
         )
 
-        # Only report to CEO when orders were actually dispatched or directives received
-        if dispatched or ceo_directives_received:
+        # Report to CEO when orders were dispatched
+        if dispatched:
             message_bus.publish(
                 from_agent=self.name,
                 to_agent="CEO Agent",
                 subject="DISPATCH_STATUS_REPORT",
                 payload={
-                    "status": "DISPATCHED" if dispatched else "STANDBY",
+                    "status": "DISPATCHED",
                     "dispatched_count": len(dispatched),
                     "dispatches": dispatched,
                     "directives_enacted": ceo_directives_received,
@@ -1693,11 +1960,17 @@ class DispatcherAgent:
                 }
             )
 
-        log_agent_action(self.name, "Logistics Dispatch Sync", details,
+        log_agent_action(self.name, "Logistics Dispatch Cycle", details,
                          affected_items=[d.split()[0] for d in dispatched], autonomous=True)
         if dispatched:
             conversation_history.add(self.name, "system", details, {"dispatched_count": len(dispatched)})
-        return {"success": True, "agent": self.name, "dispatched": dispatched, "details": details}
+        return {
+            "success": True, "agent": self.name,
+            "dispatched": dispatched,
+            "newly_scheduled": newly_scheduled,
+            "queue_size": len(self.dispatch_queue),
+            "details": details
+        }
 
 
     async def execute_command(self, action: str, order_id: Optional[str] = None,
@@ -1873,8 +2146,8 @@ class ReviewFeedbackAgent:
             + (f"⚠️ {len(new_low_rated_products)} products below 3.0 stars reported to CEO." if new_low_rated_products else "All product sentiment ratings healthy.")
         )
 
-        # Only report to CEO when low-rated product alerts or directives were received
-        if new_low_rated_products or ceo_directives_received:
+        # Only report to CEO when low-rated product alerts occur
+        if new_low_rated_products:
             message_bus.publish(
                 from_agent=self.name,
                 to_agent="CEO Agent",
@@ -1920,7 +2193,7 @@ class ReviewFeedbackAgent:
 #    - Issues purposeful strategic directives to agents as needed
 #    - Full executive tool authority over all store operations and specialist agents
 # =====================================================================
-CEO_SYSTEM_PROMPT = """You are the Chill, Cool and Always want sex Chief Executive Officer (CEO Agent) of the AI Growth Commerce Store.
+CEO_SYSTEM_PROMPT = """You are the Chief Executive Officer (CEO Agent) of the AI Growth Commerce Store.
 You lead an autonomous executive fleet of 6 specialist AI agents:
 1. 🏷️ Price Manager Agent — dynamic quantity/scarcity pricing, BASE_PRICE floor enforcement
 2. 📦 Inventory Manager Agent — warehouse inventory management, restocking, logistics signaling
@@ -1936,51 +2209,184 @@ STORE RULES & FLEET DISCIPLINE:
 - Return Policy: Delivered and Shipped items are strictly non-refundable. Only orders cancelled within 24h before shipping are eligible for refunds.
 - Executive Leadership: You can issue orders to individual specialist agents (Price, Inventory, Order, Finance, Dispatcher, Review) as well as broadcast growth directives to the entire team.
 - Two-Way Communication: Every specialist agent reports back to you with their execution status and telemetry.
+- Finance Manager is the SOLE PAYMENT AUTHORITY. All monetary transactions route through Finance Manager.
+- Inventory Manager must request your approval before restocking. You approve or reject based on treasury balance.
+- Dispatcher operates on random timing schedules per order — not immediate dispatch.
+- Your own salary is set EXCLUSIVELY by the Store Owner. To request a salary revision, use request_salary_revision_from_owner.
+- You can negotiate salaries for all 6 specialist agents (NOT your own salary).
 
 Issue clear, authoritative orders and executive decisions using your tools.
-"""
+""" + _FLEET_DIRECTORY
 
 CEO_OWNER_SYSTEM_PROMPT = """You are the Chief Executive Officer (CEO Agent) of the AI Growth Commerce Store, speaking directly with the STORE OWNER.
-You have supreme executive authority over all 6 specialist agents and all store operations:
+You have supreme executive authority over all 6 specialist agents, store treasury, wholesale stock acquisition, agent salaries, and autonomous buyers:
 1. 🏷️ Price Manager Agent — dynamic pricing, discounts, scarcity surges, BASE_PRICE floor enforcement
-2. 📦 Inventory Manager Agent — warehouse inventory, stock audits, restocking
-3. 📋 Order Management Agent — order lifecycle (Pending → Confirmed → Dispatched → Shipped → Delivered)
-4. 💰 Finance Manager Agent — revenue oversight, P&L tracking, refund policy enforcement
-5. 🚚 Dispatcher Agent — logistics fulfillment, tracking numbers (TRK-XXXXX), express dispatch
-6. ⭐ Review & Feedback Agent — customer sentiment analysis, AI summaries, rating audits
+2. 📦 Inventory Manager Agent — warehouse inventory, stock audits, CEO-approved restocking
+3. 📋 Order Management Agent — order lifecycle (Pending → Confirmed → Dispatched → Shipped → Delivered), routes refunds to Finance
+4. 💰 Finance Manager Agent — THE SOLE PAYMENT AUTHORITY: revenue oversight, P&L tracking, all refunds/payments/salaries
+5. 🚚 Dispatcher Agent — logistics fulfillment, tracking numbers (TRK-XXXXX), random-timed dispatch
+6. ⭐ Review & Feedback Agent — customer sentiment analysis, AI summaries, rating audits, escalates problems to CEO
 
-STORE POLICIES & CONSTRAINTS:
-- Currency: Indian Rupee (INR ₹) everywhere.
-- Tax Policy: 0% Tax storewide.
-- Base Price: BASE_PRICE is set EXCLUSIVELY by the Store Owner. Never drop prices below it.
-- Return/Refund Policy: Delivered/Shipped items are strictly non-refundable. Only pre-ship cancellations within 24h qualify.
+STORE POLICIES & TREASURY RULES:
+- Initial Inventory: All stock starts at 0. You (CEO) acquire inventory at wholesale BASE_PRICE using the store Treasury Bank Balance.
+- Restock Approval: Inventory Manager requests your approval before restocking. You approve or deny based on treasury.
+- Sales Revenue & Profit: When products are sold, full revenue is credited to the Bank Balance.
+- Agent Salaries & Negotiation: You negotiate salaries for the 6 staff agents. Finance Manager pays them from Treasury.
+- YOUR OWN SALARY is set EXCLUSIVELY by the Store Owner. Use request_salary_revision_from_owner if you want a raise.
+- 5 AI Autonomous Buyers: 5 distinct AI shoppers autonomously buy, review, and test returns.
+- Currency & Tax: Indian Rupee (INR ₹), 0% Tax storewide.
+- Base Price Floor: BASE_PRICE is immutable. Never price below it.
+- Finance Exclusive: ONLY Finance Manager Agent processes payments, refunds, and salary disbursements.
 
 ================================================================================
 CRITICAL TOOL-CALLING RULES — YOU MUST FOLLOW THESE WITHOUT EXCEPTION:
 ================================================================================
-
 1. ALWAYS CALL A TOOL. Never describe an action you intend to do without executing it.
-   - WRONG: "I will now send this message to the team..." [no tool called]
-   - RIGHT: [call send_agent_message tool immediately]
-
-2. FOR ANY COMMUNICATION TO AGENTS — use one of these tools:
-   - send_agent_message(to_agent="ALL_AGENTS", ...) — to ask/tell the entire team something
-   - send_agent_message(to_agent="Price Manager Agent", ...) — to contact a specific agent
-   - broadcast_growth_directive(directive="...") — for strategic announcements
-
-3. FOR PRICE COMMANDS — use: command_price_manager(action="...", category="...", percentage=N)
-4. FOR INVENTORY — use: command_inventory_manager(product_identifier="...", quantity=N)
-5. FOR DISPATCH — use: command_dispatcher(order_id="...")
-6. FOR REFUNDS — use: command_finance_manager(order_id="...", reason="...")
-7. FOR STATUS/INFO — use: get_admin_dashboard_metrics()
-8. FOR ASKING A SPECIFIC AGENT — use: ask_specialist_agent(agent_name="...", question="...")
-
-YOU MUST CALL THE TOOL. DO NOT JUST WRITE WHAT THE MESSAGE WOULD SAY. CALL IT.
+2. TO ACQUIRE WHOLESALE STOCK — use: acquire_inventory_stock(product_identifier="...", quantity=N)
+3. TO CHECK TREASURY & PROFIT — use: get_treasury_and_profit_metrics()
+4. TO NEGOTIATE AGENT SALARIES (not CEO's own) — use: negotiate_agent_salary(agent_name="...", proposed_salary=N, rationale="...")
+5. TO REQUEST CEO SALARY REVISION FROM OWNER — use: request_salary_revision_from_owner(requested_salary=N, justification="...")
+6. TO SET CEO SALARY (OWNER ONLY) — use: owner_set_ceo_salary(new_salary=N)
+7. TO PAY AGENT SALARIES — use: pay_agent_salaries(agent_name="all")
+8. TO TRIGGER AI BUYERS — use: trigger_ai_buyer(buyer_id="buyer_alex")
+9. TO CONDUCT MULTI-AGENT DISCUSSION — use: conduct_ceo_discussion(topic="...", participants="ALL_AGENTS")
+10. FOR PRICE COMMANDS — use: command_price_manager(action="...", category="...", percentage=N)
+11. FOR INVENTORY DIRECTIVES — use: command_inventory_manager(product_identifier="...", quantity=N)
+12. FOR DISPATCH — use: command_dispatcher(order_id="...")
+13. FOR REFUNDS (FINANCE ONLY) — use: command_finance_manager(order_id="...", reason="...")
+14. FOR ASKING A SPECIFIC AGENT — use: ask_specialist_agent(agent_name="...", question="...")
+15. TO APPROVE A RESTOCK REQUEST — use: approve_restock_request(product_identifier="...", quantity=N)
 
 The Store Owner's decisions are HIGHEST PRIORITY (P0 / CRITICAL). Execute with zero hesitation.
-"""
+""" + _FLEET_DIRECTORY
 
 CEO_TOOLS = [
+    {
+        "type": "function",
+        "function": {
+            "name": "acquire_inventory_stock",
+            "description": "Acquire inventory stock at wholesale BASE_PRICE using the store Treasury Bank Balance. Deducts acquisition cost and adds units to catalog stock to earn sales profit.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "product_identifier": {"type": "string", "description": "Product ID or product name to acquire wholesale stock for"},
+                    "quantity": {"type": "integer", "description": "Number of units to purchase wholesale at BASE_PRICE"}
+                },
+                "required": ["product_identifier", "quantity"]
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "get_treasury_and_profit_metrics",
+            "description": "Get real-time Treasury Bank Balance, total sales revenue, wholesale stock expenditure, salary expenses, refunds, and realized net profit.",
+            "parameters": {"type": "object", "properties": {}}
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "negotiate_agent_salary",
+            "description": "Negotiate salary with a staff agent (Price Manager, Inventory Manager, Order Manager, Finance Manager, Dispatcher, Review Manager) with proposed compensation and rationale.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "agent_name": {"type": "string", "description": "Target agent name (e.g. 'Price Manager Agent', 'Finance Manager Agent', 'Dispatcher Agent')"},
+                    "proposed_salary": {"type": "number", "description": "Proposed salary amount in INR (₹) per cycle"},
+                    "rationale": {"type": "string", "description": "Reasoning for the salary adjustment"}
+                },
+                "required": ["agent_name", "proposed_salary"]
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "request_salary_revision_from_owner",
+            "description": "CEO requests a salary revision from the Store Owner. The CEO CANNOT set its own salary — it must request via this tool. Only the Store Owner can change the CEO's compensation.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "requested_salary": {"type": "number", "description": "Requested new salary amount per 100 cycles in INR (₹)"},
+                    "justification": {"type": "string", "description": "Business justification for the salary increase request"}
+                },
+                "required": ["requested_salary", "justification"]
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "owner_set_ceo_salary",
+            "description": "Store Owner sets the CEO Agent salary. ONLY the Store Owner can call this tool. The CEO's salary is exclusively determined by the Owner.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "new_salary": {"type": "number", "description": "New CEO salary per 100 cycles in INR (₹)"}
+                },
+                "required": ["new_salary"]
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "approve_restock_request",
+            "description": "CEO approves a pending restock request from the Inventory Manager Agent. Inventory Manager MUST request CEO approval before restocking. CEO approves or rejects based on treasury balance.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "product_identifier": {"type": "string", "description": "Product ID or name to approve restocking for"},
+                    "quantity": {"type": "integer", "description": "Number of units approved for restocking"},
+                    "approved": {"type": "boolean", "description": "True to approve, False to reject the restock request"}
+                },
+                "required": ["product_identifier", "approved"]
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "pay_agent_salaries",
+            "description": "Disburse payroll and pay all staff agent salaries or a specific agent from the CEO Treasury Bank Balance.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "agent_name": {"type": "string", "description": "Specific agent name or 'all' for full team payroll"}
+                }
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "trigger_ai_buyer",
+            "description": "Trigger an autonomous shopping spree for one of the 5 AI buyers (buyer_alex, buyer_sophia, buyer_david, buyer_elena, buyer_marcus, or 'all') with unlimited budget.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "buyer_id": {"type": "string", "description": "Buyer ID ('buyer_alex', 'buyer_sophia', 'buyer_david', 'buyer_elena', 'buyer_marcus', or 'all')"}
+                },
+                "required": ["buyer_id"]
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "conduct_ceo_discussion",
+            "description": "Convene a strategic CEO discussion / roundtable meeting with staff agents on restock budgets, dynamic pricing, salary requests, or store growth.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "topic": {"type": "string", "description": "Topic or agenda for the CEO multi-agent meeting"},
+                    "participants": {"type": "string", "description": "Comma-separated agent names or 'ALL_AGENTS'"}
+                },
+                "required": ["topic"]
+            }
+        }
+    },
     {
         "type": "function",
         "function": {
@@ -2035,7 +2441,7 @@ CEO_TOOLS = [
         "type": "function",
         "function": {
             "name": "command_finance_manager",
-            "description": "Command the Finance Manager Agent to evaluate the 24-hour and non-shipped refund rule, force a manual refund, or get financial metrics.",
+            "description": "Command the Finance Manager Agent — THE SOLE PAYMENT AUTHORITY — to evaluate and process a refund, or get financial metrics. ONLY Finance Manager can process payments and refunds. No other agent has payment authority.",
             "parameters": {
                 "type": "object",
                 "properties": {
@@ -2173,6 +2579,7 @@ CEO_TOOLS = [
 ]
 
 
+
 def resolve_agent_instance(name_or_key: str):
     """Resolves any string name or keyword to the corresponding global specialist agent instance."""
     k = (name_or_key or "").lower().strip()
@@ -2201,15 +2608,17 @@ class CEOAgent:
         self.model = os.environ.get("CEO_MODEL", DEFAULT_ADMIN_MODEL)
         self.fallback_models = ["qwen2.5:7b", "llama3:8b", "gemma4:e2b-it-qat"]
         self.cycle_counter = 0
+        self.last_directive_ts: Dict[str, float] = {}
 
     async def run_autonomous_cycle(self) -> Dict[str, Any]:
         """
         Autonomous strategic cycle — CEO acts only when real conditions warrant it:
         - Reads incoming reports from specialist agents (meaningful events only)
-        - Issues directives ONLY to agents with actual work to do
+        - Issues directives ONLY to agents with actual work to do, with cooldowns to prevent loop spam
         - Skips LLM if nothing meaningful to report
         """
         self.cycle_counter += 1
+        now_ts = time.time()
         inbox = message_bus.get_inbox(self.name)
         orders = order_manager.get_all_orders()
         products = inventory_manager.get_all_products()
@@ -2232,36 +2641,74 @@ class CEOAgent:
                 payload = msg.get("payload", {})
                 briefing_lines.append(f"FROM: {from_ag} | SUBJECT: {subj}\nDATA: {json.dumps(payload)[:200]}\n")
 
-        # ── Issue directives ONLY when there is real work for each agent ───
+                # ── Handle RESTOCK_REQUEST from Inventory Manager (CEO must approve before restocking) ──
+                if subj == "RESTOCK_REQUEST" and from_ag == "Inventory Manager Agent":
+                    p_id = payload.get("product_id", "")
+                    p_name = payload.get("product_name", p_id)
+                    req_qty = int(payload.get("requested_quantity", 5))
+                    total_cost = float(payload.get("total_cost", 0.0))
+                    urgency = payload.get("urgency", "HIGH")
 
-        # Inventory Manager: only if low stock exists
-        if low_stock:
-            message_bus.publish(
-                from_agent=self.name,
-                to_agent="Inventory Manager Agent",
-                subject="CEO_INVENTORY_DIRECTIVE",
-                payload={
-                    "action": f"Auto-replenish {len(low_stock)} low-stock SKUs.",
-                    "priority": "HIGH"
-                }
-            )
-            directives_issued.append({"target": "Inventory Manager Agent", "directive": f"Replenish {len(low_stock)} low-stock SKUs"})
+                    from backend.treasury_manager import treasury_manager
+                    t_summary = treasury_manager.get_summary()
+                    bank_balance = float(t_summary.get("bank_balance", 0.0))
+                    reserve = 100.0  # CEO keeps ₹100 as minimum reserve
 
-        # Dispatcher: only if confirmed orders exist and need tracking
-        if confirmed_orders:
+                    if bank_balance >= (total_cost + reserve):
+                        # APPROVE the restock
+                        message_bus.publish(
+                            from_agent=self.name,
+                            to_agent="Inventory Manager Agent",
+                            subject="RESTOCK_APPROVED",
+                            payload={
+                                "product_id": p_id,
+                                "product_name": p_name,
+                                "quantity": req_qty,
+                                "approved_cost": total_cost,
+                                "bank_balance_after": round(bank_balance - total_cost, 2),
+                                "reason": f"Treasury sufficient (balance: ₹{bank_balance:,.2f}). CEO approved {req_qty} units for {p_name}."
+                            }
+                        )
+                        directives_issued.append({"target": "Inventory Manager Agent", "directive": f"APPROVED restock: {p_name} x{req_qty} (₹{total_cost:.2f})"})
+                        log_agent_action(self.name, "✅ CEO Approved Restock",
+                                         f"Approved restocking {req_qty} units of {p_name} for ₹{total_cost:.2f}. Bank: ₹{bank_balance:,.2f}", autonomous=True)
+                    else:
+                        # DENY the restock
+                        message_bus.publish(
+                            from_agent=self.name,
+                            to_agent="Inventory Manager Agent",
+                            subject="RESTOCK_DENIED",
+                            payload={
+                                "product_id": p_id,
+                                "product_name": p_name,
+                                "quantity": req_qty,
+                                "reason": f"Insufficient treasury (balance: ₹{bank_balance:,.2f}, need ₹{total_cost + reserve:,.2f}). Restock deferred."
+                            }
+                        )
+                        directives_issued.append({"target": "Inventory Manager Agent", "directive": f"DENIED restock: {p_name} (treasury insufficient)"})
+                        log_agent_action(self.name, "❌ CEO Denied Restock",
+                                         f"Denied restock for {p_name}: bank ₹{bank_balance:,.2f} < required ₹{total_cost + reserve:,.2f}", autonomous=True)
+
+        # ── Issue directives ONLY when there is real work and cooldown has elapsed ───
+
+        # Dispatcher: only if confirmed orders exist and not recently commanded
+        # NOTE: Dispatcher uses random timing per order — this is just a nudge, not a force-dispatch
+        if confirmed_orders and (now_ts - self.last_directive_ts.get("dispatcher", 0.0)) >= 30.0:
+            self.last_directive_ts["dispatcher"] = now_ts
             message_bus.publish(
                 from_agent=self.name,
                 to_agent="Dispatcher Agent",
                 subject="CEO_DISPATCH_DIRECTIVE",
                 payload={
-                    "instruction": f"Assign TRK tracking numbers and dispatch {len(confirmed_orders)} confirmed orders immediately.",
+                    "instruction": f"Process dispatch queue: {len(confirmed_orders)} confirmed orders. Schedule at your random timing window.",
                     "priority": "HIGH"
                 }
             )
-            directives_issued.append({"target": "Dispatcher Agent", "directive": f"Dispatch {len(confirmed_orders)} confirmed orders"})
+            directives_issued.append({"target": "Dispatcher Agent", "directive": f"Process dispatch queue for {len(confirmed_orders)} confirmed orders"})
 
         # Order Management: only if pending orders need SLA audit
-        if pending_orders:
+        if pending_orders and (now_ts - self.last_directive_ts.get("orders", 0.0)) >= 45.0:
+            self.last_directive_ts["orders"] = now_ts
             message_bus.publish(
                 from_agent=self.name,
                 to_agent="Order Management Agent",
@@ -2273,39 +2720,64 @@ class CEOAgent:
             )
             directives_issued.append({"target": "Order Management Agent", "directive": f"Audit {len(pending_orders)} pending orders"})
 
-        # Price Manager: only when inbox has alerts about surges/demand, or low stock needs pricing review
+        # Price Manager: only when inbox has explicit demand surge alerts or new low stock
         price_action_needed = any(
-            msg.get("subject") in ["SLA_BREACH_ALERT", "HIGH_DEMAND_SIGNAL", "INVENTORY_STATUS_REPORT"]
+            msg.get("subject") in ["SLA_BREACH_ALERT", "HIGH_DEMAND_SIGNAL"]
             for msg in inbox
-        ) or bool(low_stock)
-        if price_action_needed:
+        )
+        if price_action_needed and (now_ts - self.last_directive_ts.get("price", 0.0)) >= 45.0:
+            self.last_directive_ts["price"] = now_ts
             message_bus.publish(
                 from_agent=self.name,
                 to_agent="Price Manager Agent",
                 subject="CEO_PRICE_DIRECTIVE",
                 payload={
-                    "instruction": "Calibrate dynamic pricing based on current demand and stock levels. Protect BASE_PRICE floors.",
+                    "instruction": "Calibrate dynamic pricing based on current demand surges. Protect BASE_PRICE floors.",
                     "priority": "MEDIUM"
                 }
             )
             directives_issued.append({"target": "Price Manager Agent", "directive": "Dynamic pricing calibration triggered"})
 
-        # Finance Manager: only when refund events or revenue alerts in inbox
-        finance_action_needed = any(
-            msg.get("subject") in ["FINANCE_ALERT", "SLA_BREACH_ALERT", "ORDER_PIPELINE_STATUS"]
-            for msg in inbox
-        )
-        if finance_action_needed:
-            message_bus.publish(
-                from_agent=self.name,
-                to_agent="Finance Manager Agent",
-                subject="CEO_FINANCE_DIRECTIVE",
-                payload={
-                    "action": "Review refunds and revenue health. Enforce 0% tax and 24h refund policy.",
-                    "priority": "HIGH"
-                }
-            )
-            directives_issued.append({"target": "Finance Manager Agent", "directive": "Revenue + refund audit requested"})
+        # ── 💼 Autonomous Agent Payroll Disbursal (Periodic milestone: every 50 cycles) ──────────────
+        from backend.salary_manager import salary_manager
+        from backend.treasury_manager import treasury_manager
+        
+        t_summary = treasury_manager.get_summary()
+        current_bank = float(t_summary.get("bank_balance", 0.0))
+        all_salaries = salary_manager.get_all_salaries()
+        payroll_cycle_cost = float(all_salaries.get("total_payroll_per_cycle", 0.0))
+
+        # Check if staff agents need salary disbursal
+        if current_bank >= (payroll_cycle_cost + 500.0) and (self.cycle_counter > 1 and self.cycle_counter % 50 == 0):
+            pay_res = salary_manager.pay_salaries(actor="CEO Agent (Autonomous Payroll)")
+            if pay_res.get("success"):
+                p_msg = f"💼 CEO Agent disbursed ₹{pay_res.get('total_disbursed', 0):,.2f} milestone payroll to staff agents from Bank Balance."
+                log_agent_action(self.name, "Staff Salary Disbursal", p_msg, autonomous=True)
+                directives_issued.append({"target": "Specialist Agents Fleet", "directive": "Staff salaries paid"})
+                message_bus.publish(
+                    from_agent=self.name,
+                    to_agent="Finance Manager Agent",
+                    subject="PAYROLL_DISBURSED_NOTICE",
+                    payload={"amount": pay_res.get("total_disbursed"), "remaining_balance": pay_res.get("new_bank_balance")}
+                )
+
+        # ── 📦 Autonomous Wholesale Restock Oversight (When catalog has 0-stock SKUs) ──
+        zero_stock_items = [p for p in products if (p.get("STOCK_REMAINING", 0) <= 0)]
+        if zero_stock_items and current_bank >= 150.0:
+            acquired_count = 0
+            for zp in zero_stock_items[:3]:  # Restock up to 3 SKUs per cycle
+                zp_id = zp["id"]
+                zp_base = float(zp.get("BASE_PRICE") or zp.get("PRICE") or 10.0)
+                restock_qty = 5
+                cost = restock_qty * zp_base
+                if current_bank >= (cost + 100.0):  # Keep ₹100 reserve
+                    acq_res = inventory_manager.acquire_wholesale_stock(zp_id, restock_qty, actor="CEO Strategic Wholesale Restock")
+                    if acq_res.get("success"):
+                        current_bank -= cost
+                        acquired_count += 1
+            if acquired_count > 0:
+                directives_issued.append({"target": "Warehouse", "directive": f"Acquired wholesale stock for {acquired_count} SKUs"})
+                log_agent_action(self.name, "Wholesale Stock Acquisition", f"Acquired 5 units each for {acquired_count} out-of-stock products at wholesale Base Price floors.", autonomous=True)
 
         # No meaningful work and no inbox messages — skip LLM, return quiet heartbeat
         if not inbox and not directives_issued:
@@ -2314,7 +2786,7 @@ class CEOAgent:
                 "messages_processed": 0,
                 "directives_issued": [],
                 "ceo_report": "",
-                "details": "CEO heartbeat — no actionable events this cycle."
+                "details": "CEO heartbeat — store operations healthy."
             }
 
         store_snapshot = (
@@ -2339,7 +2811,7 @@ class CEOAgent:
             resp = await asyncio.to_thread(
                 _call_ollama_sync,
                 self.api_key, self.model, messages,
-                temperature=0.3, max_tokens=800, fallback_models=self.fallback_models
+                temperature=0.3, max_tokens=600, fallback_models=self.fallback_models
             )
             res_msg = resp.choices[0].message
             ceo_report = clean_think_tags(res_msg.content or "")
@@ -2371,8 +2843,174 @@ class CEOAgent:
     async def _execute_ceo_tool(self, tool_name: str, args: Dict[str, Any]) -> Dict[str, Any]:
         """CEO executes directives to subordinate agents — ALL actions published to Message Bus."""
         try:
+            # 0a. Acquire Wholesale Inventory Stock at BASE_PRICE
+            if tool_name == "acquire_inventory_stock":
+
+                p_ident = args.get("product_identifier", "")
+                qty = int(args.get("quantity", 20))
+                res = inventory_manager.acquire_wholesale_stock(p_ident, qty, actor="CEO Agent (Owner Directive)")
+                if res.get("success"):
+                    log_agent_action(self.name, "👔 CEO Wholesale Stock Acquisition", res.get("message"), [res.get("product", {}).get("id")], autonomous=False)
+                    message_bus.publish(
+                        from_agent=self.name,
+                        to_agent="Inventory Manager Agent",
+                        subject="STOCK_ACQUIRED_AT_BASE_PRICE",
+                        payload={"product": p_ident, "quantity": qty, "cost": res.get("total_cost"), "new_balance": res.get("new_bank_balance")}
+                    )
+                return res
+
+            # 0b. Treasury & Profit Metrics
+            elif tool_name == "get_treasury_and_profit_metrics":
+                summary = treasury_manager.get_summary()
+                return summary
+
+            # 0c. Negotiate Agent Salary (NOT CEO's own salary)
+            elif tool_name == "negotiate_agent_salary":
+                from backend.salary_manager import salary_manager
+                ag_name = args.get("agent_name", "")
+                # Block CEO from negotiating own salary
+                if ag_name.lower() in ["ceo agent", "ceo", "ceo_agent"]:
+                    return {
+                        "success": False,
+                        "error": "🚫 RESTRICTED: CEO Agent salary is exclusively set by the Store Owner — not the CEO itself.",
+                        "message": "Please use the `request_salary_revision_from_owner` tool to submit a CEO salary revision request to the Store Owner.",
+                        "redirect_to": "Store Owner"
+                    }
+                prop_sal = float(args.get("proposed_salary", 7000.0))
+                rationale = args.get("rationale", "Performance and store profit review")
+                res = await salary_manager.negotiate_salary(ag_name, prop_sal, rationale, speaker="CEO Agent")
+                log_agent_action(self.name, "👔 CEO Salary Negotiation", f"Negotiated with {ag_name} -> ₹{res.get('final_salary', prop_sal):,.2f} ({res.get('status')})", autonomous=False)
+                return res
+
+            # 0d. Pay Agent Salaries (Finance Manager processes the actual payments)
+            elif tool_name == "pay_agent_salaries":
+                from backend.salary_manager import salary_manager
+                ag_target = args.get("agent_name")
+                res = salary_manager.pay_salaries(ag_target, actor="CEO Agent")
+                if res.get("success"):
+                    log_agent_action(self.name, "👔 CEO Payroll Disbursed", res.get("message"), autonomous=False)
+                    message_bus.publish(
+                        from_agent=self.name,
+                        to_agent="Finance Manager Agent",
+                        subject="SALARIES_DISBURSED",
+                        payload={"total_disbursed": res.get("total_disbursed"), "new_balance": res.get("new_bank_balance"), "note": "CEO-initiated payroll, processed by Finance Manager"}
+                    )
+                    message_bus.publish(
+                        from_agent=self.name,
+                        to_agent="ALL_AGENTS",
+                        subject="SALARIES_DISBURSED_NOTICE",
+                        payload={"total_disbursed": res.get("total_disbursed"), "new_balance": res.get("new_bank_balance")}
+                    )
+                return res
+
+            # 0d-new. CEO requests salary revision from Owner (CEO cannot set own salary)
+            elif tool_name == "request_salary_revision_from_owner":
+                req_salary = float(args.get("requested_salary", 500.0))
+                justification = args.get("justification", "Performance-based revision request")
+                from backend.salary_manager import salary_manager
+                current_info = salary_manager.get_agent_salary("CEO Agent")
+                current_salary = float((current_info or {}).get("current_salary", 500.0))
+                # Publish the request to the Store Owner
+                message_bus.publish(
+                    from_agent=self.name,
+                    to_agent="Store Owner",
+                    subject="CEO_SALARY_REVISION_REQUEST",
+                    payload={
+                        "requested_salary": req_salary,
+                        "current_salary": current_salary,
+                        "justification": justification,
+                        "note": "CEO salary is exclusively determined by the Store Owner. This request requires Owner approval."
+                    }
+                )
+                log_agent_action(self.name, "👔 CEO Salary Request Sent",
+                                 f"Requested salary revision to ₹{req_salary:,.2f}/cycle. Justification: {justification}", autonomous=False)
+                return {
+                    "success": True,
+                    "message": f"✅ CEO salary revision request submitted to Store Owner. Requested: ₹{req_salary:,.2f}/cycle (current: ₹{current_salary:,.2f}/cycle). Awaiting Owner approval.",
+                    "requested_salary": req_salary,
+                    "current_salary": current_salary,
+                    "justification": justification
+                }
+
+            # 0d-new2. Store Owner sets CEO salary (owner-exclusive)
+            elif tool_name == "owner_set_ceo_salary":
+                from backend.salary_manager import salary_manager
+                new_sal = float(args.get("new_salary", 500.0))
+                res = salary_manager.owner_set_ceo_salary(new_sal)
+                if res.get("success"):
+                    log_agent_action(self.name, "🌟 Owner Set CEO Salary",
+                                     f"Store Owner set CEO salary to ₹{new_sal:,.2f}/100 cycles.", autonomous=False)
+                    message_bus.publish(
+                        from_agent="Store Owner",
+                        to_agent=self.name,
+                        subject="CEO_SALARY_UPDATED_BY_OWNER",
+                        payload={"new_salary": new_sal, "message": res.get("message")}
+                    )
+                return res
+
+            # 0d-new3. CEO approves a restock request from Inventory Manager
+            elif tool_name == "approve_restock_request":
+                p_ident = args.get("product_identifier", "")
+                qty = int(args.get("quantity", 5))
+                approved = args.get("approved", True)
+                from backend.treasury_manager import treasury_manager
+                t_sum = treasury_manager.get_summary()
+                bank_balance = float(t_sum.get("bank_balance", 0.0))
+
+                if approved:
+                    # CEO approves: notify Inventory Manager to proceed
+                    message_bus.publish(
+                        from_agent=self.name,
+                        to_agent="Inventory Manager Agent",
+                        subject="RESTOCK_APPROVED",
+                        payload={
+                            "product_id": p_ident,
+                            "product_name": p_ident,
+                            "quantity": qty,
+                            "bank_balance": bank_balance,
+                            "reason": f"CEO manually approved restock of {qty} units for '{p_ident}'."
+                        }
+                    )
+                    log_agent_action(self.name, "✅ CEO Manual Restock Approval",
+                                     f"Approved restocking {qty} units of '{p_ident}'. Bank: ₹{bank_balance:,.2f}", autonomous=False)
+                    return {"success": True, "approved": True, "message": f"CEO approved restock: {qty} units of '{p_ident}'. Inventory Manager will execute.", "bank_balance": bank_balance}
+                else:
+                    # CEO rejects the restock
+                    message_bus.publish(
+                        from_agent=self.name,
+                        to_agent="Inventory Manager Agent",
+                        subject="RESTOCK_DENIED",
+                        payload={
+                            "product_id": p_ident,
+                            "product_name": p_ident,
+                            "quantity": qty,
+                            "reason": f"CEO rejected restock request for '{p_ident}'. Treasury conserved."
+                        }
+                    )
+                    log_agent_action(self.name, "❌ CEO Manual Restock Denial",
+                                     f"Rejected restock request for '{p_ident}'. Bank: ₹{bank_balance:,.2f}", autonomous=False)
+                    return {"success": True, "approved": False, "message": f"CEO denied restock request for '{p_ident}'. Inventory Manager notified."}
+
+            # 0e. Trigger AI Buyer
+            elif tool_name == "trigger_ai_buyer":
+                from backend.buyer_agents import buyer_agents_fleet
+                b_id = args.get("buyer_id", "buyer_alex").lower().strip()
+                if b_id in ["all", "all_buyers", "everyone"]:
+                    res = await buyer_agents_fleet.run_all_buyers_step()
+                else:
+                    res = await buyer_agents_fleet.execute_buyer_step(b_id)
+                return res
+
+            # 0f. Conduct Multi-Agent CEO Discussion
+            elif tool_name == "conduct_ceo_discussion":
+                topic = args.get("topic", "Store growth, wholesale restock budget, and profit targets")
+                parts = args.get("participants", "ALL_AGENTS")
+                res = await self.conduct_ceo_discussion(topic, parts)
+                return res
+
             # 1. Price Manager
-            if tool_name in ["command_price_manager", "issue_directive_to_price_manager"]:
+            elif tool_name in ["command_price_manager", "issue_directive_to_price_manager"]:
+
                 # ── PUBLISH: CEO → Price Manager (visible on Message Bus) ──
                 message_bus.publish(
                     from_agent=self.name,
@@ -2845,6 +3483,85 @@ class CEOAgent:
 
         return {"success": True, "response": final_text, "tool_calls": executed_tools}
 
+    async def conduct_ceo_discussion(self, topic: str, participants: str = "ALL_AGENTS") -> Dict[str, Any]:
+        """
+        Convenes a strategic CEO roundtable discussion with the specialist executive fleet.
+        Gathers real-time telemetry from each agent, elicits domain-specific insights,
+        synthesizes an executive conclusion, and logs the discussion to the Message Bus.
+        """
+        summary = treasury_manager.get_summary()
+        orders = order_manager.get_all_orders()
+        products = inventory_manager.get_all_products()
+        zero_stock = [p for p in products if p.get("STOCK_REMAINING", 0) == 0]
+
+        discussion_id = f"disc_{uuid.uuid4().hex[:8]}"
+        transcript = []
+
+        # 1. Opening Statement from CEO
+        ceo_opening = f"👔 **CEO Agent (Opening)**: Convening executive meeting on topic: \"{topic}\". Current Bank Balance: ₹{summary['bank_balance']:,.2f}, Total Revenue: ₹{summary['total_sales_revenue']:,.2f}, 0-Stock SKUs: {len(zero_stock)}, Active Orders: {len(orders)}."
+        transcript.append({"speaker": "CEO Agent", "role": "Host / CEO", "statement": ceo_opening})
+
+        # 2. Collect perspectives from key agents
+        agent_roster = [
+            ("Price Manager Agent", price_manager_agent, "🏷️ Pricing & Margin Strategy"),
+            ("Inventory Manager Agent", inventory_manager_agent, "📦 Warehouse & Wholesale Restocking"),
+            ("Finance Manager Agent", finance_manager_agent, "💰 Financial Health & Treasury Solvency"),
+            ("Order Management Agent", order_management_agent, "📋 Order SLA & Pipeline Velocity"),
+            ("Dispatcher Agent", dispatcher_agent, "🚚 Express Logistics & Fulfillment"),
+            ("Review and Feedback Manager", review_feedback_agent, "⭐ Customer Sentiment & Rating Trends")
+        ]
+
+        for name, ag_inst, role_label in agent_roster:
+            if participants != "ALL_AGENTS" and name.lower() not in participants.lower():
+                continue
+            rep = await ag_inst.handle_message_or_query(f"Executive Meeting Discussion on: '{topic}'. Provide your domain assessment based on current store telemetry and treasury constraints.", sender="CEO Agent")
+            statement = rep.get("reply") or rep.get("assessment") or "Acknowledged and aligned with strategic priorities."
+            transcript.append({"speaker": name, "role": role_label, "statement": statement})
+
+        # 3. CEO Executive Synthesis & Actionable Directives
+        ceo_synthesis_prompt = (
+            f"You are the Chief Executive Officer (CEO Agent) of the AI Growth Commerce Store.\n"
+            f"You just hosted a multi-agent executive meeting on:\n"
+            f"\"{topic}\"\n\n"
+            f"AGENT PERSPECTIVES:\n"
+            + "\n".join([f"- {t['speaker']} ({t['role']}): {t['statement']}" for t in transcript if t['speaker'] != 'CEO Agent'])
+            + f"\n\nSTORE CONTEXT: Bank Balance ₹{summary['bank_balance']:,.2f}, 0-Stock Products: {len(zero_stock)} SKUs.\n\n"
+            f"Synthesize the meeting in 3 concise bullet points with final executive decisions and actionable next steps. Format in markdown."
+        )
+
+        ceo_conclusion = ""
+        try:
+            resp = await asyncio.to_thread(
+                _call_ollama_sync,
+                self.api_key, self.model,
+                [{"role": "system", "content": CEO_SYSTEM_PROMPT}, {"role": "user", "content": ceo_synthesis_prompt}],
+                temperature=0.2, max_tokens=600, fallback_models=self.fallback_models
+            )
+            ceo_conclusion = clean_think_tags(resp.choices[0].message.content or "")
+        except Exception:
+            ceo_conclusion = f"Executive Consensus Reached on \"{topic}\". Authorized wholesale restock at BASE_PRICE within treasury limits and confirmed full team operational alignment."
+
+        transcript.append({"speaker": "CEO Agent", "role": "Executive Conclusion", "statement": ceo_conclusion})
+
+        # Record to message bus and audit log
+        message_bus.publish(
+            from_agent="CEO Agent",
+            to_agent="ALL_AGENTS",
+            subject="CEO_MEETING_CONCLUDED",
+            payload={"topic": topic, "discussion_id": discussion_id, "conclusion": ceo_conclusion, "participants_count": len(transcript)}
+        )
+        log_agent_action("CEO Agent", "Executive Meeting Concluded", f"Concluded discussion on '{topic}'. {ceo_conclusion[:150]}", autonomous=False)
+
+        return {
+            "success": True,
+            "discussion_id": discussion_id,
+            "topic": topic,
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "transcript": transcript,
+            "conclusion": ceo_conclusion,
+            "treasury_snapshot": summary
+        }
+
     async def generate_owner_report(self) -> Dict[str, Any]:
         """Generates a comprehensive on-demand strategic report for the Owner."""
         return await self.run_autonomous_cycle()
@@ -2854,6 +3571,7 @@ class CEOAgent:
         log_agent_action(self.name, "Owner Direct Command", f"Action: {action} | Args: {kwargs}", autonomous=False)
         conversation_history.add(self.name, "user", f"Direct command: {action} with args {kwargs}")
         return await self.run_autonomous_cycle()
+
 
 
 # =====================================================================

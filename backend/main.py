@@ -16,6 +16,9 @@ from backend.order_manager import order_manager
 from backend.agent import commerce_agent
 from backend.payment_manager import payment_manager
 from backend.review_manager import review_manager
+from backend.treasury_manager import treasury_manager
+from backend.salary_manager import salary_manager
+from backend.buyer_agents import buyer_agents_fleet
 from backend.admin_agents import (
     price_manager_agent,
     inventory_manager_agent,
@@ -32,6 +35,7 @@ from backend.admin_agents import (
 )
 from backend.background_workers import background_worker
 from backend.ollama_loader import ensure_ollama_ready, unload_all_models_from_vram
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -218,6 +222,15 @@ async def checkout(req: CheckoutRequest):
     )
     if not result.get("success"):
         raise HTTPException(status_code=400, detail=result.get("error", "Checkout failed"))
+
+    # Deposit sales revenue to CEO Treasury
+    order = result.get("order", {})
+    treasury_manager.deposit_sales(
+        amount=order.get("total", 0.0),
+        order_id=order.get("order_id", ""),
+        items_summary=f"{len(order.get('items', []))} items",
+        customer=order.get("customer_name", req.user_id)
+    )
     return result
 
 # Razorpay Payment Gateway Endpoints
@@ -277,8 +290,16 @@ async def verify_razorpay_payment(req: RazorpayVerifyPaymentRequest):
     if not order_result.get("success"):
         raise HTTPException(status_code=400, detail=order_result.get("error", "Failed to finalize order."))
 
+    # Deposit sales revenue to CEO Treasury
+    order = order_result.get("order", {})
+    treasury_manager.deposit_sales(
+        amount=order.get("total", 0.0),
+        order_id=order.get("order_id", ""),
+        items_summary=f"{len(order.get('items', []))} items",
+        customer=order.get("customer_name", req.user_id)
+    )
+
     # AP2 Protocol: Save payment token for future autonomous agent payments
-    # After the first verified Razorpay checkout, agent can auto-pay without any human popup
     saved_card = cart_manager.get_customer_payment_details(req.user_id) or {}
     payment_manager.save_ap2_token_from_payment(
         user_id=req.user_id,
@@ -317,6 +338,16 @@ async def card_checkout_razorpay(req: CardPaymentRequest):
     )
     if not result.get("success"):
         raise HTTPException(status_code=400, detail=result.get("error", "Card payment failed"))
+    
+    # Deposit to treasury
+    order = result.get("order", {})
+    if order:
+        treasury_manager.deposit_sales(
+            amount=order.get("total", 0.0),
+            order_id=order.get("order_id", ""),
+            items_summary=f"{len(order.get('items', []))} items",
+            customer=req.cardholder_name
+        )
     return result
 
 @app.get("/api/customer/payment-details")
@@ -350,12 +381,29 @@ async def save_customer_payment_details(req: SaveCustomerCardRequest):
     return saved
 
 @app.get("/api/orders")
-async def get_orders(user_id: str = "user_alex"):
-    orders = order_manager.get_orders_by_user(user_id)
+async def get_orders(user_id: Optional[str] = None):
+    """
+    Returns orders list. If user_id is None or 'ALL', returns all store orders.
+    Otherwise returns orders for the specified user.
+    """
+    if not user_id or user_id.upper() == "ALL":
+        orders = order_manager.get_all_orders()
+    else:
+        orders = order_manager.get_orders_by_user(user_id)
     return {
         "count": len(orders),
         "orders": orders
     }
+
+@app.get("/api/admin/orders")
+async def get_admin_all_orders():
+    """Returns 100% of all customer and AI shopper orders for the Admin Dashboard."""
+    orders = order_manager.get_all_orders()
+    return {
+        "count": len(orders),
+        "orders": orders
+    }
+
 
 @app.get("/api/orders/{order_id}")
 async def get_order_details(order_id: str):
@@ -369,10 +417,18 @@ async def refund_order(order_id: str, reason: Optional[str] = "Customer Request"
     """
     Issues a refund on Razorpay Gateway and updates customer account & inventory.
     """
+    order = order_manager.get_order_by_id(order_id)
     res = payment_manager.process_refund(order_id=order_id, reason=reason)
     if not res.get("success"):
         raise HTTPException(status_code=400, detail=res.get("error", "Refund failed"))
+    if order:
+        treasury_manager.deduct_refund(
+            amount=order.get("total", 0.0),
+            order_id=order_id,
+            reason=reason or "Customer Refund"
+        )
     return res
+
 
 @app.get("/api/payment/dashboard-info")
 async def get_payment_dashboard_info():
@@ -384,20 +440,25 @@ async def get_payment_dashboard_info():
 @app.get("/api/payment/ap2-status")
 async def get_ap2_authorization_status(user_id: str = "user_alex"):
     """
-    AP2 Protocol: Check if the user has an active Razorpay authorization token for autonomous agent payments.
+    AP2 Protocol: Check if the user has an active cryptographically signed AP2 spending mandate for autonomous agent payments.
     """
     token = cart_manager.get_ap2_payment_token(user_id)
-    if token:
+    if token and (token.get("status") in ["authorized", "ACTIVE_AND_VERIFIED"] or token.get("mandate_id")):
         return {
             "authorized": True,
-            "authorized_at": token.get("authorized_at"),
+            "mandate_id": token.get("mandate_id"),
+            "spending_limit": token.get("spending_limit_per_tx", 1000000.0),
+            "protocol": token.get("protocol", "Google Agent Payments Protocol (AP2) v1.0"),
+            "authorized_agent": token.get("authorized_agent", "nova_commerce_agent"),
+            "valid_until": token.get("valid_until"),
             "card_details": token.get("card_details", {}),
-            "message": "AP2 auto-pay is active. Agent can place orders autonomously without any checkout popup."
+            "message": f"AP2 Auto-Pay Mandate active ({token.get('mandate_id', 'Verified')}). Agent can place orders autonomously via Razorpay without checkout popups."
         }
     return {
         "authorized": False,
-        "message": "AP2 not yet authorized. Complete one-time Razorpay Checkout via the '🔐 Authorize Auto-Pay' button."
+        "message": "AP2 not yet authorized. Complete one-time Razorpay setup via the '🔐 Authorize Auto-Pay' button."
     }
+
 
 @app.post("/api/payment/ap2-save-token")
 async def save_ap2_token(req: AP2SaveTokenRequest):
@@ -517,6 +578,39 @@ class AdminAgentIntervalRequest(BaseModel):
 class AdminChatRequest(BaseModel):
     prompt: str
     conversation_history: Optional[List[Dict[str, str]]] = None
+
+class AdminAcquireStockRequest(BaseModel):
+    product_id: str
+    quantity: int = 20
+    actor: Optional[str] = "Store Owner"
+
+class AdminResetTreasuryRequest(BaseModel):
+    bank_balance: Optional[float] = None
+
+class AdminNegotiateSalaryRequest(BaseModel):
+    agent_name: str
+    proposed_salary: float
+    rationale: Optional[str] = "Performance and store growth review"
+
+class AdminPaySalaryRequest(BaseModel):
+    agent_name: Optional[str] = None
+    actor: Optional[str] = "Store Owner"
+
+class AdminUpdateSalaryRequest(BaseModel):
+    agent_name: str
+    new_salary: float
+    status: Optional[str] = "Agreed"
+
+class AdminBuyerTriggerRequest(BaseModel):
+    buyer_id: str = "buyer_alex"
+
+class AdminBuyerToggleRequest(BaseModel):
+    enabled: Optional[bool] = None
+
+class AdminCEODiscussionRequest(BaseModel):
+    topic: str
+    participants: Optional[str] = "ALL_AGENTS"
+
 
 @app.get("/admin")
 async def serve_admin_panel():
@@ -723,6 +817,191 @@ async def admin_chat(req: AdminChatRequest):
     return output
 
 
+# =====================================================================
+# 💰 TREASURY & WHOLESALE INVENTORY ACQUISITION ENDPOINTS
+# =====================================================================
+
+@app.get("/api/admin/treasury")
+async def get_treasury_summary(limit: int = 30):
+    """Returns live Treasury Bank Balance, sales revenues, inventory spend, salary payouts, and net profit."""
+    summary = treasury_manager.get_summary()
+    transactions = treasury_manager.get_transactions(limit=limit)
+    summary["transactions"] = transactions
+    return summary
+
+@app.post("/api/admin/treasury/acquire-stock")
+async def admin_acquire_stock(req: AdminAcquireStockRequest):
+    """Acquires inventory stock at wholesale BASE_PRICE using CEO Treasury Bank Balance."""
+    res = inventory_manager.acquire_wholesale_stock(
+        product_identifier=req.product_id,
+        quantity=req.quantity,
+        actor=req.actor or "Store Owner"
+    )
+    if not res.get("success"):
+        raise HTTPException(status_code=400, detail=res.get("error", "Stock acquisition failed"))
+    return res
+
+@app.post("/api/admin/treasury/reset")
+async def admin_reset_treasury(req: AdminResetTreasuryRequest):
+    """Resets the store treasury bank balance."""
+    res = treasury_manager.reset_treasury(req.bank_balance)
+    return res
+
+
+# =====================================================================
+# 💼 AGENT SALARY MANAGEMENT & INTERACTIVE NEGOTIATION ENDPOINTS
+# =====================================================================
+
+@app.get("/api/admin/salaries")
+async def get_agent_salaries():
+    """Returns salary breakdown, performance metrics, and negotiation status for all specialist agents."""
+    return salary_manager.get_all_salaries()
+
+@app.post("/api/admin/salaries/negotiate")
+async def negotiate_agent_salary(req: AdminNegotiateSalaryRequest):
+    """Interactive multi-agent salary negotiation with AI agents formulating reasoned counter-offers."""
+    res = await salary_manager.negotiate_salary(
+        agent_name=req.agent_name,
+        proposed_salary=req.proposed_salary,
+        rationale=req.rationale or "Performance review",
+        speaker="Store Owner / CEO"
+    )
+    if not res.get("success"):
+        raise HTTPException(status_code=400, detail=res.get("error", "Negotiation failed"))
+    return res
+
+@app.post("/api/admin/salaries/pay")
+async def pay_agent_salaries(req: AdminPaySalaryRequest):
+    """Disburses salary payments to specialist agents from the CEO Treasury Bank Balance."""
+    res = salary_manager.pay_salaries(agent_name=req.agent_name, actor=req.actor or "Store Owner")
+    if not res.get("success"):
+        raise HTTPException(status_code=400, detail=res.get("error", "Payroll disbursal failed"))
+    return res
+
+@app.post("/api/admin/salaries/update")
+async def update_agent_salary(req: AdminUpdateSalaryRequest):
+    """Directly sets an agent's salary amount."""
+    res = salary_manager.update_agent_salary(agent_name=req.agent_name, new_salary=req.new_salary, status=req.status or "Agreed")
+    if not res.get("success"):
+        raise HTTPException(status_code=400, detail=res.get("error", "Salary update failed"))
+    return res
+
+
+# =====================================================================
+# 🛍️ 5 AI AUTONOMOUS BUYER AGENTS ENDPOINTS
+# =====================================================================
+
+@app.get("/api/admin/buyers")
+async def get_ai_buyers():
+    """Returns all 5 AI buyer personas, activity statuses, total spent, and preferences."""
+    buyers = buyer_agents_fleet.get_all_buyers()
+    return {
+        "success": True,
+        "count": len(buyers),
+        "buyers": buyers
+    }
+
+@app.post("/api/admin/buyers/trigger")
+async def trigger_ai_buyer(req: AdminBuyerTriggerRequest):
+    """Manually triggers an autonomous shopping/evaluating cycle for a specific AI buyer or all buyers."""
+    b_id = req.buyer_id.lower().strip()
+    if b_id in ["all", "all_buyers", "everyone"]:
+        res = await buyer_agents_fleet.run_all_buyers_step()
+    else:
+        res = await buyer_agents_fleet.execute_buyer_step(b_id)
+    if not res.get("success"):
+        raise HTTPException(status_code=400, detail=res.get("error", "Buyer trigger failed"))
+    return res
+
+@app.post("/api/admin/buyers/toggle")
+async def toggle_ai_buyers(req: AdminBuyerToggleRequest):
+    """Enables or disables 24/7 background autonomous buyer simulation."""
+    b_state = background_worker.agent_states.get("buyer_agents", {})
+    if req.enabled is not None:
+        b_state["enabled"] = req.enabled
+    else:
+        b_state["enabled"] = not b_state.get("enabled", True)
+    return {
+        "success": True,
+        "enabled": b_state["enabled"],
+        "message": f"Autonomous Buyer Simulation is now {'ENABLED' if b_state['enabled'] else 'PAUSED'}."
+    }
+
+
+# =====================================================================
+# 👔 CEO MULTI-AGENT ROUNDTABLE DISCUSSION ENDPOINTS
+# =====================================================================
+
+@app.post("/api/admin/ceo/discussion")
+async def start_ceo_discussion(req: AdminCEODiscussionRequest):
+    """Convenes a strategic CEO roundtable discussion with specialist agents."""
+    if not req.topic.strip():
+        raise HTTPException(status_code=400, detail="Discussion topic cannot be empty")
+    res = await ceo_agent.conduct_ceo_discussion(topic=req.topic, participants=req.participants or "ALL_AGENTS")
+    return res
+
+@app.post("/api/admin/reset-store")
+async def reset_store_complete():
+    """
+    Resets the store to initial clean state:
+    1. Sets all 27 products inventory stock to 0 STOCK (wholesale restock required).
+    2. Resets all orders to empty.
+    3. Resets customer reviews to empty.
+    4. Resets Treasury Bank Balance to default ₹1,000.0.
+    5. Resets specialist agent salaries to CEO base ₹50.0 / 100 cycles with 0 total earned.
+    6. Resets all 5 AI buyers with staggered random 0-5m purchase schedules.
+    7. Clears all active shopping carts.
+    8. Clears message bus history, agent inboxes, conversation turns, and audit logs.
+    """
+    from backend.admin_agents import conversation_history, LOGS_FILE, _log_lock
+
+    # 1. Reset inventory to 0 stock
+    products = inventory_manager.get_all_products()
+    for p in products:
+        p["STOCK_REMAINING"] = 0
+        base_p = float(p.get("BASE_PRICE") or 10.0)
+        p["PRICE"] = round(base_p * 1.25, 2)
+    inventory_manager._write_inventory(products)
+
+    # 2. Reset orders
+    order_manager._write_orders([])
+
+    # 3. Reset customer reviews
+    review_manager._write_reviews([])
+
+    # 4. Reset treasury to 1000.0
+    treasury_manager.reset_treasury(new_balance=1000.0)
+
+    # 5. Reset salaries
+    salary_manager.reset_salaries()
+
+    # 6. Reset buyers with staggered 0-5m countdowns
+    buyer_agents_fleet.reset_buyers()
+
+    # 7. Clear carts
+    for b in buyer_agents_fleet.get_all_buyers():
+        cart_manager.clear_cart(b["id"])
+    cart_manager.clear_cart("user_alex")
+
+    # 8. Clear message bus, conversation history, and audit logs
+    message_bus.clear_history()
+    conversation_history.clear()
+
+    with _log_lock:
+        try:
+            with open(LOGS_FILE, "w", encoding="utf-8") as f:
+                json.dump([], f)
+        except Exception:
+            pass
+
+    return {
+        "success": True,
+        "bank_balance": 1000.0,
+        "message": "Store successfully reset: All 27 products at 0 stock (Wholesale restock required), Orders & Reviews cleared, Bank Balance reset to ₹1,000.0, Staff Salaries reset to ₹50/100 cycles, and AI Shoppers staggered across 0–5 minutes."
+    }
+
+
+
 # Serve root frontend
 @app.get("/")
 async def root():
@@ -730,4 +1009,5 @@ async def root():
     if os.path.exists(index_file):
         return FileResponse(index_file)
     return {"message": "AI Growth Commerce Agentic Store API is running."}
+
 

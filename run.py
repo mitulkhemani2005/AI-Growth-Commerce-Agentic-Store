@@ -27,7 +27,7 @@ if __name__ == "__main__":
 
         # 2. Start Web Server
         # reload=False ensures backend does NOT restart on database/inventory JSON file writes
-        uvicorn.run("backend.main:app", host="127.0.0.1", port=8000, reload=False)
+        uvicorn.run("backend.main:app", host="127.0.0.1", port=8000, reload=True)
     except KeyboardInterrupt:
         print("\n[Server] Interrupted by user (CTRL+C).", flush=True)
     finally:

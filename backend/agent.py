@@ -841,7 +841,7 @@ class CommerceAgent:
                     reason=tool_args.get("reason", "Customer requested cancellation")
                 )
 
-            # 13. Request Razorpay Order Refund
+            # 13. Request Order Refund (Routed to Finance Manager Agent — SOLE PAYMENT AUTHORITY)
             elif tool_name == "request_order_refund":
                 order_id = tool_args.get("order_id")
                 if not order_id:
@@ -857,10 +857,45 @@ class CommerceAgent:
                 if not order_id:
                     return {"success": False, "error": "No past orders found to evaluate for refund."}
 
-                return payment_manager.process_refund(
-                    order_id=order_id,
-                    reason=tool_args.get("reason", "Customer requested refund via Agent")
+                # Verify order exists and belongs to user
+                order = order_manager.get_order_by_id(order_id)
+                if not order:
+                    return {"success": False, "error": f"Order {order_id} not found."}
+
+                order_status = order.get("status", "")
+                # Quick eligibility check (Finance Manager will do the final authority check)
+                if order_status in ["Delivered", "Shipped"]:
+                    return {
+                        "success": False,
+                        "error": f"Refund not eligible: Order {order_id} is already {order_status}. Store policy: Delivered/Shipped orders are strictly non-refundable.",
+                        "status": order_status,
+                        "policy": "Only orders cancelled before shipping are eligible for refunds."
+                    }
+
+                # Route refund request to Finance Manager Agent (the sole payment authority)
+                from backend.admin_agents import message_bus as admin_message_bus
+                admin_message_bus.publish(
+                    from_agent="Customer Agent (Nova)",
+                    to_agent="Finance Manager Agent",
+                    subject="REFUND_REQUEST",
+                    payload={
+                        "order_id": order_id,
+                        "user_id": user_id,
+                        "order_status": order_status,
+                        "order_total": order.get("total", 0),
+                        "reason": tool_args.get("reason", "Customer requested refund via Nova Agent"),
+                        "source": "customer_agent",
+                        "note": "Finance Manager is the sole payment authority for all refunds."
+                    }
                 )
+                return {
+                    "success": True,
+                    "message": f"💰 Refund request for Order {order_id} has been routed to the Finance Manager for processing. The Finance Manager will evaluate eligibility and process your refund. You will be notified of the outcome.",
+                    "order_id": order_id,
+                    "order_status": order_status,
+                    "routed_to": "Finance Manager Agent",
+                    "note": "All refunds are processed exclusively by the Finance Manager Agent per store policy."
+                }
 
             # 14. Get Product Reviews
             elif tool_name == "get_product_reviews":

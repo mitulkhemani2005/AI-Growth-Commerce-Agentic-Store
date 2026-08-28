@@ -46,6 +46,16 @@
           <i data-lucide="layout-dashboard"></i>
           <span>Overview</span>
         </button>
+        <button class="nav-item highlight-treasury" data-tab="treasury">
+          <i data-lucide="wallet"></i>
+          <span>CEO Treasury & Salaries</span>
+          <span class="badge emerald" id="treasuryBadge">₹500K</span>
+        </button>
+        <button class="nav-item highlight-buyers" data-tab="buyers">
+          <i data-lucide="users"></i>
+          <span>5 AI Shoppers Fleet</span>
+          <span class="badge purple" id="buyersBadge">5 Active</span>
+        </button>
         <button class="nav-item" data-tab="agents">
           <i data-lucide="bot"></i>
           <span>24/7 Agent Fleet</span>
@@ -70,7 +80,7 @@
         </button>
         <button class="nav-item highlight" data-tab="chat">
           <i data-lucide="sparkles"></i>
-          <span>Admin AI Chatbot</span>
+          <span>CEO Command Chat</span>
         </button>
       </nav>
 
@@ -89,9 +99,13 @@
       <header class="admin-header">
         <div class="header-left">
           <h1 id="pageTitle">Store Overview</h1>
-          <p id="pageSubtitle">Real-time telemetry, automated agent actions, and store health (INR ₹, 0% Tax)</p>
+          <p id="pageSubtitle">Real-time telemetry, automated agent actions, treasury P&L, and 5 AI buyers (INR ₹, 0% Tax)</p>
         </div>
         <div class="header-right">
+          <button class="action-btn-sm warning" id="resetStoreBtn" title="Reset all inventory to 0 stock and reset CEO Bank Balance" onclick="openResetStoreConfirm()">
+            <i data-lucide="rotate-cw"></i>
+            <span>Reset 0-Stock State</span>
+          </button>
           <button class="refresh-btn" id="refreshDataBtn" title="Sync Live Data">
             <i data-lucide="refresh-cw"></i>
             <span>Live Sync</span>
@@ -105,23 +119,41 @@
 
       <!-- TAB 1: OVERVIEW -->
       <section class="tab-pane active" id="tab-overview">
-        <!-- KPI Cards Grid -->
-        <div class="kpi-grid">
+        <!-- KPI Cards Grid (6 Enhanced Metric Cards) -->
+        <div class="kpi-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
+          <div class="kpi-card gradient-cyan">
+            <div class="kpi-icon"><i data-lucide="landmark"></i></div>
+            <div class="kpi-meta">
+              <span class="kpi-label">CEO Bank Balance</span>
+              <h3 class="kpi-value" id="kpiBankBalance">₹500,000.00</h3>
+              <span class="kpi-subtext" id="kpiBankBalanceSub">Treasury Capital (.env)</span>
+            </div>
+          </div>
+
           <div class="kpi-card gradient-emerald">
             <div class="kpi-icon"><i data-lucide="indian-rupee"></i></div>
             <div class="kpi-meta">
-              <span class="kpi-label">Total Revenue (Realized)</span>
+              <span class="kpi-label">Total Sales Revenue</span>
               <h3 class="kpi-value" id="kpiRevenue">₹0.00</h3>
-              <span class="kpi-subtext">Online captured payments (0% Tax)</span>
+              <span class="kpi-subtext">Online captured orders (0% Tax)</span>
+            </div>
+          </div>
+
+          <div class="kpi-card gradient-green">
+            <div class="kpi-icon"><i data-lucide="trending-up"></i></div>
+            <div class="kpi-meta">
+              <span class="kpi-label">Net Realized Profit</span>
+              <h3 class="kpi-value" id="kpiNetProfit">₹0.00</h3>
+              <span class="kpi-subtext" id="kpiProfitMargin">Margin: 0.0%</span>
             </div>
           </div>
 
           <div class="kpi-card gradient-purple">
-            <div class="kpi-icon"><i data-lucide="zap"></i></div>
+            <div class="kpi-icon"><i data-lucide="shopping-bag"></i></div>
             <div class="kpi-meta">
-              <span class="kpi-label">24/7 Autonomous Actions</span>
-              <h3 class="kpi-value" id="kpiAgentActions">0</h3>
-              <span class="kpi-subtext">Executed across 7 agents</span>
+              <span class="kpi-label">Wholesale Stock Spend</span>
+              <h3 class="kpi-value" id="kpiInventorySpend">₹0.00</h3>
+              <span class="kpi-subtext">Acquired at Base Price floor</span>
             </div>
           </div>
 
@@ -137,12 +169,13 @@
           <div class="kpi-card gradient-amber">
             <div class="kpi-icon"><i data-lucide="alert-triangle"></i></div>
             <div class="kpi-meta">
-              <span class="kpi-label">Low Stock Alerts</span>
-              <h3 class="kpi-value" id="kpiLowStock">0</h3>
-              <span class="kpi-subtext">SKUs needing restock</span>
+              <span class="kpi-label">0-Stock / Low Stock</span>
+              <h3 class="kpi-value" id="kpiLowStock">27</h3>
+              <span class="kpi-subtext">Awaiting CEO Restock</span>
             </div>
           </div>
         </div>
+
 
         <!-- 2 Column Section: 7 Agents Status & Live Inter-Agent Communications -->
         <div class="dashboard-grid-2col">
@@ -190,8 +223,320 @@
         </div>
       </section>
 
+      <!-- TAB: CEO TREASURY, WHOLESALE ACQUISITION & AGENT SALARIES -->
+      <section class="tab-pane" id="tab-treasury">
+        <div class="section-intro">
+          <div class="intro-text">
+            <h2>💰 CEO Treasury, Wholesale Stock Acquisition & Agent Salaries</h2>
+            <p>The CEO manages the store <strong>Treasury Bank Balance</strong> (default: ₹1,000). Inventory starts at <strong>0 stock</strong> — the CEO acquires wholesale inventory at <strong>BASE_PRICE floor</strong> to generate profit when sold to customers and 5 AI buyers. Staff agent salaries are negotiated and paid from this treasury balance (min ₹50 / 100 cycles).</p>
+          </div>
+          <div class="action-buttons-group">
+            <button class="action-btn primary" onclick="openAcquireStockModal()">
+              <i data-lucide="plus-circle"></i>
+              <span>Acquire Wholesale Stock</span>
+            </button>
+            <button class="action-btn emerald" id="payAllSalariesBtn" onclick="disburseFullPayroll()">
+              <i data-lucide="send"></i>
+              <span>Disburse Full Payroll</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Treasury Ledger Cards -->
+        <div class="treasury-cards-grid">
+          <div class="treasury-card cyan">
+            <div class="treasury-card-header">
+              <span>CEO Bank Balance</span>
+              <i data-lucide="landmark"></i>
+            </div>
+            <h2 id="treasuryBankBalance">₹1,000.00</h2>
+            <div class="treasury-card-footer">
+              <span class="badge cyan">Liquid Treasury</span>
+              <span id="treasuryStartingCapital">Capital: ₹1,000 (.env)</span>
+            </div>
+          </div>
+
+
+          <div class="treasury-card emerald">
+            <div class="treasury-card-header">
+              <span>Total Sales Revenue</span>
+              <i data-lucide="trending-up"></i>
+            </div>
+            <h2 id="treasurySalesRevenue">₹0.00</h2>
+            <div class="treasury-card-footer">
+              <span class="badge emerald" id="treasurySalesCount">0 Sales</span>
+              <span>Deposited to Treasury</span>
+            </div>
+          </div>
+
+          <div class="treasury-card green">
+            <div class="treasury-card-header">
+              <span>Net Realized Profit</span>
+              <i data-lucide="pie-chart"></i>
+            </div>
+            <h2 id="treasuryNetProfit">₹0.00</h2>
+            <div class="treasury-card-footer">
+              <span class="badge green" id="treasuryMarginBadge">0.0% Margin</span>
+              <span id="treasuryRoiText">ROI: 0.0%</span>
+            </div>
+          </div>
+
+          <div class="treasury-card purple">
+            <div class="treasury-card-header">
+              <span>Wholesale Stock Spend</span>
+              <i data-lucide="shopping-bag"></i>
+            </div>
+            <h2 id="treasuryStockSpend">₹0.00</h2>
+            <div class="treasury-card-footer">
+              <span class="badge purple" id="treasuryUnitsAcquired">0 Units Acquired</span>
+              <span>Cost at BASE_PRICE</span>
+            </div>
+          </div>
+
+          <div class="treasury-card amber">
+            <div class="treasury-card-header">
+              <span>Agent Salaries Paid</span>
+              <i data-lucide="award"></i>
+            </div>
+            <h2 id="treasurySalariesPaid">₹0.00</h2>
+            <div class="treasury-card-footer">
+              <span class="badge amber" id="treasuryTeamLiability">6 Agents Liability</span>
+              <span>Paid from Balance</span>
+            </div>
+          </div>
+
+          <div class="treasury-card rose">
+            <div class="treasury-card-header">
+              <span>Refunds Processed</span>
+              <i data-lucide="rotate-ccw"></i>
+            </div>
+            <h2 id="treasuryRefunds">₹0.00</h2>
+            <div class="treasury-card-footer">
+              <span class="badge rose" id="treasuryRefundCount">0 Refunds</span>
+              <span>24h Pre-Shipment Only</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2 Column Section: Stock Acquisition Console & Recent Treasury Ledger -->
+        <div class="dashboard-grid-2col" style="margin-top: 1.5rem;">
+          <!-- Quick Wholesale Acquisition Console -->
+          <div class="panel-card">
+            <div class="panel-header">
+              <div class="panel-title">
+                <i data-lucide="package-plus" class="panel-icon" style="color: #06b6d4;"></i>
+                <h3>📦 Wholesale Inventory Stock Acquisition Console</h3>
+              </div>
+              <span class="badge blue">BASE_PRICE Floor</span>
+            </div>
+            <div class="stock-console-body">
+              <p class="console-desc">The store began at <strong>0 stock</strong>. Acquire inventory at the fixed wholesale <code>BASE_PRICE</code>. When sold to customers or the 5 AI buyers at selling <code>PRICE</code>, the gross margin <code>(PRICE - BASE_PRICE)</code> is realized as net profit.</p>
+              
+              <div class="form-group" style="margin-top: 1rem;">
+                <label>Select Product to Restock</label>
+                <select id="quickAcquireSelect" class="admin-select" onchange="onQuickAcquireProductChange()">
+                  <!-- Populated via JS -->
+                </select>
+              </div>
+
+              <div class="stock-calc-preview" id="quickAcquirePreview">
+                <div class="calc-row">
+                  <span>Current Catalog Stock:</span>
+                  <strong id="previewCurrentStock" class="highlight-red">0 Units (OUT OF STOCK)</strong>
+                </div>
+                <div class="calc-row">
+                  <span>Wholesale Base Price (Cost):</span>
+                  <strong id="previewBasePrice">₹0.00</strong>
+                </div>
+                <div class="calc-row">
+                  <span>Current Selling Price:</span>
+                  <strong id="previewSellingPrice">₹0.00</strong>
+                </div>
+                <div class="calc-row">
+                  <span>Gross Profit Per Unit:</span>
+                  <strong id="previewUnitMargin" class="highlight-green">+₹0.00</strong>
+                </div>
+              </div>
+
+              <div class="form-row" style="margin-top: 1rem;">
+                <div class="form-group">
+                  <label>Units to Purchase Wholesale</label>
+                  <input type="number" id="quickAcquireQty" value="20" min="1" max="500" class="admin-input" oninput="recalculateQuickAcquireCost()">
+                </div>
+                <div class="form-group">
+                  <label>Total Acquisition Cost</label>
+                  <input type="text" id="quickAcquireTotalCost" value="₹0.00" readonly class="admin-input readonly-input">
+                </div>
+              </div>
+
+              <div class="bank-impact-preview">
+                <span>Remaining Bank Balance after purchase:</span>
+                <strong id="previewRemainingBalance">₹500,000.00</strong>
+              </div>
+
+              <button class="action-btn primary" style="width: 100%; justify-content: center; margin-top: 1rem;" onclick="submitQuickAcquire()">
+                <i data-lucide="check-circle"></i>
+                <span>Acquire Stock from Wholesale & Pay from Bank</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Treasury Transaction Ledger -->
+          <div class="panel-card">
+            <div class="panel-header">
+              <div class="panel-title">
+                <i data-lucide="receipt" class="panel-icon" style="color: #10b981;"></i>
+                <h3>📑 Live Treasury Cash-Flow Ledger</h3>
+              </div>
+              <span class="live-pulse-badge">AUDITED</span>
+            </div>
+            <div class="treasury-ledger-feed" id="treasuryLedgerFeed" style="max-height: 440px; overflow-y: auto;">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Section B: Agent Salaries & Interactive Negotiation Board -->
+        <div class="panel-card" style="margin-top: 1.5rem;">
+          <div class="panel-header">
+            <div class="panel-title">
+              <i data-lucide="users-2" class="panel-icon" style="color: #f59e0b;"></i>
+              <h3>💼 Specialist Agent Salary Management & Interactive Negotiation</h3>
+            </div>
+            <div class="header-actions">
+              <span class="badge amber" id="totalPayrollLabel">Total Payroll: ₹44,500.00 / cycle</span>
+            </div>
+          </div>
+          <p class="panel-subtitle" style="padding: 0 1.25rem 0.5rem; color: #94a3b8; font-size: 0.85rem;">
+            Specialist agents receive compensation from the CEO Treasury Bank Balance. Store Owner and CEO can dynamically propose salary adjustments and conduct <strong>interactive negotiations</strong> — agents will formulate intelligent counter-proposals based on their performance scores and store profitability.
+          </p>
+
+          <div class="admin-table-container">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Agent Specialist</th>
+                  <th>Domain Role</th>
+                  <th>Rate (₹ / 100 Cycles)</th>
+                  <th>Total Salary Paid (₹)</th>
+                  <th>Performance Rating</th>
+                  <th>Status</th>
+                  <th>Last Paid At</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="salariesTableBody">
+                <!-- Rendered via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+
+        <!-- Section C: CEO Multi-Agent Roundtable Meeting Room -->
+        <div class="panel-card" style="margin-top: 1.5rem;">
+          <div class="panel-header">
+            <div class="panel-title">
+              <i data-lucide="messages-square" class="panel-icon" style="color: #ec4899;"></i>
+              <h3>👔 CEO Strategic Multi-Agent Roundtable Discussion Room</h3>
+            </div>
+            <span class="badge purple">LLM Multi-Agent Synthesis</span>
+          </div>
+          
+          <div class="meeting-room-container">
+            <div class="meeting-controls-row">
+              <div class="form-group flex-2">
+                <label>Discussion Agenda / Topic</label>
+                <input type="text" id="meetingTopicInput" class="admin-input" placeholder="e.g. Wholesale restock budget, dynamic pricing adjustments, and AI buyer growth" value="Wholesale inventory restock budget, base price margins, and autonomous buyer demand">
+              </div>
+              <div class="form-group flex-1">
+                <label>Preset Agendas</label>
+                <select id="meetingPresetSelect" class="admin-select" onchange="onMeetingPresetChange()">
+                  <option value="custom">Custom Agenda...</option>
+                  <option value="restock">📦 Restock Budget & Base Price Margins</option>
+                  <option value="pricing">🏷️ Dynamic Pricing & Scarcity Calibration</option>
+                  <option value="salaries">💼 Performance Evaluation & Salary Review</option>
+                  <option value="buyers">🛍️ AI Buyer Traffic & Return Policy Compliance</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>&nbsp;</label>
+                <button class="action-btn primary" id="conveneMeetingBtn" onclick="startCEOMeeting()">
+                  <i data-lucide="play"></i>
+                  <span>Convene Meeting</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Live Discussion Transcript -->
+            <div class="meeting-transcript-box" id="meetingTranscriptBox">
+              <div class="meeting-empty-placeholder">
+                <i data-lucide="users" style="width: 48px; height: 48px; opacity: 0.3; margin-bottom: 0.5rem;"></i>
+                <p>No meeting in session. Enter an agenda above and click <strong>Convene Meeting</strong> to gather all specialist agents for a strategic roundtable.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB: 5 AI AUTONOMOUS SHOPPERS FLEET -->
+      <section class="tab-pane" id="tab-buyers">
+        <div class="section-intro">
+          <div class="intro-text">
+            <h2>🛍️ 5 AI Autonomous Shoppers Fleet</h2>
+            <p>5 distinct AI consumer personas with <strong>unlimited budgets</strong> continuously browse catalog inventory, make purchase decisions based on their personality traits, check out via 1-click AP2 protocol, publish verified reviews, and stress-test 24h refund policies.</p>
+          </div>
+          <div class="action-buttons-group">
+            <button class="action-btn emerald" id="toggleBuyersSimulationBtn" onclick="toggleBuyersSimulation()">
+              <i data-lucide="power"></i>
+              <span id="toggleBuyersText">Simulation: ACTIVE</span>
+            </button>
+            <button class="action-btn primary" id="triggerAllBuyersBtn" onclick="triggerAllBuyers()">
+              <i data-lucide="shopping-bag"></i>
+              <span>Trigger All 5 Shoppers Now</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 5 AI Buyer Persona Cards Grid -->
+        <div class="buyer-cards-grid" id="buyersCardsGrid">
+          <!-- 5 Buyer Cards Rendered via JS -->
+        </div>
+
+        <!-- Live AI Shoppers Activity & Orders Stream -->
+        <div class="panel-card" style="margin-top: 1.5rem;">
+          <div class="panel-header">
+            <div class="panel-title">
+              <i data-lucide="activity" class="panel-icon" style="color: #a855f7;"></i>
+              <h3>🛒 Live AI Shopper Activity & Transaction Stream</h3>
+            </div>
+            <span class="live-pulse-badge">REAL-TIME AP2 STREAM</span>
+          </div>
+          <div class="admin-table-container">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Shopper Persona</th>
+                  <th>Action</th>
+                  <th>Target Product</th>
+                  <th>Amount (₹)</th>
+                  <th>Payment Type</th>
+                  <th>Customer Review</th>
+                  <th>Status</th>
+                  <th>Timestamp</th>
+                </tr>
+              </thead>
+              <tbody id="buyersActivityTableBody">
+                <!-- Rendered via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
       <!-- TAB 2: 24/7 AGENT FLEET HUB -->
       <section class="tab-pane" id="tab-agents">
+
         <div class="section-intro">
           <div class="intro-text">
             <h2>Autonomous Agent Fleet (7 Collaborative Agents)</h2>
@@ -600,7 +945,132 @@
     </div>
   </div>
 
+  <!-- Wholesale Stock Acquisition Modal -->
+  <div class="admin-modal-overlay" id="acquireStockModal">
+    <div class="admin-modal" style="max-width: 540px;">
+      <div class="modal-header">
+        <h3><i data-lucide="package-plus"></i> Acquire Wholesale Stock at Base Price</h3>
+        <button class="modal-close-btn" onclick="closeModal('acquireStockModal')"><i data-lucide="x"></i></button>
+      </div>
+      <form id="acquireStockForm" class="modal-form" onsubmit="event.preventDefault(); submitModalAcquireStock();">
+        <div class="form-group">
+          <label>Target Product</label>
+          <select id="modalAcquireProductSelect" class="admin-select" onchange="onModalAcquireProductChange()">
+            <!-- Populated via JS -->
+          </select>
+        </div>
+        
+        <div class="stock-calc-preview" id="modalAcquirePreview" style="margin: 0.75rem 0;">
+          <div class="calc-row">
+            <span>Wholesale Base Price:</span>
+            <strong id="modalPreviewBasePrice">₹0.00</strong>
+          </div>
+          <div class="calc-row">
+            <span>Current Stock:</span>
+            <strong id="modalPreviewCurrentStock">0 Units</strong>
+          </div>
+          <div class="calc-row">
+            <span>Selling Price:</span>
+            <strong id="modalPreviewSellingPrice">₹0.00</strong>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Units to Purchase</label>
+            <input type="number" id="modalAcquireQty" value="20" min="1" max="500" required oninput="recalculateModalAcquireCost()">
+          </div>
+          <div class="form-group">
+            <label>Total Acquisition Cost</label>
+            <input type="text" id="modalAcquireTotalCost" value="₹0.00" readonly class="readonly-input">
+          </div>
+        </div>
+
+        <div class="bank-impact-preview" style="margin-top: 0.5rem;">
+          <span>Current Bank Balance:</span>
+          <strong id="modalCurrentBankBalance">₹500,000.00</strong>
+        </div>
+
+        <button type="submit" class="action-btn primary" style="width: 100%; justify-content: center; margin-top: 1rem;">
+          <i data-lucide="check-circle"></i>
+          <span>Confirm Wholesale Purchase</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Interactive Agent Salary Negotiation Modal -->
+  <div class="admin-modal-overlay" id="negotiateSalaryModal">
+    <div class="admin-modal" style="max-width: 650px;">
+      <div class="modal-header">
+        <h3><i data-lucide="briefcase"></i> Interactive Agent Salary Negotiation</h3>
+        <button class="modal-close-btn" onclick="closeModal('negotiateSalaryModal')"><i data-lucide="x"></i></button>
+      </div>
+      <div class="salary-negotiation-body">
+        <div class="agent-profile-bar" id="negModalAgentHeader">
+          <!-- Filled via JS -->
+        </div>
+
+        <div class="negotiation-chat-thread" id="negChatThread" style="max-height: 240px; overflow-y: auto; margin: 1rem 0; padding: 0.75rem; background: rgba(15, 23, 42, 0.6); border-radius: 8px; border: 1px solid rgba(255,255,255,0.08);">
+          <!-- Dialogue messages -->
+        </div>
+
+        <form id="negotiateSalaryForm" class="modal-form" onsubmit="event.preventDefault(); submitSalaryProposal();">
+          <input type="hidden" id="negAgentName">
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label>Proposed Salary (₹ / cycle)</label>
+              <input type="number" id="negProposedSalary" step="100" min="1000" required placeholder="e.g. 7500">
+            </div>
+            <div class="form-group flex-2">
+              <label>Owner Rationale / Performance Justification</label>
+              <input type="text" id="negRationale" placeholder="e.g. Store profitability increased 15% this week" value="High SLA adherence and proactive store management">
+            </div>
+          </div>
+
+          <div class="form-actions-row" style="display: flex; gap: 0.75rem; margin-top: 0.75rem;">
+            <button type="submit" class="action-btn primary" id="negSubmitBtn" style="flex: 1; justify-content: center;">
+              <i data-lucide="send"></i>
+              <span>Send Salary Proposal</span>
+            </button>
+            <button type="button" class="action-btn emerald" id="negAcceptBtn" style="justify-content: center;" onclick="acceptCounterProposal()">
+              <i data-lucide="check"></i>
+              <span>Accept Agreement</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reset Store State Confirm Modal -->
+  <div class="admin-modal-overlay" id="resetStoreConfirmModal">
+    <div class="admin-modal" style="max-width: 480px;">
+      <div class="modal-header">
+        <h3 style="color: #f43f5e;"><i data-lucide="alert-triangle"></i> Reset Store to Initial Clean State?</h3>
+        <button class="modal-close-btn" onclick="closeModal('resetStoreConfirmModal')"><i data-lucide="x"></i></button>
+      </div>
+      <div class="modal-body" style="padding: 1rem 0; color: #cbd5e1; font-size: 0.9rem;">
+        <p>This action will completely reset the store:</p>
+        <ul style="margin: 0.75rem 0 1rem 1.5rem; line-height: 1.6;">
+          <li>Set all 27 catalog products to <strong>0 STOCK</strong> (Wholesale restock required).</li>
+          <li>Reset Treasury Bank Balance to default <strong>₹1,000.00</strong>.</li>
+          <li>Clear all Orders & Dispatches (reset to 0).</li>
+          <li>Reset Staff Agent Salaries to CEO minimum <strong>₹50.00 / 100 cycles</strong> (₹0 paid).</li>
+          <li>Reset 5 AI buyers with staggered random <strong>0 to 5 minutes</strong> purchase schedules.</li>
+        </ul>
+        <p>The CEO will then acquire stock at wholesale base price and run automated commerce operations.</p>
+      </div>
+      <div class="modal-footer" style="display: flex; gap: 0.75rem; justify-content: flex-end;">
+        <button class="action-btn" onclick="closeModal('resetStoreConfirmModal')">Cancel</button>
+        <button class="action-btn warning" onclick="confirmResetStoreComplete()">Confirm Reset</button>
+      </div>
+    </div>
+  </div>
+
+
   <!-- Admin Scripts -->
-  <script src="/frontend/admin/js/admin.js?v=3.3"></script>
+  <script src="/frontend/admin/js/admin.js?v=4.0"></script>
 </body>
 </html>
+

@@ -1113,3 +1113,677 @@ body.admin-body {
   0% { background-color: rgba(16, 185, 129, 0.25) !important; }
   100% { background-color: transparent !important; }
 }
+
+/* =====================================================================
+   💰 TREASURY, SALARIES, 5 AI BUYERS & CEO DISCUSSIONS STYLES
+   ===================================================================== */
+
+/* Gradient Card Variants */
+.gradient-cyan {
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.15), rgba(15, 23, 42, 0.95)) !important;
+  border-color: rgba(6, 182, 212, 0.4) !important;
+}
+.gradient-cyan .kpi-icon {
+  background: rgba(6, 182, 212, 0.2);
+  color: #06b6d4;
+}
+
+.gradient-green {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.15), rgba(15, 23, 42, 0.95)) !important;
+  border-color: rgba(34, 197, 94, 0.4) !important;
+}
+.gradient-green .kpi-icon {
+  background: rgba(34, 197, 94, 0.2);
+  color: #22c55e;
+}
+
+/* Treasury Cards Grid */
+.treasury-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.25rem;
+  margin-top: 1rem;
+}
+
+.treasury-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.treasury-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--border-glow);
+}
+
+.treasury-card.cyan { border-color: rgba(6, 182, 212, 0.3); background: linear-gradient(145deg, rgba(6, 182, 212, 0.08), var(--bg-card)); }
+.treasury-card.emerald { border-color: rgba(16, 185, 129, 0.3); background: linear-gradient(145deg, rgba(16, 185, 129, 0.08), var(--bg-card)); }
+.treasury-card.green { border-color: rgba(34, 197, 94, 0.3); background: linear-gradient(145deg, rgba(34, 197, 94, 0.08), var(--bg-card)); }
+.treasury-card.purple { border-color: rgba(168, 85, 247, 0.3); background: linear-gradient(145deg, rgba(168, 85, 247, 0.08), var(--bg-card)); }
+.treasury-card.amber { border-color: rgba(245, 158, 11, 0.3); background: linear-gradient(145deg, rgba(245, 158, 11, 0.08), var(--bg-card)); }
+.treasury-card.rose { border-color: rgba(244, 63, 94, 0.3); background: linear-gradient(145deg, rgba(244, 63, 94, 0.08), var(--bg-card)); }
+
+.treasury-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.treasury-card h2 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.65rem;
+  font-weight: 700;
+  margin: 0.75rem 0;
+  color: #fff;
+}
+
+.treasury-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.75rem;
+  color: var(--text-dim);
+}
+
+/* Stock Acquisition Console */
+.stock-console-body {
+  padding: 1.25rem;
+}
+
+.console-desc {
+  font-size: 0.85rem;
+  color: #94a3b8;
+  line-height: 1.5;
+}
+
+.stock-calc-preview {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-md);
+  padding: 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.calc-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.calc-row strong {
+  color: #f1f5f9;
+}
+
+.highlight-red { color: #f43f5e !important; font-weight: 700; }
+.highlight-green { color: #10b981 !important; font-weight: 700; }
+
+.bank-impact-preview {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(6, 182, 212, 0.1);
+  border: 1px solid rgba(6, 182, 212, 0.3);
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-md);
+  font-size: 0.85rem;
+  color: #cbd5e1;
+  margin-top: 1rem;
+}
+
+.bank-impact-preview strong {
+  color: #06b6d4;
+  font-size: 0.95rem;
+}
+
+.readonly-input {
+  background: rgba(30, 41, 59, 0.5) !important;
+  color: #38bdf8 !important;
+  font-weight: 600 !important;
+  cursor: not-allowed;
+}
+
+/* Treasury Ledger Feed */
+.treasury-ledger-feed {
+  padding: 0.75rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.ledger-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.6rem 0.8rem;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  font-size: 0.8rem;
+}
+
+.ledger-item-left {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.ledger-type-badge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.ledger-type-badge.sale { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+.ledger-type-badge.spend { background: rgba(168, 85, 247, 0.2); color: #c084fc; }
+.ledger-type-badge.salary { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+.ledger-type-badge.refund { background: rgba(244, 63, 94, 0.2); color: #fb7185; }
+
+.ledger-amount {
+  font-weight: 700;
+  font-family: monospace;
+}
+.ledger-amount.pos { color: #10b981; }
+.ledger-amount.neg { color: #f43f5e; }
+
+/* 5 AI Buyer Cards Grid */
+.buyer-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.25rem;
+  margin-top: 1rem;
+}
+
+.buyer-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.buyer-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(168, 85, 247, 0.5);
+  box-shadow: 0 8px 25px rgba(168, 85, 247, 0.15);
+}
+
+.buyer-card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: 0.75rem;
+}
+
+.buyer-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #a855f7, #3b82f6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  box-shadow: 0 4px 12px rgba(168, 85, 247, 0.3);
+}
+
+.buyer-info h4 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.buyer-persona-tag {
+  font-size: 0.72rem;
+  color: #c084fc;
+  font-weight: 600;
+}
+
+.buyer-desc {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+  margin-bottom: 0.75rem;
+}
+
+.buyer-metrics-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+  background: rgba(15, 23, 42, 0.6);
+  border-radius: var(--radius-sm);
+  padding: 0.6rem;
+  margin-bottom: 0.75rem;
+  text-align: center;
+}
+
+.buyer-metric span {
+  font-size: 0.68rem;
+  color: var(--text-dim);
+  display: block;
+}
+
+.buyer-metric strong {
+  font-size: 0.82rem;
+  color: #f1f5f9;
+}
+
+.buyer-live-status {
+  font-size: 0.78rem;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 0.75rem;
+  padding: 4px 8px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 4px;
+}
+
+/* Meeting Room & Transcripts */
+.meeting-room-container {
+  padding: 1.25rem;
+}
+
+.meeting-controls-row {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-end;
+  margin-bottom: 1.25rem;
+}
+
+.flex-1 { flex: 1; }
+.flex-2 { flex: 2; }
+
+.meeting-transcript-box {
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  min-height: 220px;
+  max-height: 480px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.meeting-empty-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 180px;
+  color: var(--text-dim);
+  text-align: center;
+  font-size: 0.85rem;
+}
+
+.transcript-bubble {
+  display: flex;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-md);
+  background: rgba(30, 41, 59, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.transcript-bubble.ceo {
+  background: rgba(236, 72, 153, 0.1);
+  border-color: rgba(236, 72, 153, 0.3);
+}
+
+.transcript-bubble.price {
+  background: rgba(16, 185, 129, 0.1);
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+.transcript-bubble.inventory {
+  background: rgba(6, 182, 212, 0.1);
+  border-color: rgba(6, 182, 212, 0.3);
+}
+
+.transcript-bubble.finance {
+  background: rgba(245, 158, 11, 0.1);
+  border-color: rgba(245, 158, 11, 0.3);
+}
+
+.transcript-bubble.order {
+  background: rgba(59, 130, 246, 0.1);
+  border-color: rgba(59, 130, 246, 0.3);
+}
+
+.transcript-bubble.dispatcher {
+  background: rgba(168, 85, 247, 0.1);
+  border-color: rgba(168, 85, 247, 0.3);
+}
+
+.transcript-bubble.review {
+  background: rgba(234, 179, 8, 0.1);
+  border-color: rgba(234, 179, 8, 0.3);
+}
+
+.bubble-speaker {
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: #fff;
+  min-width: 140px;
+}
+
+.bubble-role {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  display: block;
+}
+
+.bubble-text {
+  font-size: 0.85rem;
+  color: #e2e8f0;
+  line-height: 1.5;
+  flex: 1;
+}
+
+/* Negotiation Modal Styles */
+.agent-profile-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(30, 41, 59, 0.5);
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-md);
+  margin-bottom: 0.75rem;
+}
+
+.neg-message {
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  margin-bottom: 0.5rem;
+  font-size: 0.83rem;
+  line-height: 1.4;
+}
+
+.neg-message.user {
+  background: rgba(59, 130, 246, 0.2);
+  border: 1px solid rgba(59, 130, 246, 0.4);
+  color: #93c5fd;
+  margin-left: 2rem;
+}
+
+.neg-message.agent {
+  background: rgba(168, 85, 247, 0.2);
+  border: 1px solid rgba(168, 85, 247, 0.4);
+  color: #e9d5ff;
+  margin-right: 2rem;
+}
+
+/* =====================================================================
+   💰 CEO TREASURY, WHOLESALE ACQUISITION & AGENT SALARIES STYLES
+   ===================================================================== */
+.treasury-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.25rem;
+  margin-top: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.treasury-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 1.4rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.treasury-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--card-accent, #38bdf8), transparent);
+}
+
+.treasury-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--card-accent, #38bdf8);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+}
+
+.treasury-card.cyan { --card-accent: #06b6d4; background: linear-gradient(135deg, rgba(6, 182, 212, 0.08) 0%, rgba(15, 23, 42, 0.7) 100%); }
+.treasury-card.emerald { --card-accent: #10b981; background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(15, 23, 42, 0.7) 100%); }
+.treasury-card.green { --card-accent: #22c55e; background: linear-gradient(135deg, rgba(34, 197, 94, 0.08) 0%, rgba(15, 23, 42, 0.7) 100%); }
+.treasury-card.purple { --card-accent: #a855f7; background: linear-gradient(135deg, rgba(168, 85, 247, 0.08) 0%, rgba(15, 23, 42, 0.7) 100%); }
+.treasury-card.amber { --card-accent: #f59e0b; background: linear-gradient(135deg, rgba(245, 158, 11, 0.08) 0%, rgba(15, 23, 42, 0.7) 100%); }
+.treasury-card.rose { --card-accent: #f43f5e; background: linear-gradient(135deg, rgba(244, 63, 94, 0.08) 0%, rgba(15, 23, 42, 0.7) 100%); }
+
+.treasury-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.treasury-card-header span {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.treasury-card-header i {
+  width: 20px;
+  height: 20px;
+  color: var(--card-accent, #38bdf8);
+}
+
+.treasury-card h2 {
+  font-size: 1.85rem;
+  font-weight: 700;
+  font-family: 'JetBrains Mono', 'Space Grotesk', monospace;
+  letter-spacing: -0.02em;
+  color: #fff;
+  margin: 0.35rem 0 0.85rem 0;
+}
+
+.treasury-card.cyan h2 { color: #67e8f9; }
+.treasury-card.emerald h2 { color: #6ee7b7; }
+.treasury-card.green h2 { color: #86efac; }
+.treasury-card.purple h2 { color: #d8b4fe; }
+.treasury-card.amber h2 { color: #fde68a; }
+.treasury-card.rose h2 { color: #fda4af; }
+
+.treasury-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding-top: 0.65rem;
+}
+
+/* Wholesale Console & Preview */
+.stock-console-body {
+  padding: 1.25rem;
+}
+
+.console-desc {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.stock-calc-preview {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+  margin-top: 1rem;
+}
+
+.calc-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.82rem;
+  padding: 0.35rem 0;
+  color: var(--text-muted);
+}
+
+.calc-row strong {
+  font-family: 'JetBrains Mono', monospace;
+  color: #e2e8f0;
+}
+
+.highlight-green { color: #34d399 !important; }
+.highlight-red { color: #f87171 !important; }
+
+.bank-impact-preview {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(6, 182, 212, 0.08);
+  border: 1px solid rgba(6, 182, 212, 0.25);
+  border-radius: var(--radius-md);
+  padding: 0.75rem 1rem;
+  margin-top: 1rem;
+  font-size: 0.82rem;
+  color: #a5f3fc;
+}
+
+.bank-impact-preview strong {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.95rem;
+  color: #22d3ee;
+}
+
+/* Treasury Ledger Feed */
+.treasury-ledger-feed {
+  padding: 0.75rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.ledger-tx-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-left: 3px solid var(--tx-accent, #38bdf8);
+  border-radius: var(--radius-sm);
+  padding: 0.65rem 0.85rem;
+  transition: background 0.15s ease;
+}
+
+.ledger-tx-item:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.ledger-tx-item.sales { --tx-accent: #10b981; }
+.ledger-tx-item.stock { --tx-accent: #06b6d4; }
+.ledger-tx-item.salary { --tx-accent: #a855f7; }
+.ledger-tx-item.refund { --tx-accent: #f43f5e; }
+.ledger-tx-item.capital { --tx-accent: #3b82f6; }
+
+.tx-left {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.tx-type-tag {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--tx-accent, #38bdf8);
+}
+
+.tx-desc {
+  font-size: 0.82rem;
+  color: #e2e8f0;
+}
+
+.tx-time {
+  font-size: 0.7rem;
+  color: var(--text-dim);
+}
+
+.tx-right {
+  text-align: right;
+}
+
+.tx-amount {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.tx-amount.pos { color: #34d399; }
+.tx-amount.neg { color: #fda4af; }
+
+.tx-bal-after {
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Salary Earned Pill */
+.salary-earned-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  color: #34d399;
+  padding: 0.2rem 0.55rem;
+  border-radius: 9999px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+/* Buyer Countdown Badge */
+.buyer-countdown-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(56, 189, 248, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  color: #38bdf8;
+  padding: 0.2rem 0.5rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.72rem;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+

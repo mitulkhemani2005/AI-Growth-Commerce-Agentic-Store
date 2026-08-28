@@ -292,6 +292,53 @@ class InventoryManager:
                 "product": target
             }
 
+    def acquire_wholesale_stock(self, product_identifier: str, quantity: int, actor: str = "CEO Agent") -> Dict[str, Any]:
+        """
+        Acquires inventory stock at wholesale BASE_PRICE using the store Treasury Bank Balance.
+        Deducts cost from CEO bank balance and increments stock units upon successful treasury transaction.
+        """
+        from backend.treasury_manager import treasury_manager
+        with _lock:
+            products = self._read_inventory()
+            found = False
+            target = None
+            ident_clean = product_identifier.lower().strip()
+            for p in products:
+                if p.get("id", "").lower() == ident_clean or ident_clean in p.get("PRODUCT_NAME", "").lower():
+                    target = p
+                    found = True
+                    break
+            if not found:
+                return {"success": False, "error": f"Product '{product_identifier}' not found in catalog."}
+
+            qty = max(1, int(quantity))
+            base_price = float(target.get("BASE_PRICE", target.get("PRICE", 1.0)))
+
+            # Deduct funds from Treasury Bank Balance at Base Wholesale Price
+            spend_res = treasury_manager.spend_for_stock(
+                product_id=target["id"],
+                product_name=target["PRODUCT_NAME"],
+                quantity=qty,
+                base_price=base_price,
+                actor=actor
+            )
+            if not spend_res.get("success"):
+                return spend_res
+
+            # Increment stock in inventory
+            target["STOCK_REMAINING"] = target.get("STOCK_REMAINING", 0) + qty
+            self._write_inventory(products)
+
+            return {
+                "success": True,
+                "message": f"Successfully acquired {qty} units of '{target['PRODUCT_NAME']}' at wholesale Base Price ₹{base_price:,.2f}/unit (Total: ₹{spend_res['total_cost']:,.2f}). Remaining bank balance: ₹{spend_res['new_balance']:,.2f}.",
+                "product": target,
+                "quantity_acquired": qty,
+                "base_price": base_price,
+                "total_cost": spend_res["total_cost"],
+                "new_bank_balance": spend_res["new_balance"]
+            }
+
     def restock_product(self, product_identifier: str, quantity: int) -> Dict[str, Any]:
         """Increments stock for a product by a specified quantity."""
         with _lock:
@@ -315,6 +362,7 @@ class InventoryManager:
                 "message": f"Restocked {quantity} units for '{target['PRODUCT_NAME']}'. New stock: {target['STOCK_REMAINING']}.",
                 "product": target
             }
+
 
     def add_product(self, product_data: Dict[str, Any]) -> Dict[str, Any]:
         """Adds a brand new product to the catalog with BASE_PRICE."""
@@ -403,5 +451,15 @@ class InventoryManager:
         products = self._read_inventory()
         return [p for p in products if p.get("STOCK_REMAINING", 0) <= threshold]
 
+    def reset_to_zero_stock(self) -> Dict[str, Any]:
+        """Sets all product inventory stock to 0."""
+        with _lock:
+            products = self._read_inventory()
+            for p in products:
+                p["STOCK_REMAINING"] = 0
+            self._write_inventory(products)
+            return {"success": True, "count": len(products), "message": "All products reset to 0 stock."}
+
 # Global singleton
 inventory_manager = InventoryManager()
+
