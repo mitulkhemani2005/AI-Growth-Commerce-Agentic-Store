@@ -1,0 +1,179 @@
+{
+  "agents": [
+    {
+      "agent_id": "agt_ceo",
+      "name": "CEO Agent",
+      "slug": "ceo",
+      "description": "Chief Executive Officer — Fleet Commander & Store Strategist",
+      "agent_type": "executive",
+      "status": "idle",
+      "model_config": {
+        "model_name": "ollama/qwen2.5:7b"
+      },
+      "metadata": {
+        "display_name": "CEO Agent",
+        "role": "Fleet Commander & Store Strategist",
+        "color": "#ef4444",
+        "room_id": "manager",
+        "phaser_agent_id": "agt_ceo",
+        "sprite_key": "char_01",
+        "is_dispatcher": false
+      },
+      "created_at": "2026-08-30T21:48:45.266606+00:00",
+      "updated_at": "2026-08-30T21:48:45.266606+00:00",
+      "last_active_at": null,
+      "error_message": null
+    },
+    {
+      "agent_id": "agt_price",
+      "name": "Price Manager Agent",
+      "slug": "price_manager",
+      "description": "Head of Dynamic Pricing & Margin Optimization",
+      "agent_type": "pricing",
+      "status": "idle",
+      "model_config": {
+        "model_name": "ollama/qwen2.5:7b"
+      },
+      "metadata": {
+        "display_name": "Price Manager",
+        "role": "Head of Dynamic Pricing & Margins",
+        "color": "#f59e0b",
+        "room_id": "workspace",
+        "phaser_agent_id": "agt_price",
+        "sprite_key": "char_02",
+        "is_dispatcher": false
+      },
+      "created_at": "2026-08-30T21:48:45.266606+00:00",
+      "updated_at": "2026-08-30T21:48:45.266606+00:00",
+      "last_active_at": null,
+      "error_message": null
+    },
+    {
+      "agent_id": "agt_inventory",
+      "name": "Inventory Manager Agent",
+      "slug": "inventory_manager",
+      "description": "Warehouse Logistics & Stock Velocity Specialist",
+      "agent_type": "logistics",
+      "status": "idle",
+      "model_config": {
+        "model_name": "ollama/qwen2.5:7b"
+      },
+      "metadata": {
+        "display_name": "Inventory Manager",
+        "role": "Warehouse Logistics & Restocking",
+        "color": "#10b981",
+        "room_id": "datacenter",
+        "phaser_agent_id": "agt_inventory",
+        "sprite_key": "char_03",
+        "is_dispatcher": false
+      },
+      "created_at": "2026-08-30T21:48:45.266606+00:00",
+      "updated_at": "2026-08-30T21:48:45.266606+00:00",
+      "last_active_at": null,
+      "error_message": null
+    },
+    {
+      "agent_id": "agt_order",
+      "name": "Order Management Agent",
+      "slug": "order_manager",
+      "description": "Order Lifecycle & SLA Governance Director",
+      "agent_type": "operations",
+      "status": "idle",
+      "model_config": {
+        "model_name": "ollama/qwen2.5:7b"
+      },
+      "metadata": {
+        "display_name": "Order Manager",
+        "role": "Order Lifecycle & SLA Governance",
+        "color": "#3b82f6",
+        "room_id": "workspace",
+        "phaser_agent_id": "agt_order",
+        "sprite_key": "char_04",
+        "is_dispatcher": false
+      },
+      "created_at": "2026-08-30T21:48:45.266606+00:00",
+      "updated_at": "2026-08-30T21:48:45.266606+00:00",
+      "last_active_at": null,
+      "error_message": null
+    },
+    {
+      "agent_id": "agt_finance",
+      "name": "Finance Manager Agent",
+      "slug": "finance_manager",
+      "description": "Chief Financial Officer & Sole Payment Authority",
+      "agent_type": "finance",
+      "status": "idle",
+      "model_config": {
+        "model_name": "ollama/qwen2.5:7b"
+      },
+      "metadata": {
+        "display_name": "Finance Manager",
+        "role": "Chief Financial Officer & Refunds",
+        "color": "#8b5cf6",
+        "room_id": "meeting",
+        "phaser_agent_id": "agt_finance",
+        "sprite_key": "char_05",
+        "is_dispatcher": false
+      },
+      "created_at": "2026-08-30T21:48:45.266606+00:00",
+      "updated_at": "2026-08-30T21:48:45.266606+00:00",
+      "last_active_at": null,
+      "error_message": null
+    },
+    {
+      "agent_id": "agt_dispatcher",
+      "name": "Dispatcher Agent",
+      "slug": "dispatcher",
+      "description": "Express Fulfillment & Tracking Controller",
+      "agent_type": "dispatcher",
+      "status": "idle",
+      "model_config": {
+        "model_name": "ollama/qwen2.5:7b"
+      },
+      "metadata": {
+        "display_name": "Dispatcher Agent",
+        "role": "Express Fulfillment & Intent Router",
+        "color": "#06b6d4",
+        "room_id": "showroom",
+        "phaser_agent_id": "agt_dispatcher",
+        "sprite_key": "char_06",
+        "is_dispatcher": true
+      },
+      "created_at": "2026-08-30T21:48:45.266606+00:00",
+      "updated_at": "2026-08-30T21:48:45.266606+00:00",
+      "last_active_at": null,
+      "error_message": null
+    },
+    {
+      "agent_id": "agt_review",
+      "name": "Review and Feedback Manager",
+      "slug": "review_manager",
+      "description": "Customer Sentiment & AI Feedback Lead",
+      "agent_type": "reviews",
+      "status": "idle",
+      "model_config": {
+        "model_name": "ollama/qwen2.5:7b"
+      },
+      "metadata": {
+        "display_name": "Review Manager",
+        "role": "Customer Sentiment & Reviews Lead",
+        "color": "#ec4899",
+        "room_id": "meeting",
+        "phaser_agent_id": "agt_review",
+        "sprite_key": "char_07",
+        "is_dispatcher": false
+      },
+      "created_at": "2026-08-30T21:48:45.266606+00:00",
+      "updated_at": "2026-08-30T21:48:45.266606+00:00",
+      "last_active_at": null,
+      "error_message": null
+    }
+  ],
+  "skills": [],
+  "agent_skills": [],
+  "costs": [],
+  "conversations": [],
+  "messages": [],
+  "tasks": [],
+  "events": []
+}

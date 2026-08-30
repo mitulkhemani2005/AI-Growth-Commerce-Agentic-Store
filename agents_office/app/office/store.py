@@ -1,32 +1,23 @@
-"""AgentsOffice 容器层数据操作 -- agents, skills, cost_records 的 CRUD。"""
+"""AgentsOffice 容器层数据操作 -- 100% JSON-Based Pure Storage (无 SQLite / 无 SQL 数据库)。"""
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone
-from decimal import Decimal
-from typing import Any, Dict, List, Optional, Tuple
+import json
+import os
+import threading
+from datetime import datetime, timezone
+from typing import Any, Dict, List, Optional
 
-from sqlalchemy import func as sa_func
-from sqlalchemy import text
-from sqlalchemy.orm import Session, sessionmaker
-
-from app.db.engine import build_session_factory
-from app.db.orm_models import (
-    AgentEventRow,
-    AgentRow,
-    AgentSkillRow,
-    ChatMessageRow,
-    ConversationRow,
-    CostRecordRow,
-    ModelPricingRow,
-    ProductRow,
-    SkillRow,
-    TaskRow,
-)
 from app.models import now_iso
+
+DATA_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "data"))
+JSON_FILE = os.path.join(DATA_DIR, "agents_office.json")
+INVENTORY_FILE = os.path.join(DATA_DIR, "inventory.json")
+
+_store_lock = threading.RLock()
 
 
 def _dt_to_iso(val: Any) -> str:
-    """将数据库返回的 datetime 转为 ISO 字符串。"""
+    """将 datetime 转为 ISO 字符串。"""
     if val is None:
         return now_iso()
     if isinstance(val, str):
@@ -35,236 +26,268 @@ def _dt_to_iso(val: Any) -> str:
 
 
 class OfficeStore:
-    """AgentsOffice 容器层 Store -- 管理 agents, skills, cost_records 的 CRUD。"""
+    """100% 纯 JSON 数据存储 -- 管理 agents, skills, costs, conversations, tasks。"""
 
-    def __init__(self, database_url: str) -> None:
-        from app.db.engine import build_sync_engine
-        self.engine = build_sync_engine(database_url)
-        self.SessionFactory = sessionmaker(bind=self.engine, expire_on_commit=False)
-        # 自动创建所有表结构
-        from app.db.orm_models import Base
-        try:
-            Base.metadata.create_all(bind=self.engine)
-            self._seed_default_agents_if_empty()
-        except Exception as e:
-            import logging
-            logging.getLogger(__name__).warning(f"Error initializing DB tables / seed: {e}")
+    def __init__(self, database_url: Optional[str] = None) -> None:
+        self.file_path = JSON_FILE
+        os.makedirs(DATA_DIR, exist_ok=True)
+        self._load_or_seed()
 
-    def _seed_default_agents_if_empty(self) -> None:
-        """数据库为空时自动填充内置角色，让办公室立即活跃。"""
-        with self.SessionFactory() as session:
+    def _get_default_agents(self) -> List[Dict[str, Any]]:
+        now = datetime.now(timezone.utc).isoformat()
+        return [
+            {
+                "agent_id": "agt_ceo",
+                "name": "CEO Agent",
+                "slug": "ceo",
+                "description": "Chief Executive Officer — Fleet Commander & Store Strategist",
+                "agent_type": "executive",
+                "status": "idle",
+                "model_config": {"model_name": "ollama/qwen2.5:7b"},
+                "metadata": {
+                    "display_name": "CEO Agent",
+                    "role": "Fleet Commander & Store Strategist",
+                    "color": "#ef4444",
+                    "room_id": "manager",
+                    "phaser_agent_id": "agt_ceo",
+                    "sprite_key": "char_01",
+                    "is_dispatcher": False,
+                },
+                "created_at": now,
+                "updated_at": now,
+                "last_active_at": None,
+                "error_message": None,
+            },
+            {
+                "agent_id": "agt_price",
+                "name": "Price Manager Agent",
+                "slug": "price_manager",
+                "description": "Head of Dynamic Pricing & Margin Optimization",
+                "agent_type": "pricing",
+                "status": "idle",
+                "model_config": {"model_name": "ollama/qwen2.5:7b"},
+                "metadata": {
+                    "display_name": "Price Manager",
+                    "role": "Head of Dynamic Pricing & Margins",
+                    "color": "#f59e0b",
+                    "room_id": "workspace",
+                    "phaser_agent_id": "agt_price",
+                    "sprite_key": "char_02",
+                    "is_dispatcher": False,
+                },
+                "created_at": now,
+                "updated_at": now,
+                "last_active_at": None,
+                "error_message": None,
+            },
+            {
+                "agent_id": "agt_inventory",
+                "name": "Inventory Manager Agent",
+                "slug": "inventory_manager",
+                "description": "Warehouse Logistics & Stock Velocity Specialist",
+                "agent_type": "logistics",
+                "status": "idle",
+                "model_config": {"model_name": "ollama/qwen2.5:7b"},
+                "metadata": {
+                    "display_name": "Inventory Manager",
+                    "role": "Warehouse Logistics & Restocking",
+                    "color": "#10b981",
+                    "room_id": "datacenter",
+                    "phaser_agent_id": "agt_inventory",
+                    "sprite_key": "char_03",
+                    "is_dispatcher": False,
+                },
+                "created_at": now,
+                "updated_at": now,
+                "last_active_at": None,
+                "error_message": None,
+            },
+            {
+                "agent_id": "agt_order",
+                "name": "Order Management Agent",
+                "slug": "order_manager",
+                "description": "Order Lifecycle & SLA Governance Director",
+                "agent_type": "operations",
+                "status": "idle",
+                "model_config": {"model_name": "ollama/qwen2.5:7b"},
+                "metadata": {
+                    "display_name": "Order Manager",
+                    "role": "Order Lifecycle & SLA Governance",
+                    "color": "#3b82f6",
+                    "room_id": "workspace",
+                    "phaser_agent_id": "agt_order",
+                    "sprite_key": "char_04",
+                    "is_dispatcher": False,
+                },
+                "created_at": now,
+                "updated_at": now,
+                "last_active_at": None,
+                "error_message": None,
+            },
+            {
+                "agent_id": "agt_finance",
+                "name": "Finance Manager Agent",
+                "slug": "finance_manager",
+                "description": "Chief Financial Officer & Sole Payment Authority",
+                "agent_type": "finance",
+                "status": "idle",
+                "model_config": {"model_name": "ollama/qwen2.5:7b"},
+                "metadata": {
+                    "display_name": "Finance Manager",
+                    "role": "Chief Financial Officer & Refunds",
+                    "color": "#8b5cf6",
+                    "room_id": "meeting",
+                    "phaser_agent_id": "agt_finance",
+                    "sprite_key": "char_05",
+                    "is_dispatcher": False,
+                },
+                "created_at": now,
+                "updated_at": now,
+                "last_active_at": None,
+                "error_message": None,
+            },
+            {
+                "agent_id": "agt_dispatcher",
+                "name": "Dispatcher Agent",
+                "slug": "dispatcher",
+                "description": "Express Fulfillment & Tracking Controller",
+                "agent_type": "dispatcher",
+                "status": "idle",
+                "model_config": {"model_name": "ollama/qwen2.5:7b"},
+                "metadata": {
+                    "display_name": "Dispatcher Agent",
+                    "role": "Express Fulfillment & Intent Router",
+                    "color": "#06b6d4",
+                    "room_id": "showroom",
+                    "phaser_agent_id": "agt_dispatcher",
+                    "sprite_key": "char_06",
+                    "is_dispatcher": True,
+                },
+                "created_at": now,
+                "updated_at": now,
+                "last_active_at": None,
+                "error_message": None,
+            },
+            {
+                "agent_id": "agt_review",
+                "name": "Review and Feedback Manager",
+                "slug": "review_manager",
+                "description": "Customer Sentiment & AI Feedback Lead",
+                "agent_type": "reviews",
+                "status": "idle",
+                "model_config": {"model_name": "ollama/qwen2.5:7b"},
+                "metadata": {
+                    "display_name": "Review Manager",
+                    "role": "Customer Sentiment & Reviews Lead",
+                    "color": "#ec4899",
+                    "room_id": "meeting",
+                    "phaser_agent_id": "agt_review",
+                    "sprite_key": "char_07",
+                    "is_dispatcher": False,
+                },
+                "created_at": now,
+                "updated_at": now,
+                "last_active_at": None,
+                "error_message": None,
+            },
+        ]
+
+    def _load_or_seed(self) -> Dict[str, Any]:
+        with _store_lock:
+            data = None
+            if os.path.exists(self.file_path):
+                try:
+                    with open(self.file_path, "r", encoding="utf-8") as f:
+                        data = json.load(f)
+                except Exception:
+                    data = None
+
+            if not data or not isinstance(data, dict) or not data.get("agents"):
+                data = {
+                    "agents": self._get_default_agents(),
+                    "skills": [],
+                    "agent_skills": [],
+                    "costs": [],
+                    "conversations": [],
+                    "messages": [],
+                    "tasks": [],
+                    "events": [],
+                }
+                self._save(data)
+            return data
+
+    def _save(self, data: Dict[str, Any]) -> None:
+        with _store_lock:
             try:
-                # 清理旧数据并同步电商全套 7 位专属 Agent
-                session.query(AgentRow).delete()
-
-                default_agents = [
-
-                    {
-                        "agent_id": "agt_ceo",
-                        "name": "CEO Agent",
-                        "slug": "ceo",
-                        "description": "Chief Executive Officer — Fleet Commander & Store Strategist",
-                        "agent_type": "executive",
-                        "status": "idle",
-                        "model_config": {"model_name": "ollama/qwen2.5:7b"},
-                        "metadata": {
-                            "display_name": "CEO Agent",
-                            "role": "Fleet Commander & Store Strategist",
-                            "color": "#ef4444",
-                            "room_id": "manager",
-                            "phaser_agent_id": "agt_ceo",
-                            "sprite_key": "char_01",
-                            "is_dispatcher": False,
-                        },
-                    },
-                    {
-                        "agent_id": "agt_price",
-                        "name": "Price Manager Agent",
-                        "slug": "price_manager",
-                        "description": "Head of Dynamic Pricing & Margin Optimization",
-                        "agent_type": "pricing",
-                        "status": "idle",
-                        "model_config": {"model_name": "ollama/qwen2.5:7b"},
-                        "metadata": {
-                            "display_name": "Price Manager",
-                            "role": "Head of Dynamic Pricing & Margins",
-                            "color": "#f59e0b",
-                            "room_id": "workspace",
-                            "phaser_agent_id": "agt_price",
-                            "sprite_key": "char_02",
-                            "is_dispatcher": False,
-                        },
-                    },
-                    {
-                        "agent_id": "agt_inventory",
-                        "name": "Inventory Manager Agent",
-                        "slug": "inventory_manager",
-                        "description": "Warehouse Logistics & Stock Velocity Specialist",
-                        "agent_type": "logistics",
-                        "status": "idle",
-                        "model_config": {"model_name": "ollama/qwen2.5:7b"},
-                        "metadata": {
-                            "display_name": "Inventory Manager",
-                            "role": "Warehouse Logistics & Restocking",
-                            "color": "#10b981",
-                            "room_id": "datacenter",
-                            "phaser_agent_id": "agt_inventory",
-                            "sprite_key": "char_03",
-                            "is_dispatcher": False,
-                        },
-                    },
-                    {
-                        "agent_id": "agt_order",
-                        "name": "Order Management Agent",
-                        "slug": "order_manager",
-                        "description": "Order Lifecycle & SLA Governance Director",
-                        "agent_type": "operations",
-                        "status": "idle",
-                        "model_config": {"model_name": "ollama/qwen2.5:7b"},
-                        "metadata": {
-                            "display_name": "Order Manager",
-                            "role": "Order Lifecycle & SLA Governance",
-                            "color": "#3b82f6",
-                            "room_id": "workspace",
-                            "phaser_agent_id": "agt_order",
-                            "sprite_key": "char_04",
-                            "is_dispatcher": False,
-                        },
-                    },
-                    {
-                        "agent_id": "agt_finance",
-                        "name": "Finance Manager Agent",
-                        "slug": "finance_manager",
-                        "description": "Chief Financial Officer & Sole Payment Authority",
-                        "agent_type": "finance",
-                        "status": "idle",
-                        "model_config": {"model_name": "ollama/qwen2.5:7b"},
-                        "metadata": {
-                            "display_name": "Finance Manager",
-                            "role": "Chief Financial Officer & Refunds",
-                            "color": "#8b5cf6",
-                            "room_id": "meeting",
-                            "phaser_agent_id": "agt_finance",
-                            "sprite_key": "char_05",
-                            "is_dispatcher": False,
-                        },
-                    },
-                    {
-                        "agent_id": "agt_dispatcher",
-                        "name": "Dispatcher Agent",
-                        "slug": "dispatcher",
-                        "description": "Express Fulfillment & Tracking Controller",
-                        "agent_type": "dispatcher",
-                        "status": "idle",
-                        "model_config": {"model_name": "ollama/qwen2.5:7b"},
-                        "metadata": {
-                            "display_name": "Dispatcher Agent",
-                            "role": "Express Fulfillment & Intent Router",
-                            "color": "#06b6d4",
-                            "room_id": "showroom",
-                            "phaser_agent_id": "agt_dispatcher",
-                            "sprite_key": "char_06",
-                            "is_dispatcher": True,
-                        },
-                    },
-                    {
-                        "agent_id": "agt_review",
-                        "name": "Review and Feedback Manager",
-                        "slug": "review_manager",
-                        "description": "Customer Sentiment & AI Feedback Lead",
-                        "agent_type": "reviews",
-                        "status": "idle",
-                        "model_config": {"model_name": "ollama/qwen2.5:7b"},
-                        "metadata": {
-                            "display_name": "Review Manager",
-                            "role": "Customer Sentiment & Reviews Lead",
-                            "color": "#ec4899",
-                            "room_id": "meeting",
-                            "phaser_agent_id": "agt_review",
-                            "sprite_key": "char_07",
-                            "is_dispatcher": False,
-                        },
-                    },
-                ]
-
-
-                for a in default_agents:
-                    row = AgentRow(
-                        agent_id=a["agent_id"],
-                        name=a["name"],
-                        slug=a["slug"],
-                        description=a["description"],
-                        agent_type=a["agent_type"],
-                        status="idle",
-                        model_config=a["model_config"],
-                        extra_metadata=a["metadata"],
-                    )
-                    session.add(row)
-                session.commit()
+                with open(self.file_path, "w", encoding="utf-8") as f:
+                    json.dump(data, f, indent=2, ensure_ascii=False)
             except Exception as e:
-                session.rollback()
                 import logging
-                logging.getLogger(__name__).warning(f"Failed to seed default agents: {e}")
-
+                logging.getLogger(__name__).error(f"Error saving agents_office.json: {e}")
 
     # ================================================================
     # Agent CRUD
     # ================================================================
 
     def create_agent(self, agent_id: str, data: Dict[str, Any]) -> Dict[str, Any]:
-        with self.SessionFactory() as session:
-            row = AgentRow(
-                agent_id=agent_id,
-                name=data["name"],
-                slug=data["slug"],
-                description=data.get("description"),
-                agent_type=data.get("agent_type", "general"),
-                status="idle",
-                model_config=data.get("model_config", {}),
-                extra_metadata=data.get("metadata", {}),
-            )
-            session.add(row)
-            session.commit()
-            return self._agent_row_to_dict(row)
+        db = self._load_or_seed()
+        now = datetime.now(timezone.utc).isoformat()
+        agent = {
+            "agent_id": agent_id,
+            "name": data["name"],
+            "slug": data["slug"],
+            "description": data.get("description", ""),
+            "agent_type": data.get("agent_type", "general"),
+            "status": "idle",
+            "model_config": data.get("model_config", {}),
+            "metadata": data.get("metadata", {}),
+            "created_at": now,
+            "updated_at": now,
+            "last_active_at": None,
+            "error_message": None,
+        }
+        db["agents"].append(agent)
+        self._save(db)
+        return agent
 
     def list_agents(
         self,
         status: Optional[str] = None,
         agent_type: Optional[str] = None,
     ) -> List[Dict[str, Any]]:
-        with self.SessionFactory() as session:
-            q = session.query(AgentRow)
-            if status:
-                q = q.filter(AgentRow.status == status)
-            if agent_type:
-                q = q.filter(AgentRow.agent_type == agent_type)
-            q = q.order_by(AgentRow.created_at)
-            return [self._agent_row_to_dict(r) for r in q.all()]
+        db = self._load_or_seed()
+        agents = db.get("agents", [])
+        if status:
+            agents = [a for a in agents if a.get("status") == status]
+        if agent_type:
+            agents = [a for a in agents if a.get("agent_type") == agent_type]
+        return agents
 
     def get_agent(self, agent_id: str) -> Optional[Dict[str, Any]]:
-        with self.SessionFactory() as session:
-            row = session.get(AgentRow, agent_id)
-            if row is None:
-                return None
-            return self._agent_row_to_dict(row)
+        db = self._load_or_seed()
+        for a in db.get("agents", []):
+            if a.get("agent_id") == agent_id or a.get("slug") == agent_id:
+                return a
+        return None
 
     def update_agent(self, agent_id: str, data: Dict[str, Any]) -> Optional[Dict[str, Any]]:
-        with self.SessionFactory() as session:
-            row = session.get(AgentRow, agent_id)
-            if row is None:
-                return None
-            if "name" in data and data["name"] is not None:
-                row.name = data["name"]
-            if "description" in data and data["description"] is not None:
-                row.description = data["description"]
-            if "agent_type" in data and data["agent_type"] is not None:
-                row.agent_type = data["agent_type"]
-            if "model_config" in data and data["model_config"] is not None:
-                row.model_config = data["model_config"]
-            if "metadata" in data and data["metadata"] is not None:
-                row.extra_metadata = data["metadata"]
-            session.commit()
-            return self._agent_row_to_dict(row)
+        db = self._load_or_seed()
+        for a in db.get("agents", []):
+            if a.get("agent_id") == agent_id or a.get("slug") == agent_id:
+                if "name" in data and data["name"] is not None:
+                    a["name"] = data["name"]
+                if "description" in data and data["description"] is not None:
+                    a["description"] = data["description"]
+                if "agent_type" in data and data["agent_type"] is not None:
+                    a["agent_type"] = data["agent_type"]
+                if "model_config" in data and data["model_config"] is not None:
+                    a["model_config"] = data["model_config"]
+                if "metadata" in data and data["metadata"] is not None:
+                    a["metadata"] = data["metadata"]
+                a["updated_at"] = datetime.now(timezone.utc).isoformat()
+                self._save(db)
+                return a
+        return None
 
     def update_agent_status(
         self,
@@ -272,834 +295,207 @@ class OfficeStore:
         status: str,
         error_message: Optional[str] = None,
     ) -> Optional[Dict[str, Any]]:
-        with self.SessionFactory() as session:
-            row = session.get(AgentRow, agent_id)
-            if row is None:
-                return None
-            row.status = status
-            row.error_message = error_message
-            if status == "running":
-                row.last_active_at = datetime.now(timezone.utc)
-            session.commit()
-            return self._agent_row_to_dict(row)
-
-    # ================================================================
-    # Agent 详情（含 skills、最近事件、累计成本）
-    # ================================================================
+        db = self._load_or_seed()
+        for a in db.get("agents", []):
+            if a.get("agent_id") == agent_id or a.get("slug") == agent_id:
+                a["status"] = status
+                a["error_message"] = error_message
+                if status == "running":
+                    a["last_active_at"] = datetime.now(timezone.utc).isoformat()
+                a["updated_at"] = datetime.now(timezone.utc).isoformat()
+                self._save(db)
+                return a
+        return None
 
     def get_agent_detail(self, agent_id: str) -> Optional[Dict[str, Any]]:
-        with self.SessionFactory() as session:
-            row = session.get(AgentRow, agent_id)
-            if row is None:
-                return None
-            agent_dict = self._agent_row_to_dict(row)
+        agent = self.get_agent(agent_id)
+        if not agent:
+            return None
+        res = dict(agent)
+        res["skills"] = []
+        res["recent_events"] = []
+        res["total_cost"] = 0.0
+        return res
 
-            # 绑定的 skills
-            skill_rows = (
-                session.query(SkillRow)
-                .join(AgentSkillRow, AgentSkillRow.skill_id == SkillRow.skill_id)
-                .filter(AgentSkillRow.agent_id == agent_id)
-                .all()
-            )
-            agent_dict["skills"] = [self._skill_row_to_dict(s) for s in skill_rows]
+    def get_all_agent_configs(self) -> Dict[str, Any]:
+        db = self._load_or_seed()
+        configs = {}
+        for a in db.get("agents", []):
+            slug = a.get("slug")
+            if slug:
+                m_cfg = a.get("model_config") or {}
+                meta = a.get("metadata") or {}
+                configs[slug] = {
+                    "model_name": m_cfg.get("model_name", "ollama/qwen2.5:7b"),
+                    "temperature": m_cfg.get("temperature", 0.7),
+                    "max_tokens": m_cfg.get("max_tokens", 2048),
+                    "api_base": m_cfg.get("api_base"),
+                    "api_key": m_cfg.get("api_key"),
+                    "display_name": meta.get("display_name", a.get("name")),
+                    "role": meta.get("role", a.get("description")),
+                    "system_prompt": a.get("system_prompt", ""),
+                    "color": meta.get("color", "#4ade80"),
+                    "active": a.get("status") != "offline",
+                }
+        return configs
 
-            # 最近 20 条事件（通过 slug 关联 agent_events）
-            events = (
-                session.query(AgentEventRow)
-                .filter(AgentEventRow.agent_name == row.slug)
-                .order_by(AgentEventRow.created_at.desc())
-                .limit(20)
-                .all()
-            )
-            agent_dict["recent_events"] = [self._event_row_to_dict(e) for e in events]
+    def update_agent_config_by_slug(self, slug: str, config: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+        db = self._load_or_seed()
+        for a in db.get("agents", []):
+            if a.get("slug") == slug:
+                m_cfg = a.setdefault("model_config", {})
+                meta = a.setdefault("metadata", {})
+                if "model_name" in config and config["model_name"]:
+                    m_cfg["model_name"] = config["model_name"]
+                if "temperature" in config and config["temperature"] is not None:
+                    m_cfg["temperature"] = config["temperature"]
+                if "max_tokens" in config and config["max_tokens"] is not None:
+                    m_cfg["max_tokens"] = config["max_tokens"]
+                if "api_base" in config:
+                    m_cfg["api_base"] = config["api_base"]
+                if "api_key" in config:
+                    m_cfg["api_key"] = config["api_key"]
 
-            # 累计成本
-            total = (
-                session.query(sa_func.coalesce(sa_func.sum(CostRecordRow.total_cost), 0))
-                .filter(CostRecordRow.agent_id == agent_id)
-                .scalar()
-            )
-            agent_dict["total_cost"] = float(total) if total else 0.0
+                if "display_name" in config and config["display_name"] is not None:
+                    meta["display_name"] = config["display_name"]
+                    a["name"] = config["display_name"]
+                if "role" in config and config["role"] is not None:
+                    meta["role"] = config["role"]
+                    a["description"] = config["role"]
+                if "color" in config and config["color"] is not None:
+                    meta["color"] = config["color"]
+                if "system_prompt" in config and config["system_prompt"] is not None:
+                    a["system_prompt"] = config["system_prompt"]
 
-            return agent_dict
+                a["updated_at"] = datetime.now(timezone.utc).isoformat()
+                self._save(db)
+                return a
+        return None
 
     # ================================================================
-    # Skill CRUD
+    # Skills, Costs, Conversations, Tasks, Query
     # ================================================================
 
     def create_skill(self, skill_id: str, data: Dict[str, Any]) -> Dict[str, Any]:
-        with self.SessionFactory() as session:
-            row = SkillRow(
-                skill_id=skill_id,
-                name=data["name"],
-                display_name=data["display_name"],
-                description=data.get("description"),
-                skill_type=data.get("skill_type", "tool"),
-                endpoint=data.get("endpoint"),
-                config=data.get("config", {}),
-            )
-            session.add(row)
-            session.commit()
-            return self._skill_row_to_dict(row)
+        db = self._load_or_seed()
+        skill = {"skill_id": skill_id, **data, "created_at": now_iso()}
+        db.setdefault("skills", []).append(skill)
+        self._save(db)
+        return skill
 
-    def list_skills(
-        self,
-        skill_type: Optional[str] = None,
-        status: Optional[str] = None,
-    ) -> List[Dict[str, Any]]:
-        with self.SessionFactory() as session:
-            q = session.query(SkillRow)
-            if skill_type:
-                q = q.filter(SkillRow.skill_type == skill_type)
-            if status:
-                q = q.filter(SkillRow.status == status)
-            q = q.order_by(SkillRow.created_at)
-            return [self._skill_row_to_dict(r) for r in q.all()]
+    def list_skills(self, skill_type: Optional[str] = None, status: Optional[str] = None) -> List[Dict[str, Any]]:
+        db = self._load_or_seed()
+        skills = db.get("skills", [])
+        if skill_type:
+            skills = [s for s in skills if s.get("skill_type") == skill_type]
+        return skills
 
-    # ================================================================
-    # Agent-Skill 绑定/解绑
-    # ================================================================
-
-    def bind_skill(self, agent_id: str, skill_id: str, config: Optional[Dict] = None) -> bool:
-        with self.SessionFactory() as session:
-            # 检查 agent 和 skill 是否存在
-            agent = session.get(AgentRow, agent_id)
-            skill = session.get(SkillRow, skill_id)
-            if agent is None or skill is None:
-                return False
-            existing = session.get(AgentSkillRow, (agent_id, skill_id))
-            if existing is not None:
-                return True  # 已绑定
-            row = AgentSkillRow(
-                agent_id=agent_id,
-                skill_id=skill_id,
-                config=config or {},
-            )
-            session.add(row)
-            session.commit()
-            return True
+    def bind_skill(self, agent_id: str, skill_id: str, config: Dict[str, Any] = {}) -> bool:
+        db = self._load_or_seed()
+        db.setdefault("agent_skills", []).append({"agent_id": agent_id, "skill_id": skill_id, "config": config})
+        self._save(db)
+        return True
 
     def unbind_skill(self, agent_id: str, skill_id: str) -> bool:
-        with self.SessionFactory() as session:
-            row = session.get(AgentSkillRow, (agent_id, skill_id))
-            if row is None:
-                return False
-            session.delete(row)
-            session.commit()
-            return True
+        db = self._load_or_seed()
+        db["agent_skills"] = [bs for bs in db.get("agent_skills", []) if not (bs.get("agent_id") == agent_id and bs.get("skill_id") == skill_id)]
+        self._save(db)
+        return True
 
-    # ================================================================
-    # Per-Agent 模型配置
-    # ================================================================
+    def record_cost(self, agent_id: str, model_name: str, input_tokens: int, output_tokens: int, total_cost: float = 0.0, **kwargs: Any) -> Dict[str, Any]:
+        db = self._load_or_seed()
+        cost_entry = {
+            "record_id": f"cst_{now_iso()}",
+            "agent_id": agent_id,
+            "model_name": model_name,
+            "input_tokens": input_tokens,
+            "output_tokens": output_tokens,
+            "total_cost": total_cost,
+            "created_at": now_iso(),
+        }
+        db.setdefault("costs", []).append(cost_entry)
+        self._save(db)
+        return cost_entry
 
-    def get_agent_model_configs(self) -> Dict[str, Dict[str, str]]:
-        """获取所有 Agent 的模型配置。返回 {agent_slug: {model_name, api_base, api_key}}。"""
-        with self.SessionFactory() as session:
-            rows = session.query(AgentRow).all()
-            result: Dict[str, Dict[str, str]] = {}
-            for row in rows:
-                cfg = row.model_config or {}
-                if cfg.get("model_name") or cfg.get("api_base"):
-                    result[row.slug] = {
-                        "model_name": cfg.get("model_name", ""),
-                        "api_base": cfg.get("api_base", ""),
-                        "api_key": cfg.get("api_key", ""),
-                    }
-            return result
+    def get_costs_by_agent(self) -> List[Dict[str, Any]]:
+        db = self._load_or_seed()
+        costs = db.get("costs", [])
+        by_agent: Dict[str, Dict[str, Any]] = {}
+        for c in costs:
+            aid = c.get("agent_id", "unknown")
+            if aid not in by_agent:
+                by_agent[aid] = {"agent_id": aid, "total_input_tokens": 0, "total_output_tokens": 0, "total_cost": 0.0, "request_count": 0}
+            by_agent[aid]["total_input_tokens"] += c.get("input_tokens", 0)
+            by_agent[aid]["total_output_tokens"] += c.get("output_tokens", 0)
+            by_agent[aid]["total_cost"] += c.get("total_cost", 0.0)
+            by_agent[aid]["request_count"] += 1
+        return list(by_agent.values())
 
-    def get_all_agent_configs(self) -> Dict[str, Dict[str, Any]]:
-        """获取所有 Agent 的完整定义（模型配置 + 身份/行为定义）。"""
-        with self.SessionFactory() as session:
-            rows = session.query(AgentRow).all()
-            result = {}
-            for row in rows:
-                cfg = row.model_config or {}
-                meta = row.extra_metadata or {}
-                result[row.slug] = {
-                    # 模型配置
-                    "model_name": cfg.get("model_name", ""),
-                    "temperature": cfg.get("temperature", 0.7),
-                    "max_tokens": cfg.get("max_tokens", 2048),
-                    "api_base": cfg.get("api_base", ""),
-                    "api_key": cfg.get("api_key", ""),
-                    # 身份定义
-                    "display_name": meta.get("display_name", row.name),
-                    "role": meta.get("role", row.description or ""),
-                    "system_prompt": meta.get("system_prompt", ""),
-                    "color": meta.get("color", ""),
-                    "active": meta.get("active", False),
-                }
-            return result
+    def get_cost_summary(self) -> Dict[str, Any]:
+        costs = self.get_costs_by_agent()
+        return {
+            "total_cost": sum(c.get("total_cost", 0.0) for c in costs),
+            "total_input_tokens": sum(c.get("total_input_tokens", 0) for c in costs),
+            "total_output_tokens": sum(c.get("total_output_tokens", 0) for c in costs),
+            "agents": costs,
+        }
 
-    def update_agent_config_by_slug(
-        self, slug: str, config: Dict[str, Any]
-    ) -> Optional[Dict[str, Any]]:
-        """按 slug 更新 Agent 的完整配置（模型 + 身份/行为）。如果不存在则自动创建。"""
-        from app.models import make_id
+    def list_conversations(self, limit: int = 30) -> List[Dict[str, Any]]:
+        db = self._load_or_seed()
+        return db.get("conversations", [])[:limit]
 
-        # 分离模型配置和身份配置
-        model_fields = {"model_name", "temperature", "max_tokens", "api_base", "api_key"}
-        identity_fields = {"display_name", "role", "system_prompt", "color", "active"}
+    def create_conversation(self, conv_id: str, title: str, metadata: Dict[str, Any] = {}) -> Dict[str, Any]:
+        db = self._load_or_seed()
+        conv = {"conversation_id": conv_id, "title": title, "metadata": metadata, "created_at": now_iso()}
+        db.setdefault("conversations", []).insert(0, conv)
+        self._save(db)
+        return conv
 
-        model_cfg = {k: v for k, v in config.items() if k in model_fields}
-        identity_cfg = {k: v for k, v in config.items() if k in identity_fields}
+    def add_message(self, msg_id: str, conversation_id: str, role: str, content: str, agent_id: Optional[str] = None) -> Dict[str, Any]:
+        db = self._load_or_seed()
+        msg = {
+            "message_id": msg_id,
+            "conversation_id": conversation_id,
+            "role": role,
+            "content": content,
+            "agent_id": agent_id,
+            "created_at": now_iso(),
+        }
+        db.setdefault("messages", []).append(msg)
+        self._save(db)
+        return msg
 
-        with self.SessionFactory() as session:
-            row = session.query(AgentRow).filter(AgentRow.slug == slug).first()
-            if row is None:
-                row = AgentRow(
-                    agent_id=make_id("agt"),
-                    name=identity_cfg.get("display_name", slug),
-                    slug=slug,
-                    description=identity_cfg.get("role", ""),
-                    agent_type="general",
-                    status="idle",
-                    model_config=model_cfg,
-                    extra_metadata=identity_cfg,
-                )
-                session.add(row)
-            else:
-                # 合并更新 model_config
-                if model_cfg:
-                    existing_mc = row.model_config or {}
-                    existing_mc.update(model_cfg)
-                    row.model_config = existing_mc
-                # 合并更新 extra_metadata（身份信息）
-                if identity_cfg:
-                    existing_meta = row.extra_metadata or {}
-                    existing_meta.update(identity_cfg)
-                    row.extra_metadata = existing_meta
-                    # 同步 name 和 description 列
-                    if "display_name" in identity_cfg:
-                        row.name = identity_cfg["display_name"]
-                    if "role" in identity_cfg:
-                        row.description = identity_cfg["role"]
-            session.commit()
-            return self._agent_row_to_dict(row)
+    def list_messages(self, conversation_id: str) -> List[Dict[str, Any]]:
+        db = self._load_or_seed()
+        return [m for m in db.get("messages", []) if m.get("conversation_id") == conversation_id]
 
-    def get_active_agent_definitions(self) -> List[Dict[str, Any]]:
-        """获取所有活跃 Agent 的定义，供调度员动态构建路由使用。"""
-        with self.SessionFactory() as session:
-            rows = session.query(AgentRow).all()
-            result = []
-            for row in rows:
-                meta = row.extra_metadata or {}
-                if not meta.get("active", False):
-                    continue
-                cfg = row.model_config or {}
-                result.append({
-                    "slug": row.slug,
-                    "display_name": meta.get("display_name", row.name),
-                    "role": meta.get("role", row.description or ""),
-                    "system_prompt": meta.get("system_prompt", ""),
-                    "color": meta.get("color", ""),
-                    "model_name": cfg.get("model_name", ""),
-                    "temperature": cfg.get("temperature", 0.7),
-                    "max_tokens": cfg.get("max_tokens", 2048),
-                    "room_id": meta.get("room_id", "workspace"),
-                    "phaser_agent_id": meta.get("phaser_agent_id", ""),
-                })
-            return result
+    def list_tasks(self, **kwargs: Any) -> List[Dict[str, Any]]:
+        db = self._load_or_seed()
+        return db.get("tasks", [])
 
-    # ================================================================
-    # 可用模型列表
-    # ================================================================
+    def list_events(self, **kwargs: Any) -> List[Dict[str, Any]]:
+        db = self._load_or_seed()
+        return db.get("events", [])
 
     def list_models(self) -> List[Dict[str, Any]]:
-        """返回所有活跃模型及其定价信息，供前端配置面板使用。"""
-        from app.office.cost_engine import get_pricing_list
-        with self.SessionFactory() as session:
-            return get_pricing_list(session)
+        return [
+            {"model_name": "ollama/qwen2.5:7b", "provider": "ollama", "input_price": 0.0, "output_price": 0.0},
+        ]
 
-    # ================================================================
-    # 成本记录写入
-    # ================================================================
-
-    def record_cost(
-        self,
-        agent_slug: str,
-        trace_id: str,
-        model_name: str,
-        input_tokens: int,
-        output_tokens: int,
-        total_tokens: int,
-        duration_ms: Optional[int] = None,
-        agent_id: Optional[str] = None,
-        task_id: Optional[str] = None,
-        metadata: Optional[Dict[str, Any]] = None,
-    ) -> None:
-        """将一次 LLM 调用的 token 用量和费用写入 cost_records 表。"""
-        from app.office.cost_engine import calculate_cost
-
-        with self.SessionFactory() as session:
-            input_cost, output_cost, total_cost = calculate_cost(
-                model_name=model_name,
-                input_tokens=input_tokens,
-                output_tokens=output_tokens,
-                session=session,
-            )
-            row = CostRecordRow(
-                agent_id=agent_id,
-                agent_slug=agent_slug,
-                task_id=task_id,
-                trace_id=trace_id,
-                model_name=model_name,
-                input_tokens=input_tokens,
-                output_tokens=output_tokens,
-                total_tokens=total_tokens,
-                input_cost=input_cost,
-                output_cost=output_cost,
-                total_cost=total_cost,
-                duration_ms=duration_ms,
-                extra_metadata=metadata or {},
-            )
-            session.add(row)
-            session.commit()
-
-    # ================================================================
-    # 成本查询
-    # ================================================================
-
-    def costs_by_agent(
-        self,
-        start: Optional[datetime] = None,
-        end: Optional[datetime] = None,
-    ) -> List[Dict[str, Any]]:
-        with self.SessionFactory() as session:
-            q = session.query(
-                CostRecordRow.agent_id,
-                CostRecordRow.agent_slug,
-                sa_func.sum(CostRecordRow.input_tokens).label("total_input_tokens"),
-                sa_func.sum(CostRecordRow.output_tokens).label("total_output_tokens"),
-                sa_func.sum(CostRecordRow.total_tokens).label("total_tokens"),
-                sa_func.sum(CostRecordRow.total_cost).label("total_cost"),
-                sa_func.count().label("call_count"),
-            )
-            q = self._apply_time_filter(q, CostRecordRow.created_at, start, end)
-            q = q.group_by(CostRecordRow.agent_id, CostRecordRow.agent_slug)
-            q = q.order_by(sa_func.sum(CostRecordRow.total_cost).desc())
-            results = []
-            for row in q.all():
-                # 尝试获取 agent 名称
-                agent_name = None
-                if row.agent_id:
-                    agent_row = session.get(AgentRow, row.agent_id)
-                    if agent_row:
-                        agent_name = agent_row.name
-                results.append({
-                    "agent_id": row.agent_id,
-                    "agent_slug": row.agent_slug,
-                    "agent_name": agent_name,
-                    "total_input_tokens": int(row.total_input_tokens or 0),
-                    "total_output_tokens": int(row.total_output_tokens or 0),
-                    "total_tokens": int(row.total_tokens or 0),
-                    "total_cost": float(row.total_cost or 0),
-                    "call_count": int(row.call_count or 0),
-                })
-            return results
-
-    def costs_by_model(
-        self,
-        start: Optional[datetime] = None,
-        end: Optional[datetime] = None,
-    ) -> List[Dict[str, Any]]:
-        with self.SessionFactory() as session:
-            q = session.query(
-                CostRecordRow.model_name,
-                sa_func.sum(CostRecordRow.input_tokens).label("total_input_tokens"),
-                sa_func.sum(CostRecordRow.output_tokens).label("total_output_tokens"),
-                sa_func.sum(CostRecordRow.total_tokens).label("total_tokens"),
-                sa_func.sum(CostRecordRow.total_cost).label("total_cost"),
-                sa_func.count().label("call_count"),
-            )
-            q = self._apply_time_filter(q, CostRecordRow.created_at, start, end)
-            q = q.group_by(CostRecordRow.model_name)
-            q = q.order_by(sa_func.sum(CostRecordRow.total_cost).desc())
-            return [
-                {
-                    "model_name": row.model_name,
-                    "total_input_tokens": int(row.total_input_tokens or 0),
-                    "total_output_tokens": int(row.total_output_tokens or 0),
-                    "total_tokens": int(row.total_tokens or 0),
-                    "total_cost": float(row.total_cost or 0),
-                    "call_count": int(row.call_count or 0),
-                }
-                for row in q.all()
-            ]
-
-    def cost_summary(self) -> Dict[str, Any]:
-        """返回今日、本周、本月的费用总览。"""
-        now = datetime.now(timezone.utc)
-        today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
-        week_start = today_start - timedelta(days=now.weekday())
-        month_start = today_start.replace(day=1)
-
-        return {
-            "today": self._cost_summary_for_period("today", today_start, now),
-            "this_week": self._cost_summary_for_period("this_week", week_start, now),
-            "this_month": self._cost_summary_for_period("this_month", month_start, now),
-        }
-
-    def _cost_summary_for_period(
-        self,
-        period: str,
-        start: datetime,
-        end: datetime,
-    ) -> Dict[str, Any]:
-        with self.SessionFactory() as session:
-            row = (
-                session.query(
-                    sa_func.coalesce(sa_func.sum(CostRecordRow.total_cost), 0).label("total_cost"),
-                    sa_func.coalesce(sa_func.sum(CostRecordRow.total_tokens), 0).label("total_tokens"),
-                    sa_func.count().label("call_count"),
-                )
-                .filter(CostRecordRow.created_at >= start)
-                .filter(CostRecordRow.created_at <= end)
-                .one()
-            )
-            return {
-                "period": period,
-                "total_cost": float(row.total_cost),
-                "total_tokens": int(row.total_tokens),
-                "call_count": int(row.call_count),
-            }
-
-    # ================================================================
-    # 任务查询（复用现有 tasks 表）
-    # ================================================================
-
-    def list_tasks(
-        self,
-        status: Optional[str] = None,
-        task_type: Optional[str] = None,
-        agent_slug: Optional[str] = None,
-        limit: int = 100,
-        offset: int = 0,
-    ) -> List[Dict[str, Any]]:
-        with self.SessionFactory() as session:
-            q = session.query(TaskRow)
-            if status:
-                q = q.filter(TaskRow.status == status)
-            if task_type:
-                q = q.filter(TaskRow.task_type == task_type)
-            if agent_slug:
-                q = q.filter(TaskRow.agent_slug == agent_slug)
-            q = q.order_by(TaskRow.created_at.desc()).offset(offset).limit(limit)
-            return [self._task_row_to_dict(r) for r in q.all()]
-
-    def get_task_detail(self, task_id: str) -> Optional[Dict[str, Any]]:
-        with self.SessionFactory() as session:
-            row = session.get(TaskRow, task_id)
-            if row is None:
-                return None
-            task_dict = self._task_row_to_dict(row)
-            task_dict["input"] = getattr(row, "input") or {}
-            task_dict["output"] = row.output
-            task_dict["error"] = row.error
-
-            # 关联事件时间线（通过 trace_id）
-            events = (
-                session.query(AgentEventRow)
-                .filter(AgentEventRow.trace_id == row.trace_id)
-                .order_by(AgentEventRow.created_at)
-                .all()
-            )
-            task_dict["events"] = [self._event_row_to_dict(e) for e in events]
-            return task_dict
-
-    # ================================================================
-    # 事件查询（复用现有 agent_events 表）
-    # ================================================================
-
-    def list_events(
-        self,
-        agent_name: Optional[str] = None,
-        event_type: Optional[str] = None,
-        trace_id: Optional[str] = None,
-        limit: int = 100,
-        offset: int = 0,
-    ) -> List[Dict[str, Any]]:
-        with self.SessionFactory() as session:
-            q = session.query(AgentEventRow)
-            if agent_name:
-                q = q.filter(AgentEventRow.agent_name == agent_name)
-            if event_type:
-                q = q.filter(AgentEventRow.event_type == event_type)
-            if trace_id:
-                q = q.filter(AgentEventRow.trace_id == trace_id)
-            q = q.order_by(AgentEventRow.created_at.desc()).offset(offset).limit(limit)
-            return [self._event_row_to_dict(r) for r in q.all()]
-
-    # ================================================================
-    # Conversation & ChatMessage CRUD
-    # ================================================================
-
-    def create_conversation(self, conversation_id: str, title: str = "") -> Dict[str, Any]:
-        with self.SessionFactory() as session:
-            row = ConversationRow(conversation_id=conversation_id, title=title)
-            session.add(row)
-            session.commit()
-            session.refresh(row)
-            return self._conversation_row_to_dict(row)
-
-    def list_conversations(self, limit: int = 50, offset: int = 0) -> List[Dict[str, Any]]:
-        with self.SessionFactory() as session:
-            q = (
-                session.query(ConversationRow)
-                .filter(ConversationRow.status == "active")
-                .order_by(ConversationRow.updated_at.desc())
-                .offset(offset)
-                .limit(limit)
-            )
-            results = []
-            for row in q.all():
-                d = self._conversation_row_to_dict(row)
-                # 附带消息数量和最后一条消息预览
-                msg_count = (
-                    session.query(sa_func.count(ChatMessageRow.message_id))
-                    .filter(ChatMessageRow.conversation_id == row.conversation_id)
-                    .scalar()
-                ) or 0
-                last_msg = (
-                    session.query(ChatMessageRow)
-                    .filter(ChatMessageRow.conversation_id == row.conversation_id)
-                    .order_by(ChatMessageRow.created_at.desc())
-                    .first()
-                )
-                d["message_count"] = msg_count
-                d["last_message"] = last_msg.content[:80] if last_msg else ""
-                results.append(d)
-            return results
-
-    def get_conversation_messages(
-        self, conversation_id: str, limit: int = 200, offset: int = 0,
-    ) -> Optional[Dict[str, Any]]:
-        with self.SessionFactory() as session:
-            conv = session.get(ConversationRow, conversation_id)
-            if not conv:
-                return None
-            msgs = (
-                session.query(ChatMessageRow)
-                .filter(ChatMessageRow.conversation_id == conversation_id)
-                .order_by(ChatMessageRow.created_at.asc())
-                .offset(offset)
-                .limit(limit)
-                .all()
-            )
-            return {
-                **self._conversation_row_to_dict(conv),
-                "messages": [self._chat_message_row_to_dict(m) for m in msgs],
-            }
-
-    def add_chat_message(
-        self,
-        conversation_id: str,
-        role: str,
-        content: str,
-        agent_slug: Optional[str] = None,
-        agent_name: Optional[str] = None,
-        message_type: Optional[str] = None,
-        metadata: Optional[Dict[str, Any]] = None,
-    ) -> Dict[str, Any]:
-        with self.SessionFactory() as session:
-            row = ChatMessageRow(
-                conversation_id=conversation_id,
-                role=role,
-                content=content,
-                agent_slug=agent_slug,
-                agent_name=agent_name,
-                message_type=message_type,
-                extra_metadata=metadata or {},
-            )
-            session.add(row)
-            # 更新会话的 updated_at
-            conv = session.get(ConversationRow, conversation_id)
-            if conv:
-                conv.updated_at = datetime.now(timezone.utc)
-                # 如果是第一条用户消息且标题为空，用消息内容作标题
-                if not conv.title and role == "user":
-                    conv.title = content[:50]
-            session.commit()
-            session.refresh(row)
-            return self._chat_message_row_to_dict(row)
-
-    def update_conversation(self, conversation_id: str, data: Dict[str, Any]) -> Optional[Dict[str, Any]]:
-        with self.SessionFactory() as session:
-            conv = session.get(ConversationRow, conversation_id)
-            if not conv:
-                return None
-            if "title" in data:
-                conv.title = data["title"]
-            if "status" in data:
-                conv.status = data["status"]
-            conv.updated_at = datetime.now(timezone.utc)
-            session.commit()
-            session.refresh(conv)
-            return self._conversation_row_to_dict(conv)
-
-    def delete_conversation(self, conversation_id: str) -> bool:
-        with self.SessionFactory() as session:
-            conv = session.get(ConversationRow, conversation_id)
-            if not conv:
-                return False
-            conv.status = "deleted"
-            conv.updated_at = datetime.now(timezone.utc)
-            session.commit()
-            return True
-
-    @staticmethod
-    def _conversation_row_to_dict(row: ConversationRow) -> Dict[str, Any]:
-        return {
-            "conversation_id": row.conversation_id,
-            "title": row.title or "",
-            "status": row.status,
-            "created_at": _dt_to_iso(row.created_at),
-            "updated_at": _dt_to_iso(row.updated_at),
-        }
-
-    @staticmethod
-    def _chat_message_row_to_dict(row: ChatMessageRow) -> Dict[str, Any]:
-        return {
-            "message_id": row.message_id,
-            "conversation_id": row.conversation_id,
-            "role": row.role,
-            "agent_slug": row.agent_slug,
-            "agent_name": row.agent_name,
-            "content": row.content,
-            "message_type": row.message_type,
-            "metadata": row.extra_metadata or {},
-            "created_at": _dt_to_iso(row.created_at),
-        }
-
-    # ================================================================
-    # Product CRUD — 商品数据持久化
-    # ================================================================
-
-    def save_products(
-        self,
-        products: List[Dict[str, Any]],
-        source: str,
-        batch_id: Optional[str] = None,
-    ) -> List[Dict[str, Any]]:
-        """批量导入商品数据，已存在的 product_id+platform 组合会更新。
-
-        Args:
-            products: ProductImportItem 转换后的 dict 列表
-            source: 数据来源标识
-            batch_id: 外部批次号
-
-        Returns:
-            导入结果列表 [{product_id, platform, name, status: "created"|"updated"}]
-        """
-        results = []
-        with self.SessionFactory() as session:
-            for item in products:
-                # 用 platform + product_id 构造唯一 key
-                pk = f"{item['platform']}_{item['product_id']}"
-                existing = session.get(ProductRow, pk)
-
-                # 将完整数据打包为 raw_data 和 attributes
-                raw_data = {
-                    "source": source,
-                    "batch_id": batch_id,
-                    "price": item.get("price"),
-                    "original_price": item.get("original_price"),
-                    "url": item.get("url"),
-                    "shop_name": item.get("shop_name"),
-                    "images": item.get("images", []),
-                    "video_url": item.get("video_url"),
-                    "specs": item.get("specs", []),
-                    "description": item.get("description"),
-                    "promotions": item.get("promotions", []),
-                    "rating": item.get("rating"),
-                    "review_count": item.get("review_count"),
-                    "sales_count": item.get("sales_count"),
-                    "extra": item.get("extra", {}),
-                }
-                attributes = {
-                    "specs": item.get("specs", []),
-                    "promotions": item.get("promotions", []),
-                }
-
-                if existing:
-                    existing.name = item["name"]
-                    existing.brand = item.get("brand")
-                    existing.category = item.get("category")
-                    existing.source_url = item.get("url")
-                    existing.attributes = attributes
-                    existing.raw_data = raw_data
-                    status = "updated"
-                else:
-                    row = ProductRow(
-                        product_id=pk,
-                        sku=item["product_id"],
-                        name=item["name"],
-                        category=item.get("category"),
-                        brand=item.get("brand"),
-                        source_platform=item["platform"],
-                        source_url=item.get("url"),
-                        attributes=attributes,
-                        raw_data=raw_data,
-                    )
-                    session.add(row)
-                    status = "created"
-
-                results.append({
-                    "product_id": item["product_id"],
-                    "platform": item["platform"],
-                    "name": item["name"],
-                    "price": item.get("price"),
-                    "status": status,
-                })
-            session.commit()
-        return results
-
-    def get_product(self, product_id: str) -> Optional[Dict[str, Any]]:
-        """按主键查询商品。"""
-        with self.SessionFactory() as session:
-            row = session.get(ProductRow, product_id)
-            if row is None:
-                return None
-            return self._product_row_to_dict(row)
-
-    def list_products(
-        self,
-        platform: Optional[str] = None,
-        category: Optional[str] = None,
-        keyword: Optional[str] = None,
-        limit: int = 100,
-        offset: int = 0,
-    ) -> List[Dict[str, Any]]:
-        """查询商品列表，支持按平台、类目、关键词筛选。"""
-        with self.SessionFactory() as session:
-            q = session.query(ProductRow)
-            if platform:
-                q = q.filter(ProductRow.source_platform == platform)
-            if category:
-                q = q.filter(ProductRow.category == category)
-            if keyword:
-                q = q.filter(ProductRow.name.ilike(f"%{keyword}%"))
-            q = q.order_by(ProductRow.updated_at.desc()).offset(offset).limit(limit)
-            return [self._product_row_to_dict(r) for r in q.all()]
-
-    def count_products(
-        self,
-        platform: Optional[str] = None,
-        category: Optional[str] = None,
-        keyword: Optional[str] = None,
-    ) -> int:
-        """统计商品数量（筛选条件与 list_products 一致）。"""
-        with self.SessionFactory() as session:
-            q = session.query(sa_func.count(ProductRow.product_id))
-            if platform:
-                q = q.filter(ProductRow.source_platform == platform)
-            if category:
-                q = q.filter(ProductRow.category == category)
-            if keyword:
-                q = q.filter(ProductRow.name.ilike(f"%{keyword}%"))
-            return q.scalar() or 0
-
-    @staticmethod
-    def _product_row_to_dict(row: ProductRow) -> Dict[str, Any]:
-        raw = row.raw_data or {}
-        return {
-            "product_id": row.product_id,
-            "sku": row.sku,
-            "name": row.name,
-            "category": row.category,
-            "brand": row.brand,
-            "platform": row.source_platform,
-            "url": row.source_url,
-            "price": raw.get("price"),
-            "original_price": raw.get("original_price"),
-            "shop_name": raw.get("shop_name"),
-            "images": raw.get("images", []),
-            "specs": raw.get("specs", []),
-            "description": raw.get("description"),
-            "promotions": raw.get("promotions", []),
-            "rating": raw.get("rating"),
-            "review_count": raw.get("review_count"),
-            "sales_count": raw.get("sales_count"),
-            "created_at": _dt_to_iso(row.created_at),
-            "updated_at": _dt_to_iso(row.updated_at),
-        }
-
-    # ================================================================
-    # 私有辅助方法
-    # ================================================================
-
-    @staticmethod
-    def _apply_time_filter(q, column, start, end):
-        if start:
-            q = q.filter(column >= start)
-        if end:
-            q = q.filter(column <= end)
-        return q
-
-    @staticmethod
-    def _agent_row_to_dict(row: AgentRow) -> Dict[str, Any]:
-        return {
-            "agent_id": row.agent_id,
-            "name": row.name,
-            "slug": row.slug,
-            "description": row.description,
-            "agent_type": row.agent_type,
-            "status": row.status,
-            "model_config": row.model_config or {},
-            "last_active_at": _dt_to_iso(row.last_active_at) if row.last_active_at else None,
-            "error_message": row.error_message,
-            "metadata": row.extra_metadata or {},
-            "created_at": _dt_to_iso(row.created_at),
-            "updated_at": _dt_to_iso(row.updated_at),
-        }
-
-    @staticmethod
-    def _skill_row_to_dict(row: SkillRow) -> Dict[str, Any]:
-        return {
-            "skill_id": row.skill_id,
-            "name": row.name,
-            "display_name": row.display_name,
-            "description": row.description,
-            "skill_type": row.skill_type,
-            "endpoint": row.endpoint,
-            "config": row.config or {},
-            "status": row.status,
-            "created_at": _dt_to_iso(row.created_at),
-            "updated_at": _dt_to_iso(row.updated_at),
-        }
-
-    @staticmethod
-    def _task_row_to_dict(row: TaskRow) -> Dict[str, Any]:
-        return {
-            "task_id": row.task_id,
-            "trace_id": row.trace_id,
-            "task_type": row.task_type,
-            "status": row.status,
-            "agent_id": getattr(row, "agent_id", None),
-            "agent_slug": getattr(row, "agent_slug", None),
-            "created_at": _dt_to_iso(row.created_at),
-            "updated_at": _dt_to_iso(row.updated_at),
-        }
-
-    @staticmethod
-    def _event_row_to_dict(row: AgentEventRow) -> Dict[str, Any]:
-        return {
-            "event_id": row.event_id,
-            "trace_id": row.trace_id,
-            "agent_name": row.agent_name,
-            "event_type": row.event_type,
-            "session_id": row.session_id,
-            "payload": row.payload or {},
-            "created_at": _dt_to_iso(row.created_at),
-        }
+    def execute_query(self, query: str) -> Dict[str, Any]:
+        """Read directly from data/inventory.json for data manager queries without SQL."""
+        if os.path.exists(INVENTORY_FILE):
+            try:
+                with open(INVENTORY_FILE, "r", encoding="utf-8") as f:
+                    inv = json.load(f)
+                return {"success": True, "rows": inv, "count": len(inv)}
+            except Exception as e:
+                return {"success": False, "error": str(e)}
+        return {"success": True, "rows": [], "count": 0}
 
 
 def _create_office_store() -> OfficeStore:
-    """创建并初始化 OfficeStore 实例。"""
-    from app.config import settings
-    db_url = settings.database_url_sync or "sqlite:///./agents_office_data.db"
-    return OfficeStore(db_url)
+    return OfficeStore()
 
 
 office_store: OfficeStore = _create_office_store()
-

@@ -1141,10 +1141,10 @@
     "alpha": 0.15,
     "gamma": 0.85,
     "epsilon": 0.1,
-    "total_rewards": 21.0,
-    "episode_count": 19,
+    "total_rewards": 22.0,
+    "episode_count": 20,
     "action_counts": {
-      "purchase_assistant": 11,
+      "purchase_assistant": 12,
       "add_to_cart": 1,
       "trigger_razorpay_checkout": 1,
       "recommend_products": 2,
@@ -1172,6 +1172,9 @@
       },
       "tool=purchase_assist|user_id=user_e2e_custom": {
         "purchase_assistant": 0.2775
+      },
+      "tool=purchase_assist|user_id=user_alex": {
+        "purchase_assistant": 0.15
       }
     },
     "history": [
@@ -1326,6 +1329,14 @@
         "next_state": "success=1",
         "q_after": 0.7685,
         "timestamp": "2026-08-30T20:45:03.329036"
+      },
+      {
+        "state": "tool=purchase_assist|user_id=user_alex",
+        "action": "purchase_assistant",
+        "reward": 1.0,
+        "next_state": "success=1",
+        "q_after": 0.15,
+        "timestamp": "2026-08-30T21:40:57.026276"
       }
     ]
   }

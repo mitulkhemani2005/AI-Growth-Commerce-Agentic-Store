@@ -13,7 +13,7 @@
     "last_paid_at": null,
     "negotiation_history": [
       {
-        "timestamp": "2026-08-30T20:52:58.751380+00:00",
+        "timestamp": "2026-08-30T20:59:01.259633+00:00",
         "speaker": "Store Owner",
         "message": "CEO salary is exclusively set by the Store Owner. Current premium rate: \u20b9500.00 per 100 cycles \u2014 the highest in the entire agent fleet. CEO must request salary revision directly from the Store Owner."
       }
@@ -33,7 +33,7 @@
     "last_paid_at": null,
     "negotiation_history": [
       {
-        "timestamp": "2026-08-30T20:52:58.751403+00:00",
+        "timestamp": "2026-08-30T20:59:01.260050+00:00",
         "speaker": "CEO Agent",
         "message": "Compensation established at \u20b950.00 per 100 cycles base minimum floor for dynamic pricing & margin governance."
       }
@@ -53,7 +53,7 @@
     "last_paid_at": null,
     "negotiation_history": [
       {
-        "timestamp": "2026-08-30T20:52:58.751406+00:00",
+        "timestamp": "2026-08-30T20:59:01.260059+00:00",
         "speaker": "CEO Agent",
         "message": "Compensation established at \u20b950.00 per 100 cycles base minimum floor for wholesale restocking & 0-stock audits."
       }
@@ -73,7 +73,7 @@
     "last_paid_at": null,
     "negotiation_history": [
       {
-        "timestamp": "2026-08-30T20:52:58.751408+00:00",
+        "timestamp": "2026-08-30T20:59:01.260062+00:00",
         "speaker": "CEO Agent",
         "message": "Compensation established at \u20b950.00 per 100 cycles base minimum floor for <1h order SLA audits."
       }
@@ -93,7 +93,7 @@
     "last_paid_at": null,
     "negotiation_history": [
       {
-        "timestamp": "2026-08-30T20:52:58.751412+00:00",
+        "timestamp": "2026-08-30T20:59:01.260065+00:00",
         "speaker": "CEO Agent",
         "message": "Compensation established at \u20b950.00 per 100 cycles base minimum floor for strict 24h refund oversight & P&L health. Finance Manager is the SOLE payment authority in the fleet."
       }
@@ -113,7 +113,7 @@
     "last_paid_at": null,
     "negotiation_history": [
       {
-        "timestamp": "2026-08-30T20:52:58.751414+00:00",
+        "timestamp": "2026-08-30T20:59:01.260067+00:00",
         "speaker": "CEO Agent",
         "message": "Compensation established at \u20b950.00 per 100 cycles base minimum floor for TRK tracking assignment & express dispatch."
       }
@@ -133,7 +133,7 @@
     "last_paid_at": null,
     "negotiation_history": [
       {
-        "timestamp": "2026-08-30T20:52:58.751418+00:00",
+        "timestamp": "2026-08-30T20:59:01.260069+00:00",
         "speaker": "CEO Agent",
         "message": "Compensation established at \u20b950.00 per 100 cycles base minimum floor for AI review sentiment intelligence."
       }
