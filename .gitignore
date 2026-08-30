@@ -78,3 +78,10 @@ node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# ---- AgentsOffice ----
+agents_office_tmp/
+agents_office_data.db
+agents_office/.env
+agents_office/frontend/node_modules/
+agents_office/frontend/dist/
