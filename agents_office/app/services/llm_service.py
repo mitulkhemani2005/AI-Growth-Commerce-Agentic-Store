@@ -39,19 +39,43 @@ def _resolve_model(
 
     当调用方已显式传入 api_base/api_key 时，不做覆盖。
     目前支持自动识别：
-      - Qwen 系列 → 阿里云百炼 DashScope
+      - Ollama 本地模型 (如 ollama/qwen2.5:7b, qwen2.5:7b) → 本地 Ollama 服务 (无需 API Key)
+      - Qwen 系列 → 阿里云百炼 DashScope (若配置了 DASHSCOPE_API_KEY)
     """
     if api_base or api_key:
         return model, api_base, api_key
 
-    # Qwen 模型 → DashScope
-    model_lower = model.lower()
+    model_lower = model.lower() if model else ""
+    ollama_base = settings.ollama_api_base.rstrip("/")
+    if ollama_base.endswith("/v1"):
+        ollama_base = ollama_base[:-3]
+
+    # Ollama 本地模型识别
+    if (
+        model_lower.startswith("ollama/")
+        or model_lower.startswith("ollama_chat/")
+        or ":" in model_lower
+        or model_lower in {"qwen2.5:7b", "qwen2.5:14b", "llama3.1:8b", "llama3:8b", "gemma4:e4b"}
+    ):
+        raw_name = model
+        if raw_name.startswith("ollama/"):
+            raw_name = raw_name[len("ollama/"):]
+        elif raw_name.startswith("ollama_chat/"):
+            raw_name = raw_name[len("ollama_chat/"):]
+        return f"ollama_chat/{raw_name}", ollama_base, None
+
+    # Qwen 云端模型 → DashScope (仅在明确配置了 key 且非本地模型时)
     if ("qwen" in model_lower) and settings.dashscope_api_key:
-        # 确保模型名有 openai/ 前缀（LiteLLM 的 OpenAI 兼容模式）
         clean_name = model.split("/", 1)[-1] if "/" in model else model
         return f"openai/{clean_name}", _DASHSCOPE_API_BASE, settings.dashscope_api_key
 
+    # 默认回退：默认使用本地 Ollama qwen2.5:7b (无需任何 API Key)
+    if not settings.gemini_api_key and not settings.openai_api_key and not settings.anthropic_api_key and not settings.deepseek_api_key:
+        return "ollama_chat/qwen2.5:7b", ollama_base, None
+
     return model, api_base, api_key
+
+
 
 
 def chat_completion(

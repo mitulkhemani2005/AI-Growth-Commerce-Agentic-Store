@@ -1007,6 +1007,7 @@ def list_models() -> ApiEnvelope:
 
 # provider 到友好名称的映射
 _PROVIDER_MAP = {
+    "ollama": "ollama",
     "gemini": "google",
     "openai": "openai",
     "anthropic": "anthropic",
@@ -1017,6 +1018,12 @@ _PROVIDER_MAP = {
 # 推荐模型精选列表 — 只展示每个 provider 的主力 chat 模型
 # 按 provider 分组，组内按推荐度排序
 _RECOMMENDED_MODELS: Dict[str, list] = {
+    "ollama": [
+        "ollama/qwen2.5:7b",
+        "ollama/qwen2.5:14b",
+        "ollama/llama3.1:8b",
+        "ollama/llama3:8b",
+    ],
     "gemini": [
         "gemini/gemini-2.5-flash",
         "gemini/gemini-2.5-pro",
@@ -1060,6 +1067,10 @@ _RECOMMENDED_MODELS: Dict[str, list] = {
 
 # 手工覆盖的显示名 — 对自动生成效果不好的模型单独指定
 _DISPLAY_NAME_OVERRIDES: Dict[str, str] = {
+    "ollama/qwen2.5:7b": "Ollama Qwen2.5 7B (Local - Free)",
+    "ollama/qwen2.5:14b": "Ollama Qwen2.5 14B (Local)",
+    "ollama/llama3.1:8b": "Ollama LLaMA 3.1 8B (Local)",
+    "ollama/llama3:8b": "Ollama LLaMA 3 8B (Local)",
     "claude-sonnet-4-6": "Claude Sonnet 4.6",
     "claude-sonnet-4-5": "Claude Sonnet 4.5",
     "claude-haiku-4-5": "Claude Haiku 4.5",
@@ -1083,6 +1094,7 @@ _DISPLAY_NAME_OVERRIDES: Dict[str, str] = {
     "qwen-max": "Qwen Max",
     "qwen-vl-max": "Qwen VL Max（视觉）",
 }
+
 
 
 def _model_display_name(model_name: str) -> str:
