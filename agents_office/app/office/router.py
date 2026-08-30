@@ -528,6 +528,32 @@ def list_agents(
     return _envelope(trace_id=trace_id, data={"agents": agents, "total": len(agents)})
 
 
+@router.get("/agent-registry")
+def get_agent_registry() -> ApiEnvelope:
+    """供 Phaser 3 前端引擎加载的 Agent 注册表接口。"""
+    trace_id = make_id("trc")
+    store = _require_store()
+    agents = store.list_agents()
+    registry_list = []
+    for a in agents:
+        meta = a.get("metadata") or {}
+        registry_list.append({
+            "agent_id": a["agent_id"],
+            "name": a["name"],
+            "slug": a["slug"],
+            "display_name": meta.get("display_name", a["name"]),
+            "role": meta.get("role", a.get("description", "")),
+            "color": meta.get("color", "#4ade80"),
+            "room_id": meta.get("room_id", "workspace"),
+            "phaser_agent_id": meta.get("phaser_agent_id", f"agt_{a['slug']}"),
+            "sprite_key": meta.get("sprite_key", "char_01"),
+            "is_dispatcher": meta.get("is_dispatcher", False) or a.get("agent_type") == "dispatcher",
+            "status": a.get("status", "idle"),
+        })
+    return _envelope(trace_id=trace_id, data={"agents": registry_list})
+
+
+
 @router.get("/agents/{agent_id}")
 def get_agent(agent_id: str) -> ApiEnvelope:
     trace_id = make_id("trc")

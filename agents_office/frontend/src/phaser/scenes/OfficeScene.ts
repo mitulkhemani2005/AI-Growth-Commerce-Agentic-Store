@@ -369,9 +369,9 @@ export class OfficeScene extends Phaser.Scene {
     EventBus.on('chat:agent-bubble', this.onAgentBubble, this);
     EventBus.on('agent:status', this.onAgentStatusChange, this);
 
-    // 7. 空闲 Agent 随机走动
+    // 7. 空闲 Agent 随机走动 (2.5s 周期，办公室活跃运转)
     this.time.addEvent({
-      delay: 5000,
+      delay: 2500,
       loop: true,
       callback: this.idleWander,
       callbackScope: this,
@@ -379,6 +379,7 @@ export class OfficeScene extends Phaser.Scene {
 
     EventBus.emit('scene:ready');
   }
+
 
   // ============================================================
   // 聊天事件 → Agent 地图移动 & 对话气泡
@@ -990,11 +991,11 @@ export class OfficeScene extends Phaser.Scene {
       if ((agent as any)._typingTimer) return; // 工作中不走动
       if ((agent as any)._wandering) return;   // 已在串门中
 
-      // 25% 概率触发
-      if (Math.random() > 0.25) return;
+      // 45% 概率触发走动
+      if (Math.random() > 0.45) return;
 
-      // 15% 概率去公共区域串门，85% 在房间内闲逛
-      if (Math.random() < 0.15) {
+      // 25% 概率去公共区域串门（喝咖啡/会议桌/展厅），75% 在房间内走动/巡视
+      if (Math.random() < 0.25) {
         this.wanderToPOI(agent);
       } else {
         this.wanderInRoom(agent);
@@ -1011,17 +1012,24 @@ export class OfficeScene extends Phaser.Scene {
     const dx = randomSpot.x - agent.container.x;
     const dy = randomSpot.y - agent.container.y;
     const distance = Math.sqrt(dx * dx + dy * dy);
-    if (distance < 30) return;
+    if (distance < 20) return;
 
     const dir = this.getDirection(dx, dy);
     agent.sprite.play(`${agent.spriteKey}-walk-${dir}`);
     agent.isMoving = true;
 
+    // 10% 几率走动时冒出短状态气泡
+    if (Math.random() < 0.10 && !agent.bubbleContainer) {
+      const phrases = ['⚡ 正在分析...', '📊 检查数据', '🛒 浏览展厅', '💡 构思策略', '✨ 就绪中'];
+      const text = phrases[Math.floor(Math.random() * phrases.length)];
+      this.showAgentBubble(agent.slug, text, 2000);
+    }
+
     this.tweens.add({
       targets: agent.container,
       x: randomSpot.x,
       y: randomSpot.y,
-      duration: (distance / 60) * 1000,
+      duration: (distance / 65) * 1000,
       ease: 'Linear',
       onUpdate: () => { agent.container.setDepth(agent.container.y + 10000); },
       onComplete: () => {
@@ -1030,6 +1038,7 @@ export class OfficeScene extends Phaser.Scene {
       },
     });
   }
+
 
   /** 去公共休闲点串门 — 走到 POI → 执行行为动画 → 回到自己房间 */
   private wanderToPOI(agent: AgentCharacter) {

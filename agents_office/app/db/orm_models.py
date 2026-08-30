@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from sqlalchemy import (
     BigInteger,
     Boolean,
@@ -8,16 +6,21 @@ from sqlalchemy import (
     DateTime,
     ForeignKey,
     Integer,
+    JSON,
     Numeric,
     Text,
     func,
 )
-from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.dialects.postgresql import JSONB as PG_JSONB
 from sqlalchemy.orm import DeclarativeBase
+
+# Cross-dialect JSONB: falls back to standard JSON on SQLite
+JSONB = JSON().with_variant(PG_JSONB, "postgresql")
 
 
 class Base(DeclarativeBase):
     pass
+
 
 
 # ---- 1. products ----

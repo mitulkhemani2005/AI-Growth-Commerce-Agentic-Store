@@ -38,7 +38,155 @@ class OfficeStore:
     """AgentsOffice 容器层 Store -- 管理 agents, skills, cost_records 的 CRUD。"""
 
     def __init__(self, database_url: str) -> None:
-        self.SessionFactory = build_session_factory(database_url)
+        from app.db.engine import build_sync_engine
+        self.engine = build_sync_engine(database_url)
+        self.SessionFactory = sessionmaker(bind=self.engine, expire_on_commit=False)
+        # 自动创建所有表结构
+        from app.db.orm_models import Base
+        try:
+            Base.metadata.create_all(bind=self.engine)
+            self._seed_default_agents_if_empty()
+        except Exception as e:
+            import logging
+            logging.getLogger(__name__).warning(f"Error initializing DB tables / seed: {e}")
+
+    def _seed_default_agents_if_empty(self) -> None:
+        """数据库为空时自动填充内置角色，让办公室立即活跃。"""
+        with self.SessionFactory() as session:
+            try:
+                count = session.query(AgentRow).count()
+                if count > 0:
+                    return
+
+                default_agents = [
+                    {
+                        "agent_id": "agt_dispatcher",
+                        "name": "Dispatcher",
+                        "slug": "dispatcher",
+                        "description": "智能调度中心，分析用户意图并分发到对应 Agent",
+                        "agent_type": "dispatcher",
+                        "status": "idle",
+                        "model_config": {"model_name": "ollama/qwen2.5:7b"},
+                        "metadata": {
+                            "display_name": "调度员",
+                            "role": "任务分配与意图调度",
+                            "color": "#ff6b6b",
+                            "room_id": "manager",
+                            "phaser_agent_id": "agt_dispatcher",
+                            "sprite_key": "char_01",
+                            "is_dispatcher": True,
+                        },
+                    },
+                    {
+                        "agent_id": "agt_assistant",
+                        "name": "Assistant",
+                        "slug": "assistant",
+                        "description": "全能工作伙伴，解答各类业务疑问与整理文档",
+                        "agent_type": "general",
+                        "status": "idle",
+                        "model_config": {"model_name": "ollama/qwen2.5:7b"},
+                        "metadata": {
+                            "display_name": "通用助理",
+                            "role": "日常问答与协作整理",
+                            "color": "#4ade80",
+                            "room_id": "workspace",
+                            "phaser_agent_id": "agt_assistant",
+                            "sprite_key": "char_02",
+                            "is_dispatcher": False,
+                        },
+                    },
+                    {
+                        "agent_id": "agt_sales",
+                        "name": "Sales Guide",
+                        "slug": "sales_agent",
+                        "description": "电商商品选品与购物导购咨询专员",
+                        "agent_type": "sales",
+                        "status": "idle",
+                        "model_config": {"model_name": "ollama/qwen2.5:7b"},
+                        "metadata": {
+                            "display_name": "商品导购员",
+                            "role": "商品推荐与导购咨询",
+                            "color": "#38bdf8",
+                            "room_id": "showroom",
+                            "phaser_agent_id": "agt_sales",
+                            "sprite_key": "char_03",
+                            "is_dispatcher": False,
+                        },
+                    },
+                    {
+                        "agent_id": "agt_data_eng",
+                        "name": "Data Engineer",
+                        "slug": "data_engineer",
+                        "description": "数据仓库与报表分析，支持 SQL 查询与数据清洗",
+                        "agent_type": "data",
+                        "status": "idle",
+                        "model_config": {"model_name": "ollama/qwen2.5:7b"},
+                        "metadata": {
+                            "display_name": "数据工程师",
+                            "role": "数据分析与报表处理",
+                            "color": "#a78bfa",
+                            "room_id": "datacenter",
+                            "phaser_agent_id": "agt_data_eng",
+                            "sprite_key": "char_04",
+                            "is_dispatcher": False,
+                        },
+                    },
+                    {
+                        "agent_id": "agt_growth",
+                        "name": "Growth Strategist",
+                        "slug": "growth_agent",
+                        "description": "制定营销增长方案，分析折扣率与转化策略",
+                        "agent_type": "marketing",
+                        "status": "idle",
+                        "model_config": {"model_name": "ollama/qwen2.5:7b"},
+                        "metadata": {
+                            "display_name": "增长顾问",
+                            "role": "营销增长与促销策略",
+                            "color": "#f59e0b",
+                            "room_id": "meeting",
+                            "phaser_agent_id": "agt_growth",
+                            "sprite_key": "char_05",
+                            "is_dispatcher": False,
+                        },
+                    },
+                    {
+                        "agent_id": "agt_support",
+                        "name": "Support Specialist",
+                        "slug": "support_agent",
+                        "description": "处理客户订单咨询与履约售后问题",
+                        "agent_type": "support",
+                        "status": "idle",
+                        "model_config": {"model_name": "ollama/qwen2.5:7b"},
+                        "metadata": {
+                            "display_name": "客服专员",
+                            "role": "售后客服与订单跟进",
+                            "color": "#ec4899",
+                            "room_id": "workspace",
+                            "phaser_agent_id": "agt_support",
+                            "sprite_key": "char_06",
+                            "is_dispatcher": False,
+                        },
+                    },
+                ]
+
+                for a in default_agents:
+                    row = AgentRow(
+                        agent_id=a["agent_id"],
+                        name=a["name"],
+                        slug=a["slug"],
+                        description=a["description"],
+                        agent_type=a["agent_type"],
+                        status="idle",
+                        model_config=a["model_config"],
+                        extra_metadata=a["metadata"],
+                    )
+                    session.add(row)
+                session.commit()
+            except Exception as e:
+                session.rollback()
+                import logging
+                logging.getLogger(__name__).warning(f"Failed to seed default agents: {e}")
+
 
     # ================================================================
     # Agent CRUD
@@ -927,12 +1075,12 @@ class OfficeStore:
         }
 
 
-def _create_office_store() -> Optional[OfficeStore]:
-    """根据环境变量创建 OfficeStore 实例。"""
+def _create_office_store() -> OfficeStore:
+    """创建并初始化 OfficeStore 实例。"""
     from app.config import settings
-    if settings.database_url_sync:
-        return OfficeStore(settings.database_url_sync)
-    return None
+    db_url = settings.database_url_sync or "sqlite:///./agents_office_data.db"
+    return OfficeStore(db_url)
 
 
-office_store: Optional[OfficeStore] = _create_office_store()
+office_store: OfficeStore = _create_office_store()
+

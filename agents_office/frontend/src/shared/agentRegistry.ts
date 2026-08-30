@@ -19,9 +19,12 @@ export interface AgentRegistryEntry {
 const SPRITE_MAP: Record<string, string> = {
   dispatcher: 'char_01',
   assistant: 'char_02',
+  sales_agent: 'char_03',
   data_engineer: 'char_04',
+  growth_agent: 'char_05',
+  support_agent: 'char_06',
 };
-let nextSpriteIndex = 5; // 用户自定义 agent 从 char_05 开始
+let nextSpriteIndex = 7; // 用户自定义 agent 从 char_07 开始
 
 /** 最大可用精灵数（素材包提供 20 个预制角色） */
 const MAX_SPRITES = 20;
@@ -40,16 +43,17 @@ export function getSpriteKey(slug: string): string {
 let cachedAgents: AgentRegistryEntry[] | null = null;
 let loadPromise: Promise<AgentRegistryEntry[]> | null = null;
 
-/** 硬编码 fallback — 通用版默认 Agent（使用 i18n） */
-import { t } from './i18n';
-
 function getFallbackAgents(): AgentRegistryEntry[] {
   return [
-    { slug: 'dispatcher', displayName: t('builtin.dispatcher'), role: t('builtin.dispatcher.role'), color: '#ff6b6b', roomId: 'manager', phaserAgentId: 'agt_dispatcher', isDispatcher: true },
-    { slug: 'assistant', displayName: t('builtin.assistant'), role: t('builtin.assistant.role'), color: '#4ade80', roomId: 'workspace', phaserAgentId: 'agt_assistant', isDispatcher: false },
-    { slug: 'data_engineer', displayName: t('builtin.data_engineer'), role: t('builtin.data_engineer.role'), color: '#a78bfa', roomId: 'datacenter', phaserAgentId: 'agt_data_eng', isDispatcher: false },
+    { slug: 'dispatcher', displayName: '调度员', role: '任务分配与意图调度', color: '#ff6b6b', roomId: 'manager', phaserAgentId: 'agt_dispatcher', isDispatcher: true },
+    { slug: 'assistant', displayName: '通用助理', role: '日常问答与协作整理', color: '#4ade80', roomId: 'workspace', phaserAgentId: 'agt_assistant', isDispatcher: false },
+    { slug: 'sales_agent', displayName: '商品导购员', role: '商品推荐与导购咨询', color: '#38bdf8', roomId: 'showroom', phaserAgentId: 'agt_sales', isDispatcher: false },
+    { slug: 'data_engineer', displayName: '数据工程师', role: '数据分析与报表处理', color: '#a78bfa', roomId: 'datacenter', phaserAgentId: 'agt_data_eng', isDispatcher: false },
+    { slug: 'growth_agent', displayName: '增长顾问', role: '营销增长与促销策略', color: '#f59e0b', roomId: 'meeting', phaserAgentId: 'agt_growth', isDispatcher: false },
+    { slug: 'support_agent', displayName: '客服专员', role: '售后客服与订单跟进', color: '#ec4899', roomId: 'workspace', phaserAgentId: 'agt_support', isDispatcher: false },
   ];
 }
+
 
 /**
  * 加载 Agent 注册表。首次调用会发请求，后续返回缓存。

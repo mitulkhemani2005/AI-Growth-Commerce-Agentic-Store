@@ -9,9 +9,10 @@ from dotenv import load_dotenv
 load_dotenv()  # 从项目根目录 .env 文件加载环境变量
 
 
-def _get_database_url_sync() -> Optional[str]:
+def _get_database_url_sync() -> str:
     val = os.getenv("DATABASE_URL_SYNC", "").strip()
-    return val if val else None
+    return val if val else "sqlite:///./agents_office_data.db"
+
 
 
 @dataclass(frozen=True)
