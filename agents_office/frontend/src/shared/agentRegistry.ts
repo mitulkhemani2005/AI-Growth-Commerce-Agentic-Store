@@ -17,14 +17,15 @@ export interface AgentRegistryEntry {
 
 /** sprite 映射：slug → 精灵 key。后端不管前端素材，由前端维护。 */
 const SPRITE_MAP: Record<string, string> = {
-  dispatcher: 'char_01',
-  assistant: 'char_02',
-  sales_agent: 'char_03',
-  data_engineer: 'char_04',
-  growth_agent: 'char_05',
-  support_agent: 'char_06',
+  ceo: 'char_01',
+  price_manager: 'char_02',
+  inventory_manager: 'char_03',
+  order_manager: 'char_04',
+  finance_manager: 'char_05',
+  dispatcher: 'char_06',
+  review_manager: 'char_07',
 };
-let nextSpriteIndex = 7; // 用户自定义 agent 从 char_07 开始
+let nextSpriteIndex = 8; // 用户自定义 agent 从 char_08 开始
 
 /** 最大可用精灵数（素材包提供 20 个预制角色） */
 const MAX_SPRITES = 20;
@@ -45,14 +46,16 @@ let loadPromise: Promise<AgentRegistryEntry[]> | null = null;
 
 function getFallbackAgents(): AgentRegistryEntry[] {
   return [
-    { slug: 'dispatcher', displayName: '调度员', role: '任务分配与意图调度', color: '#ff6b6b', roomId: 'manager', phaserAgentId: 'agt_dispatcher', isDispatcher: true },
-    { slug: 'assistant', displayName: '通用助理', role: '日常问答与协作整理', color: '#4ade80', roomId: 'workspace', phaserAgentId: 'agt_assistant', isDispatcher: false },
-    { slug: 'sales_agent', displayName: '商品导购员', role: '商品推荐与导购咨询', color: '#38bdf8', roomId: 'showroom', phaserAgentId: 'agt_sales', isDispatcher: false },
-    { slug: 'data_engineer', displayName: '数据工程师', role: '数据分析与报表处理', color: '#a78bfa', roomId: 'datacenter', phaserAgentId: 'agt_data_eng', isDispatcher: false },
-    { slug: 'growth_agent', displayName: '增长顾问', role: '营销增长与促销策略', color: '#f59e0b', roomId: 'meeting', phaserAgentId: 'agt_growth', isDispatcher: false },
-    { slug: 'support_agent', displayName: '客服专员', role: '售后客服与订单跟进', color: '#ec4899', roomId: 'workspace', phaserAgentId: 'agt_support', isDispatcher: false },
+    { slug: 'ceo', displayName: 'CEO Agent', role: 'Fleet Commander & Store Strategist', color: '#ef4444', roomId: 'manager', phaserAgentId: 'agt_ceo', isDispatcher: false },
+    { slug: 'price_manager', displayName: 'Price Manager', role: 'Head of Dynamic Pricing & Margins', color: '#f59e0b', roomId: 'workspace', phaserAgentId: 'agt_price', isDispatcher: false },
+    { slug: 'inventory_manager', displayName: 'Inventory Manager', role: 'Warehouse Logistics & Restocking', color: '#10b981', roomId: 'datacenter', phaserAgentId: 'agt_inventory', isDispatcher: false },
+    { slug: 'order_manager', displayName: 'Order Manager', role: 'Order Lifecycle & SLA Governance', color: '#3b82f6', roomId: 'workspace', phaserAgentId: 'agt_order', isDispatcher: false },
+    { slug: 'finance_manager', displayName: 'Finance Manager', role: 'Chief Financial Officer & Refunds', color: '#8b5cf6', roomId: 'meeting', phaserAgentId: 'agt_finance', isDispatcher: false },
+    { slug: 'dispatcher', displayName: 'Dispatcher Agent', role: 'Express Fulfillment & Intent Router', color: '#06b6d4', roomId: 'showroom', phaserAgentId: 'agt_dispatcher', isDispatcher: true },
+    { slug: 'review_manager', displayName: 'Review Manager', role: 'Customer Sentiment & Reviews Lead', color: '#ec4899', roomId: 'meeting', phaserAgentId: 'agt_review', isDispatcher: false },
   ];
 }
+
 
 
 /**

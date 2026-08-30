@@ -79,19 +79,28 @@ export const en: Record<string, string> = {
   'db.error': 'Query error',
 
   // ========== Room Names ==========
-  'room.showroom': 'Showroom',
-  'room.manager': 'Command Center',
-  'room.meeting': 'Meeting Room',
-  'room.workspace': 'Workspace',
-  'room.datacenter': 'Data Center',
+  'room.showroom': 'Fulfillment & Dispatch Hub',
+  'room.manager': 'CEO Executive Suite',
+  'room.meeting': 'Finance & Sentiment Boardroom',
+  'room.workspace': 'Pricing & Order Operations',
+  'room.datacenter': 'Inventory & Warehouse Logistics',
 
   // ========== Built-in Agents ==========
-  'builtin.dispatcher': 'Dispatcher',
-  'builtin.dispatcher.role': 'Task routing & dispatch',
-  'builtin.assistant': 'Assistant',
-  'builtin.assistant.role': 'General-purpose helper',
-  'builtin.data_engineer': 'Data Engineer',
-  'builtin.data_engineer.role': 'Data management & upload',
+  'builtin.ceo': 'CEO Agent',
+  'builtin.ceo.role': 'Fleet Commander & Store Strategist',
+  'builtin.price_manager': 'Price Manager',
+  'builtin.price_manager.role': 'Head of Dynamic Pricing & Margins',
+  'builtin.inventory_manager': 'Inventory Manager',
+  'builtin.inventory_manager.role': 'Warehouse Logistics & Restocking',
+  'builtin.order_manager': 'Order Manager',
+  'builtin.order_manager.role': 'Order Lifecycle & SLA Governance',
+  'builtin.finance_manager': 'Finance Manager',
+  'builtin.finance_manager.role': 'Chief Financial Officer & Refunds',
+  'builtin.dispatcher': 'Dispatcher Agent',
+  'builtin.dispatcher.role': 'Express Fulfillment & Intent Router',
+  'builtin.review_manager': 'Review Manager',
+  'builtin.review_manager.role': 'Customer Sentiment & Reviews Lead',
+
 
   // ========== Common ==========
   'common.close': 'Close',

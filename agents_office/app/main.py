@@ -16,7 +16,7 @@ app.include_router(office_router, prefix="/api/v1/office", tags=["AgentsOffice"]
 BASE_DIR = Path(__file__).resolve().parent
 STATIC_DIR = BASE_DIR / "static"
 
-app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+app.mount("/static", StaticFiles(directory=STATIC_DIR, html=True), name="static")
 
 
 def envelope(trace_id: str, data: dict, error: Optional[str] = None) -> ApiEnvelope:
@@ -25,10 +25,19 @@ def envelope(trace_id: str, data: dict, error: Optional[str] = None) -> ApiEnvel
 
 @app.get("/")
 def home() -> FileResponse:
+    office_index = STATIC_DIR / "office" / "index.html"
+    if office_index.exists():
+        return FileResponse(office_index)
     return FileResponse(STATIC_DIR / "index.html")
+
+
+@app.get("/office")
+def office_page() -> FileResponse:
+    return FileResponse(STATIC_DIR / "office" / "index.html")
 
 
 @app.get("/api/v1/health")
 def health() -> ApiEnvelope:
     trace_id = make_id("trc")
     return envelope(trace_id=trace_id, data={"status": "ok"})
+

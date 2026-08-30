@@ -35,14 +35,14 @@ function detectLocale(): Locale {
   const saved = localStorage.getItem(STORAGE_KEY) as Locale;
   if (saved && MESSAGES[saved]) return saved;
 
-  const lang = navigator.language;
+  const lang = navigator.language || 'en';
   if (lang.startsWith('zh')) {
     return lang.includes('TW') || lang.includes('HK') ? 'zh-TW' : 'zh-CN';
   }
   if (lang.startsWith('ja')) return 'ja';
-  if (lang.startsWith('en')) return 'en';
-  return 'zh-CN';
+  return 'en';
 }
+
 
 let currentLocale: Locale = detectLocale();
 let listeners: Array<(locale: Locale) => void> = [];
