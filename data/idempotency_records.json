@@ -1,1 +1,21 @@
-{}
+{
+  "refund:ORD-5620-89FA": {
+    "operation_id": "refund:ORD-5620-89FA",
+    "operation_type": "REFUND",
+    "actor": "Finance Manager Agent",
+    "status": "SUCCESS",
+    "started_at": "2026-08-30T21:57:09.673476+00:00",
+    "started_at_ts": 1788127029.6734903,
+    "completed_at": "2026-08-30T21:57:09.791895+00:00",
+    "result": {
+      "success": true,
+      "order_id": "ORD-5620-89FA",
+      "refund_amount": 50.31,
+      "status": "Refunded",
+      "message": "Successfully refunded \u20b950.31 for Order #ORD-5620-89FA via Razorpay Gateway. Inventory restocked."
+    },
+    "error": null,
+    "retry_count": 0,
+    "metadata": {}
+  }
+}

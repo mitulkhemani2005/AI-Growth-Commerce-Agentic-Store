@@ -59,27 +59,27 @@ export const DatabasePanel: React.FC<Props> = ({ onClose }) => {
         return list;
       }
     } catch {
-      setError('无法连接到后端服务');
+      setError('Unable to connect to backend service');
       return [];
     } finally {
       setLoadingTables(false);
     }
   }, []);
 
-  // 加载文件列表
+  // Load files list
   const loadFiles = useCallback(async () => {
     try {
       const res = await fetch('/api/v1/office/uploads');
       const envelope = await res.json();
       setFiles(envelope?.data?.files || []);
     } catch {
-      // 静默失败
+      // Silent fail
     }
   }, []);
 
   useEffect(() => {
     loadTables().then((list) => {
-      // 自动选中第一个表并加载数据
+      // Auto select first table
       if (list.length > 0) {
         loadTableData(list[0].table_name);
       }
@@ -88,7 +88,7 @@ export const DatabasePanel: React.FC<Props> = ({ onClose }) => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // 查询表数据
+  // Query table data
   const loadTableData = useCallback(async (tableName: string) => {
     setSelectedTable(tableName);
     setLoadingData(true);
@@ -100,7 +100,6 @@ export const DatabasePanel: React.FC<Props> = ({ onClose }) => {
       if (data?.error) {
         setError(data.error);
       } else if (data?.type === 'query') {
-        // 后端返回 rows 为 dict 数组，转成二维数组供渲染
         const cols: string[] = data.columns || [];
         const arrayRows = (data.rows || []).map((row: any) =>
           Array.isArray(row) ? row : cols.map((c) => row[c] ?? null)
@@ -108,13 +107,13 @@ export const DatabasePanel: React.FC<Props> = ({ onClose }) => {
         setTableData({ columns: cols, rows: arrayRows });
       }
     } catch {
-      setError('查询数据失败');
+      setError('Failed to query table data');
     } finally {
       setLoadingData(false);
     }
   }, []);
 
-  // 加载文件预览
+  // Load file preview
   const loadFilePreview = useCallback(async (fileName: string) => {
     setSelectedFile(fileName);
     setLoadingData(true);
@@ -129,7 +128,7 @@ export const DatabasePanel: React.FC<Props> = ({ onClose }) => {
         setFilePreview(data as FilePreview);
       }
     } catch {
-      setError('文件预览加载失败');
+      setError('Failed to load file preview');
     } finally {
       setLoadingData(false);
     }
@@ -140,12 +139,12 @@ export const DatabasePanel: React.FC<Props> = ({ onClose }) => {
   const formatBytes = (bytes: number) => {
     if (bytes < 1024) return `${bytes} B`;
     if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-    return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   };
 
-  // SQL 类型 → 颜色映射
-  const typeColor = (t: string) => {
-    if (t.includes('int') || t.includes('numeric') || t.includes('float') || t.includes('double')) return '#60a5fa';
+  const typeColor = (sqlType: string) => {
+    const t = sqlType.toLowerCase();
+    if (t.includes('int') || t.includes('numeric') || t.includes('float') || t.includes('real')) return '#38bdf8';
     if (t.includes('char') || t.includes('text')) return '#4ade80';
     if (t.includes('bool')) return '#f472b6';
     if (t.includes('date') || t.includes('time')) return '#fbbf24';
@@ -155,28 +154,28 @@ export const DatabasePanel: React.FC<Props> = ({ onClose }) => {
   return (
     <div style={S.overlay} onClick={onClose}>
       <div style={S.panel} onClick={(e) => e.stopPropagation()}>
-        {/* 标题栏 */}
+        {/* Title Bar */}
         <div style={S.titleBar}>
           <div style={S.titleLeft}>
             <span style={S.titleIcon}>🗄️</span>
-            <span style={S.titleText}>数据库管理</span>
+            <span style={S.titleText}>Database & Data Manager</span>
           </div>
           <button style={S.closeBtn} onClick={onClose}>✕</button>
         </div>
 
-        {/* Tab 切换 */}
+        {/* Tab Bar */}
         <div style={S.tabBar}>
           <button
             style={activeTab === 'tables' ? { ...S.tab, ...S.tabActive } : S.tab}
             onClick={() => { setActiveTab('tables'); setSelectedFile(null); setFilePreview(null); }}
           >
-            📊 数据表 ({tables.length})
+            📊 Data Tables ({tables.length})
           </button>
           <button
             style={activeTab === 'files' ? { ...S.tab, ...S.tabActive } : S.tab}
             onClick={() => { setActiveTab('files'); setSelectedTable(null); setTableData(null); }}
           >
-            📁 上传文件 ({files.length})
+            📁 Uploaded Files ({files.length})
           </button>
           <button style={S.refreshBtn} onClick={() => { loadTables(); loadFiles(); }}>🔄</button>
         </div>
@@ -184,17 +183,17 @@ export const DatabasePanel: React.FC<Props> = ({ onClose }) => {
         {error && <div style={S.errorMsg}>{error}</div>}
 
         <div style={S.body}>
-          {/* 左栏：表列表 / 文件列表 */}
+          {/* Left Column: Tables / Files list */}
           <div style={S.sidebar}>
             {activeTab === 'tables' ? (
               loadingTables ? (
-                <div style={S.loading}>加载中...</div>
+                <div style={S.loading}>Loading...</div>
               ) : tables.length === 0 ? (
                 <div style={S.empty}>
                   <div style={{ fontSize: 32, marginBottom: 8 }}>📭</div>
-                  <div>暂无数据表</div>
+                  <div>No data tables yet</div>
                   <div style={{ fontSize: 11, color: '#888', marginTop: 4 }}>
-                    上传 CSV/Excel 文件并让数据工程师导入
+                    Upload CSV/Excel files or query inventory
                   </div>
                 </div>
               ) : (
@@ -212,7 +211,7 @@ export const DatabasePanel: React.FC<Props> = ({ onClose }) => {
                       {t.table_name.replace('ud_', '')}
                     </div>
                     <div style={S.tableItemMeta}>
-                      {t.row_count} 行 · {t.columns.length} 列
+                      {t.row_count} rows · {t.columns.length} cols
                     </div>
                   </div>
                 ))
@@ -221,7 +220,7 @@ export const DatabasePanel: React.FC<Props> = ({ onClose }) => {
               files.length === 0 ? (
                 <div style={S.empty}>
                   <div style={{ fontSize: 32, marginBottom: 8 }}>📂</div>
-                  <div>暂无上传文件</div>
+                  <div>No uploaded files</div>
                 </div>
               ) : (
                 files.map((f) => (
@@ -248,30 +247,30 @@ export const DatabasePanel: React.FC<Props> = ({ onClose }) => {
             )}
           </div>
 
-          {/* 右栏：表结构 + 数据预览 / 文件预览 */}
+          {/* Right Column: Schema + Preview */}
           <div style={S.main}>
             {loadingData ? (
               <div style={S.mainEmpty}>
-                <div style={S.loading}>加载中...</div>
+                <div style={S.loading}>Loading...</div>
               </div>
             ) : selectedTable && selectedTableInfo ? (
               <>
-                {/* 表头信息 */}
+                {/* Table Header */}
                 <div style={S.tableHeader}>
                   <span style={S.tableName}>{selectedTableInfo.table_name}</span>
                   <span style={S.tableStats}>
-                    {selectedTableInfo.row_count} 行 · {selectedTableInfo.columns.length} 列
+                    {selectedTableInfo.row_count} rows · {selectedTableInfo.columns.length} columns
                   </span>
                 </div>
 
-                {/* Schema 卡片 */}
+                {/* Schema Card */}
                 <div style={S.schemaCard}>
-                  <div style={S.schemaTitle}>表结构 (Schema)</div>
+                  <div style={S.schemaTitle}>Table Structure (Schema)</div>
                   <table style={S.schemaTable}>
                     <thead>
                       <tr>
-                        <th style={S.schemaTh}>列名</th>
-                        <th style={S.schemaTh}>数据类型</th>
+                        <th style={S.schemaTh}>Column Name</th>
+                        <th style={S.schemaTh}>Data Type</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -285,9 +284,9 @@ export const DatabasePanel: React.FC<Props> = ({ onClose }) => {
                   </table>
                 </div>
 
-                {/* 数据预览 */}
+                {/* Data Preview */}
                 <div style={S.dataSection}>
-                  <div style={S.schemaTitle}>数据预览 (前 100 行)</div>
+                  <div style={S.schemaTitle}>Data Preview (Top 100 rows)</div>
                   {tableData ? (
                     <div style={S.dataTableWrap}>
                       <table style={S.dataTable}>
@@ -318,31 +317,31 @@ export const DatabasePanel: React.FC<Props> = ({ onClose }) => {
                       </table>
                     </div>
                   ) : (
-                    <div style={S.loading}>暂无数据</div>
+                    <div style={S.loading}>No data rows</div>
                   )}
                 </div>
               </>
             ) : selectedFile && filePreview ? (
               <>
-                {/* 文件预览头 */}
+                {/* File Preview Header */}
                 <div style={S.tableHeader}>
                   <span style={S.tableName}>📄 {filePreview.file_name}</span>
                   <span style={S.tableStats}>
-                    {filePreview.total_rows} 行 · {filePreview.total_columns} 列
+                    {filePreview.total_rows} rows · {filePreview.total_columns} columns
                   </span>
                 </div>
 
-                {/* 文件列信息 */}
+                {/* File Columns Info */}
                 <div style={S.schemaCard}>
-                  <div style={S.schemaTitle}>文件结构 (Columns)</div>
+                  <div style={S.schemaTitle}>File Structure (Columns)</div>
                   <table style={S.schemaTable}>
                     <thead>
                       <tr>
-                        <th style={S.schemaTh}>原始列名</th>
-                        <th style={S.schemaTh}>安全列名</th>
-                        <th style={S.schemaTh}>推断类型</th>
-                        <th style={S.schemaTh}>空值</th>
-                        <th style={S.schemaTh}>唯一值</th>
+                        <th style={S.schemaTh}>Original Column</th>
+                        <th style={S.schemaTh}>Safe Name</th>
+                        <th style={S.schemaTh}>Inferred Type</th>
+                        <th style={S.schemaTh}>Nulls</th>
+                        <th style={S.schemaTh}>Unique</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -359,9 +358,9 @@ export const DatabasePanel: React.FC<Props> = ({ onClose }) => {
                   </table>
                 </div>
 
-                {/* 文件数据预览 */}
+                {/* File Data Preview */}
                 <div style={S.dataSection}>
-                  <div style={S.schemaTitle}>数据预览 (前 {filePreview.preview.length} 行)</div>
+                  <div style={S.schemaTitle}>Data Preview (First {filePreview.preview.length} rows)</div>
                   {filePreview.preview.length > 0 ? (
                     <div style={S.dataTableWrap}>
                       <table style={S.dataTable}>
@@ -381,7 +380,7 @@ export const DatabasePanel: React.FC<Props> = ({ onClose }) => {
                                 <td key={col.original_name} style={S.dataTd}>
                                   {row[col.original_name] === null || row[col.original_name] === '' ? (
                                     <span style={{ color: '#666', fontStyle: 'italic' }}>
-                                      {row[col.original_name] === null ? 'NULL' : '(空)'}
+                                      {row[col.original_name] === null ? 'NULL' : '(empty)'}
                                     </span>
                                   ) : (
                                     String(row[col.original_name])
@@ -394,7 +393,7 @@ export const DatabasePanel: React.FC<Props> = ({ onClose }) => {
                       </table>
                     </div>
                   ) : (
-                    <div style={S.loading}>文件无数据行</div>
+                    <div style={S.loading}>File contains no rows</div>
                   )}
                 </div>
               </>
@@ -402,8 +401,9 @@ export const DatabasePanel: React.FC<Props> = ({ onClose }) => {
               <div style={S.mainEmpty}>
                 <div style={{ fontSize: 48, marginBottom: 16, opacity: 0.3 }}>🗄️</div>
                 <div style={{ color: '#888' }}>
-                  {activeTab === 'tables' ? '选择左侧的数据表查看详情' : '选择左侧的文件查看预览'}
+                  {activeTab === 'tables' ? 'Select a data table on the left to view schema and rows' : 'Select a file on the left to preview content'}
                 </div>
+
               </div>
             )}
           </div>

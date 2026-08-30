@@ -172,7 +172,14 @@
   "skills": [],
   "agent_skills": [],
   "costs": [],
-  "conversations": [],
+  "conversations": [
+    {
+      "conversation_id": "conv_fdd5e3143c",
+      "title": "与Inventory Manager的私聊",
+      "metadata": {},
+      "created_at": "2026-08-30T22:05:21.992102+00:00"
+    }
+  ],
   "messages": [],
   "tasks": [],
   "events": []

@@ -203,50 +203,53 @@ const ROOM_CORRIDOR: Record<string, string> = {
 type Direction = 'down' | 'right' | 'up' | 'left';
 
 // ============================================================
-// Agent 配置 — 从 agentRegistry 动态构建
+// Agent 配置 — 从 agentRegistry 动态构建并指定专属工位与办公室
 // ============================================================
 function cssColorToHex(css: string): number {
   return parseInt(css.replace('#', ''), 16);
 }
 
-// 预定义的不重叠初始站位 — 全部在走廊正中央和房间中心开阔地带
+export const DESIGNATED_AGENT_DESKS: Record<string, { x: number; y: number; room: string; facingDir: Direction; roleTitle: string }> = {
+  ceo: { x: 830, y: 180, room: 'manager', facingDir: 'down', roleTitle: 'CEO Executive Suite' },
+  price_manager: { x: 760, y: 380, room: 'workspace', facingDir: 'up', roleTitle: 'Dynamic Pricing Desk' },
+  order_manager: { x: 940, y: 380, room: 'workspace', facingDir: 'up', roleTitle: 'Order Operations Desk' },
+  inventory_manager: { x: 850, y: 640, room: 'datacenter', facingDir: 'up', roleTitle: 'Warehouse Logistics Desk' },
+  finance_manager: { x: 365, y: 620, room: 'meeting', facingDir: 'up', roleTitle: 'CFO Finance Desk' },
+  dispatcher: { x: 360, y: 230, room: 'showroom', facingDir: 'down', roleTitle: 'Fulfillment & Dispatch Hub' },
+  review_manager: { x: 465, y: 620, room: 'meeting', facingDir: 'up', roleTitle: 'Customer Sentiment Desk' },
+};
+
+// 预定义的不重叠初始站位 — 备用
 const FIXED_SPAWN_POINTS: { x: number; y: number; room: string }[] = [
-  { x: 720, y: 190, room: 'manager' },      // 1. 调度中心正中央
-  { x: 350, y: 250, room: 'showroom' },      // 2. 展示厅正中央
-  { x: 620, y: 370, room: 'workspace' },     // 3. 主走廊中段
-  { x: 830, y: 400, room: 'workspace' },     // 4. 待命区中央
-  { x: 810, y: 680, room: 'datacenter' },    // 5. 数据中心正中央
-  { x: 620, y: 300, room: 'workspace' },     // 6. 主走廊上段
-  { x: 620, y: 460, room: 'workspace' },     // 7. 主走廊下段
-  { x: 350, y: 660, room: 'meeting' },       // 8. 协作室正中央
-  { x: 920, y: 400, room: 'workspace' },     // 9. 待命区右侧开阔
-  { x: 800, y: 190, room: 'manager' },       // 10. 调度中心右侧
-  { x: 250, y: 250, room: 'showroom' },      // 11. 展示厅左侧
-  { x: 720, y: 400, room: 'workspace' },     // 12. 走廊中间
-  { x: 900, y: 680, room: 'datacenter' },    // 13. 数据中心右侧
-  { x: 450, y: 660, room: 'meeting' },       // 14. 协作室右侧
-  { x: 620, y: 250, room: 'workspace' },     // 15. 走廊最上段
-  { x: 520, y: 370, room: 'workspace' },     // 16. 走廊左侧
-  { x: 450, y: 250, room: 'showroom' },      // 17. 展示厅右侧
-  { x: 720, y: 680, room: 'datacenter' },    // 18. 数据中心左侧
-  { x: 520, y: 460, room: 'workspace' },     // 19. 走廊左下
-  { x: 250, y: 660, room: 'meeting' },       // 20. 协作室左侧
+  { x: 830, y: 180, room: 'manager' },      // 1. CEO
+  { x: 360, y: 230, room: 'showroom' },     // 2. Dispatcher
+  { x: 760, y: 380, room: 'workspace' },    // 3. Price Manager
+  { x: 940, y: 380, room: 'workspace' },    // 4. Order Manager
+  { x: 850, y: 640, room: 'datacenter' },   // 5. Inventory Manager
+  { x: 365, y: 620, room: 'meeting' },      // 6. Finance Manager
+  { x: 465, y: 620, room: 'meeting' },      // 7. Review Manager
 ];
 
 function buildAgentSpawns() {
   return getAgentsCached().map((a, idx) => {
-    const spawn = FIXED_SPAWN_POINTS[idx % FIXED_SPAWN_POINTS.length];
+    const designated = DESIGNATED_AGENT_DESKS[a.slug] || {
+      ...FIXED_SPAWN_POINTS[idx % FIXED_SPAWN_POINTS.length],
+      facingDir: 'down' as Direction,
+      roleTitle: a.role,
+    };
     return {
       agentId: a.phaserAgentId || `agt_${a.slug}`,
       name: a.displayName,
       slug: a.slug,
       spriteKey: getSpriteKey(a.slug),
-      homeRoom: a.roomId || spawn.room,
+      homeRoom: designated.room || a.roomId || 'workspace',
       color: cssColorToHex(a.color),
-      fixedSpawn: { x: spawn.x, y: spawn.y },
+      fixedSpawn: { x: designated.x, y: designated.y },
+      homeDesk: { x: designated.x, y: designated.y, room: designated.room, facingDir: designated.facingDir },
     };
   });
 }
+
 
 interface AgentCharacter {
   container: Phaser.GameObjects.Container;
@@ -259,9 +262,12 @@ interface AgentCharacter {
   isMoving: boolean;
   homeRoom: string;
   currentRoom: string;
+  homeDesk: { x: number; y: number; room: string; facingDir: Direction };
+  isVisiting?: boolean;
   bubbleContainer?: Phaser.GameObjects.Container;
   bubbleTimer?: Phaser.Time.TimerEvent;
 }
+
 
 export class OfficeScene extends Phaser.Scene {
   private agents: AgentCharacter[] = [];
@@ -364,12 +370,14 @@ export class OfficeScene extends Phaser.Scene {
 
     this.input.mouse?.disableContextMenu();
 
-    // 6. 监听聊天事件驱动 Agent 移动 & 对话气泡 & 状态
+    // 6. Listen for chat & store bridge events to drive agent movement, desk visits, and bubbles
     EventBus.on('chat:agent-move', this.onChatAgentMove, this);
     EventBus.on('chat:agent-bubble', this.onAgentBubble, this);
     EventBus.on('agent:status', this.onAgentStatusChange, this);
+    EventBus.on('chat:agent-visit', this.onAgentVisit, this);
+    EventBus.on('chat:boardroom-meeting', this.onBoardroomMeeting, this);
 
-    // 7. 空闲 Agent 随机走动 (2.5s 周期，办公室活跃运转)
+    // 7. Idle wander (2.5s cycle)
     this.time.addEvent({
       delay: 2500,
       loop: true,
@@ -382,7 +390,7 @@ export class OfficeScene extends Phaser.Scene {
 
 
   // ============================================================
-  // 聊天事件 → Agent 地图移动 & 对话气泡
+  // Chat & Meeting Events → Real-time Desk Visits & Dialogues
   // ============================================================
   private onChatAgentMove(data: { agentId: string; roomId: string }) {
     this.moveAgentToRoom(data.agentId, data.roomId);
@@ -391,6 +399,7 @@ export class OfficeScene extends Phaser.Scene {
   private onAgentBubble(data: { agentSlug: string; text: string; duration?: number }) {
     this.showAgentBubble(data.agentSlug, data.text, data.duration);
   }
+
 
   // ============================================================
   // 房间名称标签
@@ -618,11 +627,11 @@ export class OfficeScene extends Phaser.Scene {
 
   private createAgents() {
     this.agentSpawns.forEach((spawn) => {
-      // 使用预定义的固定站位，不再从房间 spots 取
       const pos = (spawn as any).fixedSpawn || ROOMS[spawn.homeRoom]?.spots?.[0] || { x: 600, y: 400 };
+      const homeDesk = (spawn as any).homeDesk || { x: pos.x, y: pos.y, room: spawn.homeRoom, facingDir: 'down' };
 
       const sprite = this.add.sprite(0, 0, spawn.spriteKey);
-      sprite.play(`${spawn.spriteKey}-idle-down`);
+      sprite.play(`${spawn.spriteKey}-idle-${homeDesk.facingDir}`);
 
       const nameTag = this.add.text(0, -42, spawn.name, {
         fontFamily: 'monospace',
@@ -656,9 +665,11 @@ export class OfficeScene extends Phaser.Scene {
         isMoving: false,
         homeRoom: spawn.homeRoom,
         currentRoom: spawn.homeRoom,
+        homeDesk,
       });
     });
   }
+
 
   private getDirection(dx: number, dy: number): Direction {
     if (Math.abs(dx) > Math.abs(dy)) {
@@ -1183,13 +1194,161 @@ export class OfficeScene extends Phaser.Scene {
     return nearest;
   }
 
+  // ============================================================
+  // Corporate Communication & Desk Visit Protocols
+  // ============================================================
+  private onAgentVisit(data: {
+    fromSlug: string;
+    fromName: string;
+    toSlug: string;
+    toName: string;
+    subject: string;
+    speakText: string;
+    replyText: string;
+    duration?: number;
+  }) {
+    const fromAgent = this.agents.find((a) => a.slug === data.fromSlug);
+    const toAgent = this.agents.find((a) => a.slug === data.toSlug);
+    if (!fromAgent || !toAgent || fromAgent.isMoving) return;
+
+    fromAgent.isVisiting = true;
+
+    // Calculate visitor spot standing in front of colleague's desk
+    const targetDesk = toAgent.homeDesk || { x: toAgent.container.x, y: toAgent.container.y, room: toAgent.currentRoom, facingDir: 'up' };
+    const visitorSpot = {
+      x: targetDesk.x > 500 ? targetDesk.x - 36 : targetDesk.x + 36,
+      y: targetDesk.y + (targetDesk.facingDir === 'up' ? 24 : -24),
+    };
+
+    this.walkAgentToPosition(fromAgent, visitorSpot, toAgent.homeRoom, () => {
+      // Arrived at colleague's desk!
+      fromAgent.isMoving = false;
+      const dx = toAgent.container.x - fromAgent.container.x;
+      const dy = toAgent.container.y - fromAgent.container.y;
+      fromAgent.sprite.play(`${fromAgent.spriteKey}-idle-${this.getDirection(dx, dy)}`);
+
+      // Host agent stops typing and turns to face visiting colleague
+      toAgent.sprite.play(`${toAgent.spriteKey}-idle-${this.getDirection(-dx, -dy)}`);
+
+      // Step 1: Visiting agent speaks
+      this.showAgentBubble(fromAgent.slug, data.speakText, 3500);
+
+      // Step 2: Colleague acknowledges & responds
+      this.time.delayedCall(1400, () => {
+        this.showAgentBubble(toAgent.slug, data.replyText, 3500);
+      });
+
+      // Step 3: Meeting concludes, visiting agent returns to their designated desk
+      const meetingDuration = data.duration || 4500;
+      this.time.delayedCall(meetingDuration, () => {
+        this.showAgentBubble(fromAgent.slug, '🤝 Done, heading back to my desk.', 1800);
+        this.time.delayedCall(1200, () => {
+          this.returnAgentToDesk(fromAgent);
+          toAgent.sprite.play(`${toAgent.spriteKey}-idle-${toAgent.homeDesk.facingDir}`);
+        });
+      });
+    });
+  }
+
+  private onBoardroomMeeting(data: {
+    leaderSlug: string;
+    leaderName: string;
+    subject: string;
+    text: string;
+    duration?: number;
+  }) {
+    const boardroomSpots = [
+      { x: 265, y: 620 },
+      { x: 365, y: 620 },
+      { x: 465, y: 620 },
+      { x: 265, y: 720 },
+      { x: 365, y: 720 },
+      { x: 465, y: 720 },
+      { x: 365, y: 670 },
+    ];
+
+    let spotIdx = 0;
+    for (const agent of this.agents) {
+      const spot = boardroomSpots[spotIdx % boardroomSpots.length];
+      spotIdx++;
+      this.walkAgentToPosition(agent, spot, 'meeting', () => {
+        agent.isMoving = false;
+        agent.sprite.play(`${agent.spriteKey}-idle-up`);
+      });
+    }
+
+    this.time.delayedCall(2200, () => {
+      this.showAgentBubble(data.leaderSlug, data.text, 4500);
+    });
+
+    const meetingDuration = data.duration || 6000;
+    this.time.delayedCall(meetingDuration, () => {
+      for (const agent of this.agents) {
+        this.returnAgentToDesk(agent);
+      }
+    });
+  }
+
+  private walkAgentToPosition(
+    agent: AgentCharacter,
+    targetPos: { x: number; y: number },
+    targetRoomId: string,
+    onArrived: () => void,
+  ) {
+    if (agent.currentRoom === targetRoomId) {
+      agent.isMoving = true;
+      this.moveAlongPathWithCallback(agent, [targetPos], 0, () => {
+        agent.isMoving = false;
+        onArrived();
+      });
+      return;
+    }
+
+    const exitNode = ROOM_CORRIDOR[agent.currentRoom];
+    const targetNode = ROOM_CORRIDOR[targetRoomId];
+    if (!exitNode || !targetNode) { onArrived(); return; }
+
+    const corridorPath = this.findCorridorPath(exitNode, targetNode);
+    const room = ROOMS[agent.currentRoom];
+    const targetRoom = ROOMS[targetRoomId];
+    const fullPath = [
+      room.entry,
+      ...(corridorPath || []).map((id) => {
+        const node = CORRIDOR_NODES.find((n) => n.id === id);
+        return node ? { x: node.x, y: node.y } : room.entry;
+      }),
+      targetRoom.entry,
+      targetPos,
+    ];
+
+    agent.isMoving = true;
+    this.moveAlongPathWithCallback(agent, fullPath, 0, () => {
+      agent.isMoving = false;
+      agent.currentRoom = targetRoomId;
+      onArrived();
+    });
+  }
+
+  private returnAgentToDesk(agent: AgentCharacter) {
+    const desk = agent.homeDesk;
+    this.walkAgentToPosition(agent, { x: desk.x, y: desk.y }, desk.room, () => {
+      agent.isMoving = false;
+      agent.isVisiting = false;
+      agent.currentRoom = desk.room;
+      agent.sprite.play(`${agent.spriteKey}-idle-${desk.facingDir}`);
+    });
+  }
+
   shutdown() {
     EventBus.off('chat:agent-move', this.onChatAgentMove, this);
     EventBus.off('chat:agent-bubble', this.onAgentBubble, this);
     EventBus.off('agent:status', this.onAgentStatusChange, this);
+    EventBus.off('chat:agent-visit', this.onAgentVisit, this);
+    EventBus.off('chat:boardroom-meeting', this.onBoardroomMeeting, this);
   }
 
   update(_time: number, _delta: number) {
-    // WebSocket 事件驱动（未来）
+    // WebSocket / event driven updates
   }
 }
+

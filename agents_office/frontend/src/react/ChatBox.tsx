@@ -15,12 +15,18 @@ const GROUP_CONTACT_SLUG = 'group';
 
 interface ChatMessage {
   id: string;
-  role: 'user' | 'agent' | 'system' | 'dispatcher' | 'process' | 'skill';
+  role: 'user' | 'agent' | 'system' | 'dispatcher' | 'process' | 'skill' | 'inter_agent' | 'store_log';
   agentSlug?: string;
   agentName?: string;
+  toAgentSlug?: string;
+  toAgentName?: string;
+  subject?: string;
+  action?: string;
   content: string;
+  replyContent?: string;
   messageType?: string;
   timestamp: Date;
+  payload?: any;
   skillData?: {
     sessionId?: string;
     interactionType?: string;
@@ -28,6 +34,7 @@ interface ChatMessage {
     prompt?: any;
   };
 }
+
 
 interface ConversationSummary {
   conversation_id: string;
@@ -105,8 +112,9 @@ function parseMarkdownContent(content: string): React.ReactNode[] {
             </tbody>
           </table>
           {rows.length > 0 && (
-            <div style={tableStyles.footer}>{rows.length} 行数据</div>
+            <div style={tableStyles.footer}>{rows.length} rows</div>
           )}
+
         </div>,
       );
     } else {
@@ -257,14 +265,15 @@ function formatRelativeTime(isoStr: string): string {
   const now = new Date();
   const diffMs = now.getTime() - d.getTime();
   const diffMin = Math.floor(diffMs / 60000);
-  if (diffMin < 1) return '刚刚';
-  if (diffMin < 60) return `${diffMin} 分钟前`;
+  if (diffMin < 1) return 'Just now';
+  if (diffMin < 60) return `${diffMin}m ago`;
   const diffHr = Math.floor(diffMin / 60);
-  if (diffHr < 24) return `${diffHr} 小时前`;
+  if (diffHr < 24) return `${diffHr}h ago`;
   const diffDay = Math.floor(diffHr / 24);
-  if (diffDay < 30) return `${diffDay} 天前`;
-  return d.toLocaleDateString('zh-CN');
+  if (diffDay < 30) return `${diffDay}d ago`;
+  return d.toLocaleDateString('en-US');
 }
+
 
 // ============================================================
 // ChatBox 组件
@@ -365,6 +374,107 @@ export const ChatBox: React.FC = () => {
     return list;
   }, [agents, lastMessages]);
 
+  // 1. Initial fetch of agent communication logs & live bridge synchronization
+  useEffect(() => {
+    fetch('/api/admin/agent-messages?limit=25')
+      .then((r) => r.json())
+      .then((data) => {
+        const msgs = data.messages || [];
+        const loaded: ChatMessage[] = msgs.reverse().map((m: any) => {
+          const fromRaw = m.from_agent || m.from || 'Agent';
+          const toRaw = m.to_agent || m.to || 'All Store Fleet';
+          const fromSlug = fromRaw.toLowerCase().replace(/ agent/g, '').replace(/ /g, '_');
+          const toSlug = toRaw.toLowerCase().replace(/ agent/g, '').replace(/ /g, '_');
+          const cleanSubject = (m.subject || m.event_type || 'Store Communication').replace(/_/g, ' ');
+          let summary = '';
+          if (m.payload) {
+            if (typeof m.payload === 'string') summary = m.payload;
+            else if (m.payload.action && m.payload.details) summary = `${m.payload.action}: ${m.payload.details}`;
+            else if (m.payload.reason) summary = `${m.payload.reason}`;
+            else summary = JSON.stringify(m.payload, null, 2);
+          }
+          return {
+            id: m.id || m.message_id || `hist-${Math.random()}`,
+            role: 'inter_agent' as const,
+            agentSlug: fromSlug,
+            agentName: fromRaw,
+            toAgentSlug: toSlug,
+            toAgentName: toRaw,
+            subject: cleanSubject,
+            content: summary || cleanSubject,
+            timestamp: new Date(m.timestamp || Date.now()),
+          };
+        });
+        if (loaded.length > 0) {
+          setMessages((prev) => [...prev, ...loaded]);
+        }
+      })
+      .catch(() => {});
+
+    const onStoreMessage = (data: any) => {
+      const newMsg: ChatMessage = {
+        id: data.id || nextMsgId(),
+        role: 'inter_agent',
+        agentSlug: data.fromSlug,
+        agentName: data.fromName,
+        toAgentSlug: data.toSlug,
+        toAgentName: data.toName,
+        subject: data.subject,
+        content: data.content,
+        replyContent: data.replyContent,
+        payload: data.payload,
+        timestamp: new Date(data.timestamp || Date.now()),
+      };
+
+      setMessages((prev) => [...prev, newMsg]);
+
+      setLastMessages((prev) => ({
+        ...prev,
+        [GROUP_CONTACT_SLUG]: `${data.fromName}: ${data.subject || 'Inter-agent communication'}`,
+        [data.fromSlug]: `Sent: ${data.subject || 'Communication'}`,
+        ...(data.toSlug && data.toSlug !== 'all' ? { [data.toSlug]: `Received: ${data.subject || 'Message'}` } : {}),
+      }));
+    };
+
+    const onStoreLog = (data: any) => {
+      const newMsg: ChatMessage = {
+        id: data.id || nextMsgId(),
+        role: 'store_log',
+        agentSlug: data.agentSlug,
+        agentName: data.agentName,
+        action: data.action,
+        content: data.details || data.action,
+        timestamp: new Date(data.timestamp || Date.now()),
+      };
+
+      setMessages((prev) => [...prev, newMsg]);
+    };
+
+    EventBus.on('store:agent-message', onStoreMessage);
+    EventBus.on('store:agent-log', onStoreLog);
+
+    return () => {
+      EventBus.off('store:agent-message', onStoreMessage);
+      EventBus.off('store:agent-log', onStoreLog);
+    };
+  }, []);
+
+  const displayedMessages = React.useMemo(() => {
+    if (activeContact === GROUP_CONTACT_SLUG) {
+      return messages;
+    }
+    return messages.filter((m) => {
+      if (m.role === 'system') return true;
+      if (m.role === 'inter_agent') {
+        return m.agentSlug === activeContact || m.toAgentSlug === activeContact;
+      }
+      if (m.role === 'store_log') {
+        return m.agentSlug === activeContact;
+      }
+      return m.agentSlug === activeContact || m.role === 'user';
+    });
+  }, [messages, activeContact]);
+
   // 切换联系人
   const handleSelectContact = useCallback((slug: string) => {
     if (slug === activeContact) return;
@@ -374,15 +484,9 @@ export const ChatBox: React.FC = () => {
     setShowHistory(false);
     setActiveSkillSession(null);
     setSelectedProducts([]);
-
-    if (slug === GROUP_CONTACT_SLUG) {
-      setMessages([makeWelcomeMsg()]);
-    } else {
-      const agent = getAgents().find((a) => a.slug === slug);
-      setMessages([makeWelcomeMsg(agent?.name || slug)]);
-    }
     inputRef.current?.focus();
   }, [activeContact]);
+
 
   // 新建会话（在当前联系人下）
   const startNewConversation = useCallback(() => {
@@ -583,14 +687,14 @@ export const ChatBox: React.FC = () => {
             });
             break;
 
-          // Skill 事件处理
+          // Skill Event Handlers
           case 'skill_start': {
             const d = event.data;
             setActiveSkillSession(d.session_id);
             addMessage({
               role: 'skill',
               agentSlug: d.agent_slug,
-              content: `🔍 ${d.display_name} 技能启动中...`,
+              content: `🔍 Starting skill ${d.display_name}...`,
               messageType: 'skill_start',
               skillData: { sessionId: d.session_id },
             });
@@ -602,7 +706,7 @@ export const ChatBox: React.FC = () => {
             if (d.interaction_type === 'search_results') {
               addMessage({
                 role: 'skill',
-                content: d.content || '搜索完成',
+                content: d.content || 'Search complete',
                 messageType: 'skill_search_results',
                 skillData: {
                   sessionId: d.session_id || activeSkillSessionRef.current,
@@ -613,7 +717,7 @@ export const ChatBox: React.FC = () => {
             } else if (d.interaction_type === 'awaiting_user') {
               addMessage({
                 role: 'skill',
-                content: d.prompt?.message || '请选择要对比的商品',
+                content: d.prompt?.message || 'Please select products to compare',
                 messageType: 'skill_awaiting_user',
                 skillData: {
                   sessionId: d.session_id || activeSkillSessionRef.current,
@@ -624,7 +728,7 @@ export const ChatBox: React.FC = () => {
             } else if (d.interaction_type === 'comparison_result') {
               addMessage({
                 role: 'skill',
-                content: d.content || '比价分析完成',
+                content: d.content || 'Comparison analysis complete',
                 messageType: 'skill_comparison_result',
                 skillData: {
                   sessionId: d.session_id,
@@ -632,7 +736,7 @@ export const ChatBox: React.FC = () => {
                   payload: d.payload,
                 },
               });
-              updateLastMessage(activeContact, d.content || '比价分析完成');
+              updateLastMessage(activeContact, d.content || 'Comparison analysis complete');
             }
             break;
           }
@@ -655,7 +759,7 @@ export const ChatBox: React.FC = () => {
     } catch (err) {
       addMessage({
         role: 'system',
-        content: `连接失败: ${err instanceof Error ? err.message : '未知错误'}。请确认后端已启动。`,
+        content: `Connection failed: ${err instanceof Error ? err.message : 'Unknown error'}. Please check if backend is running.`,
       });
     } finally {
       for (const slug of activeAgentSlugs) {
@@ -665,7 +769,7 @@ export const ChatBox: React.FC = () => {
     }
   }, [input, sending, addMessage, conversationId, activeContact, agents, loadConversations, updateLastMessage]);
 
-  // Skill 商品选择切换
+  // Skill product selection toggle
   const toggleProductSelection = useCallback((productId: string) => {
     setSelectedProducts((prev) => {
       if (prev.includes(productId)) return prev.filter((id) => id !== productId);
@@ -674,14 +778,14 @@ export const ChatBox: React.FC = () => {
     });
   }, []);
 
-  // Skill 用户响应
+  // Skill user response
   const handleSkillRespond = useCallback(async () => {
     if (!activeSkillSession || selectedProducts.length < 2 || skillResponding) return;
 
     setSkillResponding(true);
     addMessage({
       role: 'user',
-      content: `已选择 ${selectedProducts.length} 个商品进行对比`,
+      content: `Selected ${selectedProducts.length} items for comparison`,
     });
 
     try {
@@ -695,7 +799,7 @@ export const ChatBox: React.FC = () => {
               if (d.interaction_type === 'comparison_result') {
                 addMessage({
                   role: 'skill',
-                  content: d.content || '比价分析完成',
+                  content: d.content || 'Comparison analysis complete',
                   messageType: 'skill_comparison_result',
                   skillData: {
                     interactionType: 'comparison_result',
@@ -713,7 +817,7 @@ export const ChatBox: React.FC = () => {
               setActiveSkillSession(null);
               addMessage({
                 role: 'system',
-                content: `比价分析失败: ${event.data.error || '未知错误'}`,
+                content: `Comparison failed: ${event.data.error || 'Unknown error'}`,
               });
               break;
           }
@@ -722,23 +826,23 @@ export const ChatBox: React.FC = () => {
     } catch (err) {
       addMessage({
         role: 'system',
-        content: `响应失败: ${err instanceof Error ? err.message : '未知错误'}`,
+        content: `Response failed: ${err instanceof Error ? err.message : 'Unknown error'}`,
       });
     } finally {
       setSkillResponding(false);
     }
   }, [activeSkillSession, selectedProducts, skillResponding, addMessage]);
 
-  // 文件上传
+  // File upload
   const uploadFile = useCallback(async (file: File) => {
     const ext = file.name.split('.').pop()?.toLowerCase();
     if (!ext || !['csv', 'xlsx', 'xls'].includes(ext)) {
-      addMessage({ role: 'system', content: `不支持的文件格式 .${ext}，请上传 .csv 或 .xlsx 文件` });
+      addMessage({ role: 'system', content: `Unsupported file format .${ext}. Please upload .csv or .xlsx files.` });
       return;
     }
 
     setUploading(true);
-    addMessage({ role: 'system', content: `正在上传 ${file.name}...` });
+    addMessage({ role: 'system', content: `Uploading ${file.name}...` });
 
     const formData = new FormData();
     formData.append('file', file);
@@ -749,7 +853,7 @@ export const ChatBox: React.FC = () => {
         body: formData,
       });
 
-      setMessages((prev) => prev.filter((m) => m.content !== `正在上传 ${file.name}...`));
+      setMessages((prev) => prev.filter((m) => m.content !== `Uploading ${file.name}...`));
 
       if (res.ok) {
         const envelope = await res.json();
@@ -760,24 +864,25 @@ export const ChatBox: React.FC = () => {
 
         addMessage({
           role: 'system',
-          content: `文件 ${file.name} 上传成功 (${rows} 行 x ${cols} 列)。\n输入需求让数据工程师帮你处理，例如：\n"帮我分析刚才上传的文件并导入数据库"`,
+          content: `File ${file.name} uploaded successfully (${rows} rows x ${cols} cols).\nAsk an agent to process it, e.g.:\n"Analyze the uploaded file and import it into the inventory"`,
         });
 
         historyRef.current.push({
           role: 'user',
-          content: `[系统通知] 用户上传了文件: ${file.name}，路径: ${data?.file_path}，${rows} 行 x ${cols} 列`,
+          content: `[System] User uploaded file: ${file.name}, path: ${data?.file_path}, ${rows} rows x ${cols} cols`,
         });
       } else {
         const err = await res.json().catch(() => null);
-        addMessage({ role: 'system', content: `上传失败: ${err?.detail || res.statusText}` });
+        addMessage({ role: 'system', content: `Upload failed: ${err?.detail || res.statusText}` });
       }
     } catch {
-      setMessages((prev) => prev.filter((m) => m.content !== `正在上传 ${file.name}...`));
-      addMessage({ role: 'system', content: '上传失败: 网络错误' });
+      setMessages((prev) => prev.filter((m) => m.content !== `Uploading ${file.name}...`));
+      addMessage({ role: 'system', content: 'Upload failed: Network error' });
     } finally {
       setUploading(false);
     }
   }, [addMessage]);
+
 
   const triggerFileDialog = useCallback(() => {
     if (uploading || sending) return;
@@ -928,8 +1033,8 @@ export const ChatBox: React.FC = () => {
       {dragging && (
         <div style={styles.dropOverlay}>
           <div style={styles.dropIcon}>📂</div>
-          <div style={styles.dropText}>松开鼠标上传文件</div>
-          <div style={styles.dropHint}>支持 .csv / .xlsx / .xls</div>
+          <div style={styles.dropText}>Release to upload file</div>
+          <div style={styles.dropHint}>Supports .csv / .xlsx / .xls</div>
         </div>
       )}
 
@@ -949,7 +1054,7 @@ export const ChatBox: React.FC = () => {
             <div style={styles.headerLeft}>
               <button
                 onClick={toggleHistory}
-                title="会话历史"
+                title="Conversation History"
                 style={{
                   ...styles.headerBtn,
                   color: showHistory ? '#ffd700' : '#888',
@@ -967,7 +1072,7 @@ export const ChatBox: React.FC = () => {
             <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
               <button
                 onClick={startNewConversation}
-                title="新建对话"
+                title="New Conversation"
                 style={styles.headerBtn}
               >
                 +
@@ -979,12 +1084,12 @@ export const ChatBox: React.FC = () => {
           {showHistory && (
             <div style={styles.historyPanel}>
               <div style={styles.historyHeader}>
-                <span>会话历史</span>
-                <span style={{ color: '#888', fontSize: 12 }}>{conversations.length} 个会话</span>
+                <span>Conversation History</span>
+                <span style={{ color: '#888', fontSize: 12 }}>{conversations.length} chats</span>
               </div>
               <div style={styles.historyList}>
                 {conversations.length === 0 ? (
-                  <div style={styles.historyEmpty}>暂无历史会话</div>
+                  <div style={styles.historyEmpty}>No conversation history</div>
                 ) : (
                   conversations.map((conv) => (
                     <div
@@ -1007,10 +1112,10 @@ export const ChatBox: React.FC = () => {
                     >
                       <div style={styles.historyItemMain}>
                         <div style={styles.historyTitle}>
-                          {conv.title || '新对话'}
+                          {conv.title || 'New Chat'}
                         </div>
                         <div style={styles.historyMeta}>
-                          <span>{conv.message_count} 条消息</span>
+                          <span>{conv.message_count} messages</span>
                           <span>{formatRelativeTime(conv.updated_at)}</span>
                         </div>
                         {conv.last_message && (
@@ -1021,7 +1126,7 @@ export const ChatBox: React.FC = () => {
                       </div>
                       <button
                         onClick={(e) => deleteConversation(conv.conversation_id, e)}
-                        title="删除会话"
+                        title="Delete conversation"
                         style={styles.historyDeleteBtn}
                       >
                         ✕
@@ -1036,20 +1141,65 @@ export const ChatBox: React.FC = () => {
           {/* 加载中提示 */}
           {loadingHistory && (
             <div style={styles.loadingOverlay}>
-              加载历史消息中...
+              Loading conversation history...
             </div>
           )}
 
-          {/* 消息列表 */}
+          {/* Messages List */}
           <div style={styles.messageList}>
-            {messages.map((msg) => (
+            {displayedMessages.map((msg) => (
               <div key={msg.id} style={{ marginBottom: 10 }}>
                 {msg.role === 'system' ? (
                   <div style={styles.systemMsg}>{msg.content}</div>
                 ) : msg.role === 'user' ? (
                   <div>
-                    <div style={styles.senderLabel}>你</div>
+                    <div style={styles.senderLabel}>You</div>
                     <div style={styles.userBubble}>{msg.content}</div>
+                  </div>
+                ) : msg.role === 'inter_agent' ? (
+                  <div style={styles.interAgentCard}>
+                    <div style={styles.interAgentHeader}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                        <span style={{ color: getAgentColor(msg.agentSlug), fontWeight: 'bold', fontSize: 13 }}>
+                          {msg.agentName}
+                        </span>
+                        <span style={{ color: '#888', fontSize: 11 }}>➔</span>
+                        <span style={{ background: 'rgba(255,255,255,0.08)', padding: '2px 6px', borderRadius: 3, color: '#ffd700', fontSize: 11, fontWeight: 'bold' }}>
+                          {msg.toAgentName || 'All Fleet'}
+                        </span>
+                      </div>
+                      <span style={{ color: '#777', fontSize: 10 }}>{formatRelativeTime(msg.timestamp.toISOString())}</span>
+                    </div>
+                    {msg.subject && (
+                      <div style={styles.interAgentSubject}>
+                        📋 {msg.subject}
+                      </div>
+                    )}
+                    <div style={styles.interAgentBody}>
+                      {parseMarkdownContent(msg.content)}
+                    </div>
+                    {msg.replyContent && (
+                      <div style={styles.interAgentReply}>
+                        <div style={{ color: '#4ade80', fontSize: 11, fontWeight: 'bold', marginBottom: 2 }}>
+                          ↳ Response from {msg.toAgentName || 'Recipient'}:
+                        </div>
+                        <div style={{ color: '#ccc', fontSize: 12 }}>
+                          {msg.replyContent}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ) : msg.role === 'store_log' ? (
+                  <div style={styles.storeLogCard}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 3 }}>
+                      <span style={{ color: getAgentColor(msg.agentSlug), fontWeight: 'bold', fontSize: 12 }}>
+                        ⚡ {msg.agentName}
+                      </span>
+                      <span style={{ color: '#777', fontSize: 10 }}>{formatRelativeTime(msg.timestamp.toISOString())}</span>
+                    </div>
+                    <div style={{ color: '#ddd', fontSize: 12, lineHeight: '1.4' }}>
+                      <strong>{msg.action}</strong>: {msg.content}
+                    </div>
                   </div>
                 ) : msg.role === 'process' ? (
                   <div style={styles.processMsg}>
@@ -1095,15 +1245,15 @@ export const ChatBox: React.FC = () => {
                                     </div>
                                     <div style={skillStyles.productMeta}>
                                       <span style={skillStyles.productPrice}>
-                                        ¥{p.price}
+                                        ₹{p.price}
                                       </span>
                                       {p.original_price > p.price && (
                                         <span style={skillStyles.originalPrice}>
-                                          ¥{p.original_price}
+                                          ₹{p.original_price}
                                         </span>
                                       )}
                                       <span style={skillStyles.productRating}>
-                                        {p.rating} ({(p.review_count / 1000).toFixed(1)}k评)
+                                        {p.rating} ({(p.review_count / 1000).toFixed(1)}k reviews)
                                       </span>
                                     </div>
                                     {p.promotions?.length > 0 && (
@@ -1141,29 +1291,29 @@ export const ChatBox: React.FC = () => {
                     {msg.messageType === 'skill_comparison_result' && msg.skillData?.payload && (
                       <div style={skillStyles.comparisonCard}>
                         <div style={skillStyles.comparisonHeader}>
-                          {msg.skillData.payload.type_label || '比价结论'}
+                          {msg.skillData.payload.type_label || 'Comparison Result'}
                         </div>
                         <div style={skillStyles.recommendation}>
                           {msg.skillData.payload.recommendation}
                         </div>
                         <div style={skillStyles.priceRange}>
                           <div style={skillStyles.priceItem}>
-                            <span style={{ color: '#888' }}>最低价</span>
+                            <span style={{ color: '#888' }}>Lowest Price</span>
                             <span style={skillStyles.lowPrice}>
-                              ¥{msg.skillData.payload.price_range.min}
+                              ₹{msg.skillData.payload.price_range.min}
                             </span>
                           </div>
                           <div style={skillStyles.priceItem}>
-                            <span style={{ color: '#888' }}>最高价</span>
+                            <span style={{ color: '#888' }}>Highest Price</span>
                             <span style={{ color: '#ff6b6b', fontSize: 18 }}>
-                              ¥{msg.skillData.payload.price_range.max}
+                              ₹{msg.skillData.payload.price_range.max}
                             </span>
                           </div>
                           {msg.skillData.payload.price_range.savings > 0 && (
                             <div style={skillStyles.priceItem}>
-                              <span style={{ color: '#888' }}>可省</span>
+                              <span style={{ color: '#888' }}>Savings</span>
                               <span style={{ color: '#ffd700', fontSize: 18, fontWeight: 'bold' }}>
-                                ¥{msg.skillData.payload.price_range.savings}
+                                ₹{msg.skillData.payload.price_range.savings}
                               </span>
                             </div>
                           )}
@@ -1175,7 +1325,7 @@ export const ChatBox: React.FC = () => {
                                 <div key={platform} style={{ marginBottom: 4 }}>
                                   <span style={{ color: '#ffd700', fontSize: 11 }}>{platform}: </span>
                                   <span style={{ color: '#aaa', fontSize: 11 }}>
-                                    {(promos as string[]).join('、')}
+                                    {(promos as string[]).join(', ')}
                                   </span>
                                 </div>
                               ),
@@ -1205,6 +1355,7 @@ export const ChatBox: React.FC = () => {
             <div ref={messagesEndRef} />
           </div>
 
+
           {/* @提及下拉 */}
           {showMention && filteredAgents.length > 0 && (
             <div style={styles.mentionMenu}>
@@ -1229,7 +1380,7 @@ export const ChatBox: React.FC = () => {
           <div style={styles.inputArea}>
             <button
               type="button"
-              title="上传 CSV / Excel 文件（也可拖拽文件到聊天区）"
+              title="Upload CSV / Excel file (or drag and drop into chat)"
               onClick={triggerFileDialog}
               disabled={uploading || sending}
               style={{
@@ -1479,6 +1630,50 @@ const styles: Record<string, React.CSSProperties> = {
     lineHeight: '1.6',
     whiteSpace: 'pre-wrap' as const,
   },
+  interAgentCard: {
+    background: 'rgba(20, 20, 45, 0.85)',
+    border: '1px solid rgba(255, 215, 0, 0.3)',
+    borderRadius: '6px',
+    padding: '10px 12px',
+    fontSize: '13px',
+    lineHeight: '1.5',
+    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.4)',
+  },
+  interAgentHeader: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingBottom: '6px',
+    marginBottom: '6px',
+    borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+  },
+  interAgentSubject: {
+    fontSize: '12px',
+    fontWeight: 'bold',
+    color: '#ffd700',
+    marginBottom: '6px',
+    letterSpacing: '0.5px',
+  },
+  interAgentBody: {
+    color: '#e0e0e0',
+    fontSize: '13px',
+    lineHeight: '1.6',
+    whiteSpace: 'pre-wrap' as const,
+  },
+  interAgentReply: {
+    marginTop: '8px',
+    padding: '8px 10px',
+    background: 'rgba(74, 222, 128, 0.08)',
+    borderLeft: '3px solid #4ade80',
+    borderRadius: '3px',
+  },
+  storeLogCard: {
+    background: 'rgba(255, 255, 255, 0.04)',
+    borderLeft: '3px solid #60a5fa',
+    borderRadius: '4px',
+    padding: '8px 10px',
+    fontSize: '12px',
+  },
   mentionMenu: {
     padding: '6px',
     background: 'rgba(20, 20, 50, 0.98)',
@@ -1486,6 +1681,7 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: '4px',
     margin: '0 14px',
   },
+
   mentionItem: {
     padding: '8px 10px',
     cursor: 'pointer',

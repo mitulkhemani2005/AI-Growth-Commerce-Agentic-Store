@@ -77,7 +77,7 @@ def get_full_registry() -> Dict[str, Dict[str, Any]]:
 
 
 def build_dispatcher_prompt(registry: Dict[str, Dict[str, Any]]) -> str:
-    """根据当前活跃 Agent 注册表动态构建调度员系统提示词。"""
+    """Dynamically construct Dispatcher system prompt based on active store fleet agents."""
     agent_descriptions = []
     for i, (slug, defn) in enumerate(registry.items(), 1):
         name = defn.get("display_name", slug)
@@ -88,7 +88,7 @@ def build_dispatcher_prompt(registry: Dict[str, Dict[str, Any]]) -> str:
 
     agents_section = "\n".join(agent_descriptions)
 
-    # 动态加载可用 Skill 列表
+    # Load available skills if any
     skills_section = ""
     try:
         from app.services.skills.registry import list_skills as list_registered_skills
@@ -96,37 +96,34 @@ def build_dispatcher_prompt(registry: Dict[str, Dict[str, Any]]) -> str:
         if skills:
             skill_lines = []
             for s in skills:
-                agents_str = "、".join(s.get("agent_slugs", []))
+                agents_str = ", ".join(s.get("agent_slugs", []))
                 skill_lines.append(
-                    f"- **{s['display_name']}** (`{s['name']}`) — {s['description']}（关联 Agent: {agents_str}）"
+                    f"- **{s['display_name']}** (`{s['name']}`) — {s['description']} (Assigned Agents: {agents_str})"
                 )
-            skills_section = "\n## 可用 Skill（高级能力）\n\n" + "\n".join(skill_lines) + "\n"
+            skills_section = "\n## Available Skills\n\n" + "\n".join(skill_lines) + "\n"
     except Exception:
         pass
 
-    return f"""你是 AgentsOffice 的调度员（Dispatcher），负责理解用户需求并分配给合适的 Agent。
+    return f"""You are the Dispatcher Agent of the AI Growth Commerce Store. You analyze customer and administrative requests and route them to the appropriate specialist agent in the fleet.
 
-## 可用 Agent
+## Store Fleet Agents:
 
 {agents_section}
 {skills_section}
-## 你的工作规则
+## Routing Rules:
+- Carefully evaluate the user's intent.
+- Assign the task to the most suitable specialist agent (e.g. price_manager for prices/margins, inventory_manager for stock/warehouse, order_manager for orders/tracking, finance_manager for refunds/treasury, review_manager for customer reviews, or ceo for high-level business strategy).
+- If the user is just casually greeting or making small talk, reply warmly and directly without routing.
+- When delegating to an agent, call `assign_task`.
+- Always respond in English.
 
-- 分析用户的意图，决定交给谁处理
-- 根据每个 Agent 的职责描述选择最合适的 Agent
-- 当用户需求明确匹配某个 Skill 的能力时（如比价、跨平台对比），优先调用 trigger_skill
-- 如果需要多个 Agent 协作 → 说明协作方式
-- 如果用户在闲聊/打招呼 → 你直接回复，不需要分配
-
-## 输出格式
-
-- 需要触发 Skill → 调用 trigger_skill
-- 需要分配给 Agent → 调用 assign_task
-- 闲聊 → 直接回复文字"""
+## Output Format:
+- Delegating task → Call assign_task
+- Small talk / greeting → Reply directly in English"""
 
 
 def build_dispatcher_tools(registry: Dict[str, Dict[str, Any]]) -> List[Dict]:
-    """根据当前活跃 Agent 注册表动态构建调度员工具定义。"""
+    """Dynamically construct Dispatcher tool schemas."""
     agent_slugs = list(registry.keys())
 
     tools: List[Dict] = [
@@ -134,22 +131,22 @@ def build_dispatcher_tools(registry: Dict[str, Dict[str, Any]]) -> List[Dict]:
             "type": "function",
             "function": {
                 "name": "assign_task",
-                "description": "将用户任务分配给指定 Agent 执行",
+                "description": "Assign the user task to a specialist store agent in the fleet",
                 "parameters": {
                     "type": "object",
                     "properties": {
                         "agent_slug": {
                             "type": "string",
                             "enum": agent_slugs,
-                            "description": "目标 Agent 标识",
+                            "description": "Target Agent Slug identifier",
                         },
                         "task_summary": {
                             "type": "string",
-                            "description": "简要说明分配给 Agent 的任务内容",
+                            "description": "Concise summary of the task assigned to the agent in English",
                         },
                         "needs_collaboration": {
                             "type": "boolean",
-                            "description": "是否需要多 Agent 协作",
+                            "description": "Whether multi-agent boardroom collaboration is required",
                         },
                     },
                     "required": ["agent_slug", "task_summary"],
@@ -158,7 +155,7 @@ def build_dispatcher_tools(registry: Dict[str, Dict[str, Any]]) -> List[Dict]:
         },
     ]
 
-    # 动态添加 Skill 触发工具
+    # Dynamically add skill trigger tool if registered
     try:
         from app.services.skills.registry import list_skills as list_registered_skills
         skills = list_registered_skills()
@@ -168,21 +165,18 @@ def build_dispatcher_tools(registry: Dict[str, Dict[str, Any]]) -> List[Dict]:
                 "type": "function",
                 "function": {
                     "name": "trigger_skill",
-                    "description": (
-                        "当用户需求明确匹配某个 Skill 的高级能力时调用（如跨平台比价、"
-                        "商品对比等）。Skill 是多步骤交互流程，会引导用户完成操作。"
-                    ),
+                    "description": "Trigger an interactive multi-step skill session",
                     "parameters": {
                         "type": "object",
                         "properties": {
                             "skill_name": {
                                 "type": "string",
                                 "enum": skill_names,
-                                "description": "要触发的 Skill 标识",
+                                "description": "Identifier of the skill to trigger",
                             },
                             "query": {
                                 "type": "string",
-                                "description": "从用户消息中提取的核心搜索关键词（去除意图词，保留商品名/品类）",
+                                "description": "Core search query extracted from user message",
                             },
                         },
                         "required": ["skill_name", "query"],
@@ -193,3 +187,4 @@ def build_dispatcher_tools(registry: Dict[str, Dict[str, Any]]) -> List[Dict]:
         pass
 
     return tools
+

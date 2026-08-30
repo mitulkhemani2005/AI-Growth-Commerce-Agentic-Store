@@ -30,16 +30,10 @@ const LOCALE_NAMES: Record<Locale, string> = {
 
 const STORAGE_KEY = 'agents-office-locale';
 
-/** 检测浏览器语言 */
+/** 检测浏览器语言 (默认一律使用 English) */
 function detectLocale(): Locale {
   const saved = localStorage.getItem(STORAGE_KEY) as Locale;
   if (saved && MESSAGES[saved]) return saved;
-
-  const lang = navigator.language || 'en';
-  if (lang.startsWith('zh')) {
-    return lang.includes('TW') || lang.includes('HK') ? 'zh-TW' : 'zh-CN';
-  }
-  if (lang.startsWith('ja')) return 'ja';
   return 'en';
 }
 
@@ -67,7 +61,7 @@ export function onLocaleChange(fn: (locale: Locale) => void): () => void {
 
 /** 翻译函数 */
 export function t(key: string, params?: Record<string, string | number>): string {
-  let msg = MESSAGES[currentLocale]?.[key] || MESSAGES['zh-CN']?.[key] || key;
+  let msg = MESSAGES[currentLocale]?.[key] || MESSAGES['en']?.[key] || key;
   if (params) {
     Object.entries(params).forEach(([k, v]) => {
       msg = msg.replace(new RegExp(`\\{${k}\\}`, 'g'), String(v));
@@ -75,6 +69,7 @@ export function t(key: string, params?: Record<string, string | number>): string
   }
   return msg;
 }
+
 
 /** 获取所有可用语言 */
 export function getAvailableLocales(): Array<{ code: Locale; name: string }> {

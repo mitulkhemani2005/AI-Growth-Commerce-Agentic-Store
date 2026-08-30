@@ -92,18 +92,18 @@ async def dispatch(
                 result_messages.append({
                     "role": "dispatcher",
                     "agent_slug": "dispatcher",
-                    "agent_name": "调度员",
-                    "content": f"收到，我来启动{skill_name}技能帮你处理。",
+                    "agent_name": "Dispatcher Agent",
+                    "content": f"Understood, starting {skill_name} skill to handle this.",
                     "usage": dispatcher_result["usage"],
                     "message_type": "routing",
-                    "movement": {"agent_id": "agt_dispatcher", "room_id": "manager"},
+                    "movement": {"agent_id": "agt_dispatcher", "room_id": "showroom"},
                 })
 
-                # 找到 Skill 关联的 Agent slug（用于前端展示）
+                # Skill associated agent slug
                 from app.services.skills.registry import get_skill
                 skill_obj = get_skill(skill_name)
                 agent_slug_for_skill = (
-                    skill_obj.agent_slugs[0] if skill_obj and skill_obj.agent_slugs else "shopping_guide"
+                    skill_obj.agent_slugs[0] if skill_obj and skill_obj.agent_slugs else "price_manager"
                 )
 
                 skill_events = []
@@ -126,24 +126,24 @@ async def dispatch(
 
             elif func_name == "assign_task":
                 args = json.loads(func.get("arguments", "{}"))
-                agent_slug = args.get("agent_slug", "shopping_guide")
+                agent_slug = args.get("agent_slug", "price_manager")
                 task_summary = args.get("task_summary", user_message)
 
-                # 从注册表获取 Agent 信息
+                # Get agent info from registry
                 agent_defn = registry.get(agent_slug, {})
                 target_name = agent_defn.get("display_name", agent_slug)
 
                 result_messages.append({
                     "role": "dispatcher",
                     "agent_slug": "dispatcher",
-                    "agent_name": "调度员",
-                    "content": f"收到，这个需求交给{target_name}处理。",
+                    "agent_name": "Dispatcher Agent",
+                    "content": f"Understood, delegating this task to {target_name}.",
                     "usage": dispatcher_result["usage"],
                     "message_type": "routing",
-                    "movement": {"agent_id": "agt_dispatcher", "room_id": "manager"},
+                    "movement": {"agent_id": "agt_dispatcher", "room_id": "showroom"},
                 })
 
-                # 确定目标模型和代理配置：per-agent 配置 > 全局 agent_model
+                # Determine model
                 target_model = None
                 target_api_base = None
                 target_api_key = None
@@ -169,12 +169,13 @@ async def dispatch(
         result_messages.append({
             "role": "dispatcher",
             "agent_slug": "dispatcher",
-            "agent_name": "调度员",
+            "agent_name": "Dispatcher Agent",
             "content": dispatcher_result["content"],
             "usage": dispatcher_result["usage"],
             "message_type": "response",
             "movement": None,
         })
+
 
     agent_movements = [
         msg["movement"] for msg in result_messages

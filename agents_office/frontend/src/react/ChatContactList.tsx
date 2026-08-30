@@ -42,10 +42,11 @@ export const ChatContactList: React.FC<ChatContactListProps> = ({
                 if (!isActive) e.currentTarget.style.background = 'transparent';
               }}
             >
-              {/* 头像/颜色点 */}
+              {/* Avatar / Color badge */}
               <div style={{ ...styles.avatar, background: c.color }}>
-                {c.slug === 'group' ? '群' : c.name.charAt(0)}
+                {c.slug === 'group' ? '👥' : c.name.charAt(0)}
               </div>
+
 
               <div style={styles.info}>
                 <div style={styles.nameRow}>

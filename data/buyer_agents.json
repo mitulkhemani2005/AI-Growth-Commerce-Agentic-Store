@@ -12,14 +12,14 @@
     "price_sensitivity": "Low (Unlimited Budget)",
     "return_probability": 0.05,
     "review_sentiment": "Positive & Technical",
-    "total_spent": 1073.8,
-    "orders_count": 8,
+    "total_spent": 2179.23,
+    "orders_count": 17,
     "returns_count": 0,
-    "reviews_written": 8,
-    "status": "Browsing catalog (Next order in ~119s)",
-    "next_purchase_ts": 1788126444.264792,
-    "next_delay_seconds": 119,
-    "last_action_ts": 1788126325.26479
+    "reviews_written": 17,
+    "status": "Browsing catalog (Next order in ~265s)",
+    "next_purchase_ts": 1788128252.338304,
+    "next_delay_seconds": 265,
+    "last_action_ts": 1788127987.338303
   },
   {
     "id": "buyer_sophia",
@@ -34,14 +34,14 @@
     "price_sensitivity": "High (Values Good Deals)",
     "return_probability": 0.2,
     "review_sentiment": "Value & Quality Focused",
-    "total_spent": 365.11,
-    "orders_count": 5,
+    "total_spent": 720.17,
+    "orders_count": 11,
     "returns_count": 0,
-    "reviews_written": 5,
-    "status": "Browsing catalog (Next order in ~261s)",
-    "next_purchase_ts": 1788126552.6324944,
-    "next_delay_seconds": 261,
-    "last_action_ts": 1788126291.6324933
+    "reviews_written": 11,
+    "status": "Browsing catalog (Next order in ~225s)",
+    "next_purchase_ts": 1788128125.493181,
+    "next_delay_seconds": 225,
+    "last_action_ts": 1788127900.4931796
   },
   {
     "id": "buyer_david",
@@ -56,14 +56,14 @@
     "price_sensitivity": "Medium",
     "return_probability": 0.15,
     "review_sentiment": "Acoustic & Feature Detailed",
-    "total_spent": 507.43,
-    "orders_count": 9,
+    "total_spent": 758.98,
+    "orders_count": 14,
     "returns_count": 0,
-    "reviews_written": 9,
-    "status": "Browsing catalog (Next order in ~134s)",
-    "next_purchase_ts": 1788126566.8903375,
-    "next_delay_seconds": 20,
-    "last_action_ts": 1788126388.8296041
+    "reviews_written": 14,
+    "status": "Browsing catalog (Next order in ~282s)",
+    "next_purchase_ts": 1788128188.1881833,
+    "next_delay_seconds": 282,
+    "last_action_ts": 1788127906.1881828
   },
   {
     "id": "buyer_elena",
@@ -79,14 +79,14 @@
     "price_sensitivity": "Zero (Unlimited Budget)",
     "return_probability": 0.08,
     "review_sentiment": "Sophisticated & Enthusiastic",
-    "total_spent": 792.06,
-    "orders_count": 8,
+    "total_spent": 1577.69,
+    "orders_count": 16,
     "returns_count": 0,
-    "reviews_written": 8,
-    "status": "Browsing catalog (Next order in ~196s)",
-    "next_purchase_ts": 1788126598.2656343,
-    "next_delay_seconds": 196,
-    "last_action_ts": 1788126402.2656336
+    "reviews_written": 16,
+    "status": "Browsing catalog (Next order in ~108s)",
+    "next_purchase_ts": 1788128030.0025723,
+    "next_delay_seconds": 108,
+    "last_action_ts": 1788127922.002571
   },
   {
     "id": "buyer_marcus",
@@ -102,13 +102,13 @@
     "price_sensitivity": "Low",
     "return_probability": 0.3,
     "review_sentiment": "Expressive with Emojis",
-    "total_spent": 300.43,
-    "orders_count": 4,
+    "total_spent": 779.11,
+    "orders_count": 12,
     "returns_count": 0,
-    "reviews_written": 4,
-    "status": "Browsing catalog (Next order in ~96s)",
-    "next_purchase_ts": 1788126571.8903375,
-    "next_delay_seconds": 25,
-    "last_action_ts": 1788126430.110942
+    "reviews_written": 12,
+    "status": "Browsing catalog (Next order in ~264s)",
+    "next_purchase_ts": 1788128272.2389781,
+    "next_delay_seconds": 264,
+    "last_action_ts": 1788128008.2389772
   }
 ]
