@@ -7,7 +7,7 @@ client = TestClient(app)
 
 @pytest.fixture(autouse=True)
 def setup_treasury():
-    treasury_manager.reset_treasury(1000.0)
+    treasury_manager.reset_treasury(500000.0)
     yield
 
 def test_api_treasury_overview():
@@ -23,7 +23,7 @@ def test_api_salaries():
     assert res.status_code == 200
     data = res.json()
     assert data["success"] is True
-    assert len(data["salaries"]) == 6
+    assert len(data["salaries"]) == 7
 
 def test_api_buyers_list():
     res = client.get("/api/admin/buyers")

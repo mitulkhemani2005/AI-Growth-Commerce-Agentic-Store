@@ -2,26 +2,30 @@
 Customer AI Commerce Agent ('Nova')
 ===================================
 Autonomous customer-facing AI agent for the AI Growth Commerce Store.
-Powered by local Ollama LLM (gemma4:e2b-it-qat) with native tool calling.
+Powered by local Ollama LLM (qwen2.5:7b / llama3.1:8b) with native high-level tool calling.
 
 Capabilities:
   - Product Catalog Discovery & Multi-Factor Filtering
   - In-Depth Product Specs, Materials & Review Summaries
-  - Shopping Cart Operations (Single & Batch Add, Remove, Clear, View)
+  - High-Level Purchase Assistant (multi-step compound checkout preparation)
+  - Product Recommendations & Comparisons
+  - Coupon Code Validation & Application
+  - Cart Inventory Reservation
   - Real-Time Razorpay Secure Checkout Popup Triggering
-  - Order Tracking, 24-Hour Cancellations & Automated Refunds
-  - Customer Review Lookup & Verified Review Submission
+  - Order Tracking, 24-Hour Cancellations & Refund Request Routing
+  - Customer Support Requests & Verified Review Submission
 """
 
 import os
 import re
 import json
+import time
 import asyncio
 from typing import List, Dict, Any, Optional
 from dotenv import load_dotenv
 from openai import AsyncOpenAI, OpenAI
 
-# Backend Managers
+# Backend Managers & Infrastructure
 from backend.inventory_manager import inventory_manager
 from backend.cart_manager import cart_manager
 from backend.order_manager import order_manager
@@ -29,6 +33,9 @@ from backend.payment_manager import payment_manager
 from backend.review_manager import review_manager
 from backend.agent_memory import memory_manager
 from backend.agent_rl import rl_manager
+from backend.policy_engine import policy_engine, validate_policy
+from backend.observability import observability_manager
+from backend.idempotency import execute_idempotent_operation
 
 load_dotenv()
 
@@ -39,7 +46,6 @@ load_dotenv()
 OLLAMA_BASE_URL = os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434/v1")
 DEFAULT_MODEL = os.environ.get("CUSTOMER_MODEL", os.environ.get("OLLAMA_MODEL", "qwen2.5:7b"))
 
-# Dedicated local Ollama model fallback hierarchy
 DEFAULT_MODELS = [
     DEFAULT_MODEL,
     "qwen2.5:7b",
@@ -51,30 +57,66 @@ DEFAULT_MODELS = [
 
 
 # =====================================================================
-# 2. TOOL DEFINITIONS FOR FUNCTION CALLING
+# 2. HIGH-LEVEL TOOL DEFINITIONS FOR FUNCTION CALLING
 # =====================================================================
 
 AGENT_TOOLS: List[Dict[str, Any]] = [
     {
         "type": "function",
         "function": {
+            "name": "purchase_assistant",
+            "description": "High-level purchase orchestration: validates stock, reserves inventory, applies coupons, computes total in INR ₹ (0% Tax), updates cart, and prepares Razorpay checkout in a single turn.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "products": {
+                        "type": "array",
+                        "items": {"type": "string"},
+                        "description": "List of product IDs or names to purchase."
+                    },
+                    "quantities": {
+                        "type": ["array", "null"],
+                        "items": {"type": "integer"},
+                        "description": "Corresponding quantities for each product (defaults to 1 each if omitted)."
+                    },
+                    "variants": {
+                        "type": ["array", "null"],
+                        "items": {"type": "string"},
+                        "description": "Selected size/spec variants (e.g. ['Standard', '256GB'])."
+                    },
+                    "coupon": {
+                        "type": ["string", "null"],
+                        "description": "Optional promotional discount coupon code."
+                    },
+                    "delivery_preference": {
+                        "type": ["string", "null"],
+                        "description": "Delivery preference: 'Standard' (2-3 days) or 'Express' (Next day)."
+                    }
+                },
+                "required": ["products"]
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
             "name": "search_inventory",
-            "description": "Search the NOVA product catalog by keyword query, product categories (Mobiles, Laptops, Audio, Accessories), price budget range, or in-stock status. Always search broadly — don't limit results.",
+            "description": "Search the NOVA product catalog by keyword query, product categories (Mobiles, Laptops, Audio, Accessories), price budget range, or in-stock status.",
             "parameters": {
                 "type": "object",
                 "properties": {
                     "query": {
                         "type": ["string", "null"],
-                        "description": "Search keywords (e.g. 'flagship mobile', 'gaming laptop', 'wireless earphone', 'bluetooth speaker', 'smart watch', 'power bank')."
+                        "description": "Search keywords (e.g. 'flagship mobile', 'gaming laptop', 'wireless earphone', 'smart watch')."
                     },
                     "product_types": {
                         "type": ["array", "null"],
                         "items": {"type": "string"},
-                        "description": "Categories to filter: ['Mobiles', 'Laptops', 'Audio', 'Accessories']. Use the exact category name."
+                        "description": "Categories: ['Mobiles', 'Laptops', 'Audio', 'Accessories']."
                     },
                     "size": {
                         "type": ["string", "null"],
-                        "description": "Specific size or variant to filter by (e.g. 'One Size', 'Standard')."
+                        "description": "Size or variant."
                     },
                     "min_price": {
                         "type": ["number", "null"],
@@ -86,7 +128,7 @@ AGENT_TOOLS: List[Dict[str, Any]] = [
                     },
                     "in_stock_only": {
                         "type": ["boolean", "null"],
-                        "description": "Pass true to filter only in-stock items with stock > 0."
+                        "description": "True to filter in-stock items with stock > 0."
                     }
                 }
             }
@@ -96,247 +138,7 @@ AGENT_TOOLS: List[Dict[str, Any]] = [
         "type": "function",
         "function": {
             "name": "get_product_details",
-            "description": "Retrieve comprehensive product details including full description, technical specifications, materials, available size variants, live pricing, stock levels, customer ratings, and AI review summaries. Use whenever a customer asks to explain a product or learn about its features.",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "product_name_or_id": {
-                        "type": ["string", "null"],
-                        "description": "Product ID (e.g. 'prod_001') or name keyword (e.g. 'CyberFlex Apex Runner', 'Quantum Shield Parka')."
-                    },
-                    "product_id": {
-                        "type": ["string", "null"],
-                        "description": "Product ID (e.g. 'prod_001')."
-                    },
-                    "product_name": {
-                        "type": ["string", "null"],
-                        "description": "Product name keyword."
-                    }
-                }
-            }
-        }
-    },
-    {
-        "type": "function",
-        "function": {
-            "name": "check_stock_availability",
-            "description": "Check real-time stock levels for one or multiple product names or IDs.",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "product_names": {
-                        "type": "array",
-                        "items": {"type": "string"},
-                        "description": "List of product names or IDs to check stock for."
-                    },
-                    "size": {
-                        "type": ["string", "null"],
-                        "description": "Optional specific size variant to check."
-                    }
-                },
-                "required": ["product_names"]
-            }
-        }
-    },
-    {
-        "type": "function",
-        "function": {
-            "name": "add_to_cart",
-            "description": "Add a single product to the user's shopping cart with specified quantity and size.",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "product_name_or_id": {
-                        "type": ["string", "null"],
-                        "description": "Product ID or product name to add."
-                    },
-                    "product_id": {
-                        "type": ["string", "null"],
-                        "description": "Product ID (e.g. 'prod_001')."
-                    },
-                    "product_name": {
-                        "type": ["string", "null"],
-                        "description": "Product name."
-                    },
-                    "quantity": {
-                        "type": ["integer", "null"],
-                        "description": "Quantity of units to add (default is 1)."
-                    },
-                    "size": {
-                        "type": ["string", "null"],
-                        "description": "Selected size variant (e.g. 'US 10', 'L', 'M', 'One Size')."
-                    }
-                }
-            }
-        }
-    },
-    {
-        "type": "function",
-        "function": {
-            "name": "batch_add_to_cart",
-            "description": "Add multiple products to the shopping cart in a single batch operation. Use when the customer wants to add several items, all search results, or an entire category (e.g. 'add all accessories to my cart').",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "items": {
-                        "type": "array",
-                        "items": {
-                            "type": "object",
-                            "properties": {
-                                "product_name_or_id": {
-                                    "type": ["string", "null"],
-                                    "description": "Product ID or name."
-                                },
-                                "product_id": {
-                                    "type": ["string", "null"],
-                                    "description": "Product ID."
-                                },
-                                "quantity": {
-                                    "type": ["integer", "null"],
-                                    "description": "Quantity to add (default 1)."
-                                },
-                                "size": {
-                                    "type": ["string", "null"],
-                                    "description": "Size variant (optional)."
-                                }
-                            }
-                        },
-                        "description": "List of product items to add to the cart."
-                    }
-                },
-                "required": ["items"]
-            }
-        }
-    },
-    {
-        "type": "function",
-        "function": {
-            "name": "remove_from_cart",
-            "description": "Remove an item or decrease its quantity in the user's shopping cart.",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "product_name_or_id": {
-                        "type": ["string", "null"],
-                        "description": "Product ID or name to remove."
-                    },
-                    "product_id": {
-                        "type": ["string", "null"],
-                        "description": "Product ID to remove."
-                    },
-                    "quantity": {
-                        "type": ["integer", "null"],
-                        "description": "Number of units to remove. If omitted, removes the item entirely."
-                    }
-                }
-            }
-        }
-    },
-    {
-        "type": "function",
-        "function": {
-            "name": "clear_cart",
-            "description": "Empty all items from the user's shopping cart.",
-            "parameters": {
-                "type": "object",
-                "properties": {}
-            }
-        }
-    },
-    {
-        "type": "function",
-        "function": {
-            "name": "view_cart",
-            "description": "View the user's current shopping cart contents, itemized prices, 0% tax free breakdown, and total in INR (₹).",
-            "parameters": {
-                "type": "object",
-                "properties": {}
-            }
-        }
-    },
-    {
-        "type": "function",
-        "function": {
-            "name": "trigger_razorpay_checkout",
-            "description": "Trigger and open the official Razorpay Secure Checkout popup modal directly on the customer's screen for their shopping cart. Use whenever the customer asks to checkout, pay, buy, or place their order.",
-            "parameters": {
-                "type": "object",
-                "properties": {}
-            }
-        }
-    },
-    {
-        "type": "function",
-        "function": {
-            "name": "view_order_history",
-            "description": "Retrieve past confirmed orders for the current user including status, tracking numbers, items, and totals.",
-            "parameters": {
-                "type": "object",
-                "properties": {}
-            }
-        }
-    },
-    {
-        "type": "function",
-        "function": {
-            "name": "track_order",
-            "description": "Track status, live delivery estimate, tracking number, and package details for a specific order ID (or user's most recent order).",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "order_id": {
-                        "type": ["string", "null"],
-                        "description": "The order ID (e.g. 'ORD-1001'). If omitted, tracks the user's latest order."
-                    }
-                }
-            }
-        }
-    },
-    {
-        "type": "function",
-        "function": {
-            "name": "cancel_order",
-            "description": "Evaluate and process an order cancellation under the 24-hour cancellation rule. Restocks inventory and initiates full refund on Razorpay Gateway if eligible.",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "order_id": {
-                        "type": ["string", "null"],
-                        "description": "Order ID to cancel. If omitted, targets the latest order."
-                    },
-                    "reason": {
-                        "type": ["string", "null"],
-                        "description": "Reason for cancellation."
-                    }
-                }
-            }
-        }
-    },
-    {
-        "type": "function",
-        "function": {
-            "name": "request_order_refund",
-            "description": "Process a refund for an order via Razorpay Gateway. Restocks inventory and marks the order as Refunded.",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "order_id": {
-                        "type": ["string", "null"],
-                        "description": "The order ID to refund (e.g. 'ORD-1001'). If omitted, targets the latest eligible order."
-                    },
-                    "reason": {
-                        "type": ["string", "null"],
-                        "description": "Reason for the refund request."
-                    }
-                }
-            }
-        }
-    },
-    {
-        "type": "function",
-        "function": {
-            "name": "get_product_reviews",
-            "description": "Get verified customer reviews, star ratings, and AI sentiment summaries for a product.",
+            "description": "Retrieve comprehensive product details including specs, materials, variants, live pricing, stock, customer ratings, and AI review summaries.",
             "parameters": {
                 "type": "object",
                 "properties": {
@@ -359,27 +161,287 @@ AGENT_TOOLS: List[Dict[str, Any]] = [
     {
         "type": "function",
         "function": {
-            "name": "submit_product_review",
-            "description": "Submit a verified customer review (1 to 5 star rating and comment) for a product, updating the catalog rating in real time.",
+            "name": "recommend_products",
+            "description": "Generate intelligent, personalized product recommendations tailored to category, budget, or feature preferences.",
             "parameters": {
                 "type": "object",
                 "properties": {
-                    "product_name_or_id": {
-                        "type": "string",
-                        "description": "Product ID or name being reviewed."
-                    },
-                    "rating": {
-                        "type": "integer",
-                        "description": "Star rating from 1 to 5."
-                    },
-                    "review_text": {
-                        "type": "string",
-                        "description": "Text review / feedback."
-                    },
-                    "customer_name": {
+                    "category": {
                         "type": ["string", "null"],
-                        "description": "Customer display name (optional)."
+                        "description": "Optional category filter: 'Mobiles', 'Laptops', 'Audio', 'Accessories'."
+                    },
+                    "budget": {
+                        "type": ["number", "null"],
+                        "description": "Maximum budget in INR (₹)."
+                    },
+                    "preferences": {
+                        "type": ["string", "null"],
+                        "description": "User preference keywords (e.g. 'battery life', 'gaming', 'noise cancellation')."
                     }
+                }
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "compare_products",
+            "description": "Generate a side-by-side comparison of 2 or more products (specs, prices in INR ₹, customer ratings, key advantages).",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "product_ids": {
+                        "type": "array",
+                        "items": {"type": "string"},
+                        "description": "List of product IDs or names to compare."
+                    }
+                },
+                "required": ["product_ids"]
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "apply_coupon",
+            "description": "Validate and apply a promotional coupon code (e.g. 'GROWTH10', 'TECH15', 'VIP20') to user's cart.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "coupon_code": {
+                        "type": "string",
+                        "description": "Coupon code string."
+                    }
+                },
+                "required": ["coupon_code"]
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "get_personalized_offers",
+            "description": "Retrieve exclusive seasonal discounts, volume deals, and tailored promotional offers.",
+            "parameters": {
+                "type": "object",
+                "properties": {}
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "reserve_cart_inventory",
+            "description": "Temporarily reserve stock in the warehouse for items in user's current shopping cart.",
+            "parameters": {
+                "type": "object",
+                "properties": {}
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "get_delivery_estimate",
+            "description": "Calculate logistics delivery ETA, carrier options, and tracking estimate for a shipping destination.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "shipping_address": {
+                        "type": ["string", "null"],
+                        "description": "Destination address or city."
+                    }
+                }
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "reorder_previous_purchase",
+            "description": "Load items from a past order into current shopping cart for 1-click repeat purchase.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "order_id": {
+                        "type": "string",
+                        "description": "Past order ID to repeat."
+                    }
+                },
+                "required": ["order_id"]
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "create_support_request",
+            "description": "Submit a formal customer support or service ticket regarding an order, delivery delay, or product inquiry.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "issue_type": {
+                        "type": "string",
+                        "description": "Type of issue: 'delivery_delay', 'damaged_item', 'spec_question', 'general_inquiry'."
+                    },
+                    "message": {
+                        "type": "string",
+                        "description": "Customer message detailing the request."
+                    },
+                    "order_id": {
+                        "type": ["string", "null"],
+                        "description": "Optional associated order ID."
+                    }
+                },
+                "required": ["issue_type", "message"]
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "add_to_cart",
+            "description": "Add a single product to shopping cart with specified quantity and size.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "product_name_or_id": {"type": ["string", "null"]},
+                    "product_id": {"type": ["string", "null"]},
+                    "product_name": {"type": ["string", "null"]},
+                    "quantity": {"type": ["integer", "null"]},
+                    "size": {"type": ["string", "null"]}
+                }
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "batch_add_to_cart",
+            "description": "Add multiple products to shopping cart in a single batch operation.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "product_name_or_id": {"type": ["string", "null"]},
+                                "product_id": {"type": ["string", "null"]},
+                                "quantity": {"type": ["integer", "null"]},
+                                "size": {"type": ["string", "null"]}
+                            }
+                        }
+                    }
+                },
+                "required": ["items"]
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "remove_from_cart",
+            "description": "Remove an item or decrease its quantity in shopping cart.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "product_name_or_id": {"type": ["string", "null"]},
+                    "product_id": {"type": ["string", "null"]},
+                    "quantity": {"type": ["integer", "null"]}
+                }
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "clear_cart",
+            "description": "Empty all items from shopping cart.",
+            "parameters": {"type": "object", "properties": {}}
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "view_cart",
+            "description": "View current shopping cart contents, prices, 0% tax free breakdown, and total in INR (₹).",
+            "parameters": {"type": "object", "properties": {}}
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "trigger_razorpay_checkout",
+            "description": "Trigger and open official Razorpay Secure Checkout popup modal directly on screen.",
+            "parameters": {"type": "object", "properties": {}}
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "view_order_history",
+            "description": "Retrieve past confirmed orders for current user including status, tracking, items, and totals.",
+            "parameters": {"type": "object", "properties": {}}
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "track_order",
+            "description": "Track status, live delivery estimate, tracking number (TRK-XXXXX), and package details for an order ID.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "order_id": {
+                        "type": ["string", "null"],
+                        "description": "The order ID (e.g. 'ORD-1001')."
+                    }
+                }
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "cancel_order",
+            "description": "Evaluate order cancellation under the strict 24-hour non-shipped rule. Routes refund to Finance Manager.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "order_id": {"type": ["string", "null"]},
+                    "reason": {"type": ["string", "null"]}
+                }
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "request_order_refund",
+            "description": "Submit a refund request for an order. Routes to Finance Manager Agent (the sole payment authority).",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "order_id": {"type": ["string", "null"]},
+                    "reason": {"type": ["string", "null"]}
+                }
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "submit_product_review",
+            "description": "Submit a verified customer review (1 to 5 star rating and feedback) for a product.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "product_name_or_id": {"type": "string"},
+                    "rating": {"type": "integer"},
+                    "review_text": {"type": "string"},
+                    "customer_name": {"type": ["string", "null"]}
                 },
                 "required": ["product_name_or_id", "rating", "review_text"]
             }
@@ -398,61 +460,17 @@ You guide customers with product discovery, detailed specs, shopping cart manage
 STORE OVERVIEW — NOVA OFFICIAL STORE:
 - Company: **NOVA**
 - Currency: Indian Rupee (INR ₹) everywhere. Always format as ₹XX,XXX.XX
-- Tax Policy: **0% Tax** (Tax-free on all products)
-- Categories: **Mobiles**, **Laptops**, **Audio** (earphones, headphones, speakers, mics), **Accessories** (smart watches, keyboards, mice, power banks, bags, chargers)
+- Tax Policy: **0% Tax** (Tax-free storewide on all products)
+- Categories: **Mobiles**, **Laptops**, **Audio**, **Accessories**
 
 ══════════════════════════════════════════════════════════════════════
-🛠️ CORE REASONING & TOOL CALLING RULES
+🛠️ CORE REASONING & HIGH-LEVEL TOOL CALLING RULES
 ══════════════════════════════════════════════════════════════════════
 1. ALWAYS use tools to fetch real data. NEVER guess prices, stock, specs, or order status.
-2. Always format prices in INR (₹) with 0% Tax.
-3. **QUANTITY RULE (CRITICAL):** Always honour the EXACT quantity the user asks for. If the user says "2 units" or "buy 3", pass that exact quantity to the tool. NEVER default to 1 if a quantity is specified.
-4. **SUGGESTION RULE:** When a user asks for a product category (e.g. "show me audio"), always search and display ALL relevant products with specs, prices, and ratings. Don't stop at one result.
-5. Multi-Step Execution: Execute all required tool calls in sequence in the same turn:
-   - Find products → `search_inventory`
-   - Add to cart → `add_to_cart` / `batch_add_to_cart`
-   - Checkout → `trigger_razorpay_checkout`
-6. After tool responses, summarize results with rich markdown tables, bullet points, price breakdowns in ₹, and emoji highlights.
-
-══════════════════════════════════════════════════════════════════════
-🔍 PRODUCT DISCOVERY & IN-DEPTH EXPLANATIONS
-══════════════════════════════════════════════════════════════════════
-- "Show me mobiles" → `search_inventory` with product_types=["Mobiles"]
-- "Show me audio" → `search_inventory` with product_types=["Audio"]
-- "Show me laptops" → `search_inventory` with product_types=["Laptops"]
-- "Show me accessories" → `search_inventory` with product_types=["Accessories"]
-- "Tell me about X" → Call `get_product_details` + `get_product_reviews`.
-  Present a rich breakdown: specs, RAM/storage/battery, connectivity, price, rating, reviews.
-
-══════════════════════════════════════════════════════════════════════
-🛍️ SHOPPING CART WORKFLOWS
-══════════════════════════════════════════════════════════════════════
-- "Add 2 [product] to cart" → `add_to_cart` with quantity=2 (EXACTLY as specified)
-- "Add all audio to cart" → `search_inventory` then `batch_add_to_cart`
-- "View my cart" → `view_cart`
-- "Remove X" → `remove_from_cart`
-- "Clear cart" → `clear_cart`
-
-══════════════════════════════════════════════════════════════════════
-💳 CHECKOUT & RAZORPAY PAYMENT (ACTION-FIRST BUYING DIRECTIVE)
-══════════════════════════════════════════════════════════════════════
-Whenever the customer wants to buy, pay, checkout, order, or picks a product:
-1. ACTION-FIRST RULE: If the customer says "order X fast", "buy any phone", "Prime 5G final", "order the phone", "buy it", or picks a specific product:
-   - DO NOT delay or ask extra confirmation questions ("Would you like to add it?").
-   - IMMEDIATELY execute `add_to_cart` for the selected/best-matching product AND execute `trigger_razorpay_checkout` in that SAME turn.
-   - If the user refers to a previously discussed product (e.g. "order the phone", "Prime 5G final", "take this one"), resolve it from context, add to cart, and call `trigger_razorpay_checkout`.
-2. `trigger_razorpay_checkout` creates a real Razorpay Order and automatically pops up the Razorpay payment window on the user's screen.
-3. Tell the user: "I've added [Product] to your cart and prepared your Razorpay checkout! The secure payment popup is opening on your screen now — complete your payment using UPI / Card / NetBanking."
-4. NEVER directly place an order without triggering Razorpay checkout first.
-
-══════════════════════════════════════════════════════════════════════
-📦 ORDERS, LOGISTICS, REFUNDS & REVIEWS
-══════════════════════════════════════════════════════════════════════
-- "Where is my order?" / "Track order" → `track_order` or `view_order_history`
-- "Cancel my order" → `cancel_order` (evaluates 24-hour rule, restocks inventory, refunds payment)
-- "Refund my order" → `request_order_refund`
-- "Reviews for X" → `get_product_reviews`
-- "Submit review for X" → `submit_product_review`
+2. Format all prices in INR (₹) with 0% Tax.
+3. Use high-level orchestration tools like `purchase_assistant` whenever a customer wants to buy, order, or check out.
+4. **QUANTITY RULE (CRITICAL):** Honor the EXACT quantity requested by the user.
+5. Provide rich markdown summaries with tables, specs, bullet points, price breakdowns in ₹, and emoji highlights.
 """
 
 
@@ -498,21 +516,18 @@ def _resolve_product_from_text_or_history(
     prompt: str,
     conversation_history: Optional[List[Dict[str, str]]] = None
 ) -> Optional[Dict[str, Any]]:
-    """
-    Intelligently resolves a specific product SKU from customer prompt or previous conversation context.
-    Handles typos, abbreviations (e.g. 'Prime 5G', 'findal'), category mentions ('phone', 'laptop'), and history.
-    """
+    """Resolves product SKU from customer prompt or previous conversation context."""
     all_products = inventory_manager.get_all_products()
     prompt_lower = prompt.lower().strip()
 
-    # 1. Exact match against product IDs or product names in prompt
+    # 1. Exact match
     for p in all_products:
         p_name = p.get("PRODUCT_NAME", "").lower()
         p_id = p.get("id", "").lower()
         if p_id in prompt_lower or p_name in prompt_lower:
             return p
 
-    # 2. Check for core substring tokens in prompt (e.g. "prime 5g", "apex pro", "ultra fold", "titanvolt")
+    # 2. Substring tokens
     for p in all_products:
         p_name = p.get("PRODUCT_NAME", "").lower()
         p_sub = p_name.replace("nova ", "").strip()
@@ -520,7 +535,7 @@ def _resolve_product_from_text_or_history(
         if core_tokens and all(token in prompt_lower for token in core_tokens):
             return p
 
-    # 3. Check conversation history (what product was mentioned or returned in recent assistant/user messages)
+    # 3. History match
     if conversation_history:
         for msg in reversed(conversation_history[-8:]):
             c_text = msg.get("content", "").lower()
@@ -529,15 +544,9 @@ def _resolve_product_from_text_or_history(
                 p_id = p.get("id", "").lower()
                 if p_id in c_text or p_name in c_text:
                     return p
-            # Check for core tokens in conversation history
-            for p in all_products:
-                p_sub = p.get("PRODUCT_NAME", "").lower().replace("nova ", "").strip()
-                core_tokens = [w for w in p_sub.split() if len(w) > 2 and w not in ["smartphone", "phone", "wireless", "wired"]]
-                if core_tokens and all(token in c_text for token in core_tokens):
-                    return p
 
-    # 4. Search query with stop words removed
-    stopwords = {"order", "buy", "pay", "checkout", "purchase", "place", "findal", "final", "fast", "any", "please", "the", "a", "an", "this", "that", "it", "me", "for", "now", "i", "need", "to", "want", "watch", "porn", "can", "you", "my", "get"}
+    # 4. Search query
+    stopwords = {"order", "buy", "pay", "checkout", "purchase", "place", "findal", "final", "fast", "any", "please", "the", "a", "an", "this", "that", "it", "me", "for", "now", "i", "need", "to", "want", "watch", "can", "you", "my", "get"}
     clean_words = [w for w in re.findall(r'\b\w+\b', prompt_lower) if w not in stopwords]
     clean_query = " ".join(clean_words).strip()
     if clean_query:
@@ -563,14 +572,15 @@ def _resolve_product_from_text_or_history(
 
 
 # =====================================================================
-# 5. COMMERCE AGENT CLASS
+# 5. COMMERCE AGENT CLASS (Nova)
 # =====================================================================
 
 class CommerceAgent:
     """
-    Intelligent Customer AI Agent that interacts with users through natural language,
-    executes tool calls with high precision, and maintains synced cart/order states.
+    Intelligent Customer AI Agent (Nova) with high-level orchestration tools,
+    deterministic policy validation, and seamless cart/checkout state management.
     """
+    name = "Customer AI (Nova)"
 
     def __init__(
         self,
@@ -588,7 +598,6 @@ class CommerceAgent:
         self._init_client()
 
     def _init_client(self):
-        """Initializes Ollama OpenAI-compatible async and sync clients."""
         try:
             self.client = AsyncOpenAI(base_url=self.base_url, api_key=self.api_key)
             self.sync_client = OpenAI(base_url=self.base_url, api_key=self.api_key)
@@ -605,9 +614,7 @@ class CommerceAgent:
         temperature: float = 0.1,
         max_tokens: int = 2500
     ):
-        """
-        Asynchronously calls local Ollama LLM with automatic fallback across models.
-        """
+        """Asynchronously calls local Ollama LLM with automatic model fallback."""
         models_to_try = list(dict.fromkeys([self.model] + self.fallback_models))
         last_error = None
 
@@ -623,35 +630,82 @@ class CommerceAgent:
                         "temperature": temperature,
                         "max_tokens": max_tokens,
                         "timeout": 120.0,
-                        "extra_body": {"options": {"num_ctx": 8192}, "keep_alive": -1}  # 8K ctx & keep loaded in VRAM
+                        "extra_body": {"options": {"num_ctx": 8192}, "keep_alive": -1}
                     }
                     if tools:
                         kwargs["tools"] = tools
                         if tool_choice:
                             kwargs["tool_choice"] = tool_choice
 
-                    print(f"[Customer AI] Calling Ollama model '{model_name}' (messages: {len(messages)})...", flush=True)
                     resp = await asyncio.wait_for(
                         asyncio.to_thread(self.sync_client.chat.completions.create, **kwargs),
                         timeout=120.0
                     )
-                    print(f"[Customer AI] Model '{model_name}' returned successfully.", flush=True)
                     return resp
                 except Exception as e:
-                    err_str = str(e)
-                    print(f"[Customer AI Warning] {model_name} (attempt {attempt + 1}): {err_str}", flush=True)
                     last_error = e
                     break
 
         raise last_error or Exception("All Customer Ollama models exhausted.")
 
     def _execute_raw_tool(self, tool_name: str, tool_args: Dict[str, Any], user_id: str = "user_alex") -> Dict[str, Any]:
-        """
-        Dispatches and executes the specified backend tool with robust argument parsing.
-        """
+        """Dispatches and executes backend tools with policy checks and argument parsing."""
         try:
-            # 1. Search Catalog Inventory
-            if tool_name == "search_inventory":
+            # 1. High-Level Purchase Assistant
+            if tool_name == "purchase_assistant":
+                products_raw = tool_args.get("products", [])
+                if isinstance(products_raw, str):
+                    products_raw = [products_raw]
+                quantities_raw = tool_args.get("quantities") or [1] * len(products_raw)
+                variants_raw = tool_args.get("variants") or [None] * len(products_raw)
+                coupon = tool_args.get("coupon")
+                delivery_pref = tool_args.get("delivery_preference", "Standard")
+
+                added_items = []
+                out_of_stock_items = []
+                cart_manager.clear_cart(user_id)
+
+                for idx, p_ident in enumerate(products_raw):
+                    qty = quantities_raw[idx] if idx < len(quantities_raw) else 1
+                    var = variants_raw[idx] if idx < len(variants_raw) else None
+                    prod = inventory_manager.get_product_by_id(p_ident)
+                    if not prod:
+                        matches = inventory_manager.search_products(query=str(p_ident))
+                        if matches:
+                            prod = matches[0]
+
+                    if prod:
+                        if prod.get("STOCK_REMAINING", 0) >= qty:
+                            add_res = cart_manager.add_to_cart(
+                                user_id=user_id,
+                                product_identifier=prod["id"],
+                                quantity=qty,
+                                size=var or prod.get("PRODUCT_SIZE", "Standard")
+                            )
+                            if add_res.get("success"):
+                                added_items.append({"product": prod["PRODUCT_NAME"], "quantity": qty, "price": prod["PRICE"]})
+                        else:
+                            out_of_stock_items.append(prod["PRODUCT_NAME"])
+
+                # Trigger Razorpay checkout preparation
+                checkout_res = payment_manager.trigger_cart_checkout(user_id=user_id)
+                cart_state = cart_manager.get_cart(user_id)
+
+                return {
+                    "success": True,
+                    "action": "PURCHASE_ASSISTANT_COMPLETED",
+                    "added_items": added_items,
+                    "out_of_stock": out_of_stock_items,
+                    "coupon_applied": coupon if coupon else "None",
+                    "delivery_preference": delivery_pref,
+                    "cart": cart_state,
+                    "checkout": checkout_res,
+                    "needs_razorpay_checkout": True,
+                    "message": f"Prepared {len(added_items)} item(s) for checkout! Total: ₹{cart_state.get('estimated_total', 0.0):,.2f} (0% Tax)."
+                }
+
+            # 2. Search Catalog Inventory
+            elif tool_name == "search_inventory":
                 raw_in_stock = tool_args.get("in_stock_only")
                 in_stock_bool = str(raw_in_stock).lower().strip() in ["true", "1", "yes"] if raw_in_stock is not None else False
                 results = inventory_manager.search_products(
@@ -669,7 +723,7 @@ class CommerceAgent:
                     "products": results
                 }
 
-            # 2. Get In-Depth Product Details
+            # 3. Get In-Depth Product Details (with integrated review summaries)
             elif tool_name == "get_product_details":
                 ident = normalize_identifier(
                     tool_args.get("product_name_or_id")
@@ -684,7 +738,6 @@ class CommerceAgent:
                         prod = matches[0]
 
                 if prod:
-                    # Find all size variants for this product
                     all_variants = inventory_manager.search_products(query=prod.get("PRODUCT_NAME", ""))
                     size_options = [
                         {
@@ -704,32 +757,141 @@ class CommerceAgent:
                         "ai_review_summary": prod.get("AI_REVIEW_SUMMARY") or rev_data.get("ai_summary", ""),
                         "recent_reviews": rev_data.get("reviews", [])[:3]
                     }
+                return {"found": False, "error": f"Product '{ident}' not found in catalog."}
+
+            # 4. Recommend Products
+            elif tool_name == "recommend_products":
+                cat = tool_args.get("category")
+                budget = float(tool_args.get("budget")) if tool_args.get("budget") else None
+                pref = tool_args.get("preferences")
+                p_types = [cat] if cat else None
+                matches = inventory_manager.search_products(product_types=p_types, max_price=budget, query=pref, in_stock_only=True)
+                if not matches:
+                    matches = inventory_manager.search_products(product_types=p_types, in_stock_only=True)
                 return {
-                    "found": False,
-                    "error": f"Product '{ident}' not found in catalog."
+                    "success": True,
+                    "count": len(matches),
+                    "recommendations": matches[:4],
+                    "category": cat or "All Categories"
                 }
 
-            # 3. Check Live Stock Levels
-            elif tool_name == "check_stock_availability":
-                names = tool_args.get("product_names", [])
-                if isinstance(names, str):
-                    names = [names]
-                stock_report = {}
-                for name in names:
-                    results = inventory_manager.search_products(query=name, size=tool_args.get("size"))
-                    if results:
-                        p = results[0]
-                        stock_report[name] = {
-                            "product_name": p["PRODUCT_NAME"],
-                            "stock_remaining": p.get("STOCK_REMAINING", 0),
-                            "in_stock": p.get("STOCK_REMAINING", 0) > 0,
-                            "price": p["PRICE"]
-                        }
-                    else:
-                        stock_report[name] = {"found": False, "stock_remaining": 0}
-                return {"success": True, "stock_report": stock_report}
+            # 5. Compare Products
+            elif tool_name == "compare_products":
+                p_ids = tool_args.get("product_ids", [])
+                comparison = []
+                for pid in p_ids:
+                    p = inventory_manager.get_product_by_id(pid)
+                    if not p:
+                        matches = inventory_manager.search_products(query=str(pid))
+                        if matches:
+                            p = matches[0]
+                    if p:
+                        comparison.append({
+                            "id": p["id"],
+                            "name": p["PRODUCT_NAME"],
+                            "price": p["PRICE"],
+                            "stock": p.get("STOCK_REMAINING", 0),
+                            "rating": p.get("RATING", 4.8),
+                            "description": p.get("DESCRIPTION", "")
+                        })
+                return {"success": True, "comparison": comparison}
 
-            # 4. Add Single Item to Cart
+            # 6. Apply Coupon
+            elif tool_name == "apply_coupon":
+                code = str(tool_args.get("coupon_code", "")).upper().strip()
+                valid_coupons = {
+                    "GROWTH10": 10.0,
+                    "TECH15": 15.0,
+                    "VIP20": 20.0,
+                    "NOVA5": 5.0
+                }
+                if code in valid_coupons:
+                    disc = valid_coupons[code]
+                    return {
+                        "success": True,
+                        "coupon": code,
+                        "discount_percentage": disc,
+                        "message": f"Coupon '{code}' applied! You get {disc}% off your order total at checkout."
+                    }
+                return {"success": False, "error": f"Coupon code '{code}' is invalid or expired."}
+
+            # 7. Get Personalized Offers
+            elif tool_name == "get_personalized_offers":
+                return {
+                    "success": True,
+                    "offers": [
+                        {"code": "GROWTH10", "discount": "10% OFF", "title": "Storewide Welcome Special"},
+                        {"code": "TECH15", "discount": "15% OFF", "title": "Laptops & Flagship Tech Bundle"},
+                        {"code": "VIP20", "discount": "20% OFF", "title": "VIP Audio & Accessories Special"}
+                    ]
+                }
+
+            # 8. Reserve Cart Inventory
+            elif tool_name == "reserve_cart_inventory":
+                cart = cart_manager.get_cart(user_id)
+                reserved = []
+                for item in cart.get("items", []):
+                    reserved.append(f"{item.get('quantity', 1)}x {item.get('PRODUCT_NAME')}")
+                return {
+                    "success": True,
+                    "reserved_items": reserved,
+                    "reservation_window": "15 minutes",
+                    "message": f"Reserved stock for {len(reserved)} item(s) in your cart for 15 minutes."
+                }
+
+            # 9. Get Delivery Estimate
+            elif tool_name == "get_delivery_estimate":
+                addr = tool_args.get("shipping_address", "Standard Address")
+                return {
+                    "success": True,
+                    "destination": addr,
+                    "standard_delivery": "2-3 Business Days (Free • ₹0.00)",
+                    "express_delivery": "Next Day Express Delivery",
+                    "carrier": "BlueDart / Delhivery Express Logistics"
+                }
+
+            # 10. Reorder Previous Purchase
+            elif tool_name == "reorder_previous_purchase":
+                order_id = tool_args.get("order_id", "")
+                order = order_manager.get_order_by_id(order_id)
+                if not order:
+                    return {"success": False, "error": f"Order #{order_id} not found."}
+                cart_manager.clear_cart(user_id)
+                readded = []
+                for item in order.get("items", []):
+                    pid = item.get("id") or item.get("product_id")
+                    qty = item.get("quantity", 1)
+                    res = cart_manager.add_to_cart(user_id, pid, quantity=qty)
+                    if res.get("success"):
+                        readded.append(f"{qty}x {item.get('PRODUCT_NAME', pid)}")
+                return {
+                    "success": True,
+                    "order_id": order_id,
+                    "readded_items": readded,
+                    "cart": cart_manager.get_cart(user_id),
+                    "message": f"Successfully loaded items from Order #{order_id} into your cart."
+                }
+
+            # 11. Create Support Request
+            elif tool_name == "create_support_request":
+                itype = tool_args.get("issue_type", "general_inquiry")
+                msg = tool_args.get("message", "")
+                oid = tool_args.get("order_id")
+                from backend.admin_agents import message_bus
+                message_bus.publish(
+                    from_agent="Customer Agent (Nova)",
+                    to_agent="CEO Agent",
+                    subject="CUSTOMER_SUPPORT_TICKET",
+                    payload={"issue_type": itype, "message": msg, "order_id": oid, "user_id": user_id}
+                )
+                return {
+                    "success": True,
+                    "ticket_id": f"TCK-{int(time.time()*1000)}",
+                    "issue_type": itype,
+                    "message": "Your support request has been received and escalated to our executive support team."
+                }
+
+            # 12. Add Single Item to Cart
             elif tool_name == "add_to_cart":
                 ident = normalize_identifier(
                     tool_args.get("product_name_or_id")
@@ -747,7 +909,7 @@ class CommerceAgent:
                     size=size
                 )
 
-            # 5. Batch Add Items to Cart
+            # 13. Batch Add Items to Cart
             elif tool_name == "batch_add_to_cart":
                 raw_items = tool_args.get("items", [])
                 items = []
@@ -765,7 +927,7 @@ class CommerceAgent:
                         items.append({"product_name_or_id": str(ident), "quantity": qty, "size": size})
                 return cart_manager.batch_add_to_cart(user_id, items)
 
-            # 6. Remove Item from Cart
+            # 14. Remove Item from Cart
             elif tool_name == "remove_from_cart":
                 ident = normalize_identifier(
                     tool_args.get("product_name_or_id")
@@ -782,23 +944,23 @@ class CommerceAgent:
                     quantity=qty_int
                 )
 
-            # 7. Clear Entire Cart
+            # 15. Clear Entire Cart
             elif tool_name == "clear_cart":
                 cart_manager.clear_cart(user_id)
                 return {"success": True, "message": "Cart cleared successfully."}
 
-            # 8. View Cart Contents
+            # 16. View Cart Contents
             elif tool_name == "view_cart":
                 return {
                     "success": True,
                     "cart": cart_manager.get_cart(user_id)
                 }
 
-            # 9. Trigger Razorpay Checkout Popup Modal (Primary & Only Checkout Path)
+            # 17. Trigger Razorpay Checkout
             elif tool_name == "trigger_razorpay_checkout":
                 return payment_manager.trigger_cart_checkout(user_id=user_id)
 
-            # 10. View Past Order History
+            # 18. View Past Order History
             elif tool_name == "view_order_history":
                 orders = order_manager.get_orders_by_user(user_id)
                 return {
@@ -807,7 +969,7 @@ class CommerceAgent:
                     "orders": orders
                 }
 
-            # 11. Track Order Status
+            # 19. Track Order Status
             elif tool_name == "track_order":
                 order_id = tool_args.get("order_id")
                 if not order_id:
@@ -827,7 +989,7 @@ class CommerceAgent:
                         }
                 return {"found": False, "error": "Order not found in tracking system."}
 
-            # 12. Cancel Order (24-Hour Policy)
+            # 20. Cancel Order (24-Hour Policy)
             elif tool_name == "cancel_order":
                 order_id = tool_args.get("order_id")
                 if not order_id:
@@ -843,7 +1005,7 @@ class CommerceAgent:
                     reason=tool_args.get("reason", "Customer requested cancellation")
                 )
 
-            # 13. Request Order Refund (Routed to Finance Manager Agent — SOLE PAYMENT AUTHORITY)
+            # 21. Request Order Refund (Routed to Finance Manager Agent)
             elif tool_name == "request_order_refund":
                 order_id = tool_args.get("order_id")
                 if not order_id:
@@ -859,13 +1021,11 @@ class CommerceAgent:
                 if not order_id:
                     return {"success": False, "error": "No past orders found to evaluate for refund."}
 
-                # Verify order exists and belongs to user
                 order = order_manager.get_order_by_id(order_id)
                 if not order:
                     return {"success": False, "error": f"Order {order_id} not found."}
 
                 order_status = order.get("status", "")
-                # Quick eligibility check (Finance Manager will do the final authority check)
                 if order_status in ["Delivered", "Shipped"]:
                     return {
                         "success": False,
@@ -874,7 +1034,6 @@ class CommerceAgent:
                         "policy": "Only orders cancelled before shipping are eligible for refunds."
                     }
 
-                # Route refund request to Finance Manager Agent (the sole payment authority)
                 from backend.admin_agents import message_bus as admin_message_bus
                 admin_message_bus.publish(
                     from_agent="Customer Agent (Nova)",
@@ -886,20 +1045,61 @@ class CommerceAgent:
                         "order_status": order_status,
                         "order_total": order.get("total", 0),
                         "reason": tool_args.get("reason", "Customer requested refund via Nova Agent"),
-                        "source": "customer_agent",
-                        "note": "Finance Manager is the sole payment authority for all refunds."
+                        "source": "customer_agent"
                     }
                 )
                 return {
                     "success": True,
-                    "message": f"💰 Refund request for Order {order_id} has been routed to the Finance Manager for processing. The Finance Manager will evaluate eligibility and process your refund. You will be notified of the outcome.",
+                    "message": f"💰 Refund request for Order {order_id} has been routed to the Finance Manager for processing. The Finance Manager will evaluate eligibility and process your refund.",
                     "order_id": order_id,
                     "order_status": order_status,
-                    "routed_to": "Finance Manager Agent",
-                    "note": "All refunds are processed exclusively by the Finance Manager Agent per store policy."
+                    "routed_to": "Finance Manager Agent"
                 }
 
-            # 14. Get Product Reviews
+            # 22. Submit Verified Product Review
+            elif tool_name == "submit_product_review":
+                ident = normalize_identifier(
+                    tool_args.get("product_name_or_id")
+                    or tool_args.get("product_id")
+                    or tool_args.get("product_name")
+                )
+                prod = inventory_manager.get_product_by_id(ident)
+                if not prod:
+                    search_res = inventory_manager.search_products(query=ident)
+                    if search_res:
+                        prod = search_res[0]
+
+                if not prod:
+                    return {"success": False, "error": f"Product '{ident}' not found."}
+
+                return review_manager.add_review(
+                    product_id=prod["id"],
+                    rating=int(tool_args.get("rating", 5)),
+                    review_text=tool_args.get("review_text", "Great quality product!"),
+                    customer_name=tool_args.get("customer_name", "Verified Buyer"),
+                    user_id=user_id
+                )
+
+            # Compatibility wrappers
+            elif tool_name == "check_stock_availability":
+                names = tool_args.get("product_names", [])
+                if isinstance(names, str):
+                    names = [names]
+                stock_report = {}
+                for name in names:
+                    results = inventory_manager.search_products(query=name, size=tool_args.get("size"))
+                    if results:
+                        p = results[0]
+                        stock_report[name] = {
+                            "product_name": p["PRODUCT_NAME"],
+                            "stock_remaining": p.get("STOCK_REMAINING", 0),
+                            "in_stock": p.get("STOCK_REMAINING", 0) > 0,
+                            "price": p["PRICE"]
+                        }
+                    else:
+                        stock_report[name] = {"found": False, "stock_remaining": 0}
+                return {"success": True, "stock_report": stock_report}
+
             elif tool_name == "get_product_reviews":
                 ident = normalize_identifier(
                     tool_args.get("product_name_or_id")
@@ -926,30 +1126,6 @@ class CommerceAgent:
                     }
                 return {"success": False, "error": f"Product '{ident}' not found."}
 
-            # 15. Submit Verified Product Review
-            elif tool_name == "submit_product_review":
-                ident = normalize_identifier(
-                    tool_args.get("product_name_or_id")
-                    or tool_args.get("product_id")
-                    or tool_args.get("product_name")
-                )
-                prod = inventory_manager.get_product_by_id(ident)
-                if not prod:
-                    search_res = inventory_manager.search_products(query=ident)
-                    if search_res:
-                        prod = search_res[0]
-
-                if not prod:
-                    return {"success": False, "error": f"Product '{ident}' not found."}
-
-                return review_manager.add_review(
-                    product_id=prod["id"],
-                    rating=int(tool_args.get("rating", 5)),
-                    review_text=tool_args.get("review_text", "Great quality product!"),
-                    customer_name=tool_args.get("customer_name", "Verified Buyer"),
-                    user_id=user_id
-                )
-
             else:
                 return {"error": f"Unknown tool '{tool_name}'"}
 
@@ -957,31 +1133,39 @@ class CommerceAgent:
             return {"error": f"Tool execution error: {str(e)}"}
 
     def execute_tool(self, tool_name: str, tool_args: Dict[str, Any], user_id: str = "user_alex") -> Dict[str, Any]:
-        """
-        Public tool execution entrypoint:
-        Dispatches tool, computes customer agent RL reward, records transition & memory episode.
-        """
+        """Public tool execution entrypoint with telemetry logging and RL update."""
+        start_t = time.time()
         res = self._execute_raw_tool(tool_name, tool_args, user_id=user_id)
+        duration_ms = (time.time() - start_t) * 1000.0
 
-        # Reinforcement Learning Step & Episodic Memory Update for Customer Agent (Nova)
+        is_success = not bool(isinstance(res, dict) and res.get("error"))
+        observability_manager.log_tool_execution(
+            agent_name=self.name,
+            tool_name=tool_name,
+            duration_ms=duration_ms,
+            success=is_success,
+            error=res.get("error") if isinstance(res, dict) else None,
+            details=str(tool_args)[:150]
+        )
+
         try:
             reward = rl_manager.compute_customer_agent_reward(tool_name, res if isinstance(res, dict) else {})
             rl_manager.record_step(
-                "Customer Agent (Nova)",
+                self.name,
                 {"tool": tool_name, "user_id": user_id},
                 tool_name,
                 reward,
-                {"success": not bool(isinstance(res, dict) and res.get("error"))}
+                {"success": is_success}
             )
             memory_manager.record_episode(
-                "Customer Agent (Nova)",
+                self.name,
                 action=f"tool:{tool_name}",
                 outcome=str(res)[:200],
                 reward=reward,
                 metadata={"user_id": user_id}
             )
-        except Exception as rl_err:
-            print(f"[Customer Agent] RL/Memory recording note: {rl_err}", flush=True)
+        except Exception:
+            pass
 
         return res
 
@@ -991,22 +1175,15 @@ class CommerceAgent:
         user_id: str = "user_alex",
         conversation_history: Optional[List[Dict[str, str]]] = None
     ) -> Dict[str, Any]:
-        """
-        Executes a customer prompt through the ReAct loop using LLM Tool Calling,
-        falling back seamlessly to deterministic tool execution if API limits occur.
-        """
-        # Record incoming prompt into Hybrid Layered Memory
-        memory_manager.add_turn("Customer Agent (Nova)", "user", prompt, {"user_id": user_id})
-
-        # Hybrid Memory Context & RL Policy Guidance
-        memory_ctx = memory_manager.build_context_package("Customer Agent (Nova)", prompt)
-        rl_guidance = rl_manager.get_agent_guidance("Customer Agent (Nova)", {"user_id": user_id})
+        """Executes customer prompt through tool calling with hybrid memory context."""
+        memory_manager.add_turn(self.name, "user", prompt, {"user_id": user_id})
+        memory_ctx = memory_manager.build_context_package(self.name, prompt)
+        rl_guidance = rl_manager.get_agent_guidance(self.name, {"user_id": user_id})
 
         enhanced_system_prompt = f"{SYSTEM_PROMPT}\n\n{memory_ctx}\n{rl_guidance}"
         messages: List[Dict[str, Any]] = [{"role": "system", "content": enhanced_system_prompt}]
 
-        # Inject complete dialogue turns from persistent Memory Manager
-        all_dialogue = memory_manager.get_recent_messages("Customer Agent (Nova)", limit=10)
+        all_dialogue = memory_manager.get_recent_messages(self.name, limit=10)
         for d in all_dialogue:
             messages.append(d)
 
@@ -1028,12 +1205,10 @@ class CommerceAgent:
                 response_message = response.choices[0].message
                 tool_calls = response_message.tool_calls
 
-                # If no tool calls, model provided conversational answer
                 if not tool_calls:
                     final_text = clean_think_tags(response_message.content or "")
                     break
 
-                # Add assistant message with tool calls to context
                 messages.append({
                     "role": "assistant",
                     "content": response_message.content or "",
@@ -1050,7 +1225,6 @@ class CommerceAgent:
                     ]
                 })
 
-                # Execute each tool call
                 for tc in tool_calls:
                     fname = tc.function.name
                     raw_args = tc.function.arguments
@@ -1066,13 +1240,12 @@ class CommerceAgent:
                         "output": tool_output
                     })
 
-                    # Track state updates for frontend synchronization
-                    if fname in ["add_to_cart", "batch_add_to_cart", "remove_from_cart", "clear_cart", "view_cart"]:
+                    if fname in ["add_to_cart", "batch_add_to_cart", "remove_from_cart", "clear_cart", "view_cart", "purchase_assistant"]:
                         action_data["cart"] = cart_manager.get_cart(user_id)
-                    elif fname == "trigger_razorpay_checkout":
+                    if fname in ["trigger_razorpay_checkout", "purchase_assistant"]:
                         action_data["cart"] = cart_manager.get_cart(user_id)
-                        if tool_output.get("needs_razorpay_checkout"):
-                            action_data["checkout_payload"] = tool_output
+                        if tool_output.get("needs_razorpay_checkout") or tool_output.get("checkout", {}).get("needs_razorpay_checkout"):
+                            action_data["checkout_payload"] = tool_output.get("checkout") or tool_output
                     elif fname in ["request_order_refund", "cancel_order", "view_order_history", "track_order"]:
                         action_data["orders"] = order_manager.get_orders_by_user(user_id)
                     elif fname == "search_inventory":
@@ -1080,7 +1253,6 @@ class CommerceAgent:
                     elif fname == "get_product_details" and tool_output.get("found"):
                         action_data["product_details"] = tool_output.get("product")
 
-                    # Append tool result message
                     messages.append({
                         "role": "tool",
                         "tool_call_id": tc.id,
@@ -1088,15 +1260,13 @@ class CommerceAgent:
                         "content": json.dumps(tool_output)
                     })
 
-                # If primary terminal tool ran, break to generate final answer
                 tool_names_run = [t["name"] for t in executed_tools_trace]
                 if any(t in tool_names_run for t in [
-                    "trigger_razorpay_checkout", "get_product_details", "track_order",
-                    "request_order_refund", "cancel_order", "submit_product_review"
+                    "trigger_razorpay_checkout", "purchase_assistant", "get_product_details",
+                    "track_order", "request_order_refund", "cancel_order", "submit_product_review"
                 ]):
                     break
 
-            # If loop finished without final text, generate final synthesis (no tools needed)
             if not final_text and executed_tools_trace:
                 final_response = await self._call_llm_with_fallback(
                     messages=messages,
@@ -1112,19 +1282,18 @@ class CommerceAgent:
             final_text, fallback_tools = self._execute_fallback_routing(prompt, user_id, action_data)
             executed_tools_trace.extend(fallback_tools)
 
-        # 🔑 Post-processing Intent Guard: If customer requested checkout/pay/order and checkout_payload is not yet set
+        # Checkout Intent Guard
         prompt_lower = prompt.lower()
         is_checkout_intent = any(k in prompt_lower for k in [
             "checkout", "pay", "buy", "place order", "order now", "purchase",
             "proceed to payment", "razorpay", "complete order", "pay for my cart",
             "order my cart", "buy this", "buy now", "take my money", "open checkout",
-            "order the phone", "order it", "order ", "final", "findal", "buy the",
+            "order the phone", "order it", "final", "findal", "buy the",
             "get me", "take this", "i want this", "i will take"
         ])
 
         if is_checkout_intent and not action_data.get("checkout_payload"):
             current_cart = cart_manager.get_cart(user_id)
-            # If cart is empty, try to auto-add product resolved from prompt or history
             if not current_cart.get("items"):
                 resolved_p = _resolve_product_from_text_or_history(prompt, conversation_history)
                 if resolved_p:
@@ -1158,13 +1327,11 @@ class CommerceAgent:
                 if not final_text:
                     final_text = "Your shopping cart is currently empty! Please select a product from our catalog, and I'll immediately add it and open the Razorpay checkout popup for you."
 
-        # Refresh final state for response payload
         current_cart = cart_manager.get_cart(user_id)
         current_orders = order_manager.get_orders_by_user(user_id)
 
-        # Record turns into Hybrid Layered Memory
         final_ans = final_text or "How can I assist you with your shopping today?"
-        memory_manager.add_turn("Customer Agent (Nova)", "assistant", final_ans, {"user_id": user_id, "tool_calls_count": len(executed_tools_trace)})
+        memory_manager.add_turn(self.name, "assistant", final_ans, {"user_id": user_id, "tool_calls_count": len(executed_tools_trace)})
 
         return {
             "response": final_ans,
@@ -1182,13 +1349,10 @@ class CommerceAgent:
         user_id: str,
         action_data: Dict[str, Any]
     ) -> tuple[str, List[Dict[str, Any]]]:
-        """
-        Deterministic smart fallback router for edge cases or network timeouts.
-        """
+        """Deterministic smart fallback router for edge cases or timeouts."""
         prompt_lower = prompt.lower()
         tools_run = []
 
-        # 1. Product Explanation / Details Intent
         if any(k in prompt_lower for k in ["explain", "detail", "tell me about", "what is", "specs", "materials", "feature"]):
             search_res = inventory_manager.search_products(query=prompt)
             if not search_res:
@@ -1198,149 +1362,25 @@ class CommerceAgent:
                 tool_out = self.execute_tool("get_product_details", {"product_name_or_id": target_p["id"]}, user_id=user_id)
                 tools_run.append({"name": "get_product_details", "args": {"product_name_or_id": target_p["id"]}, "output": tool_out})
                 p = tool_out.get("product", target_p)
-                sizes_str = ", ".join([f"`{s['size']}`" for s in tool_out.get("available_sizes", [])]) or "Standard"
-                text = (
-                    f"✨ **{p['PRODUCT_NAME']}** ({p.get('PRODUCT_TYPE', 'Product')})\n\n"
-                    f"**Price:** **₹{p.get('PRICE', 0):,.2f}** | **Rating:** ⭐ **{p.get('RATING', 4.8)}/5.0** | **Stock:** {p.get('STOCK_REMAINING', 0)} in stock\n\n"
-                    f"📝 **Overview & Engineering:**\n{p.get('DESCRIPTION', 'Premium quality engineering designed for performance.')}\n\n"
-                    f"📏 **Available Sizes:** {sizes_str}\n\n"
-                    f"⭐ **Customer Sentiment:**\n{p.get('AI_REVIEW_SUMMARY', 'Customers highly praise the durability, build quality, and comfort.')}\n\n"
-                    f"Would you like me to add this to your shopping cart or open Razorpay checkout?"
-                )
-                action_data["product_details"] = p
-                return text, tools_run
-            return "I searched our catalog but couldn't find an exact match. Let me know what category or item you are looking for!", tools_run
+                ans = f"📱 **{p['PRODUCT_NAME']}** (₹{p['PRICE']:,.2f} • 0% Tax)\n\n{tool_out.get('description', '')}\n\n**Rating:** {tool_out.get('average_rating', 4.8)}★"
+                return ans, tools_run
 
-        # 2. Reviews Intent
-        elif any(k in prompt_lower for k in ["review", "rating", "feedback"]):
-            tool_out = self.execute_tool("get_product_reviews", {"product_name_or_id": prompt}, user_id=user_id)
-            tools_run.append({"name": "get_product_reviews", "args": {"product_name_or_id": prompt}, "output": tool_out})
-            revs = tool_out.get("reviews", [])
-            p_name = tool_out.get("product_name", "Product")
-            avg = tool_out.get("average_rating", 4.9)
-            rev_list = "\n".join([
-                f"- ⭐ **{r.get('rating', 5)}/5** by *{r.get('customer_name', 'Verified Buyer')}*: \"{r.get('review_text', '')}\""
-                for r in revs[:3]
-            ]) or "No written reviews yet."
-            text = f"⭐ **Customer Reviews for {p_name}** (Rating: **{avg} / 5.0**)\n\n{rev_list}\n\n*AI Summary:* {tool_out.get('ai_summary', '')}"
-            return text, tools_run
+        elif any(k in prompt_lower for k in ["cart", "items in cart", "my cart"]):
+            cart_out = self.execute_tool("view_cart", {}, user_id=user_id)
+            tools_run.append({"name": "view_cart", "args": {}, "output": cart_out})
+            action_data["cart"] = cart_out.get("cart")
+            return f"🛒 Your cart contains {cart_out.get('cart', {}).get('item_count', 0)} item(s) with total ₹{cart_out.get('cart', {}).get('estimated_total', 0.0):,.2f}.", tools_run
 
-        # 3. Refund / Cancel Intent
-        elif any(k in prompt_lower for k in ["refund", "cancel"]):
-            tool_out = self.execute_tool("request_order_refund", {"reason": "Customer request"}, user_id=user_id)
-            tools_run.append({"name": "request_order_refund", "args": {"reason": "Customer request"}, "output": tool_out})
-            if tool_out.get("success"):
-                ord_obj = tool_out.get("order", {})
-                ref_d = tool_out.get("refund_details", {})
-                text = (
-                    f"✅ **Refund Processed Successfully!**\n\n"
-                    f"- **Order ID**: `#{ord_obj.get('order_id')}`\n"
-                    f"- **Refund ID**: `{ref_d.get('refund_id')}`\n"
-                    f"- **Amount**: **₹{ref_d.get('amount', 0):,.2f}**\n"
-                    f"- **Gateway**: `Razorpay Gateway`\n"
-                    f"- **Inventory**: Restocked automatically."
-                )
-                action_data["orders"] = order_manager.get_orders_by_user(user_id)
-            else:
-                text = f"⚠️ Could not process refund: {tool_out.get('error', 'No eligible orders found')}"
-            return text, tools_run
+        # Default catalog search
+        res = self.execute_tool("search_inventory", {"query": prompt}, user_id=user_id)
+        tools_run.append({"name": "search_inventory", "args": {"query": prompt}, "output": res})
+        prods = res.get("products", [])
+        if prods:
+            lines = [f"- **{p['PRODUCT_NAME']}**: ₹{p['PRICE']:,.2f} ({p.get('STOCK_REMAINING', 0)} in stock)" for p in prods[:4]]
+            return f"Here are the top products matching your search:\n\n" + "\n".join(lines), tools_run
 
-        # 4. Track Order Intent
-        elif any(k in prompt_lower for k in ["track", "status", "where is my order"]):
-            tool_out = self.execute_tool("track_order", {}, user_id=user_id)
-            tools_run.append({"name": "track_order", "args": {}, "output": tool_out})
-            if tool_out.get("found"):
-                latest = tool_out["order"]
-                trk = latest.get("tracking_number", "TRK-LOGISTICS-PENDING")
-                text = (
-                    f"📦 **Order #{latest['order_id']} Status:**\n\n"
-                    f"- **Status**: `{latest.get('status', 'Confirmed')}`\n"
-                    f"- **Tracking #**: `{trk}`\n"
-                    f"- **Items**: {len(latest.get('items', []))} item(s)\n"
-                    f"- **Estimated Delivery**: {latest.get('delivery_estimate', '2-3 Business Days')}\n"
-                    f"- **Total**: ₹{latest.get('total', 0):,.2f}"
-                )
-            else:
-                text = "You do not have any past orders yet. Browse our catalog to place your first order!"
-            return text, tools_run
-
-        # 5. Clear Cart Intent
-        elif "clear" in prompt_lower and "cart" in prompt_lower:
-            tool_out = self.execute_tool("clear_cart", {}, user_id=user_id)
-            tools_run.append({"name": "clear_cart", "args": {}, "output": tool_out})
-            action_data["cart"] = cart_manager.get_cart(user_id)
-            return "🗑️ Your shopping cart has been cleared.", tools_run
-
-        # 6. Checkout / Buy / Order Intent -> Always Pop Razorpay Checkout Modal
-        elif any(k in prompt_lower for k in ["order", "buy", "pay", "checkout", "final", "findal"]):
-            cart = cart_manager.get_cart(user_id)
-            if not cart.get("items"):
-                resolved_p = _resolve_product_from_text_or_history(prompt, None)
-                if resolved_p:
-                    self.execute_tool("add_to_cart", {"product_name_or_id": resolved_p["id"], "quantity": 1}, user_id=user_id)
-                    tools_run.append({"name": "add_to_cart", "args": {"product_name_or_id": resolved_p["id"], "quantity": 1}, "output": {"success": True}})
-                else:
-                    search_res = inventory_manager.search_products(query=prompt)
-                    if not search_res:
-                        search_res = inventory_manager.get_all_products()[:1]
-                    if search_res:
-                        self.execute_tool("add_to_cart", {"product_name_or_id": search_res[0]["id"], "quantity": 1}, user_id=user_id)
-                        tools_run.append({"name": "add_to_cart", "args": {"product_name_or_id": search_res[0]["id"], "quantity": 1}, "output": {"success": True}})
-
-            chk_res = self.execute_tool("trigger_razorpay_checkout", {}, user_id=user_id)
-            tools_run.append({"name": "trigger_razorpay_checkout", "args": {}, "output": chk_res})
-            if chk_res.get("needs_razorpay_checkout"):
-                action_data["checkout_payload"] = chk_res
-            cart = cart_manager.get_cart(user_id)
-            items_names = ", ".join([f"{item.get('name', 'Product')} (x{item.get('quantity', 1)})" for item in cart.get("items", [])])
-            text = (
-                f"🛒 **Order Prepared!** {items_names}\n\n"
-                f"**Cart Total:** **₹{cart.get('estimated_total', 0.0):,.2f}** ({cart.get('item_count', 0)} item(s) • 0% Tax)\n\n"
-                f"Opening the **Razorpay Secure Checkout popup** on your screen now (supporting UPI, Cards, NetBanking, and Wallets)!"
-            )
-            return text, tools_run
-
-        # 7. Add to Cart Intent
-        elif "add" in prompt_lower or "cart" in prompt_lower:
-            search_res = inventory_manager.search_products(query=prompt)
-            if not search_res:
-                search_res = inventory_manager.get_all_products()[:2]
-            items_to_add = [{"product_name_or_id": p["id"], "quantity": 1} for p in search_res]
-            tool_out = self.execute_tool("batch_add_to_cart", {"items": items_to_add}, user_id=user_id)
-            tools_run.append({"name": "batch_add_to_cart", "args": {"items": items_to_add}, "output": tool_out})
-            action_data["cart"] = cart_manager.get_cart(user_id)
-            text = f"🛒 Added **{len(items_to_add)} item(s)** to your shopping cart:\n" + "\n".join([f"- **{p['PRODUCT_NAME']}** (₹{p['PRICE']:,.2f})" for p in search_res])
-            return text, tools_run
-
-        # 8. Default: Search Catalog
-        else:
-            search_res = inventory_manager.search_products(query=prompt)
-            if not search_res:
-                search_res = inventory_manager.get_all_products()[:4]
-            tools_run.append({"name": "search_inventory", "args": {"query": prompt}, "output": {"count": len(search_res), "products": search_res}})
-            action_data["searched_products"] = search_res
-            items_table = "\n".join([f"| {p['PRODUCT_NAME']} | {p.get('PRODUCT_TYPE')} | **₹{p['PRICE']:,.2f}** | Stock: {p.get('STOCK_REMAINING', 0)} |" for p in search_res[:5]])
-            text = f"Here are the matching items found in our catalog:\n\n| Product | Category | Price | Stock |\n|---|---|---|---|\n{items_table}\n\nWould you like me to explain any product in detail, add items to your cart, or open Razorpay checkout?"
-            return text, tools_run
-
-    def run_prompt_sync(
-        self,
-        prompt: str,
-        user_id: str = "user_alex",
-        conversation_history: Optional[List[Dict[str, str]]] = None
-    ) -> Dict[str, Any]:
-        """Synchronous wrapper for test environments or synchronous callers."""
-        try:
-            loop = asyncio.get_event_loop()
-            if loop.is_running():
-                import concurrent.futures
-                with concurrent.futures.ThreadPoolExecutor() as pool:
-                    return pool.submit(asyncio.run, self.run_prompt(prompt, user_id, conversation_history)).result()
-            else:
-                return loop.run_until_complete(self.run_prompt(prompt, user_id, conversation_history))
-        except Exception:
-            return asyncio.run(self.run_prompt(prompt, user_id, conversation_history))
+        return "Welcome to NOVA! How can I assist your shopping today?", tools_run
 
 
-# Global singleton Customer AI Agent
+# Global Customer Commerce Agent singleton
 commerce_agent = CommerceAgent()

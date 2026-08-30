@@ -1,0 +1,20 @@
+[
+  {
+    "id": "rev_37b158",
+    "product_id": "prod_001",
+    "product_name": "NOVA Apex Pro 5G Smartphone",
+    "customer_name": "Alex Chen",
+    "rating": 5,
+    "review_text": "Hands down, the NOVA Apex Pro 5G is a beast. From the moment you hit 100W fast charging, you realize how much time you were wasting. And that Snapdragon 8 Gen 3? It's like having a supercomputer in your pocket.",
+    "created_at": "2026-08-30T20:54:51.226894+00:00"
+  },
+  {
+    "id": "rev_293626",
+    "product_id": "prod_016",
+    "product_name": "NOVA Vortex Pro RGB Wired Mechanical Keyboard",
+    "customer_name": "Sophia Miller",
+    "rating": 5,
+    "review_text": "Got the NOVA Vortex Pro RGB for a steal at \u20b943.75, and it\u2019s a game changer. Solid build, quiet typing, and those PBT keycaps make typing a joy. Worth every penny!",
+    "created_at": "2026-08-30T20:56:07.036285+00:00"
+  }
+]

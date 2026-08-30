@@ -46,6 +46,40 @@ class OrderManager:
                 return o
         return None
 
+    def create_order(
+        self,
+        user_id: str,
+        items: Optional[List[Dict[str, Any]]] = None,
+        total: Optional[float] = None,
+        shipping_address: Optional[str] = None,
+        payment_method: str = "Razorpay Gateway (Online)",
+        payment_details: Optional[Dict[str, Any]] = None,
+        customer_name: Optional[str] = None,
+        customer_email: Optional[str] = None,
+        customer_phone: Optional[str] = None,
+        notes: Optional[str] = None,
+        initial_status: str = "Confirmed"
+    ) -> Dict[str, Any]:
+        """Creates a confirmed order directly or from cart."""
+        if items:
+            cart_manager.clear_cart(user_id)
+            for it in items:
+                pid = it.get("id") or it.get("product_id")
+                qty = it.get("quantity", 1)
+                sz = it.get("PRODUCT_SIZE") or it.get("size", "Standard")
+                cart_manager.add_to_cart(user_id, pid, quantity=qty, size=sz)
+
+        res = self.create_order_from_cart(
+            user_id=user_id,
+            shipping_address=shipping_address,
+            payment_method=payment_method,
+            payment_details=payment_details,
+            initial_status=initial_status
+        )
+        if res.get("success") and res.get("order"):
+            res["order_id"] = res["order"]["order_id"]
+        return res
+
     def create_order_from_cart(
         self,
         user_id: str,

@@ -146,11 +146,20 @@ class InventoryManager:
                 })
         return variants
 
-    def deduct_stock(self, items: List[Dict[str, Any]]) -> Dict[str, Any]:
+    def deduct_stock(self, items_or_id: Any, quantity: Optional[int] = None) -> Dict[str, Any]:
         """
         Atomically decrements STOCK_REMAINING for a list of items upon order placement.
-        Items format: [{'id': 'prod_001', 'quantity': 2}, ...]
+        Accepts either list of items [{'id': ..., 'quantity': ...}] or (product_id, quantity).
         """
+        if isinstance(items_or_id, str):
+            items = [{"id": items_or_id, "quantity": quantity or 1}]
+        elif isinstance(items_or_id, list):
+            items = items_or_id
+        elif isinstance(items_or_id, dict):
+            items = [items_or_id]
+        else:
+            items = []
+
         with _lock:
             products = self._read_inventory()
             products_map = {p["id"]: p for p in products}
@@ -190,11 +199,20 @@ class InventoryManager:
                 "deducted_items": updated_items
             }
 
-    def restore_stock(self, items: List[Dict[str, Any]]) -> Dict[str, Any]:
+    def restore_stock(self, items_or_id: Any, quantity: Optional[int] = None) -> Dict[str, Any]:
         """
         Atomically increments STOCK_REMAINING when an order is refunded or cancelled.
-        Items format: [{'id': 'prod_001', 'quantity': 1}, ...]
+        Accepts either list of items [{'id': ..., 'quantity': ...}] or (product_id, quantity).
         """
+        if isinstance(items_or_id, str):
+            items = [{"id": items_or_id, "quantity": quantity or 1}]
+        elif isinstance(items_or_id, list):
+            items = items_or_id
+        elif isinstance(items_or_id, dict):
+            items = [items_or_id]
+        else:
+            items = []
+
         with _lock:
             products = self._read_inventory()
             products_map = {p["id"]: p for p in products}
@@ -216,6 +234,10 @@ class InventoryManager:
                 "success": True,
                 "restored_items": restored_items
             }
+
+    def reconcile_stock(self, product_id: str, quantity: int) -> Dict[str, Any]:
+        """Convenience method to increment stock for a single SKU."""
+        return self.restore_stock(product_id, quantity)
 
     def update_stock(self, product_id: str, new_stock: int) -> Dict[str, Any]:
         """Directly sets STOCK_REMAINING for a product."""

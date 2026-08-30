@@ -35,6 +35,10 @@ from backend.admin_agents import (
 )
 from backend.background_workers import background_worker
 from backend.ollama_loader import ensure_ollama_ready, unload_all_models_from_vram
+from backend.agent_tasks import task_manager
+from backend.observability import observability_manager
+from backend.policy_engine import policy_engine, validate_policy
+from backend.idempotency import idempotency_manager
 
 
 @asynccontextmanager
@@ -1003,6 +1007,8 @@ async def reset_store_complete():
     # 8. Clear message bus, conversation history, and audit logs
     message_bus.clear_history()
     conversation_history.clear()
+    task_manager.clear()
+    idempotency_manager.clear()
 
     with _log_lock:
         try:
@@ -1017,6 +1023,127 @@ async def reset_store_complete():
         "message": "Store successfully reset: All 27 products at 0 stock (Wholesale restock required), Orders & Reviews cleared, Bank Balance reset to ₹1,000.0, Staff Salaries reset to ₹50/100 cycles, and AI Shoppers staggered across 0–5 minutes."
     }
 
+
+# =====================================================================
+# 📋 AGENT TASKS & DELEGATION ENDPOINTS
+# =====================================================================
+
+class CreateTaskRequest(BaseModel):
+    created_by: str = "Store Owner"
+    assigned_to: str
+    objective: str
+    priority: str = "normal"
+    constraints: Optional[List[str]] = None
+    deadline: Optional[str] = None
+
+class ClaimTaskRequest(BaseModel):
+    task_id: str
+    agent_name: str
+
+class CompleteTaskRequest(BaseModel):
+    task_id: str
+    result: Any
+
+@app.get("/api/admin/tasks")
+async def get_agent_tasks(assigned_to: Optional[str] = None, status: Optional[str] = None, limit: int = 50):
+    """Returns agent tasks with optional filtering."""
+    tasks = task_manager.get_tasks(assigned_to=assigned_to, status=status, limit=limit)
+    return {"success": True, "count": len(tasks), "tasks": tasks}
+
+@app.post("/api/admin/tasks")
+async def create_agent_task(req: CreateTaskRequest):
+    """Creates a new structured agent delegation task."""
+    task = task_manager.create_task(
+        created_by=req.created_by,
+        assigned_to=req.assigned_to,
+        objective=req.objective,
+        priority=req.priority,
+        constraints=req.constraints,
+        deadline=req.deadline
+    )
+    return {"success": True, "task": task.to_dict()}
+
+@app.post("/api/admin/tasks/claim")
+async def claim_agent_task(req: ClaimTaskRequest):
+    task = task_manager.claim_task(req.task_id, req.agent_name)
+    if not task:
+        raise HTTPException(status_code=404, detail="Task not found or not in pending state")
+    return {"success": True, "task": task.to_dict()}
+
+@app.post("/api/admin/tasks/complete")
+async def complete_agent_task(req: CompleteTaskRequest):
+    task = task_manager.complete_task(req.task_id, req.result)
+    if not task:
+        raise HTTPException(status_code=404, detail="Task not found")
+    return {"success": True, "task": task.to_dict()}
+
+
+# =====================================================================
+# 📊 OBSERVABILITY & ALERT AGGREGATION ENDPOINTS
+# =====================================================================
+
+@app.get("/api/admin/observability/metrics")
+async def get_observability_metrics():
+    """Returns execution metrics, failure counts, and latency averages per tool."""
+    return {"success": True, "metrics": observability_manager.get_tool_metrics()}
+
+@app.get("/api/admin/observability/alerts")
+async def get_observability_alerts(timeframe_seconds: float = 3600.0):
+    """Returns aggregated executive alert summaries."""
+    return {"success": True, "alerts": observability_manager.aggregate_alerts(timeframe_seconds)}
+
+@app.get("/api/admin/observability/activity")
+async def get_observability_activity(limit: int = 50, agent_name: Optional[str] = None):
+    return {"success": True, "activity": observability_manager.get_agent_activity(limit, agent_name)}
+
+
+# =====================================================================
+# 🛡️ POLICY ENGINE & INVARIANT VALIDATION ENDPOINTS
+# =====================================================================
+
+class ValidatePolicyRequest(BaseModel):
+    action: str
+    actor: str
+    resource: Optional[str] = None
+    parameters: Optional[Dict[str, Any]] = None
+
+@app.post("/api/admin/policy/validate")
+async def validate_policy_endpoint(req: ValidatePolicyRequest):
+    """Validates an action against deterministic policy rules."""
+    res = validate_policy(
+        action=req.action,
+        actor=req.actor,
+        resource=req.resource,
+        parameters=req.parameters
+    )
+    return res
+
+@app.get("/api/admin/qa/invariants")
+async def validate_qa_invariants():
+    """Continuous integration invariant validation check across catalog, treasury, and orders."""
+    res = buyer_agents_fleet.validate_business_invariants()
+    return res
+
+@app.get("/api/admin/qa/report")
+async def get_qa_report():
+    """Generates continuous QA testing report."""
+    res = buyer_agents_fleet.generate_test_report()
+    return res
+
+
+# =====================================================================
+# 🔮 STRATEGIC DECISION SIMULATION ENDPOINTS
+# =====================================================================
+
+class SimulateDecisionRequest(BaseModel):
+    scenario: str
+    assumptions: Optional[Dict[str, Any]] = None
+
+@app.post("/api/admin/simulation/decision")
+async def simulate_decision_endpoint(req: SimulateDecisionRequest):
+    """Simulates business decision impact on revenue, margins, and turnover."""
+    res = ceo_agent.simulate_business_decision(req.scenario, req.assumptions)
+    return res
 
 
 # Serve root frontend

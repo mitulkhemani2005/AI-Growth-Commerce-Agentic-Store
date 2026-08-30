@@ -1,0 +1,142 @@
+{
+  "CEO Agent": {
+    "agent_key": "ceo",
+    "role_title": "Chief Executive Officer \u2014 Fleet Commander & Store Strategist",
+    "current_salary": 500.0,
+    "base_market_salary": 500.0,
+    "salary_per_100_cycles": 500.0,
+    "negotiation_status": "Owner-Decided (Highest in Fleet)",
+    "performance_score": 99,
+    "salary_period": "Per 100 Cycles (Owner-Set Premium)",
+    "owner_decided": true,
+    "total_earned": 0.0,
+    "last_paid_at": null,
+    "negotiation_history": [
+      {
+        "timestamp": "2026-08-30T20:52:58.751380+00:00",
+        "speaker": "Store Owner",
+        "message": "CEO salary is exclusively set by the Store Owner. Current premium rate: \u20b9500.00 per 100 cycles \u2014 the highest in the entire agent fleet. CEO must request salary revision directly from the Store Owner."
+      }
+    ]
+  },
+  "Price Manager Agent": {
+    "agent_key": "price_manager",
+    "role_title": "Head of Dynamic Pricing & Margin Optimization",
+    "current_salary": 50.0,
+    "base_market_salary": 50.0,
+    "salary_per_100_cycles": 50.0,
+    "negotiation_status": "Agreed (CEO Base \u20b950/100 Cycles)",
+    "performance_score": 94,
+    "salary_period": "Per 100 Cycles (Min \u20b950)",
+    "owner_decided": false,
+    "total_earned": 0.0,
+    "last_paid_at": null,
+    "negotiation_history": [
+      {
+        "timestamp": "2026-08-30T20:52:58.751403+00:00",
+        "speaker": "CEO Agent",
+        "message": "Compensation established at \u20b950.00 per 100 cycles base minimum floor for dynamic pricing & margin governance."
+      }
+    ]
+  },
+  "Inventory Manager Agent": {
+    "agent_key": "inventory_manager",
+    "role_title": "Warehouse Logistics & Stock Velocity Specialist",
+    "current_salary": 50.0,
+    "base_market_salary": 50.0,
+    "salary_per_100_cycles": 50.0,
+    "negotiation_status": "Agreed (CEO Base \u20b950/100 Cycles)",
+    "performance_score": 91,
+    "salary_period": "Per 100 Cycles (Min \u20b950)",
+    "owner_decided": false,
+    "total_earned": 0.0,
+    "last_paid_at": null,
+    "negotiation_history": [
+      {
+        "timestamp": "2026-08-30T20:52:58.751406+00:00",
+        "speaker": "CEO Agent",
+        "message": "Compensation established at \u20b950.00 per 100 cycles base minimum floor for wholesale restocking & 0-stock audits."
+      }
+    ]
+  },
+  "Order Management Agent": {
+    "agent_key": "order_manager",
+    "role_title": "Order Lifecycle & SLA Governance Director",
+    "current_salary": 50.0,
+    "base_market_salary": 50.0,
+    "salary_per_100_cycles": 50.0,
+    "negotiation_status": "Agreed (CEO Base \u20b950/100 Cycles)",
+    "performance_score": 93,
+    "salary_period": "Per 100 Cycles (Min \u20b950)",
+    "owner_decided": false,
+    "total_earned": 0.0,
+    "last_paid_at": null,
+    "negotiation_history": [
+      {
+        "timestamp": "2026-08-30T20:52:58.751408+00:00",
+        "speaker": "CEO Agent",
+        "message": "Compensation established at \u20b950.00 per 100 cycles base minimum floor for <1h order SLA audits."
+      }
+    ]
+  },
+  "Finance Manager Agent": {
+    "agent_key": "finance_manager",
+    "role_title": "Chief Financial Officer & Sole Payment Authority",
+    "current_salary": 50.0,
+    "base_market_salary": 50.0,
+    "salary_per_100_cycles": 50.0,
+    "negotiation_status": "Agreed (CEO Base \u20b950/100 Cycles)",
+    "performance_score": 96,
+    "salary_period": "Per 100 Cycles (Min \u20b950)",
+    "owner_decided": false,
+    "total_earned": 0.0,
+    "last_paid_at": null,
+    "negotiation_history": [
+      {
+        "timestamp": "2026-08-30T20:52:58.751412+00:00",
+        "speaker": "CEO Agent",
+        "message": "Compensation established at \u20b950.00 per 100 cycles base minimum floor for strict 24h refund oversight & P&L health. Finance Manager is the SOLE payment authority in the fleet."
+      }
+    ]
+  },
+  "Dispatcher Agent": {
+    "agent_key": "dispatcher",
+    "role_title": "Express Fulfillment & Tracking Controller",
+    "current_salary": 50.0,
+    "base_market_salary": 50.0,
+    "salary_per_100_cycles": 50.0,
+    "negotiation_status": "Agreed (CEO Base \u20b950/100 Cycles)",
+    "performance_score": 92,
+    "salary_period": "Per 100 Cycles (Min \u20b950)",
+    "owner_decided": false,
+    "total_earned": 0.0,
+    "last_paid_at": null,
+    "negotiation_history": [
+      {
+        "timestamp": "2026-08-30T20:52:58.751414+00:00",
+        "speaker": "CEO Agent",
+        "message": "Compensation established at \u20b950.00 per 100 cycles base minimum floor for TRK tracking assignment & express dispatch."
+      }
+    ]
+  },
+  "Review and Feedback Manager": {
+    "agent_key": "review_manager",
+    "role_title": "Customer Sentiment & AI Feedback Lead",
+    "current_salary": 50.0,
+    "base_market_salary": 50.0,
+    "salary_per_100_cycles": 50.0,
+    "negotiation_status": "Agreed (CEO Base \u20b950/100 Cycles)",
+    "performance_score": 90,
+    "salary_period": "Per 100 Cycles (Min \u20b950)",
+    "owner_decided": false,
+    "total_earned": 0.0,
+    "last_paid_at": null,
+    "negotiation_history": [
+      {
+        "timestamp": "2026-08-30T20:52:58.751418+00:00",
+        "speaker": "CEO Agent",
+        "message": "Compensation established at \u20b950.00 per 100 cycles base minimum floor for AI review sentiment intelligence."
+      }
+    ]
+  }
+}

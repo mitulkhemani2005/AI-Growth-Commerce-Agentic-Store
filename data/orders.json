@@ -1,0 +1,127 @@
+[
+  {
+    "order_id": "ORD-5446-1D61",
+    "user_id": "buyer_alex",
+    "customer_name": "Alex Chen",
+    "created_at": "2026-08-30T20:54:46.240669+00:00",
+    "status": "Shipped",
+    "delivery_estimate": "2-3 Business Days",
+    "tracking_number": "TRK-AF17D4",
+    "items": [
+      {
+        "id": "prod_001",
+        "PRODUCT_NAME": "NOVA Apex Pro 5G Smartphone",
+        "PRODUCT_TYPE": "Mobiles",
+        "PRODUCT_SIZE": "12GB RAM / 256GB",
+        "quantity": 1,
+        "price": 123.75,
+        "item_total": 123.75,
+        "IMAGE": "/static/images/phone_flagship.svg"
+      }
+    ],
+    "currency": "INR",
+    "subtotal": 123.75,
+    "tax": 0.0,
+    "total": 123.75,
+    "payment_method": "Razorpay Gateway (Online)",
+    "payment_details": {
+      "gateway": "Razorpay Gateway (Online)",
+      "razorpay_order_id": "order_TW7WPCRLWpnMgy",
+      "razorpay_payment_id": "pay_69902729c0e047",
+      "razorpay_signature": "b48889ba246c926d1ddfeffda3d3e84938e9952e9c3f763be652977ff06c6278",
+      "verified": true,
+      "ap2_mandate_id": "mandate_ap2_f94fd292d100",
+      "ap2_proof": {
+        "protocol": "AP2 (Google Agent Payments Protocol) + ACP + Razorpay Rail",
+        "authorization_layer": {
+          "mandate_id": "mandate_ap2_f94fd292d100",
+          "authorized_agent": "nova_commerce_agent",
+          "spending_mandate_signature": "abb26df3f946077971f641fd38d8ce4d12f2e359de279625504b7e634848308e",
+          "status": "VERIFIED_AND_ACTIVE"
+        },
+        "checkout_layer_acp": {
+          "acp_token": "acp_tok_ee1202d8a478",
+          "cart_digest": "a3d9304abe19a908d7b04a79dcab765a009113188681399f55dfd652c216e141",
+          "currency": "INR",
+          "tax": 0.0
+        },
+        "settlement_layer": {
+          "gateway": "Razorpay Gateway (Online)",
+          "gateway_mode": "Test Mode",
+          "razorpay_order_id": "order_TW7WPCRLWpnMgy",
+          "razorpay_payment_id": "pay_69902729c0e047",
+          "razorpay_signature": "b48889ba246c926d1ddfeffda3d3e84938e9952e9c3f763be652977ff06c6278",
+          "settlement_rail": "razorpay_upi_fiat",
+          "status": "CAPTURED",
+          "captured_amount_inr": 123.75
+        }
+      }
+    },
+    "shipping_address": "Alex Chen Residence, Innovation Hub Blvd, Sector 4",
+    "inventory_deducted": true,
+    "last_updated_at": "2026-08-30T20:56:11.104571+00:00",
+    "status_notes": "Auto-advanced carrier transit lifecycle (1m)"
+  },
+  {
+    "order_id": "ORD-5603-2DFA",
+    "user_id": "buyer_sophia",
+    "customer_name": "Sophia Miller",
+    "created_at": "2026-08-30T20:56:03.454047+00:00",
+    "status": "Dispatched",
+    "delivery_estimate": "2-3 Business Days",
+    "tracking_number": "TRK-3F757A",
+    "items": [
+      {
+        "id": "prod_016",
+        "PRODUCT_NAME": "NOVA Vortex Pro RGB Wired Mechanical Keyboard",
+        "PRODUCT_TYPE": "Accessories",
+        "PRODUCT_SIZE": "Tenkeyless (TKL)",
+        "quantity": 1,
+        "price": 43.75,
+        "item_total": 43.75,
+        "IMAGE": "/static/images/gaming_keyboard.svg"
+      }
+    ],
+    "currency": "INR",
+    "subtotal": 43.75,
+    "tax": 0.0,
+    "total": 43.75,
+    "payment_method": "Razorpay Gateway (Online)",
+    "payment_details": {
+      "gateway": "Razorpay Gateway (Online)",
+      "razorpay_order_id": "order_TW7XlXiEB1OsIM",
+      "razorpay_payment_id": "pay_4e17bbc5ff3245",
+      "razorpay_signature": "e90bc8b00bd7717043de95c0ff7e6db5a930c6f8d45eb5f7739c753cb7261ccb",
+      "verified": true,
+      "ap2_mandate_id": "mandate_ap2_c52dd77e4f64",
+      "ap2_proof": {
+        "protocol": "AP2 (Google Agent Payments Protocol) + ACP + Razorpay Rail",
+        "authorization_layer": {
+          "mandate_id": "mandate_ap2_c52dd77e4f64",
+          "authorized_agent": "nova_commerce_agent",
+          "spending_mandate_signature": "0dd60da1396067e5a87a3f13225437ae0325c94dfb319e7384046bfcaeeb8824",
+          "status": "VERIFIED_AND_ACTIVE"
+        },
+        "checkout_layer_acp": {
+          "acp_token": "acp_tok_732b7f0fc6bc",
+          "cart_digest": "5fc091bfc48210e30c979446c696090fa5641a327d889f2c9674e073caaf8539",
+          "currency": "INR",
+          "tax": 0.0
+        },
+        "settlement_layer": {
+          "gateway": "Razorpay Gateway (Online)",
+          "gateway_mode": "Test Mode",
+          "razorpay_order_id": "order_TW7XlXiEB1OsIM",
+          "razorpay_payment_id": "pay_4e17bbc5ff3245",
+          "razorpay_signature": "e90bc8b00bd7717043de95c0ff7e6db5a930c6f8d45eb5f7739c753cb7261ccb",
+          "settlement_rail": "razorpay_upi_fiat",
+          "status": "CAPTURED",
+          "captured_amount_inr": 43.75
+        }
+      }
+    },
+    "shipping_address": "Sophia Miller Residence, Innovation Hub Blvd, Sector 4",
+    "inventory_deducted": true,
+    "last_updated_at": "2026-08-30T20:56:20.572621+00:00"
+  }
+]

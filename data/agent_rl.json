@@ -1,0 +1,1332 @@
+{
+  "Dispatcher Agent": {
+    "agent_name": "Dispatcher Agent",
+    "alpha": 0.15,
+    "gamma": 0.85,
+    "epsilon": 0.1,
+    "total_rewards": 14.0,
+    "episode_count": 21,
+    "action_counts": {
+      "logistics_dispatch_cycle": 21
+    },
+    "q_table": {
+      "dispatched=[]|newly_scheduled=[]|queue_size=0": {
+        "logistics_dispatch_cycle": 0.225
+      },
+      "dispatched=[]|newly_scheduled=[]|queue_size=1": {
+        "logistics_dispatch_cycle": 0.4163
+      },
+      "dispatched=[]|newly_scheduled=[]|queue_size=2": {
+        "logistics_dispatch_cycle": 0.225
+      },
+      "dispatched=[]|newly_scheduled=[]|queue_size=3": {
+        "logistics_dispatch_cycle": 1.2
+      }
+    },
+    "history": [
+      {
+        "state": "dispatched=[]|newly_scheduled=[]|queue_size=0",
+        "action": "logistics_dispatch_cycle",
+        "reward": 0.0,
+        "next_state": "dispatched=[]|newly_scheduled=[]|queue_size=0",
+        "q_after": 0.0,
+        "timestamp": "2026-08-29T08:01:58.796653"
+      },
+      {
+        "state": "dispatched=[]|newly_scheduled=[]|queue_size=0",
+        "action": "logistics_dispatch_cycle",
+        "reward": 0.0,
+        "next_state": "dispatched=[]|newly_scheduled=[]|queue_size=0",
+        "q_after": 0.0,
+        "timestamp": "2026-08-29T08:02:20.713745"
+      },
+      {
+        "state": "dispatched=[]|newly_scheduled=[]|queue_size=0",
+        "action": "logistics_dispatch_cycle",
+        "reward": 0.0,
+        "next_state": "dispatched=[]|newly_scheduled=[]|queue_size=0",
+        "q_after": 0.0,
+        "timestamp": "2026-08-29T08:02:33.508760"
+      },
+      {
+        "state": "dispatched=[]|newly_scheduled=[]|queue_size=0",
+        "action": "logistics_dispatch_cycle",
+        "reward": 0.0,
+        "next_state": "dispatched=[]|newly_scheduled=[]|queue_size=0",
+        "q_after": 0.0,
+        "timestamp": "2026-08-29T08:02:51.894062"
+      },
+      {
+        "state": "dispatched=[]|newly_scheduled=[]|queue_size=0",
+        "action": "logistics_dispatch_cycle",
+        "reward": 0.0,
+        "next_state": "dispatched=[]|newly_scheduled=[]|queue_size=0",
+        "q_after": 0.0,
+        "timestamp": "2026-08-29T08:03:08.172936"
+      },
+      {
+        "state": "dispatched=[]|newly_scheduled=[]|queue_size=0",
+        "action": "logistics_dispatch_cycle",
+        "reward": 0.0,
+        "next_state": "dispatched=[]|newly_scheduled=[]|queue_size=0",
+        "q_after": 0.0,
+        "timestamp": "2026-08-29T08:03:23.467889"
+      },
+      {
+        "state": "dispatched=[]|newly_scheduled=[]|queue_size=0",
+        "action": "logistics_dispatch_cycle",
+        "reward": 0.0,
+        "next_state": "dispatched=[]|newly_scheduled=[]|queue_size=0",
+        "q_after": 0.0,
+        "timestamp": "2026-08-29T08:03:41.795240"
+      },
+      {
+        "state": "dispatched=[]|newly_scheduled=[]|queue_size=0",
+        "action": "logistics_dispatch_cycle",
+        "reward": 0.0,
+        "next_state": "dispatched=[]|newly_scheduled=[]|queue_size=0",
+        "q_after": 0.0,
+        "timestamp": "2026-08-29T08:03:53.999553"
+      },
+      {
+        "state": "dispatched=[]|newly_scheduled=[]|queue_size=0",
+        "action": "logistics_dispatch_cycle",
+        "reward": 0.0,
+        "next_state": "dispatched=[]|newly_scheduled=[]|queue_size=0",
+        "q_after": 0.0,
+        "timestamp": "2026-08-29T08:04:06.256834"
+      },
+      {
+        "state": "dispatched=[]|newly_scheduled=[]|queue_size=0",
+        "action": "logistics_dispatch_cycle",
+        "reward": 0.0,
+        "next_state": "dispatched=[]|newly_scheduled=[]|queue_size=0",
+        "q_after": 0.0,
+        "timestamp": "2026-08-29T08:04:20.595464"
+      },
+      {
+        "state": "dispatched=[]|newly_scheduled=[]|queue_size=0",
+        "action": "logistics_dispatch_cycle",
+        "reward": 0.0,
+        "next_state": "dispatched=[]|newly_scheduled=[]|queue_size=0",
+        "q_after": 0.0,
+        "timestamp": "2026-08-29T08:04:39.484636"
+      },
+      {
+        "state": "dispatched=[]|newly_scheduled=[]|queue_size=0",
+        "action": "logistics_dispatch_cycle",
+        "reward": 1.5,
+        "next_state": "dispatched=[]|newly_scheduled=['ORD-0448-45D3|queue_size=1",
+        "q_after": 0.225,
+        "timestamp": "2026-08-29T08:04:57.816010"
+      },
+      {
+        "state": "dispatched=[]|newly_scheduled=[]|queue_size=1",
+        "action": "logistics_dispatch_cycle",
+        "reward": 0.0,
+        "next_state": "dispatched=[]|newly_scheduled=[]|queue_size=1",
+        "q_after": 0.0,
+        "timestamp": "2026-08-29T08:05:15.236127"
+      },
+      {
+        "state": "dispatched=[]|newly_scheduled=[]|queue_size=1",
+        "action": "logistics_dispatch_cycle",
+        "reward": 0.0,
+        "next_state": "dispatched=[]|newly_scheduled=[]|queue_size=1",
+        "q_after": 0.0,
+        "timestamp": "2026-08-29T08:05:35.204526"
+      },
+      {
+        "state": "dispatched=[]|newly_scheduled=[]|queue_size=1",
+        "action": "logistics_dispatch_cycle",
+        "reward": 0.0,
+        "next_state": "dispatched=[]|newly_scheduled=[]|queue_size=1",
+        "q_after": 0.0,
+        "timestamp": "2026-08-29T08:05:57.414737"
+      },
+      {
+        "state": "dispatched=[]|newly_scheduled=[]|queue_size=1",
+        "action": "logistics_dispatch_cycle",
+        "reward": 1.5,
+        "next_state": "dispatched=[]|newly_scheduled=['ORD-0559-8353|queue_size=2",
+        "q_after": 0.225,
+        "timestamp": "2026-08-29T08:06:20.352775"
+      },
+      {
+        "state": "dispatched=[]|newly_scheduled=[]|queue_size=2",
+        "action": "logistics_dispatch_cycle",
+        "reward": 0.0,
+        "next_state": "dispatched=[]|newly_scheduled=[]|queue_size=2",
+        "q_after": 0.0,
+        "timestamp": "2026-08-29T08:06:43.042197"
+      },
+      {
+        "state": "dispatched=[]|newly_scheduled=[]|queue_size=2",
+        "action": "logistics_dispatch_cycle",
+        "reward": 1.5,
+        "next_state": "dispatched=[]|newly_scheduled=['ORD-0645-9DE7|queue_size=3",
+        "q_after": 0.225,
+        "timestamp": "2026-08-29T08:07:03.133547"
+      },
+      {
+        "state": "dispatched=[]|newly_scheduled=[]|queue_size=3",
+        "action": "logistics_dispatch_cycle",
+        "reward": 0.0,
+        "next_state": "dispatched=[]|newly_scheduled=[]|queue_size=3",
+        "q_after": 0.0,
+        "timestamp": "2026-08-29T08:07:22.831127"
+      },
+      {
+        "state": "dispatched=[]|newly_scheduled=[]|queue_size=3",
+        "action": "logistics_dispatch_cycle",
+        "reward": 8.0,
+        "next_state": "dispatched=['ORD-0645-9DE7|newly_scheduled=[]|queue_size=1",
+        "q_after": 1.2,
+        "timestamp": "2026-08-29T08:07:43.233073"
+      },
+      {
+        "state": "dispatched=[]|newly_scheduled=[]|queue_size=1",
+        "action": "logistics_dispatch_cycle",
+        "reward": 1.5,
+        "next_state": "dispatched=[]|newly_scheduled=['ORD-0743-7427|queue_size=2",
+        "q_after": 0.4163,
+        "timestamp": "2026-08-29T08:08:00.903365"
+      }
+    ]
+  },
+  "Inventory Manager Agent": {
+    "agent_name": "Inventory Manager Agent",
+    "alpha": 0.15,
+    "gamma": 0.85,
+    "epsilon": 0.1,
+    "total_rewards": -29.0,
+    "episode_count": 18,
+    "action_counts": {
+      "warehouse_restock_cycle": 18
+    },
+    "q_table": {
+      "restock_requests_sent=0|restocked_count=0|total_skus=0|zero_stock_count=0": {
+        "warehouse_restock_cycle": 0.0
+      },
+      "restock_requests_sent=0|restocked_count=0|total_skus=27|zero_stock_count=0": {
+        "warehouse_restock_cycle": 1.5746
+      },
+      "restock_requests_sent=0|restocked_count=0|total_skus=27|zero_stock_count=huge(25+)": {
+        "warehouse_restock_cycle": -6.6
+      },
+      "restock_requests_sent=0|restocked_count=0|total_skus=27|zero_stock_count=high(11-25)": {
+        "warehouse_restock_cycle": -3.5351
+      },
+      "restock_requests_sent=0|restocked_count=0|total_skus=27|zero_stock_count=med(4-10)": {
+        "warehouse_restock_cycle": 2.25
+      },
+      "restock_requests_sent=0|restocked_count=0|total_skus=27|zero_stock_count=low(1-3)": {
+        "warehouse_restock_cycle": 2.55
+      }
+    },
+    "history": [
+      {
+        "state": "restock_requests_sent=0|restocked_count=0|total_skus=0|zero_stock_count=0",
+        "action": "warehouse_restock_cycle",
+        "reward": 0.0,
+        "next_state": "restock_requests_sent=[]|restocked=[]|total_skus=0|zero_stock_count=0",
+        "q_after": 0.0,
+        "timestamp": "2026-08-29T08:01:58.940506"
+      },
+      {
+        "state": "restock_requests_sent=0|restocked_count=0|total_skus=0|zero_stock_count=0",
+        "action": "warehouse_restock_cycle",
+        "reward": 0.0,
+        "next_state": "restock_requests_sent=[]|restocked=[]|total_skus=0|zero_stock_count=0",
+        "q_after": 0.0,
+        "timestamp": "2026-08-29T08:02:20.781436"
+      },
+      {
+        "state": "restock_requests_sent=0|restocked_count=0|total_skus=0|zero_stock_count=0",
+        "action": "warehouse_restock_cycle",
+        "reward": 0.0,
+        "next_state": "restock_requests_sent=[]|restocked=[]|total_skus=0|zero_stock_count=0",
+        "q_after": 0.0,
+        "timestamp": "2026-08-29T08:02:42.740983"
+      },
+      {
+        "state": "restock_requests_sent=0|restocked_count=0|total_skus=0|zero_stock_count=0",
+        "action": "warehouse_restock_cycle",
+        "reward": 0.0,
+        "next_state": "restock_requests_sent=[]|restocked=[]|total_skus=0|zero_stock_count=0",
+        "q_after": 0.0,
+        "timestamp": "2026-08-29T08:03:02.093900"
+      },
+      {
+        "state": "restock_requests_sent=0|restocked_count=0|total_skus=0|zero_stock_count=0",
+        "action": "warehouse_restock_cycle",
+        "reward": 0.0,
+        "next_state": "restock_requests_sent=[]|restocked=[]|total_skus=0|zero_stock_count=0",
+        "q_after": 0.0,
+        "timestamp": "2026-08-29T08:03:26.517989"
+      },
+      {
+        "state": "restock_requests_sent=0|restocked_count=0|total_skus=0|zero_stock_count=0",
+        "action": "warehouse_restock_cycle",
+        "reward": 0.0,
+        "next_state": "restock_requests_sent=[]|restocked=[]|total_skus=0|zero_stock_count=0",
+        "q_after": 0.0,
+        "timestamp": "2026-08-29T08:03:42.841176"
+      },
+      {
+        "state": "restock_requests_sent=0|restocked_count=0|total_skus=0|zero_stock_count=0",
+        "action": "warehouse_restock_cycle",
+        "reward": 0.0,
+        "next_state": "restock_requests_sent=[]|restocked=[]|total_skus=0|zero_stock_count=0",
+        "q_after": 0.0,
+        "timestamp": "2026-08-29T08:04:01.183193"
+      },
+      {
+        "state": "restock_requests_sent=0|restocked_count=0|total_skus=0|zero_stock_count=0",
+        "action": "warehouse_restock_cycle",
+        "reward": 0.0,
+        "next_state": "restock_requests_sent=[]|restocked=[]|total_skus=0|zero_stock_count=0",
+        "q_after": 0.0,
+        "timestamp": "2026-08-29T08:04:17.554342"
+      },
+      {
+        "state": "restock_requests_sent=0|restocked_count=0|total_skus=27|zero_stock_count=0",
+        "action": "warehouse_restock_cycle",
+        "reward": 0.0,
+        "next_state": "restock_requests_sent=[]|restocked=[]|total_skus=27|zero_stock_count=0",
+        "q_after": 0.0,
+        "timestamp": "2026-08-29T08:04:39.503471"
+      },
+      {
+        "state": "restock_requests_sent=0|restocked_count=0|total_skus=27|zero_stock_count=huge(25+)",
+        "action": "warehouse_restock_cycle",
+        "reward": -44.0,
+        "next_state": "restock_requests_sent=['NOVA TurboFla|restocked=[]|total_skus=27|zero_stock_count=huge(25+)",
+        "q_after": -6.6,
+        "timestamp": "2026-08-29T08:05:13.010759"
+      },
+      {
+        "state": "restock_requests_sent=0|restocked_count=0|total_skus=27|zero_stock_count=high(11-25)",
+        "action": "warehouse_restock_cycle",
+        "reward": -23.0,
+        "next_state": "restock_requests_sent=['NOVA TurboFla|restocked=['NOVA TurboFla|total_skus=27|zero_stock_count=high(11-25)",
+        "q_after": -3.45,
+        "timestamp": "2026-08-29T08:05:36.569248"
+      },
+      {
+        "state": "restock_requests_sent=0|restocked_count=0|total_skus=27|zero_stock_count=high(11-25)",
+        "action": "warehouse_restock_cycle",
+        "reward": -7.0,
+        "next_state": "restock_requests_sent=['NOVA PowerStr|restocked=['NOVA TurboFla|total_skus=27|zero_stock_count=high(11-25)",
+        "q_after": -3.9825,
+        "timestamp": "2026-08-29T08:05:58.950352"
+      },
+      {
+        "state": "restock_requests_sent=0|restocked_count=0|total_skus=27|zero_stock_count=high(11-25)",
+        "action": "warehouse_restock_cycle",
+        "reward": -1.0,
+        "next_state": "restock_requests_sent=['NOVA PowerStr|restocked=['NOVA PowerStr|total_skus=27|zero_stock_count=high(11-25)",
+        "q_after": -3.5351,
+        "timestamp": "2026-08-29T08:06:22.050188"
+      },
+      {
+        "state": "restock_requests_sent=0|restocked_count=0|total_skus=27|zero_stock_count=med(4-10)",
+        "action": "warehouse_restock_cycle",
+        "reward": 15.0,
+        "next_state": "restock_requests_sent=['NOVA HyperGaN|restocked=['NOVA PowerStr|total_skus=27|zero_stock_count=med(4-10)",
+        "q_after": 2.25,
+        "timestamp": "2026-08-29T08:06:44.203824"
+      },
+      {
+        "state": "restock_requests_sent=0|restocked_count=0|total_skus=27|zero_stock_count=low(1-3)",
+        "action": "warehouse_restock_cycle",
+        "reward": 17.0,
+        "next_state": "restock_requests_sent=['NOVA HyperGaN|restocked=['NOVA HyperGaN|total_skus=27|zero_stock_count=low(1-3)",
+        "q_after": 2.55,
+        "timestamp": "2026-08-29T08:07:04.060942"
+      },
+      {
+        "state": "restock_requests_sent=0|restocked_count=0|total_skus=27|zero_stock_count=0",
+        "action": "warehouse_restock_cycle",
+        "reward": 11.0,
+        "next_state": "restock_requests_sent=['NOVA BladeFor|restocked=['NOVA HyperGaN|total_skus=27|zero_stock_count=0",
+        "q_after": 1.65,
+        "timestamp": "2026-08-29T08:07:23.310907"
+      },
+      {
+        "state": "restock_requests_sent=0|restocked_count=0|total_skus=27|zero_stock_count=0",
+        "action": "warehouse_restock_cycle",
+        "reward": 3.0,
+        "next_state": "restock_requests_sent=[]|restocked=['NOVA BladeFor|total_skus=27|zero_stock_count=0",
+        "q_after": 1.8525,
+        "timestamp": "2026-08-29T08:07:43.423845"
+      },
+      {
+        "state": "restock_requests_sent=0|restocked_count=0|total_skus=27|zero_stock_count=0",
+        "action": "warehouse_restock_cycle",
+        "reward": 0.0,
+        "next_state": "restock_requests_sent=[]|restocked=[]|total_skus=27|zero_stock_count=0",
+        "q_after": 1.5746,
+        "timestamp": "2026-08-29T08:08:00.916200"
+      }
+    ]
+  },
+  "Finance Manager Agent": {
+    "agent_name": "Finance Manager Agent",
+    "alpha": 0.15,
+    "gamma": 0.85,
+    "epsilon": 0.1,
+    "total_rewards": 28.0,
+    "episode_count": 14,
+    "action_counts": {
+      "finance_audit_cycle": 14
+    },
+    "q_table": {
+      "approved_refunds_count=0|bank_balance=1k|rejected_ineligible_count=0": {
+        "finance_audit_cycle": 2.2192
+      },
+      "approved_refunds_count=0|bank_balance=5k+|rejected_ineligible_count=0": {
+        "finance_audit_cycle": 1.1601
+      },
+      "approved_refunds_count=0|bank_balance=5k|rejected_ineligible_count=0": {
+        "finance_audit_cycle": 0.5932
+      }
+    },
+    "history": [
+      {
+        "state": "approved_refunds_count=0|bank_balance=1k|rejected_ineligible_count=0",
+        "action": "finance_audit_cycle",
+        "reward": 2.0,
+        "next_state": "approved_refunds_count=0|bank_balance=1k|rejected_ineligible_count=0",
+        "q_after": 0.3,
+        "timestamp": "2026-08-29T08:01:59.399730"
+      },
+      {
+        "state": "approved_refunds_count=0|bank_balance=1k|rejected_ineligible_count=0",
+        "action": "finance_audit_cycle",
+        "reward": 2.0,
+        "next_state": "approved_refunds_count=0|bank_balance=1k|rejected_ineligible_count=0",
+        "q_after": 0.5932,
+        "timestamp": "2026-08-29T08:02:23.009793"
+      },
+      {
+        "state": "approved_refunds_count=0|bank_balance=1k|rejected_ineligible_count=0",
+        "action": "finance_audit_cycle",
+        "reward": 2.0,
+        "next_state": "approved_refunds_count=0|bank_balance=1k|rejected_ineligible_count=0",
+        "q_after": 0.8799,
+        "timestamp": "2026-08-29T08:03:00.046607"
+      },
+      {
+        "state": "approved_refunds_count=0|bank_balance=1k|rejected_ineligible_count=0",
+        "action": "finance_audit_cycle",
+        "reward": 2.0,
+        "next_state": "approved_refunds_count=0|bank_balance=1k|rejected_ineligible_count=0",
+        "q_after": 1.1601,
+        "timestamp": "2026-08-29T08:03:31.612532"
+      },
+      {
+        "state": "approved_refunds_count=0|bank_balance=1k|rejected_ineligible_count=0",
+        "action": "finance_audit_cycle",
+        "reward": 2.0,
+        "next_state": "approved_refunds_count=0|bank_balance=1k|rejected_ineligible_count=0",
+        "q_after": 1.434,
+        "timestamp": "2026-08-29T08:03:59.131738"
+      },
+      {
+        "state": "approved_refunds_count=0|bank_balance=1k|rejected_ineligible_count=0",
+        "action": "finance_audit_cycle",
+        "reward": 2.0,
+        "next_state": "approved_refunds_count=0|bank_balance=1k|rejected_ineligible_count=0",
+        "q_after": 1.7017,
+        "timestamp": "2026-08-29T08:04:39.517447"
+      },
+      {
+        "state": "approved_refunds_count=0|bank_balance=5k+|rejected_ineligible_count=0",
+        "action": "finance_audit_cycle",
+        "reward": 2.0,
+        "next_state": "approved_refunds_count=0|bank_balance=5k+|rejected_ineligible_count=0",
+        "q_after": 0.3,
+        "timestamp": "2026-08-29T08:05:13.059498"
+      },
+      {
+        "state": "approved_refunds_count=0|bank_balance=5k+|rejected_ineligible_count=0",
+        "action": "finance_audit_cycle",
+        "reward": 2.0,
+        "next_state": "approved_refunds_count=0|bank_balance=5k+|rejected_ineligible_count=0",
+        "q_after": 0.5932,
+        "timestamp": "2026-08-29T08:05:36.804404"
+      },
+      {
+        "state": "approved_refunds_count=0|bank_balance=5k+|rejected_ineligible_count=0",
+        "action": "finance_audit_cycle",
+        "reward": 2.0,
+        "next_state": "approved_refunds_count=0|bank_balance=5k+|rejected_ineligible_count=0",
+        "q_after": 0.8799,
+        "timestamp": "2026-08-29T08:05:59.193527"
+      },
+      {
+        "state": "approved_refunds_count=0|bank_balance=5k+|rejected_ineligible_count=0",
+        "action": "finance_audit_cycle",
+        "reward": 2.0,
+        "next_state": "approved_refunds_count=0|bank_balance=5k+|rejected_ineligible_count=0",
+        "q_after": 1.1601,
+        "timestamp": "2026-08-29T08:06:22.345817"
+      },
+      {
+        "state": "approved_refunds_count=0|bank_balance=5k|rejected_ineligible_count=0",
+        "action": "finance_audit_cycle",
+        "reward": 2.0,
+        "next_state": "approved_refunds_count=0|bank_balance=5k|rejected_ineligible_count=0",
+        "q_after": 0.3,
+        "timestamp": "2026-08-29T08:06:44.425965"
+      },
+      {
+        "state": "approved_refunds_count=0|bank_balance=5k|rejected_ineligible_count=0",
+        "action": "finance_audit_cycle",
+        "reward": 2.0,
+        "next_state": "approved_refunds_count=0|bank_balance=5k|rejected_ineligible_count=0",
+        "q_after": 0.5932,
+        "timestamp": "2026-08-29T08:07:04.266818"
+      },
+      {
+        "state": "approved_refunds_count=0|bank_balance=1k|rejected_ineligible_count=0",
+        "action": "finance_audit_cycle",
+        "reward": 2.0,
+        "next_state": "approved_refunds_count=0|bank_balance=1k|rejected_ineligible_count=0",
+        "q_after": 1.9634,
+        "timestamp": "2026-08-29T08:07:23.445837"
+      },
+      {
+        "state": "approved_refunds_count=0|bank_balance=1k|rejected_ineligible_count=0",
+        "action": "finance_audit_cycle",
+        "reward": 2.0,
+        "next_state": "approved_refunds_count=0|bank_balance=1k|rejected_ineligible_count=0",
+        "q_after": 2.2192,
+        "timestamp": "2026-08-29T08:07:43.464318"
+      }
+    ]
+  },
+  "Price Manager Agent": {
+    "agent_name": "Price Manager Agent",
+    "alpha": 0.15,
+    "gamma": 0.85,
+    "epsilon": 0.1,
+    "total_rewards": 172.0,
+    "episode_count": 17,
+    "action_counts": {
+      "dynamic_pricing": 17
+    },
+    "q_table": {
+      "adjusted_count=0|products_count=0|surges=0": {
+        "dynamic_pricing": 1.455
+      },
+      "adjusted_count=0|products_count=huge(25+)|surges=0": {
+        "dynamic_pricing": 11.794
+      }
+    },
+    "history": [
+      {
+        "state": "adjusted_count=0|products_count=0|surges=0",
+        "action": "dynamic_pricing",
+        "reward": 2.0,
+        "next_state": "adjusted_count=0|base_price_violations=0|products_count=0|surges=0",
+        "q_after": 0.3,
+        "timestamp": "2026-08-29T08:01:59.456063"
+      },
+      {
+        "state": "adjusted_count=0|products_count=0|surges=0",
+        "action": "dynamic_pricing",
+        "reward": 2.0,
+        "next_state": "adjusted_count=0|base_price_violations=0|products_count=0|surges=0",
+        "q_after": 0.555,
+        "timestamp": "2026-08-29T08:02:20.845742"
+      },
+      {
+        "state": "adjusted_count=0|products_count=0|surges=0",
+        "action": "dynamic_pricing",
+        "reward": 2.0,
+        "next_state": "adjusted_count=0|base_price_violations=0|products_count=0|surges=0",
+        "q_after": 0.7718,
+        "timestamp": "2026-08-29T08:02:37.607220"
+      },
+      {
+        "state": "adjusted_count=0|products_count=0|surges=0",
+        "action": "dynamic_pricing",
+        "reward": 2.0,
+        "next_state": "adjusted_count=0|base_price_violations=0|products_count=0|surges=0",
+        "q_after": 0.956,
+        "timestamp": "2026-08-29T08:02:54.943076"
+      },
+      {
+        "state": "adjusted_count=0|products_count=0|surges=0",
+        "action": "dynamic_pricing",
+        "reward": 2.0,
+        "next_state": "adjusted_count=0|base_price_violations=0|products_count=0|surges=0",
+        "q_after": 1.1126,
+        "timestamp": "2026-08-29T08:03:10.217766"
+      },
+      {
+        "state": "adjusted_count=0|products_count=0|surges=0",
+        "action": "dynamic_pricing",
+        "reward": 2.0,
+        "next_state": "adjusted_count=0|base_price_violations=0|products_count=0|surges=0",
+        "q_after": 1.2457,
+        "timestamp": "2026-08-29T08:03:32.643927"
+      },
+      {
+        "state": "adjusted_count=0|products_count=0|surges=0",
+        "action": "dynamic_pricing",
+        "reward": 2.0,
+        "next_state": "adjusted_count=0|base_price_violations=0|products_count=0|surges=0",
+        "q_after": 1.3588,
+        "timestamp": "2026-08-29T08:03:50.951578"
+      },
+      {
+        "state": "adjusted_count=0|products_count=0|surges=0",
+        "action": "dynamic_pricing",
+        "reward": 2.0,
+        "next_state": "adjusted_count=0|base_price_violations=0|products_count=0|surges=0",
+        "q_after": 1.455,
+        "timestamp": "2026-08-29T08:04:06.270094"
+      },
+      {
+        "state": "adjusted_count=0|products_count=huge(25+)|surges=0",
+        "action": "dynamic_pricing",
+        "reward": 6.5,
+        "next_state": "adjusted_count=low(1-3)|base_price_violations=0|products_count=huge(25+)|surges=0",
+        "q_after": 0.975,
+        "timestamp": "2026-08-29T08:04:24.722232"
+      },
+      {
+        "state": "adjusted_count=0|products_count=huge(25+)|surges=0",
+        "action": "dynamic_pricing",
+        "reward": 2.0,
+        "next_state": "adjusted_count=0|base_price_violations=0|products_count=huge(25+)|surges=0",
+        "q_after": 1.1287,
+        "timestamp": "2026-08-29T08:04:42.603393"
+      },
+      {
+        "state": "adjusted_count=0|products_count=huge(25+)|surges=0",
+        "action": "dynamic_pricing",
+        "reward": 58.0,
+        "next_state": "adjusted_count=high(11-25)|base_price_violations=0|products_count=huge(25+)|surges=25",
+        "q_after": 9.6594,
+        "timestamp": "2026-08-29T08:05:14.145912"
+      },
+      {
+        "state": "adjusted_count=0|products_count=huge(25+)|surges=0",
+        "action": "dynamic_pricing",
+        "reward": 24.0,
+        "next_state": "adjusted_count=med(4-10)|base_price_violations=0|products_count=huge(25+)|surges=8",
+        "q_after": 11.8105,
+        "timestamp": "2026-08-29T08:05:37.297130"
+      },
+      {
+        "state": "adjusted_count=0|products_count=huge(25+)|surges=0",
+        "action": "dynamic_pricing",
+        "reward": 14.0,
+        "next_state": "adjusted_count=med(4-10)|base_price_violations=0|products_count=huge(25+)|surges=3",
+        "q_after": 12.1389,
+        "timestamp": "2026-08-29T08:05:59.707356"
+      },
+      {
+        "state": "adjusted_count=0|products_count=huge(25+)|surges=0",
+        "action": "dynamic_pricing",
+        "reward": 26.0,
+        "next_state": "adjusted_count=med(4-10)|base_price_violations=0|products_count=huge(25+)|surges=9",
+        "q_after": 14.2181,
+        "timestamp": "2026-08-29T08:06:22.942455"
+      },
+      {
+        "state": "adjusted_count=0|products_count=huge(25+)|surges=0",
+        "action": "dynamic_pricing",
+        "reward": 14.0,
+        "next_state": "adjusted_count=med(4-10)|base_price_violations=0|products_count=huge(25+)|surges=3",
+        "q_after": 14.1854,
+        "timestamp": "2026-08-29T08:06:44.847891"
+      },
+      {
+        "state": "adjusted_count=0|products_count=huge(25+)|surges=0",
+        "action": "dynamic_pricing",
+        "reward": 8.0,
+        "next_state": "adjusted_count=med(4-10)|base_price_violations=0|products_count=huge(25+)|surges=0",
+        "q_after": 13.2576,
+        "timestamp": "2026-08-29T08:07:23.709753"
+      },
+      {
+        "state": "adjusted_count=0|products_count=huge(25+)|surges=0",
+        "action": "dynamic_pricing",
+        "reward": 3.5,
+        "next_state": "adjusted_count=low(1-3)|base_price_violations=0|products_count=huge(25+)|surges=0",
+        "q_after": 11.794,
+        "timestamp": "2026-08-29T08:08:00.988497"
+      }
+    ]
+  },
+  "Order Management Agent": {
+    "agent_name": "Order Management Agent",
+    "alpha": 0.15,
+    "gamma": 0.85,
+    "epsilon": 0.1,
+    "total_rewards": 2.5,
+    "episode_count": 18,
+    "action_counts": {
+      "order_lifecycle_audit": 18
+    },
+    "q_table": {
+      "delivered_count=0|shipped_count=0|sla_breaches=0|total_orders=low(1-3)": {
+        "order_lifecycle_audit": 0.2727
+      },
+      "delivered_count=0|shipped_count=0|sla_breaches=0|total_orders=0": {
+        "order_lifecycle_audit": 0.0
+      }
+    },
+    "history": [
+      {
+        "state": "delivered_count=0|shipped_count=0|sla_breaches=0|total_orders=low(1-3)",
+        "action": "order_lifecycle_audit",
+        "reward": 2.5,
+        "next_state": "delivered_count=0|shipped_count=low(1-3)|sla_breaches=0|total_orders=low(1-3)",
+        "q_after": 0.375,
+        "timestamp": "2026-08-29T08:01:59.646618"
+      },
+      {
+        "state": "delivered_count=0|shipped_count=0|sla_breaches=0|total_orders=low(1-3)",
+        "action": "order_lifecycle_audit",
+        "reward": 0.0,
+        "next_state": "delivered_count=0|shipped_count=0|sla_breaches=0|total_orders=low(1-3)",
+        "q_after": 0.3666,
+        "timestamp": "2026-08-29T08:02:21.916143"
+      },
+      {
+        "state": "delivered_count=0|shipped_count=0|sla_breaches=0|total_orders=low(1-3)",
+        "action": "order_lifecycle_audit",
+        "reward": 0.0,
+        "next_state": "delivered_count=0|shipped_count=0|sla_breaches=0|total_orders=low(1-3)",
+        "q_after": 0.3584,
+        "timestamp": "2026-08-29T08:02:37.654246"
+      },
+      {
+        "state": "delivered_count=0|shipped_count=0|sla_breaches=0|total_orders=low(1-3)",
+        "action": "order_lifecycle_audit",
+        "reward": 0.0,
+        "next_state": "delivered_count=0|shipped_count=0|sla_breaches=0|total_orders=low(1-3)",
+        "q_after": 0.3503,
+        "timestamp": "2026-08-29T08:02:58.000099"
+      },
+      {
+        "state": "delivered_count=0|shipped_count=0|sla_breaches=0|total_orders=low(1-3)",
+        "action": "order_lifecycle_audit",
+        "reward": 0.0,
+        "next_state": "delivered_count=0|shipped_count=0|sla_breaches=0|total_orders=low(1-3)",
+        "q_after": 0.3424,
+        "timestamp": "2026-08-29T08:03:13.275566"
+      },
+      {
+        "state": "delivered_count=0|shipped_count=0|sla_breaches=0|total_orders=low(1-3)",
+        "action": "order_lifecycle_audit",
+        "reward": 0.0,
+        "next_state": "delivered_count=0|shipped_count=0|sla_breaches=0|total_orders=low(1-3)",
+        "q_after": 0.3347,
+        "timestamp": "2026-08-29T08:03:36.707101"
+      },
+      {
+        "state": "delivered_count=0|shipped_count=0|sla_breaches=0|total_orders=low(1-3)",
+        "action": "order_lifecycle_audit",
+        "reward": 0.0,
+        "next_state": "delivered_count=0|shipped_count=0|sla_breaches=0|total_orders=low(1-3)",
+        "q_after": 0.3272,
+        "timestamp": "2026-08-29T08:03:55.034947"
+      },
+      {
+        "state": "delivered_count=0|shipped_count=0|sla_breaches=0|total_orders=low(1-3)",
+        "action": "order_lifecycle_audit",
+        "reward": 0.0,
+        "next_state": "delivered_count=0|shipped_count=0|sla_breaches=0|total_orders=low(1-3)",
+        "q_after": 0.3198,
+        "timestamp": "2026-08-29T08:04:15.381419"
+      },
+      {
+        "state": "delivered_count=0|shipped_count=0|sla_breaches=0|total_orders=low(1-3)",
+        "action": "order_lifecycle_audit",
+        "reward": 0.0,
+        "next_state": "delivered_count=0|shipped_count=0|sla_breaches=0|total_orders=low(1-3)",
+        "q_after": 0.3126,
+        "timestamp": "2026-08-29T08:04:39.528319"
+      },
+      {
+        "state": "delivered_count=0|shipped_count=0|sla_breaches=0|total_orders=low(1-3)",
+        "action": "order_lifecycle_audit",
+        "reward": 0.0,
+        "next_state": "delivered_count=0|shipped_count=0|sla_breaches=0|total_orders=low(1-3)",
+        "q_after": 0.3056,
+        "timestamp": "2026-08-29T08:04:55.632220"
+      },
+      {
+        "state": "delivered_count=0|shipped_count=0|sla_breaches=0|total_orders=0",
+        "action": "order_lifecycle_audit",
+        "reward": 0.0,
+        "next_state": "delivered_count=0|shipped_count=0|sla_breaches=0|total_orders=0",
+        "q_after": 0.0,
+        "timestamp": "2026-08-29T08:05:14.185380"
+      },
+      {
+        "state": "delivered_count=0|shipped_count=0|sla_breaches=0|total_orders=0",
+        "action": "order_lifecycle_audit",
+        "reward": 0.0,
+        "next_state": "delivered_count=0|shipped_count=0|sla_breaches=0|total_orders=0",
+        "q_after": 0.0,
+        "timestamp": "2026-08-29T08:05:37.341767"
+      },
+      {
+        "state": "delivered_count=0|shipped_count=0|sla_breaches=0|total_orders=0",
+        "action": "order_lifecycle_audit",
+        "reward": 0.0,
+        "next_state": "delivered_count=0|shipped_count=0|sla_breaches=0|total_orders=0",
+        "q_after": 0.0,
+        "timestamp": "2026-08-29T08:05:59.750933"
+      },
+      {
+        "state": "delivered_count=0|shipped_count=0|sla_breaches=0|total_orders=low(1-3)",
+        "action": "order_lifecycle_audit",
+        "reward": 0.0,
+        "next_state": "delivered_count=0|shipped_count=0|sla_breaches=0|total_orders=low(1-3)",
+        "q_after": 0.2987,
+        "timestamp": "2026-08-29T08:06:22.987161"
+      },
+      {
+        "state": "delivered_count=0|shipped_count=0|sla_breaches=0|total_orders=low(1-3)",
+        "action": "order_lifecycle_audit",
+        "reward": 0.0,
+        "next_state": "delivered_count=0|shipped_count=0|sla_breaches=0|total_orders=low(1-3)",
+        "q_after": 0.292,
+        "timestamp": "2026-08-29T08:06:44.883651"
+      },
+      {
+        "state": "delivered_count=0|shipped_count=0|sla_breaches=0|total_orders=low(1-3)",
+        "action": "order_lifecycle_audit",
+        "reward": 0.0,
+        "next_state": "delivered_count=0|shipped_count=0|sla_breaches=0|total_orders=low(1-3)",
+        "q_after": 0.2854,
+        "timestamp": "2026-08-29T08:07:05.362758"
+      },
+      {
+        "state": "delivered_count=0|shipped_count=0|sla_breaches=0|total_orders=low(1-3)",
+        "action": "order_lifecycle_audit",
+        "reward": 0.0,
+        "next_state": "delivered_count=0|shipped_count=0|sla_breaches=0|total_orders=low(1-3)",
+        "q_after": 0.279,
+        "timestamp": "2026-08-29T08:07:23.723959"
+      },
+      {
+        "state": "delivered_count=0|shipped_count=0|sla_breaches=0|total_orders=low(1-3)",
+        "action": "order_lifecycle_audit",
+        "reward": 0.0,
+        "next_state": "delivered_count=0|shipped_count=0|sla_breaches=0|total_orders=low(1-3)",
+        "q_after": 0.2727,
+        "timestamp": "2026-08-29T08:07:43.520662"
+      }
+    ]
+  },
+  "Review and Feedback Manager": {
+    "agent_name": "Review and Feedback Manager",
+    "alpha": 0.15,
+    "gamma": 0.85,
+    "epsilon": 0.1,
+    "total_rewards": 3.0,
+    "episode_count": 9,
+    "action_counts": {
+      "review_sentiment_audit": 9
+    },
+    "q_table": {
+      "alerts_sent=0|reviews_audited=0": {
+        "review_sentiment_audit": 0.3767
+      }
+    },
+    "history": [
+      {
+        "state": "alerts_sent=0|reviews_audited=0",
+        "action": "review_sentiment_audit",
+        "reward": 0.0,
+        "next_state": "alerts_sent=0|reviews_audited=0",
+        "q_after": 0.0,
+        "timestamp": "2026-08-29T08:01:59.702057"
+      },
+      {
+        "state": "alerts_sent=0|reviews_audited=0",
+        "action": "review_sentiment_audit",
+        "reward": 0.0,
+        "next_state": "alerts_sent=0|reviews_audited=0",
+        "q_after": 0.0,
+        "timestamp": "2026-08-29T08:02:32.442976"
+      },
+      {
+        "state": "alerts_sent=0|reviews_audited=0",
+        "action": "review_sentiment_audit",
+        "reward": 0.0,
+        "next_state": "alerts_sent=0|reviews_audited=0",
+        "q_after": 0.0,
+        "timestamp": "2026-08-29T08:03:13.301616"
+      },
+      {
+        "state": "alerts_sent=0|reviews_audited=0",
+        "action": "review_sentiment_audit",
+        "reward": 0.0,
+        "next_state": "alerts_sent=0|reviews_audited=0",
+        "q_after": 0.0,
+        "timestamp": "2026-08-29T08:03:56.060108"
+      },
+      {
+        "state": "alerts_sent=0|reviews_audited=0",
+        "action": "review_sentiment_audit",
+        "reward": 0.5,
+        "next_state": "alerts_sent=0|reviews_audited=1",
+        "q_after": 0.075,
+        "timestamp": "2026-08-29T08:04:39.546327"
+      },
+      {
+        "state": "alerts_sent=0|reviews_audited=0",
+        "action": "review_sentiment_audit",
+        "reward": 0.0,
+        "next_state": "alerts_sent=0|reviews_audited=0",
+        "q_after": 0.0733,
+        "timestamp": "2026-08-29T08:05:37.429694"
+      },
+      {
+        "state": "alerts_sent=0|reviews_audited=0",
+        "action": "review_sentiment_audit",
+        "reward": 0.5,
+        "next_state": "alerts_sent=0|reviews_audited=1",
+        "q_after": 0.1373,
+        "timestamp": "2026-08-29T08:06:23.094556"
+      },
+      {
+        "state": "alerts_sent=0|reviews_audited=0",
+        "action": "review_sentiment_audit",
+        "reward": 1.0,
+        "next_state": "alerts_sent=0|reviews_audited=2",
+        "q_after": 0.2667,
+        "timestamp": "2026-08-29T08:07:04.339098"
+      },
+      {
+        "state": "alerts_sent=0|reviews_audited=0",
+        "action": "review_sentiment_audit",
+        "reward": 1.0,
+        "next_state": "alerts_sent=0|reviews_audited=2",
+        "q_after": 0.3767,
+        "timestamp": "2026-08-29T08:07:43.575408"
+      }
+    ]
+  },
+  "CEO Agent": {
+    "agent_name": "CEO Agent",
+    "alpha": 0.15,
+    "gamma": 0.85,
+    "epsilon": 0.1,
+    "total_rewards": 24.0,
+    "episode_count": 12,
+    "action_counts": {
+      "ceo_strategic_cycle": 12
+    },
+    "q_table": {
+      "confirmed_orders=0|profit=<50|refund_rate=0%|revenue=200": {
+        "ceo_strategic_cycle": 0.5932
+      },
+      "confirmed_orders=low(1-3)|profit=200|refund_rate=0%|revenue=200": {
+        "ceo_strategic_cycle": 1.7017
+      },
+      "confirmed_orders=0|profit=<50|refund_rate=0%|revenue=<50": {
+        "ceo_strategic_cycle": 0.5932
+      },
+      "confirmed_orders=low(1-3)|profit=<50|refund_rate=0%|revenue=200": {
+        "ceo_strategic_cycle": 0.5932
+      }
+    },
+    "history": [
+      {
+        "state": "confirmed_orders=0|profit=<50|refund_rate=0%|revenue=200",
+        "action": "ceo_strategic_cycle",
+        "reward": 2.0,
+        "next_state": "confirmed_orders=0|profit=<50|refund_rate=0%|revenue=200",
+        "q_after": 0.3,
+        "timestamp": "2026-08-29T08:02:19.615671"
+      },
+      {
+        "state": "confirmed_orders=0|profit=<50|refund_rate=0%|revenue=200",
+        "action": "ceo_strategic_cycle",
+        "reward": 2.0,
+        "next_state": "confirmed_orders=0|profit=<50|refund_rate=0%|revenue=200",
+        "q_after": 0.5932,
+        "timestamp": "2026-08-29T08:04:38.452149"
+      },
+      {
+        "state": "confirmed_orders=low(1-3)|profit=200|refund_rate=0%|revenue=200",
+        "action": "ceo_strategic_cycle",
+        "reward": 2.0,
+        "next_state": "confirmed_orders=low(1-3)|profit=200|refund_rate=0%|revenue=200",
+        "q_after": 0.3,
+        "timestamp": "2026-08-29T08:05:11.543940"
+      },
+      {
+        "state": "confirmed_orders=0|profit=<50|refund_rate=0%|revenue=<50",
+        "action": "ceo_strategic_cycle",
+        "reward": 2.0,
+        "next_state": "confirmed_orders=0|profit=<50|refund_rate=0%|revenue=<50",
+        "q_after": 0.3,
+        "timestamp": "2026-08-29T08:05:34.147675"
+      },
+      {
+        "state": "confirmed_orders=0|profit=<50|refund_rate=0%|revenue=<50",
+        "action": "ceo_strategic_cycle",
+        "reward": 2.0,
+        "next_state": "confirmed_orders=0|profit=<50|refund_rate=0%|revenue=<50",
+        "q_after": 0.5932,
+        "timestamp": "2026-08-29T08:05:56.346486"
+      },
+      {
+        "state": "confirmed_orders=low(1-3)|profit=<50|refund_rate=0%|revenue=200",
+        "action": "ceo_strategic_cycle",
+        "reward": 2.0,
+        "next_state": "confirmed_orders=low(1-3)|profit=<50|refund_rate=0%|revenue=200",
+        "q_after": 0.3,
+        "timestamp": "2026-08-29T08:06:19.145046"
+      },
+      {
+        "state": "confirmed_orders=low(1-3)|profit=<50|refund_rate=0%|revenue=200",
+        "action": "ceo_strategic_cycle",
+        "reward": 2.0,
+        "next_state": "confirmed_orders=low(1-3)|profit=<50|refund_rate=0%|revenue=200",
+        "q_after": 0.5932,
+        "timestamp": "2026-08-29T08:06:41.992317"
+      },
+      {
+        "state": "confirmed_orders=low(1-3)|profit=200|refund_rate=0%|revenue=200",
+        "action": "ceo_strategic_cycle",
+        "reward": 2.0,
+        "next_state": "confirmed_orders=low(1-3)|profit=200|refund_rate=0%|revenue=200",
+        "q_after": 0.5932,
+        "timestamp": "2026-08-29T08:07:02.054982"
+      },
+      {
+        "state": "confirmed_orders=low(1-3)|profit=200|refund_rate=0%|revenue=200",
+        "action": "ceo_strategic_cycle",
+        "reward": 2.0,
+        "next_state": "confirmed_orders=low(1-3)|profit=200|refund_rate=0%|revenue=200",
+        "q_after": 0.8799,
+        "timestamp": "2026-08-29T08:07:21.793942"
+      },
+      {
+        "state": "confirmed_orders=low(1-3)|profit=200|refund_rate=0%|revenue=200",
+        "action": "ceo_strategic_cycle",
+        "reward": 2.0,
+        "next_state": "confirmed_orders=low(1-3)|profit=200|refund_rate=0%|revenue=200",
+        "q_after": 1.1601,
+        "timestamp": "2026-08-29T08:07:42.047834"
+      },
+      {
+        "state": "confirmed_orders=low(1-3)|profit=200|refund_rate=0%|revenue=200",
+        "action": "ceo_strategic_cycle",
+        "reward": 2.0,
+        "next_state": "confirmed_orders=low(1-3)|profit=200|refund_rate=0%|revenue=200",
+        "q_after": 1.434,
+        "timestamp": "2026-08-29T08:07:59.849656"
+      },
+      {
+        "state": "confirmed_orders=low(1-3)|profit=200|refund_rate=0%|revenue=200",
+        "action": "ceo_strategic_cycle",
+        "reward": 2.0,
+        "next_state": "confirmed_orders=low(1-3)|profit=200|refund_rate=0%|revenue=200",
+        "q_after": 1.7017,
+        "timestamp": "2026-08-29T08:08:17.243041"
+      }
+    ]
+  },
+  "buyer_alex": {
+    "agent_name": "buyer_alex",
+    "alpha": 0.15,
+    "gamma": 0.85,
+    "epsilon": 0.1,
+    "total_rewards": 12.0,
+    "episode_count": 2,
+    "action_counts": {
+      "BUY": 2
+    },
+    "q_table": {
+      "buyer=buyer_alex|category=General": {
+        "BUY": 1.665
+      }
+    },
+    "history": [
+      {
+        "state": "buyer=buyer_alex|category=General",
+        "action": "BUY",
+        "reward": 6.0,
+        "next_state": "orders_count=low(1-3)",
+        "q_after": 0.9,
+        "timestamp": "2026-08-29T08:04:48.518231"
+      },
+      {
+        "state": "buyer=buyer_alex|category=General",
+        "action": "BUY",
+        "reward": 6.0,
+        "next_state": "orders_count=low(1-3)",
+        "q_after": 1.665,
+        "timestamp": "2026-08-29T08:06:00.059126"
+      }
+    ]
+  },
+  "buyer_sophia": {
+    "agent_name": "buyer_sophia",
+    "alpha": 0.15,
+    "gamma": 0.85,
+    "epsilon": 0.1,
+    "total_rewards": 12.0,
+    "episode_count": 2,
+    "action_counts": {
+      "BUY": 2
+    },
+    "q_table": {
+      "buyer=buyer_sophia|category=General": {
+        "BUY": 1.665
+      }
+    },
+    "history": [
+      {
+        "state": "buyer=buyer_sophia|category=General",
+        "action": "BUY",
+        "reward": 6.0,
+        "next_state": "orders_count=low(1-3)",
+        "q_after": 0.9,
+        "timestamp": "2026-08-29T08:06:45.101915"
+      },
+      {
+        "state": "buyer=buyer_sophia|category=General",
+        "action": "BUY",
+        "reward": 6.0,
+        "next_state": "orders_count=low(1-3)",
+        "q_after": 1.665,
+        "timestamp": "2026-08-29T08:20:41.119374"
+      }
+    ]
+  },
+  "buyer_david": {
+    "agent_name": "buyer_david",
+    "alpha": 0.15,
+    "gamma": 0.85,
+    "epsilon": 0.1,
+    "total_rewards": 6.0,
+    "episode_count": 1,
+    "action_counts": {
+      "BUY": 1
+    },
+    "q_table": {
+      "buyer=buyer_david|category=General": {
+        "BUY": 0.9
+      }
+    },
+    "history": [
+      {
+        "state": "buyer=buyer_david|category=General",
+        "action": "BUY",
+        "reward": 6.0,
+        "next_state": "orders_count=low(1-3)",
+        "q_after": 0.9,
+        "timestamp": "2026-08-29T08:07:43.752655"
+      }
+    ]
+  },
+  "Customer AI (Nova)": {
+    "agent_name": "Customer AI (Nova)",
+    "alpha": 0.15,
+    "gamma": 0.85,
+    "epsilon": 0.1,
+    "total_rewards": 21.0,
+    "episode_count": 19,
+    "action_counts": {
+      "purchase_assistant": 11,
+      "add_to_cart": 1,
+      "trigger_razorpay_checkout": 1,
+      "recommend_products": 2,
+      "compare_products": 2,
+      "apply_coupon": 2
+    },
+    "q_table": {
+      "tool=purchase_assist|user_id=user_test": {
+        "purchase_assistant": 0.7685
+      },
+      "tool=add_to_cart|user_id=user_alex": {
+        "add_to_cart": 0.45
+      },
+      "tool=trigger_razorpa|user_id=user_alex": {
+        "trigger_razorpay_checkout": 0.15
+      },
+      "tool=recommend_produ|user_id=user_test": {
+        "recommend_products": 0.2775
+      },
+      "tool=compare_product|user_id=user_test": {
+        "compare_products": 0.2775
+      },
+      "tool=apply_coupon|user_id=user_test": {
+        "apply_coupon": 0.2775
+      },
+      "tool=purchase_assist|user_id=user_e2e_custom": {
+        "purchase_assistant": 0.2775
+      }
+    },
+    "history": [
+      {
+        "state": "tool=purchase_assist|user_id=user_test",
+        "action": "purchase_assistant",
+        "reward": 1.0,
+        "next_state": "success=1",
+        "q_after": 0.15,
+        "timestamp": "2026-08-29T08:26:56.039139"
+      },
+      {
+        "state": "tool=purchase_assist|user_id=user_test",
+        "action": "purchase_assistant",
+        "reward": 1.0,
+        "next_state": "success=1",
+        "q_after": 0.2775,
+        "timestamp": "2026-08-29T08:28:36.483796"
+      },
+      {
+        "state": "tool=purchase_assist|user_id=user_test",
+        "action": "purchase_assistant",
+        "reward": 1.0,
+        "next_state": "success=1",
+        "q_after": 0.3859,
+        "timestamp": "2026-08-29T08:29:33.246078"
+      },
+      {
+        "state": "tool=purchase_assist|user_id=user_test",
+        "action": "purchase_assistant",
+        "reward": 1.0,
+        "next_state": "success=1",
+        "q_after": 0.478,
+        "timestamp": "2026-08-29T08:29:52.723024"
+      },
+      {
+        "state": "tool=purchase_assist|user_id=user_test",
+        "action": "purchase_assistant",
+        "reward": 1.0,
+        "next_state": "success=1",
+        "q_after": 0.5563,
+        "timestamp": "2026-08-29T08:32:34.087690"
+      },
+      {
+        "state": "tool=purchase_assist|user_id=user_test",
+        "action": "purchase_assistant",
+        "reward": 1.0,
+        "next_state": "success=1",
+        "q_after": 0.6229,
+        "timestamp": "2026-08-29T08:33:11.421028"
+      },
+      {
+        "state": "tool=add_to_cart|user_id=user_alex",
+        "action": "add_to_cart",
+        "reward": 3.0,
+        "next_state": "success=1",
+        "q_after": 0.45,
+        "timestamp": "2026-08-29T08:39:35.273200"
+      },
+      {
+        "state": "tool=trigger_razorpa|user_id=user_alex",
+        "action": "trigger_razorpay_checkout",
+        "reward": 1.0,
+        "next_state": "success=1",
+        "q_after": 0.15,
+        "timestamp": "2026-08-29T08:40:08.952450"
+      },
+      {
+        "state": "tool=purchase_assist|user_id=user_test",
+        "action": "purchase_assistant",
+        "reward": 1.0,
+        "next_state": "success=1",
+        "q_after": 0.6795,
+        "timestamp": "2026-08-29T08:45:36.575641"
+      },
+      {
+        "state": "tool=recommend_produ|user_id=user_test",
+        "action": "recommend_products",
+        "reward": 1.0,
+        "next_state": "success=1",
+        "q_after": 0.15,
+        "timestamp": "2026-08-29T08:45:36.601269"
+      },
+      {
+        "state": "tool=compare_product|user_id=user_test",
+        "action": "compare_products",
+        "reward": 1.0,
+        "next_state": "success=1",
+        "q_after": 0.15,
+        "timestamp": "2026-08-29T08:45:36.604018"
+      },
+      {
+        "state": "tool=apply_coupon|user_id=user_test",
+        "action": "apply_coupon",
+        "reward": 1.0,
+        "next_state": "success=1",
+        "q_after": 0.15,
+        "timestamp": "2026-08-29T08:45:36.614164"
+      },
+      {
+        "state": "tool=purchase_assist|user_id=user_e2e_custom",
+        "action": "purchase_assistant",
+        "reward": 1.0,
+        "next_state": "success=1",
+        "q_after": 0.15,
+        "timestamp": "2026-08-29T08:47:26.539776"
+      },
+      {
+        "state": "tool=purchase_assist|user_id=user_test",
+        "action": "purchase_assistant",
+        "reward": 1.0,
+        "next_state": "success=1",
+        "q_after": 0.7276,
+        "timestamp": "2026-08-29T08:48:38.364309"
+      },
+      {
+        "state": "tool=recommend_produ|user_id=user_test",
+        "action": "recommend_products",
+        "reward": 1.0,
+        "next_state": "success=1",
+        "q_after": 0.2775,
+        "timestamp": "2026-08-29T08:48:38.494572"
+      },
+      {
+        "state": "tool=compare_product|user_id=user_test",
+        "action": "compare_products",
+        "reward": 1.0,
+        "next_state": "success=1",
+        "q_after": 0.2775,
+        "timestamp": "2026-08-29T08:48:38.502146"
+      },
+      {
+        "state": "tool=apply_coupon|user_id=user_test",
+        "action": "apply_coupon",
+        "reward": 1.0,
+        "next_state": "success=1",
+        "q_after": 0.2775,
+        "timestamp": "2026-08-29T08:48:38.527348"
+      },
+      {
+        "state": "tool=purchase_assist|user_id=user_e2e_custom",
+        "action": "purchase_assistant",
+        "reward": 1.0,
+        "next_state": "success=1",
+        "q_after": 0.2775,
+        "timestamp": "2026-08-29T08:50:50.164421"
+      },
+      {
+        "state": "tool=purchase_assist|user_id=user_test",
+        "action": "purchase_assistant",
+        "reward": 1.0,
+        "next_state": "success=1",
+        "q_after": 0.7685,
+        "timestamp": "2026-08-30T20:45:03.329036"
+      }
+    ]
+  }
+}

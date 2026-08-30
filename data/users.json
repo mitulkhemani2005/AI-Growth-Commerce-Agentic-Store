@@ -1,0 +1,222 @@
+[
+  {
+    "user_id": "user_alex",
+    "name": "Alex Rivera",
+    "email": "alex.rivera@growthcommerce.ai",
+    "shipping_address": "742 Evergreen Terrace, San Francisco, CA 94107",
+    "auto_pay_enabled": true,
+    "cart": [],
+    "payment_details": {
+      "card_holder_name": "Alex Rivera",
+      "card_number_masked": "1111 1111 1111 1111",
+      "card_last4": "1111",
+      "card_network": "Visa",
+      "expiry_date": "12/30"
+    },
+    "ap2_payment_token": {
+      "mandate_id": "mandate_ap2_951ce579fdeb",
+      "user_id": "user_alex",
+      "authorized_agent": "nova_commerce_agent",
+      "spending_limit_per_tx": 1000000.0,
+      "currency": "INR",
+      "valid_from": "2026-08-29T08:40:31.837920+00:00",
+      "valid_until": "2027-08-29T08:40:31.837920+00:00",
+      "signature": "c36a4864af7fd2f100f72a5180df41802970fff5ad3c8c7b24a2b758f9d374d5",
+      "status": "ACTIVE_AND_VERIFIED",
+      "protocol": "Google Agent Payments Protocol (AP2) v1.0",
+      "settlement_rail": "razorpay_upi_fiat",
+      "razorpay_payment_id": "pay_TVWTQg5cTb0mb9",
+      "razorpay_order_id": "order_TVWTHwMX71AJzB",
+      "card_details": {
+        "card_holder_name": "Alex Rivera",
+        "card_number_masked": "1111 1111 1111 1111",
+        "card_last4": "1111",
+        "card_network": "Visa",
+        "expiry_date": "12/30"
+      }
+    }
+  },
+  {
+    "user_id": "buyer_alex",
+    "name": "Alex Chen",
+    "email": "buyer_alex@growthcommerce.ai",
+    "shipping_address": "Alex Chen Residence, Innovation Hub Blvd, Sector 4",
+    "auto_pay_enabled": true,
+    "cart": [],
+    "payment_details": {
+      "card_holder_name": "Alex Chen",
+      "card_number_masked": "4242 \u2022\u2022\u2022\u2022 \u2022\u2022\u2022\u2022 4242",
+      "card_last4": "4242",
+      "card_network": "Visa Infinite (Unlimited)",
+      "expiry_date": "12/32"
+    },
+    "ap2_payment_token": {
+      "mandate_id": "mandate_ap2_f94fd292d100",
+      "user_id": "buyer_alex",
+      "authorized_agent": "agent_buyer_alex",
+      "spending_limit_per_tx": 1000000.0,
+      "currency": "INR",
+      "valid_from": "2026-08-26T10:42:12.121549+00:00",
+      "valid_until": "2027-08-26T10:42:12.121549+00:00",
+      "signature": "abb26df3f946077971f641fd38d8ce4d12f2e359de279625504b7e634848308e",
+      "status": "ACTIVE_AND_VERIFIED",
+      "protocol": "Google Agent Payments Protocol (AP2) v1.0",
+      "settlement_rail": "razorpay_upi_fiat"
+    }
+  },
+  {
+    "user_id": "buyer_sophia",
+    "name": "Sophia Miller",
+    "email": "buyer_sophia@growthcommerce.ai",
+    "shipping_address": "Sophia Miller Residence, Innovation Hub Blvd, Sector 4",
+    "auto_pay_enabled": true,
+    "cart": [],
+    "payment_details": {
+      "card_holder_name": "Sophia Miller",
+      "card_number_masked": "4242 \u2022\u2022\u2022\u2022 \u2022\u2022\u2022\u2022 4242",
+      "card_last4": "4242",
+      "card_network": "Visa Infinite (Unlimited)",
+      "expiry_date": "12/32"
+    },
+    "ap2_payment_token": {
+      "mandate_id": "mandate_ap2_c52dd77e4f64",
+      "user_id": "buyer_sophia",
+      "authorized_agent": "agent_buyer_sophia",
+      "spending_limit_per_tx": 1000000.0,
+      "currency": "INR",
+      "valid_from": "2026-08-26T10:42:12.121587+00:00",
+      "valid_until": "2027-08-26T10:42:12.121587+00:00",
+      "signature": "0dd60da1396067e5a87a3f13225437ae0325c94dfb319e7384046bfcaeeb8824",
+      "status": "ACTIVE_AND_VERIFIED",
+      "protocol": "Google Agent Payments Protocol (AP2) v1.0",
+      "settlement_rail": "razorpay_upi_fiat"
+    }
+  },
+  {
+    "user_id": "buyer_david",
+    "name": "David Patel",
+    "email": "buyer_david@growthcommerce.ai",
+    "shipping_address": "David Patel Residence, Innovation Hub Blvd, Sector 4",
+    "auto_pay_enabled": true,
+    "cart": [],
+    "payment_details": {
+      "card_holder_name": "David Patel",
+      "card_number_masked": "4242 \u2022\u2022\u2022\u2022 \u2022\u2022\u2022\u2022 4242",
+      "card_last4": "4242",
+      "card_network": "Visa Infinite (Unlimited)",
+      "expiry_date": "12/32"
+    },
+    "ap2_payment_token": {
+      "mandate_id": "mandate_ap2_c5328d88301c",
+      "user_id": "buyer_david",
+      "authorized_agent": "agent_buyer_david",
+      "spending_limit_per_tx": 1000000.0,
+      "currency": "INR",
+      "valid_from": "2026-08-26T10:42:12.121602+00:00",
+      "valid_until": "2027-08-26T10:42:12.121602+00:00",
+      "signature": "7ba51727eb21dd994f3406488baea357d1f1a5a262ed3220ad7dc936e0a702aa",
+      "status": "ACTIVE_AND_VERIFIED",
+      "protocol": "Google Agent Payments Protocol (AP2) v1.0",
+      "settlement_rail": "razorpay_upi_fiat"
+    }
+  },
+  {
+    "user_id": "buyer_elena",
+    "name": "Elena Rostova",
+    "email": "buyer_elena@growthcommerce.ai",
+    "shipping_address": "Elena Rostova Residence, Innovation Hub Blvd, Sector 4",
+    "auto_pay_enabled": true,
+    "cart": [],
+    "payment_details": {
+      "card_holder_name": "Elena Rostova",
+      "card_number_masked": "4242 \u2022\u2022\u2022\u2022 \u2022\u2022\u2022\u2022 4242",
+      "card_last4": "4242",
+      "card_network": "Visa Infinite (Unlimited)",
+      "expiry_date": "12/32"
+    },
+    "ap2_payment_token": {
+      "mandate_id": "mandate_ap2_fa7dfdfdca8a",
+      "user_id": "buyer_elena",
+      "authorized_agent": "agent_buyer_elena",
+      "spending_limit_per_tx": 1000000.0,
+      "currency": "INR",
+      "valid_from": "2026-08-26T10:42:12.121612+00:00",
+      "valid_until": "2027-08-26T10:42:12.121612+00:00",
+      "signature": "864f77f15164c78c60cf9ed8bff4f8e5c0dd079d2aa20a5e2974d8b18cfecbf8",
+      "status": "ACTIVE_AND_VERIFIED",
+      "protocol": "Google Agent Payments Protocol (AP2) v1.0",
+      "settlement_rail": "razorpay_upi_fiat"
+    }
+  },
+  {
+    "user_id": "buyer_marcus",
+    "name": "Marcus Kim",
+    "email": "buyer_marcus@growthcommerce.ai",
+    "shipping_address": "Marcus Kim Residence, Innovation Hub Blvd, Sector 4",
+    "auto_pay_enabled": true,
+    "cart": [],
+    "payment_details": {
+      "card_holder_name": "Marcus Kim",
+      "card_number_masked": "4242 \u2022\u2022\u2022\u2022 \u2022\u2022\u2022\u2022 4242",
+      "card_last4": "4242",
+      "card_network": "Visa Infinite (Unlimited)",
+      "expiry_date": "12/32"
+    },
+    "ap2_payment_token": {
+      "mandate_id": "mandate_ap2_cb4f7fb79e5f",
+      "user_id": "buyer_marcus",
+      "authorized_agent": "agent_buyer_marcus",
+      "spending_limit_per_tx": 1000000.0,
+      "currency": "INR",
+      "valid_from": "2026-08-26T10:42:12.121622+00:00",
+      "valid_until": "2027-08-26T10:42:12.121622+00:00",
+      "signature": "c0f599cfc3ac014ebb8759b32a49df610380c6f4621d4fae19b6a466fc4dbd92",
+      "status": "ACTIVE_AND_VERIFIED",
+      "protocol": "Google Agent Payments Protocol (AP2) v1.0",
+      "settlement_rail": "razorpay_upi_fiat"
+    }
+  },
+  {
+    "user_id": "user_test",
+    "name": "Guest User",
+    "email": "user_test@example.com",
+    "shipping_address": "100 Tech Blvd, San Francisco, CA",
+    "auto_pay_enabled": true,
+    "cart": [
+      {
+        "id": "prod_001",
+        "quantity": 1,
+        "size": "12GB RAM / 256GB"
+      }
+    ]
+  },
+  {
+    "user_id": "user_e2e_customer",
+    "name": "Guest User",
+    "email": "user_e2e_customer@example.com",
+    "shipping_address": "100 Tech Blvd, San Francisco, CA",
+    "auto_pay_enabled": true,
+    "cart": [],
+    "ap2_payment_token": {
+      "mandate_id": "mandate_ap2_9de90037f0b2",
+      "user_id": "user_e2e_customer",
+      "authorized_agent": "nova_commerce_agent",
+      "spending_limit_per_tx": 1000000.0,
+      "currency": "INR",
+      "valid_from": "2026-08-29T08:28:37.178529+00:00",
+      "valid_until": "2027-08-29T08:28:37.178529+00:00",
+      "signature": "1d6f41c2a232dda0c0be7e7e1ac12cdb99dd58234bfbd267c0f66b3b8b0e0b53",
+      "status": "ACTIVE_AND_VERIFIED",
+      "protocol": "Google Agent Payments Protocol (AP2) v1.0",
+      "settlement_rail": "razorpay_upi_fiat"
+    }
+  },
+  {
+    "user_id": "user_refund_test",
+    "name": "Guest User",
+    "email": "user_refund_test@example.com",
+    "shipping_address": "100 Tech Blvd, San Francisco, CA",
+    "auto_pay_enabled": true,
+    "cart": []
+  }
+]

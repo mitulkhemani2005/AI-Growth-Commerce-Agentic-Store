@@ -1,0 +1,114 @@
+[
+  {
+    "id": "buyer_alex",
+    "name": "Alex Chen",
+    "persona_title": "Flagship Tech Enthusiast",
+    "avatar": "\ud83d\ude80",
+    "description": "Obsessed with top-tier flagship smartphones, high-spec M3 laptops, and RTX gaming rigs.",
+    "preferred_categories": [
+      "Mobiles",
+      "Laptops"
+    ],
+    "price_sensitivity": "Low (Unlimited Budget)",
+    "return_probability": 0.05,
+    "review_sentiment": "Positive & Technical",
+    "total_spent": 123.75,
+    "orders_count": 1,
+    "returns_count": 0,
+    "reviews_written": 1,
+    "status": "Browsing catalog (Next order in ~141s)",
+    "next_purchase_ts": 1788123432.2372265,
+    "next_delay_seconds": 141,
+    "last_action_ts": 1788123291.2372255
+  },
+  {
+    "id": "buyer_sophia",
+    "name": "Sophia Miller",
+    "persona_title": "Smart Bargain Hunter",
+    "avatar": "\ud83c\udfaf",
+    "description": "Seeks highest value-to-cost ratio, discounts, and well-priced budget flagship electronics and accessories.",
+    "preferred_categories": [
+      "Mobiles",
+      "Accessories"
+    ],
+    "price_sensitivity": "High (Values Good Deals)",
+    "return_probability": 0.2,
+    "review_sentiment": "Value & Quality Focused",
+    "total_spent": 43.75,
+    "orders_count": 1,
+    "returns_count": 0,
+    "reviews_written": 1,
+    "status": "Browsing catalog (Next order in ~256s)",
+    "next_purchase_ts": 1788123623.039118,
+    "next_delay_seconds": 256,
+    "last_action_ts": 1788123367.039117
+  },
+  {
+    "id": "buyer_david",
+    "name": "David Patel",
+    "persona_title": "Audiophile & Gadget Geek",
+    "avatar": "\ud83c\udfa7",
+    "description": "Loves noise-cancelling headphones, high-fidelity wireless audio, smart wearables, and top-rated gear.",
+    "preferred_categories": [
+      "Audio",
+      "Accessories"
+    ],
+    "price_sensitivity": "Medium",
+    "return_probability": 0.15,
+    "review_sentiment": "Acoustic & Feature Detailed",
+    "total_spent": 0.0,
+    "orders_count": 0,
+    "returns_count": 0,
+    "reviews_written": 0,
+    "status": "Browsing catalog (Next order in ~131s)",
+    "next_purchase_ts": 1788123398.5897553,
+    "next_delay_seconds": 131,
+    "last_action_ts": 0.0
+  },
+  {
+    "id": "buyer_elena",
+    "name": "Elena Rostova",
+    "persona_title": "Executive Luxury Shopper",
+    "avatar": "\ud83d\udc8e",
+    "description": "Purchases executive titanium laptops, foldables, and premium lifestyle devices with zero budget hesitation.",
+    "preferred_categories": [
+      "Laptops",
+      "Mobiles",
+      "Audio"
+    ],
+    "price_sensitivity": "Zero (Unlimited Budget)",
+    "return_probability": 0.08,
+    "review_sentiment": "Sophisticated & Enthusiastic",
+    "total_spent": 0.0,
+    "orders_count": 0,
+    "returns_count": 0,
+    "reviews_written": 0,
+    "status": "Browsing catalog (Next order in ~217s)",
+    "next_purchase_ts": 1788123484.5897553,
+    "next_delay_seconds": 217,
+    "last_action_ts": 0.0
+  },
+  {
+    "id": "buyer_marcus",
+    "name": "Marcus Kim",
+    "persona_title": "Trendsetter & Policy Tester",
+    "avatar": "\u26a1",
+    "description": "Fast-paced digital lifestyle adopter who buys trending gadgets and frequently tests seller 24-hour return policies.",
+    "preferred_categories": [
+      "Accessories",
+      "Audio",
+      "Mobiles"
+    ],
+    "price_sensitivity": "Low",
+    "return_probability": 0.3,
+    "review_sentiment": "Expressive with Emojis",
+    "total_spent": 0.0,
+    "orders_count": 0,
+    "returns_count": 0,
+    "reviews_written": 0,
+    "status": "Browsing catalog (Next order in ~280s)",
+    "next_purchase_ts": 1788123547.5897553,
+    "next_delay_seconds": 280,
+    "last_action_ts": 0.0
+  }
+]

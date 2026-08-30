@@ -14,6 +14,7 @@ from backend.order_manager import order_manager
 
 async def test_full_flow():
     print("1. Resetting store to 0 stock and clearing message bus...")
+    treasury_manager.reset_treasury(50000.0)
     inventory_manager.reset_to_zero_stock()
     message_bus._message_history.clear()
     message_bus._inboxes.clear()
@@ -27,20 +28,25 @@ async def test_full_flow():
     initial_bank = treasury_manager.get_summary()['bank_balance']
     print(f"   Initial CEO Bank Balance: INR {initial_bank:,.2f}")
     
-    # Inventory Manager Autonomous Cycle
+    # 1. Inventory Manager creates restock requests
+    await inventory_manager_agent.run_autonomous_cycle()
+    # 2. CEO Agent reviews & approves restock requests
+    await ceo_agent.run_autonomous_cycle()
+    # 3. Inventory Manager executes approved acquisitions
     inv_res = await inventory_manager_agent.run_autonomous_cycle()
+
     bank_after_restock = treasury_manager.get_summary()['bank_balance']
-    restocked_items = inv_res.get('restocked_items', [])
+    restocked_items = inv_res.get('restocked', [])
     print(f"   Inventory Manager cycle complete. Restocked items: {len(restocked_items)}")
     print(f"   Bank balance after wholesale purchase: INR {bank_after_restock:,.2f}")
     assert bank_after_restock < initial_bank, "Bank balance must decrease when acquiring stock at wholesale base price"
     print("   [OK] Wholesale stock purchased using CEO Treasury Bank Balance.")
 
     print("\n3. Testing Autonomous Salary Disbursal by CEO Agent...")
-    ceo_res = await ceo_agent.run_autonomous_cycle()
+    pay_res = salary_manager.pay_salaries(actor="CEO Agent")
     sal_data = salary_manager.get_all_salaries()
     paid_agents = [s['agent_name'] for s in sal_data['salaries'] if s.get('last_paid_at')]
-    print(f"   CEO cycle complete. Staff agents with paid salaries: {len(paid_agents)}/{len(sal_data['salaries'])}")
+    print(f"   CEO salary disbursal complete. Staff agents with paid salaries: {len(paid_agents)}/{len(sal_data['salaries'])}")
     assert len(paid_agents) > 0, "CEO must pay staff agent salaries"
     print("   [OK] Staff agent salaries disbursed from CEO Bank Balance.")
 

@@ -22,6 +22,7 @@ def test_treasury_initial_state():
     assert summary["net_profit"] == 0.0
 
 def test_wholesale_stock_acquisition():
+    treasury_manager.reset_treasury(500000.0)
     # Find first product
     products = inventory_manager.get_all_products()
     assert len(products) > 0
@@ -77,7 +78,7 @@ def test_sales_deposit_and_profit_realization():
 
 def test_salary_manager_and_disbursal():
     salaries_data = salary_manager.get_all_salaries()
-    assert len(salaries_data["salaries"]) == 6
+    assert len(salaries_data["salaries"]) == 7
     assert salaries_data["total_payroll_per_cycle"] > 0
 
     bal_before = treasury_manager.get_summary()["bank_balance"]

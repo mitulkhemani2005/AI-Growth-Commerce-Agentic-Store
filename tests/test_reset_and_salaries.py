@@ -88,11 +88,12 @@ async def run_tests():
 
     # 4. TEST WHOLESALE ACQUISITION & PROFIT RECOVERY
     print("\n--- 4. Testing Wholesale Stock Acquisition & AI Buyer AP2 Checkout ---")
-    # CEO acquires 2 units of first product
-    prod = inventory_manager.get_all_products()[0]
+    # CEO acquires 2 units of an affordable product
+    all_prods = inventory_manager.get_all_products()
+    prod = next((p for p in all_prods if float(p.get("BASE_PRICE", 1000)) <= 300), all_prods[0])
     p_id = prod["id"]
-    base_price = prod["BASE_PRICE"]
-    sell_price = prod["PRICE"]
+    base_price = float(prod.get("BASE_PRICE", 50.0))
+    sell_price = float(prod.get("PRICE", 100.0))
 
     print(f"Selected Product: '{prod['PRODUCT_NAME']}' (Base Price Cost: ₹{base_price:,.2f}, Retail Price: ₹{sell_price:,.2f})")
     

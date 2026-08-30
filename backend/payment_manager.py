@@ -588,6 +588,75 @@ class PaymentManager:
             mandate["card_details"] = card_details
         return cart_manager.save_ap2_payment_token(user_id, mandate)
 
+    def execute_automated_preauthorized_payment(
+        self,
+        user_id: str,
+        shipping_address: Optional[str] = None,
+        customer_name: Optional[str] = None,
+        customer_email: Optional[str] = None,
+        customer_phone: Optional[str] = None,
+        notes: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """
+        Executes an automated pre-authorized AP2 payment and creates a confirmed order.
+        """
+        from backend.cart_manager import cart_manager
+        from backend.order_manager import order_manager
+        from backend.treasury_manager import treasury_manager
+        from backend.inventory_manager import inventory_manager
+
+        cart = cart_manager.get_cart(user_id)
+        if not cart.get("items"):
+            return {"success": False, "error": "Cart is empty."}
+
+        total_amount = float(cart.get("estimated_total", 0.0))
+        receipt_id = f"ap2_{user_id}_{uuid.uuid4().hex[:8]}"
+
+        # Execute AP2 payment
+        ap2_res = self.execute_ap2_agent_payment(
+            user_id=user_id,
+            amount=total_amount,
+            cart=cart,
+            authorized_agent="nova_commerce_agent",
+            receipt_id=receipt_id
+        )
+        if not ap2_res.get("success"):
+            return ap2_res
+
+        # Create confirmed order (order_manager atomically deducts stock for Confirmed orders)
+        order_res = order_manager.create_order(
+            user_id=user_id,
+            items=cart.get("items", []),
+            total=total_amount,
+            shipping_address=shipping_address or "Pre-authorized Address",
+            payment_details=ap2_res.get("payment_details", {}),
+            customer_name=customer_name,
+            customer_email=customer_email,
+            customer_phone=customer_phone,
+            notes=notes or "Pre-authorized AP2 Order"
+        )
+
+        # Deposit sales into Treasury
+        items_desc = ", ".join([f"{i.get('quantity', 1)}x {i.get('PRODUCT_NAME', 'Product')}" for i in cart.get("items", [])])
+        treasury_manager.deposit_sales(
+            amount=total_amount,
+            order_id=order_res.get("order_id"),
+            items_summary=items_desc,
+            customer=customer_name or user_id
+        )
+
+        # Clear cart
+        cart_manager.clear_cart(user_id)
+
+        return {
+            "success": True,
+            "order_id": order_res.get("order_id"),
+            "amount": total_amount,
+            "razorpay_payment_id": ap2_res.get("razorpay_payment_id"),
+            "razorpay_order_id": ap2_res.get("razorpay_order_id"),
+            "order": order_res.get("order")
+        }
+
     def autonomous_agent_pay(self, user_id: str, shipping_address: Optional[str] = None, currency: str = "INR") -> Dict[str, Any]:
         """
         AP2 Protocol: Human-delegated autonomous checkout with pre-verified AP2 mandate.
