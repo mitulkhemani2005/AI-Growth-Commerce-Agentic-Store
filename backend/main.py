@@ -78,6 +78,21 @@ os.makedirs(FRONTEND_DIR, exist_ok=True)
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 app.mount("/frontend", StaticFiles(directory=FRONTEND_DIR), name="frontend")
 
+# Mount AgentsOffice visual RPG simulator
+OFFICE_STATIC_DIR = os.path.join(BASE_DIR, "agents_office", "app", "static", "office")
+if os.path.exists(OFFICE_STATIC_DIR):
+    app.mount("/office", StaticFiles(directory=OFFICE_STATIC_DIR, html=True), name="office")
+    app.mount("/static/office", StaticFiles(directory=OFFICE_STATIC_DIR, html=True), name="static_office")
+
+try:
+    import sys
+    sys.path.insert(0, os.path.join(BASE_DIR, "agents_office"))
+    from app.office.router import router as office_router
+    app.include_router(office_router, prefix="/api/v1/office", tags=["AgentsOffice"])
+except Exception as e:
+    print(f"[AgentsOffice] Router mount note: {e}")
+
+
 # Request Models
 class ChatRequest(BaseModel):
     user_id: str = "user_alex"

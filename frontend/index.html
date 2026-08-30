@@ -37,9 +37,9 @@
       </div>
 
       <!-- Live Fleet Status Pill -->
-      <div class="fleet-status-pill" title="7 Collaborative Autonomous Specialist Agents Running">
+      <div class="fleet-status-pill" onclick="window.open('/office', '_blank')" style="cursor: pointer;" title="Open AgentsOffice Pixel RPG Live Simulation">
         <span class="pulse-dot"></span>
-        <span class="fleet-text">7 AGENTS AUTONOMOUS</span>
+        <span class="fleet-text">7 AGENTS AUTONOMOUS 🏢</span>
       </div>
     </div>
 
@@ -60,11 +60,18 @@
     </div>
 
     <div class="header-actions">
+      <!-- AgentsOffice RPG Simulator Link -->
+      <a href="/office" target="_blank" class="nav-btn office-link" style="background: rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.4); color: #c084fc; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 600;" title="Open AgentsOffice Pixel RPG Live Simulation">
+        <i data-lucide="building-2" style="width: 15px; height: 15px;"></i>
+        <span>🏢 Agents Office</span>
+      </a>
+
       <!-- Admin Panel Link -->
       <a href="/admin" class="nav-btn admin-link" title="Open Store Owner Command Center">
         <i data-lucide="crown" class="crown-icon"></i>
         <span>Admin Studio</span>
       </a>
+
 
       <!-- Razorpay Keys Configuration Button -->
       <button class="nav-btn secondary-btn" id="openRazorpayConfigBtn" title="Configure Razorpay API Keys & Sandbox">

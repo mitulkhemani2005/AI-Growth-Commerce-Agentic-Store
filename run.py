@@ -18,8 +18,10 @@ if __name__ == "__main__":
     print("=" * 60)
     print("  - Web Storefront & Prompt Interface: http://127.0.0.1:8000")
     print("  - Admin Intelligence Center:         http://127.0.0.1:8000/frontend/admin/index.html")
+    print("  - AgentsOffice Visual RPG Simulator: http://127.0.0.1:8000/office")
     print("  - API Documentation:                 http://127.0.0.1:8000/docs")
     print("=" * 60)
+
     
     try:
         # 1. Warm up and load Ollama model into GPU VRAM

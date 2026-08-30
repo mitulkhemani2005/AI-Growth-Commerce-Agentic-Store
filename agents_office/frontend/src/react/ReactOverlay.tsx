@@ -65,17 +65,23 @@ interface AgentClickData {
 
 const MAX_AGENTS = 20;
 
+import { liveStoreBridge } from '../shared/liveStoreBridge';
+
 export const ReactOverlay: React.FC = () => {
   const [sceneReady, setSceneReady] = useState(false);
   const [configAgent, setConfigAgent] = useState<AgentClickData | null>(null);
   const [showDatabase, setShowDatabase] = useState(false);
-  const [agentCount, setAgentCount] = useState(6);
+  const [agentCount, setAgentCount] = useState(7);
 
   useEffect(() => {
     setAgentCount(getAgentsCached().length);
     loadAgentRegistry().then((entries) => {
       setAgentCount(entries.length);
     });
+
+    // Start live store simulation bridge
+    liveStoreBridge.start();
+    return () => liveStoreBridge.stop();
   }, []);
 
   useEffect(() => {
@@ -108,6 +114,7 @@ export const ReactOverlay: React.FC = () => {
       EventBus.off('database:open', onOpenDatabase);
     };
   }, []);
+
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {

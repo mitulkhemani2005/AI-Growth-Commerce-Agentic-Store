@@ -84,7 +84,11 @@
         </button>
       </nav>
 
-      <div class="sidebar-footer">
+      <div class="sidebar-footer" style="display: flex; flex-direction: column; gap: 8px;">
+        <a href="/office" target="_blank" class="storefront-link" style="background: rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.4); color: #c084fc;">
+          <i data-lucide="building-2"></i>
+          <span>🏢 Open Agents Office</span>
+        </a>
         <a href="/" target="_blank" class="storefront-link">
           <i data-lucide="external-link"></i>
           <span>Open Live Storefront</span>
@@ -102,6 +106,10 @@
           <p id="pageSubtitle">Real-time telemetry, automated agent actions, treasury P&L, and 5 AI buyers (INR ₹, 0% Tax)</p>
         </div>
         <div class="header-right">
+          <a href="/office" target="_blank" class="action-btn-sm" style="background: rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.4); color: #c084fc; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 6px;" title="Open AgentsOffice Pixel RPG Live Simulation">
+            <i data-lucide="building-2" style="width: 14px; height: 14px;"></i>
+            <span>🏢 Agents Office</span>
+          </a>
           <button class="action-btn-sm warning" id="resetStoreBtn" title="Reset all inventory to 0 stock and reset CEO Bank Balance" onclick="openResetStoreConfirm()">
             <i data-lucide="rotate-cw"></i>
             <span>Reset 0-Stock State</span>
@@ -115,6 +123,7 @@
             <span>Razorpay Connected</span>
           </div>
         </div>
+
       </header>
 
       <!-- TAB 1: OVERVIEW -->
