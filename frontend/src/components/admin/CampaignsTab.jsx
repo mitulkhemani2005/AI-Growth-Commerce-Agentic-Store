@@ -61,19 +61,19 @@ export default function CampaignsTab() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.75rem' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
-          <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.4rem', fontWeight: 800, color: '#111' }}>
+          <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.4rem', fontWeight: 800, color: '#fff' }}>
             ⚡ Autonomous Campaign Orchestrator Agent
           </h2>
-          <p style={{ fontSize: '0.82rem', color: '#707072' }}>
+          <p style={{ fontSize: '0.82rem', color: '#94a3b8' }}>
             Schedules and launches promotional flash sales, adjusts prices within the immutable <strong>Base Price Floor</strong>, broadcasts to the <strong>Inter-Agent Message Bus</strong>, and pings the 5 AI Shoppers.
           </p>
         </div>
       </div>
 
       {/* Launch New Campaign Card */}
-      <div className="nike-table-card" style={{ padding: '1.5rem' }}>
-        <h4 style={{ fontFamily: 'var(--font-display)', fontSize: '1.15rem', color: '#111', textTransform: 'uppercase', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <Zap size={18} style={{ color: '#d4ff00' }} />
+      <div className="glass-panel">
+        <h4 style={{ fontSize: '1rem', fontWeight: 800, color: '#fff', textTransform: 'uppercase', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <Zap size={18} style={{ color: '#fbbf24' }} />
           <span>Launch Targeted Promotional Campaign</span>
         </h4>
 
@@ -121,9 +121,9 @@ export default function CampaignsTab() {
 
           <button 
             type="submit"
-            className="nike-pill-btn primary-black"
+            className="action-btn primary"
             disabled={isLaunching}
-            style={{ height: '42px', padding: '0 1.25rem' }}
+            style={{ height: '40px', padding: '0 1.25rem', justifyContent: 'center' }}
           >
             <Megaphone size={15} />
             <span>{isLaunching ? 'Broadcasting...' : 'Launch & Broadcast'}</span>
@@ -132,59 +132,63 @@ export default function CampaignsTab() {
       </div>
 
       {/* Campaigns History Table */}
-      <div className="nike-table-card">
-        <table className="nike-table">
-          <thead>
-            <tr>
-              <th>Status</th>
-              <th>Campaign Name</th>
-              <th>Category</th>
-              <th>Discount</th>
-              <th>Marquee Announcement</th>
-              <th>Launched At</th>
-            </tr>
-          </thead>
-          <tbody>
-            {campaigns.map((c) => {
-              const isActive = c.status === 'ACTIVE';
-              return (
-                <tr key={c.id}>
-                  <td>
-                    <span style={{
-                      fontSize: '0.72rem',
-                      fontWeight: 800,
-                      padding: '0.2rem 0.55rem',
-                      borderRadius: '9999px',
-                      background: isActive ? '#dcfce7' : '#f3f4f6',
-                      color: isActive ? '#15803d' : '#707072'
-                    }}>
-                      {c.status}
-                    </span>
-                  </td>
-                  <td>
-                    <strong style={{ color: '#111' }}>{c.title}</strong>
-                    <div style={{ fontSize: '0.72rem', color: '#707072', fontFamily: 'monospace' }}>{c.id}</div>
-                  </td>
-                  <td>
-                    <span style={{ fontSize: '0.8rem', fontWeight: 600 }}>{c.category}</span>
-                  </td>
-                  <td>
-                    <span style={{ fontWeight: 800, color: '#15803d', fontFamily: 'monospace' }}>
-                      {c.discount_percent}% OFF
-                    </span>
-                  </td>
-                  <td style={{ fontSize: '0.78rem', color: '#111', maxWidth: '300px' }}>
-                    {c.banner_text}
-                  </td>
-                  <td style={{ fontSize: '0.75rem', color: '#707072' }}>
-                    {new Date(c.launched_at).toLocaleDateString()}
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+      <div className="glass-panel">
+        <div className="admin-table-wrap">
+          <table className="data-table">
+            <thead>
+              <tr>
+                <th>Status</th>
+                <th>Campaign Name</th>
+                <th>Category</th>
+                <th>Discount</th>
+                <th>Marquee Announcement</th>
+                <th>Launched At</th>
+              </tr>
+            </thead>
+            <tbody>
+              {campaigns.map((c) => {
+                const isActive = c.status === 'ACTIVE';
+                return (
+                  <tr key={c.id}>
+                    <td>
+                      <span style={{
+                        fontSize: '0.72rem',
+                        fontWeight: 800,
+                        padding: '0.2rem 0.55rem',
+                        borderRadius: '9999px',
+                        background: isActive ? 'rgba(16, 185, 129, 0.2)' : 'rgba(255, 255, 255, 0.08)',
+                        color: isActive ? '#34d399' : '#94a3b8',
+                        border: `1px solid ${isActive ? 'rgba(16, 185, 129, 0.4)' : 'rgba(255, 255, 255, 0.1)'}`
+                      }}>
+                        {c.status}
+                      </span>
+                    </td>
+                    <td>
+                      <strong style={{ color: '#fff' }}>{c.title}</strong>
+                      <div style={{ fontSize: '0.72rem', color: '#94a3b8', fontFamily: 'monospace' }}>{c.id}</div>
+                    </td>
+                    <td>
+                      <span className="prod-badge-cat" style={{ position: 'static' }}>{c.category}</span>
+                    </td>
+                    <td>
+                      <span style={{ fontWeight: 800, color: '#34d399', fontFamily: 'monospace' }}>
+                        {c.discount_percent}% OFF
+                      </span>
+                    </td>
+                    <td style={{ fontSize: '0.78rem', color: '#e2e8f0', maxWidth: '300px' }}>
+                      {c.banner_text}
+                    </td>
+                    <td style={{ fontSize: '0.75rem', color: '#94a3b8' }}>
+                      {new Date(c.launched_at).toLocaleDateString()}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
 }
+

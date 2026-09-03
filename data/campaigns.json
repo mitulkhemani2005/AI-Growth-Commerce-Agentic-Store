@@ -1,12 +1,24 @@
 [
   {
-    "id": "camp_1788472272",
+    "id": "camp_1788473655",
     "title": "Weekend Titanium Drop",
     "category": "Laptops",
     "discount_percent": 10.0,
     "banner_text": "\ud83d\udd25 WEEKEND TITANIUM DROP: UP TO 10% OFF LAPTOPS \u2022 0% TAX STOREWIDE",
     "duration_hours": 48,
     "status": "ACTIVE",
+    "launched_at": "2026-09-03T22:14:15.873362",
+    "total_revenue_generated": 0.0,
+    "orders_count": 0
+  },
+  {
+    "id": "camp_1788472272",
+    "title": "Weekend Titanium Drop",
+    "category": "Laptops",
+    "discount_percent": 10.0,
+    "banner_text": "\ud83d\udd25 WEEKEND TITANIUM DROP: UP TO 10% OFF LAPTOPS \u2022 0% TAX STOREWIDE",
+    "duration_hours": 48,
+    "status": "COMPLETED",
     "launched_at": "2026-09-03T21:51:12.853516",
     "total_revenue_generated": 0.0,
     "orders_count": 0

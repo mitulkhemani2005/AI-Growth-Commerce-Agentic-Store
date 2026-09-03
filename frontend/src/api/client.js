@@ -3,7 +3,17 @@
  * Clean, promise-based API abstraction layer for all Storefront and Admin endpoints.
  */
 
-const API_BASE = ''; // Same origin / Vite proxy handles routing
+const getApiBase = () => {
+  if (typeof window !== 'undefined' && window.location) {
+    if (window.location.port && window.location.port !== '8000') {
+      return `http://${window.location.hostname || '127.0.0.1'}:8000`;
+    }
+  }
+  return '';
+};
+
+const API_BASE = getApiBase();
+
 
 async function apiRequest(endpoint, options = {}) {
   const url = `${API_BASE}${endpoint}`;

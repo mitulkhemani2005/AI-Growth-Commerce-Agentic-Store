@@ -64,5 +64,64 @@
     "error": null,
     "retry_count": 0,
     "metadata": {}
+  },
+  "refund:ORD-0416-50C0": {
+    "operation_id": "refund:ORD-0416-50C0",
+    "operation_type": "REFUND",
+    "actor": "Finance Manager Agent",
+    "status": "SUCCESS",
+    "started_at": "2026-09-03T22:04:22.453227+00:00",
+    "started_at_ts": 1788473062.4532406,
+    "completed_at": "2026-09-03T22:04:22.624256+00:00",
+    "result": {
+      "success": true,
+      "order_id": "ORD-0416-50C0",
+      "refund_amount": 34.07,
+      "status": "Refunded",
+      "message": "Successfully refunded \u20b934.07 for Order #ORD-0416-50C0 via Razorpay Gateway. Inventory restocked."
+    },
+    "error": null,
+    "retry_count": 0,
+    "metadata": {}
+  },
+  "refund:ORD-1238-24F9": {
+    "operation_id": "refund:ORD-1238-24F9",
+    "operation_type": "REFUND",
+    "actor": "Finance Manager Agent",
+    "status": "SUCCESS",
+    "started_at": "2026-09-03T22:12:58.049544+00:00",
+    "started_at_ts": 1788473578.04956,
+    "completed_at": "2026-09-03T22:12:58.266404+00:00",
+    "result": {
+      "success": true,
+      "order_id": "ORD-1238-24F9",
+      "refund_amount": 30.42,
+      "status": "Refunded",
+      "message": "Successfully refunded \u20b930.42 for Order #ORD-1238-24F9 via Razorpay Gateway. Inventory restocked.",
+      "operation_id": "refund:ORD-1238-24F9",
+      "idempotent": true
+    },
+    "error": null,
+    "retry_count": 0,
+    "metadata": {}
+  },
+  "refund:ORD-1220-923E": {
+    "operation_id": "refund:ORD-1220-923E",
+    "operation_type": "REFUND",
+    "actor": "Finance Manager Agent",
+    "status": "SUCCESS",
+    "started_at": "2026-09-03T22:12:59.497749+00:00",
+    "started_at_ts": 1788473579.4977655,
+    "completed_at": "2026-09-03T22:12:59.716086+00:00",
+    "result": {
+      "success": true,
+      "order_id": "ORD-1220-923E",
+      "refund_amount": 26.76,
+      "status": "Refunded",
+      "message": "Successfully refunded \u20b926.76 for Order #ORD-1220-923E via Razorpay Gateway. Inventory restocked."
+    },
+    "error": null,
+    "retry_count": 0,
+    "metadata": {}
   }
 }

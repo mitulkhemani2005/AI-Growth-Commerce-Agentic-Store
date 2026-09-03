@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Trash2, ShieldCheck, ShieldAlert, CreditCard, Lock, Sparkles } from 'lucide-react';
+import { X, Trash2, ShieldCheck, ShieldAlert, CreditCard, Lock, Sparkles, Zap } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { useStore } from '../../context/StoreContext';
 import { api } from '../../api/client';
@@ -36,10 +36,52 @@ export default function CartDrawer() {
 
   if (!isCartOpen) return null;
 
-
   const items = cart?.items || [];
   const subtotal = Number(cart?.subtotal || 0);
   const total = Number(cart?.estimated_total || subtotal);
+
+  const handleAP2DirectPay = async () => {
+    if (items.length === 0) {
+      showToast('Your bag is empty.', 'error');
+      return;
+    }
+
+    setIsCheckingOut(true);
+    try {
+      const res = await api.conversationalCheckout({
+        user_id: currentUser.id,
+        payment_method: 'AP2',
+        shipping_address: currentUser.address
+      });
+
+      if (res.success) {
+        try {
+          confetti({
+            particleCount: 80,
+            spread: 60,
+            origin: { y: 0.6 }
+          });
+        } catch (e) {}
+
+        setIsCartOpen(false);
+        await Promise.all([
+          refreshCart(),
+          refreshOrders(),
+          refreshCatalog(),
+          refreshAP2Status()
+        ]);
+
+        showToast(`🎉 Order Placed via AP2 Protocol! (ID: ${res.order_id})`, 'success');
+      } else {
+        showToast(res.error || 'AP2 Direct Checkout Failed', 'error');
+      }
+    } catch (err) {
+      showToast(err.message, 'error');
+    } finally {
+      setIsCheckingOut(false);
+    }
+  };
+
 
   const handleRazorpayPay = async (isAuthorizeMode = false) => {
     if (items.length === 0) {
@@ -311,10 +353,22 @@ export default function CartDrawer() {
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem', marginTop: '0.5rem' }}>
+              {ap2Status?.authorized && items.length > 0 && (
+                <button 
+                  className="nike-pill-btn accent-volt"
+                  style={{ width: '100%', color: '#111', fontWeight: 800, justifyContent: 'center' }}
+                  onClick={handleAP2DirectPay}
+                  disabled={isCheckingOut}
+                >
+                  <Zap size={16} />
+                  <span>{isCheckingOut ? 'Settling AP2 Mandate...' : '1-Click AP2 Instant Checkout'}</span>
+                </button>
+              )}
+
               {!ap2Status?.authorized && items.length > 0 && (
                 <button 
                   className="nike-pill-btn secondary-white"
-                  style={{ width: '100%' }}
+                  style={{ width: '100%', justifyContent: 'center' }}
                   onClick={() => handleRazorpayPay(true)}
                   disabled={isCheckingOut}
                 >
@@ -325,7 +379,7 @@ export default function CartDrawer() {
 
               <button 
                 className="nike-pill-btn primary-black"
-                style={{ width: '100%' }}
+                style={{ width: '100%', justifyContent: 'center' }}
                 onClick={() => handleRazorpayPay(false)}
                 disabled={items.length === 0 || isCheckingOut}
               >
@@ -333,6 +387,7 @@ export default function CartDrawer() {
                 <span>{isCheckingOut ? 'Opening Gateway...' : 'Member Checkout / Razorpay'}</span>
               </button>
             </div>
+
           </div>
         </div>
       </div>

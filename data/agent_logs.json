@@ -1,1090 +1,475 @@
 [
   {
-    "id": "log_2591362a",
-    "agent_name": "CEO Agent",
-    "action": "CEO Strategic Cycle",
-    "details": "CEO cycle #83: Processed 6 messages. Bank Balance: \u20b9505,383.36. Directives issued: 0.",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:51:38.947898+00:00"
-  },
-  {
-    "id": "log_d3e1dc35",
-    "agent_name": "Order Management Agent",
-    "action": "Order Pipeline Lifecycle",
-    "details": "Audited 179 orders. Auto-advanced 0 status transitions.",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:51:38.908281+00:00"
-  },
-  {
-    "id": "log_5fd1a16f",
-    "agent_name": "Order Management Agent",
-    "action": "\u26a1 Message -> CEO Agent",
-    "details": "[ORDER_PIPELINE_REPORT] {\"total_orders\": 179, \"status_breakdown\": {\"Dispatched\": 3, \"Shipped\": 1, \"Delivered\": 170, \"Refunded\": 5}, \"auto_advanced\": [], \"sla_breaches\": 0}",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:51:38.884145+00:00"
-  },
-  {
-    "id": "log_dd629ae1",
-    "agent_name": "Price Manager Agent",
-    "action": "\u26a1 Message -> CEO Agent",
-    "details": "[PRICING_STATUS_REPORT] {\"total_skus\": 27, \"adjusted_count\": 21, \"adjusted_items\": [\"NOVA ClarityFlow Studio Wired In-Ear Monitors -> \\u20b927.99 (Overstock Promo)\", \"NOVA AeroPods Pro ANC Wireless Earbuds -> \\u20b950.37 (Ov",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:51:38.829418+00:00"
-  },
-  {
-    "id": "log_2c0f306c",
-    "agent_name": "Price Manager Agent",
-    "action": "Dynamic Pricing Calibration",
-    "details": "Audited 27 catalog SKUs. Dynamically adjusted 21 prices. Corrected 0 anomalies.",
-    "affected_items": [
-      "NOVA ClarityFlow Studio Wired In-Ear Monitors -> \u20b927.99 (Overstock Promo)",
-      "NOVA AeroPods Pro ANC Wireless Earbuds -> \u20b950.37 (Overstock Promo)",
-      "NOVA BoomPulse 360 Bluetooth Speaker -> \u20b943.65 (Overstock Promo)",
-      "NOVA StudioMaster Pro Hi-Fi Wired Headphones -> \u20b961.57 (Overstock Promo)",
-      "NOVA SonicFlow ANC Pro Wireless Headphones -> \u20b966.05 (Overstock Promo)",
-      "NOVA VoiceCraft XLR Studio Condenser Wired Mic -> \u20b954.85 (Overstock Promo)",
-      "NOVA StreamAir Dual Wireless Lavalier Mic System -> \u20b958.21 (Overstock Promo)",
-      "NOVA Pulse Ultra Smartwatch -> \u20b972.75 (Overstock Promo)",
-      "NOVA Pulse Slim Smartwatch -> \u20b954.85 (Overstock Promo)",
-      "NOVA Vortex Pro RGB Wired Mechanical Keyboard -> \u20b939.18 (Overstock Promo)",
-      "NOVA AirType Low-Profile Wireless Keyboard -> \u20b947.01 (Overstock Promo)",
-      "NOVA ErgoMaster Silent Wireless Mouse -> \u20b922.38 (Overstock Promo)",
-      "NOVA ViperBlade 26K DPI Gaming Mouse -> \u20b931.34 (Overstock Promo)",
-      "NOVA TitanVolt MagSafe PowerBank 10k -> \u20b927.99 (Overstock Promo)",
-      "NOVA TitanVolt HyperCharge PowerBank 20k -> \u20b939.18 (Overstock Promo)",
-      "NOVA Stealth Commuter Smart Backpack -> \u20b933.58 (Overstock Promo)",
-      "NOVA Stealth Travel Expandable Smart Backpack -> \u20b944.78 (Overstock Promo)",
-      "NOVA PowerStream 100W USB-C Laptop Charger -> \u20b927.99 (Overstock Promo)",
-      "NOVA TurboFlash 30W Mobile Fast Charger -> \u20b916.79 (Overstock Promo)",
-      "NOVA HyperGaN 65W 3-Port Fast Charger -> \u20b924.62 (Overstock Promo)",
-      "NOVA HyperGaN 140W Quad-Port Pro Charger -> \u20b942.53 (Overstock Promo)"
-    ],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:51:38.780329+00:00"
-  },
-  {
-    "id": "log_dfaae387",
-    "agent_name": "Finance Manager Agent",
-    "action": "Financial Reconciliation",
-    "details": "Audited financial accounts. Bank Balance: \u20b9505,383.36. Processed 0 refunds. Payments reconciled: MATCHED.",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:51:38.540217+00:00"
-  },
-  {
-    "id": "log_d84ee7b7",
-    "agent_name": "Finance Manager Agent",
-    "action": "\u26a1 Message -> CEO Agent",
-    "details": "[FINANCIAL_STATUS_REPORT] {\"bank_balance\": 505383.36, \"total_sales_revenue\": 6183.36, \"net_profit\": 5383.36, \"total_inventory_spend\": 0.0, \"total_salaries_paid\": 800.0, \"total_refunds_deducted\": 0.0, \"reconciliation_status\": \"",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:51:38.518937+00:00"
-  },
-  {
-    "id": "log_3dab5f95",
-    "agent_name": "Inventory Manager Agent",
-    "action": "Warehouse Audit",
-    "details": "Audited 27 products. Executed 0 approved restocks. Submitted 0 restock requests to CEO.",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:51:38.445558+00:00"
-  },
-  {
-    "id": "log_a3043929",
-    "agent_name": "Inventory Manager Agent",
-    "action": "\u26a1 Message -> CEO Agent",
-    "details": "[WAREHOUSE_STATUS_REPORT] {\"total_skus\": 27, \"total_units\": 685, \"low_stock_count\": 0, \"low_stock_items\": [], \"restocked_items\": [], \"requests_submitted\": []}",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:51:38.425686+00:00"
-  },
-  {
-    "id": "log_3eaed90c",
-    "agent_name": "Inventory Manager Agent",
-    "action": "\u26a1 Message -> Price Manager Agent",
-    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_027\", \"product_name\": \"NOVA HyperGaN 140W Quad-Port Pro Charger\", \"current_stock\": 29}",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:51:38.380548+00:00"
-  },
-  {
-    "id": "log_008c4dbc",
-    "agent_name": "Inventory Manager Agent",
-    "action": "\u26a1 Message -> Price Manager Agent",
-    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_026\", \"product_name\": \"NOVA HyperGaN 65W 3-Port Fast Charger\", \"current_stock\": 29}",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:51:38.333460+00:00"
-  },
-  {
-    "id": "log_5658423c",
-    "agent_name": "Inventory Manager Agent",
-    "action": "\u26a1 Message -> Price Manager Agent",
-    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_025\", \"product_name\": \"NOVA TurboFlash 30W Mobile Fast Charger\", \"current_stock\": 29}",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:51:38.290906+00:00"
-  },
-  {
-    "id": "log_2f55977c",
-    "agent_name": "Inventory Manager Agent",
-    "action": "\u26a1 Message -> Price Manager Agent",
-    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_024\", \"product_name\": \"NOVA PowerStream 100W USB-C Laptop Charger\", \"current_stock\": 29}",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:51:38.251555+00:00"
-  },
-  {
-    "id": "log_93a4eecc",
-    "agent_name": "Inventory Manager Agent",
-    "action": "\u26a1 Message -> Price Manager Agent",
-    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_023\", \"product_name\": \"NOVA Stealth Travel Expandable Smart Backpack\", \"current_stock\": 30}",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:51:38.196946+00:00"
-  },
-  {
-    "id": "log_c0d6ba01",
-    "agent_name": "Inventory Manager Agent",
-    "action": "\u26a1 Message -> Price Manager Agent",
-    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_022\", \"product_name\": \"NOVA Stealth Commuter Smart Backpack\", \"current_stock\": 30}",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:51:38.150043+00:00"
-  },
-  {
-    "id": "log_d410461e",
-    "agent_name": "Inventory Manager Agent",
-    "action": "\u26a1 Message -> Price Manager Agent",
-    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_021\", \"product_name\": \"NOVA TitanVolt HyperCharge PowerBank 20k\", \"current_stock\": 30}",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:51:38.109458+00:00"
-  },
-  {
-    "id": "log_519bb4d1",
-    "agent_name": "Inventory Manager Agent",
-    "action": "\u26a1 Message -> Price Manager Agent",
-    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_020\", \"product_name\": \"NOVA TitanVolt MagSafe PowerBank 10k\", \"current_stock\": 30}",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:51:38.063179+00:00"
-  },
-  {
-    "id": "log_3c96c060",
-    "agent_name": "Inventory Manager Agent",
-    "action": "\u26a1 Message -> Price Manager Agent",
-    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_019\", \"product_name\": \"NOVA ViperBlade 26K DPI Gaming Mouse\", \"current_stock\": 28}",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:51:38.014411+00:00"
-  },
-  {
-    "id": "log_7da45a52",
-    "agent_name": "Inventory Manager Agent",
-    "action": "\u26a1 Message -> Price Manager Agent",
-    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_018\", \"product_name\": \"NOVA ErgoMaster Silent Wireless Mouse\", \"current_stock\": 29}",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:51:37.972511+00:00"
-  },
-  {
-    "id": "log_290edbed",
-    "agent_name": "Inventory Manager Agent",
-    "action": "\u26a1 Message -> Price Manager Agent",
-    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_017\", \"product_name\": \"NOVA AirType Low-Profile Wireless Keyboard\", \"current_stock\": 25}",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:51:37.932552+00:00"
-  },
-  {
-    "id": "log_9283cc4e",
-    "agent_name": "Inventory Manager Agent",
-    "action": "\u26a1 Message -> Price Manager Agent",
-    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_016\", \"product_name\": \"NOVA Vortex Pro RGB Wired Mechanical Keyboard\", \"current_stock\": 28}",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:51:37.880186+00:00"
-  },
-  {
-    "id": "log_ab75fe11",
-    "agent_name": "Inventory Manager Agent",
-    "action": "\u26a1 Message -> Price Manager Agent",
-    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_015\", \"product_name\": \"NOVA Pulse Slim Smartwatch\", \"current_stock\": 28}",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:51:37.833837+00:00"
-  },
-  {
-    "id": "log_9cf47b51",
-    "agent_name": "Inventory Manager Agent",
-    "action": "\u26a1 Message -> Price Manager Agent",
-    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_014\", \"product_name\": \"NOVA Pulse Ultra Smartwatch\", \"current_stock\": 28}",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:51:37.784584+00:00"
-  },
-  {
-    "id": "log_a9808f0e",
+    "id": "log_11e6003e",
     "agent_name": "Inventory Manager Agent",
     "action": "\u26a1 Message -> Price Manager Agent",
     "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_013\", \"product_name\": \"NOVA StreamAir Dual Wireless Lavalier Mic System\", \"current_stock\": 29}",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:51:37.728930+00:00"
+    "timestamp": "2026-09-03T22:14:50.350695+00:00"
   },
   {
-    "id": "log_53dc0856",
+    "id": "log_9bc0e30d",
     "agent_name": "Inventory Manager Agent",
     "action": "\u26a1 Message -> Price Manager Agent",
     "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_012\", \"product_name\": \"NOVA VoiceCraft XLR Studio Condenser Wired Mic\", \"current_stock\": 30}",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:51:37.681772+00:00"
+    "timestamp": "2026-09-03T22:14:50.298230+00:00"
   },
   {
-    "id": "log_99026bbd",
+    "id": "log_2021dda0",
     "agent_name": "Inventory Manager Agent",
     "action": "\u26a1 Message -> Price Manager Agent",
     "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_011\", \"product_name\": \"NOVA SonicFlow ANC Pro Wireless Headphones\", \"current_stock\": 29}",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:51:37.631158+00:00"
+    "timestamp": "2026-09-03T22:14:50.236801+00:00"
   },
   {
-    "id": "log_0b6d2dcc",
+    "id": "log_97399db7",
     "agent_name": "Inventory Manager Agent",
     "action": "\u26a1 Message -> Price Manager Agent",
-    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_010\", \"product_name\": \"NOVA StudioMaster Pro Hi-Fi Wired Headphones\", \"current_stock\": 29}",
+    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_010\", \"product_name\": \"NOVA StudioMaster Pro Hi-Fi Wired Headphones\", \"current_stock\": 27}",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:51:37.586779+00:00"
+    "timestamp": "2026-09-03T22:14:50.175764+00:00"
   },
   {
-    "id": "log_8cbbe66d",
+    "id": "log_0a2e6d9e",
     "agent_name": "Inventory Manager Agent",
     "action": "\u26a1 Message -> Price Manager Agent",
     "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_009\", \"product_name\": \"NOVA BoomPulse 360 Bluetooth Speaker\", \"current_stock\": 29}",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:51:37.543283+00:00"
+    "timestamp": "2026-09-03T22:14:50.116887+00:00"
   },
   {
-    "id": "log_98e5b933",
+    "id": "log_07f65f07",
     "agent_name": "Inventory Manager Agent",
     "action": "\u26a1 Message -> Price Manager Agent",
     "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_008\", \"product_name\": \"NOVA AeroPods Pro ANC Wireless Earbuds\", \"current_stock\": 30}",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:51:37.495508+00:00"
+    "timestamp": "2026-09-03T22:14:50.051244+00:00"
   },
   {
-    "id": "log_0e82ac84",
+    "id": "log_e7e595c0",
     "agent_name": "Inventory Manager Agent",
     "action": "\u26a1 Message -> Price Manager Agent",
     "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_007\", \"product_name\": \"NOVA ClarityFlow Studio Wired In-Ear Monitors\", \"current_stock\": 29}",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:51:37.449025+00:00"
+    "timestamp": "2026-09-03T22:14:49.990625+00:00"
   },
   {
-    "id": "log_3c20e2b6",
+    "id": "log_da762419",
     "agent_name": "Dispatcher Agent",
     "action": "Logistics Dispatch Execution",
     "details": "Logistics fulfillment processed 1 confirmed orders with express tracking numbers.",
     "affected_items": [
-      "#ORD-5132-0A65 (TRK-81EFEC)"
+      "#ORD-1444-51F3 (TRK-6FD4B9)"
     ],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:51:37.399815+00:00"
+    "timestamp": "2026-09-03T22:14:49.935156+00:00"
   },
   {
-    "id": "log_98d2d8af",
+    "id": "log_2420a449",
     "agent_name": "Dispatcher Agent",
     "action": "\u26a1 Message -> CEO Agent",
-    "details": "[LOGISTICS_STATUS_REPORT] {\"dispatched_count\": 1, \"dispatched_items\": [\"#ORD-5132-0A65 (TRK-81EFEC)\"], \"queue_empty\": false, \"preferred_carrier\": \"BlueDart Express Logistics\"}",
+    "details": "[LOGISTICS_STATUS_REPORT] {\"dispatched_count\": 1, \"dispatched_items\": [\"#ORD-1444-51F3 (TRK-6FD4B9)\"], \"queue_empty\": false, \"preferred_carrier\": \"BlueDart Express Logistics\"}",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:51:37.380327+00:00"
+    "timestamp": "2026-09-03T22:14:49.915348+00:00"
   },
   {
-    "id": "log_e67236c3",
+    "id": "log_c79e07b5",
     "agent_name": "Dispatcher Agent",
     "action": "\u26a1 Message -> CEO Agent",
-    "details": "[DISPATCH_COMPLETED] {\"order_id\": \"ORD-5132-0A65\", \"tracking_number\": \"TRK-81EFEC\", \"carrier\": \"BlueDart Express Logistics\"}",
+    "details": "[DISPATCH_COMPLETED] {\"order_id\": \"ORD-1444-51F3\", \"tracking_number\": \"TRK-6FD4B9\", \"carrier\": \"BlueDart Express Logistics\"}",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:51:37.344016+00:00"
+    "timestamp": "2026-09-03T22:14:49.862520+00:00"
   },
   {
-    "id": "log_1ce8c70d",
+    "id": "log_c6358faa",
     "agent_name": "Dispatcher Agent",
     "action": "\u26a1 Message -> Order Management Agent",
-    "details": "[ORDER_DISPATCHED] {\"order_id\": \"ORD-5132-0A65\", \"tracking_number\": \"TRK-81EFEC\", \"carrier\": \"BlueDart Express Logistics\", \"eta\": \"2-3 Business Days\"}",
+    "details": "[ORDER_DISPATCHED] {\"order_id\": \"ORD-1444-51F3\", \"tracking_number\": \"TRK-6FD4B9\", \"carrier\": \"BlueDart Express Logistics\", \"eta\": \"2-3 Business Days\"}",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:51:37.306479+00:00"
+    "timestamp": "2026-09-03T22:14:49.805425+00:00"
   },
   {
-    "id": "log_5460eb17",
+    "id": "log_fe3f78c3",
     "agent_name": "Dispatcher Agent",
     "action": "\u26a1 Message -> Order Management Agent",
-    "details": "[ORDER_DISPATCHED] {\"order_id\": \"ORD-5132-0A65\", \"tracking_number\": \"TRK-81EFEC\", \"carrier\": \"BlueDart Express Logistics\", \"eta\": \"2-3 Business Days\", \"details\": \"Parcel handed to BlueDart Express Logistics under tracki",
+    "details": "[ORDER_DISPATCHED] {\"order_id\": \"ORD-1444-51F3\", \"tracking_number\": \"TRK-6FD4B9\", \"carrier\": \"BlueDart Express Logistics\", \"eta\": \"2-3 Business Days\", \"details\": \"Parcel handed to BlueDart Express Logistics under tracki",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:51:37.256638+00:00"
+    "timestamp": "2026-09-03T22:14:49.747303+00:00"
   },
   {
-    "id": "log_e05ac16d",
-    "agent_name": "AI Buyer (David Patel)",
+    "id": "log_b4dbe88e",
+    "agent_name": "AI Buyer (Marcus Kim)",
     "action": "Autonomous AP2 Purchase",
-    "details": "\ud83d\udecd\ufe0f AI Buyer David Patel (Audiophile & Gadget Geek) purchased 1x 'NOVA BoomPulse 360 Bluetooth Speaker' for \u20b947.45 via AP2 + Razorpay Gateway (Order #ORD-5132-0A65). Rated 4\u2605.",
+    "details": "\ud83d\udecd\ufe0f AI Buyer Marcus Kim (Trendsetter & Policy Tester) purchased 1x 'NOVA TitanVolt HyperCharge PowerBank 20k' for \u20b942.59 via AP2 + Razorpay Gateway (Order #ORD-1444-51F3). Rated 4\u2605.",
     "affected_items": [
-      "prod_009",
-      "ORD-5132-0A65"
+      "prod_021",
+      "ORD-1444-51F3"
     ],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:51:36.168918+00:00"
+    "timestamp": "2026-09-03T22:14:48.646450+00:00"
   },
   {
-    "id": "log_37f2eca5",
+    "id": "log_78c6ba10",
     "agent_name": "Review and Feedback Manager",
     "action": "\u26a1 Message -> Price Manager Agent",
-    "details": "[REVIEW_SUBMITTED] {\"product_id\": \"prod_009\", \"product_name\": \"NOVA BoomPulse 360 Bluetooth Speaker\", \"rating\": 4, \"review\": \"Man, the NOVA BoomPulse 360 is a game-changer for outdoor jams. Cranked up the bass while hik",
+    "details": "[REVIEW_SUBMITTED] {\"product_id\": \"prod_021\", \"product_name\": \"NOVA TitanVolt HyperCharge PowerBank 20k\", \"rating\": 4, \"review\": \"This HyperCharge PowerBank is a game-changer! I\\u2019ve tested it with multiple devices a",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:51:36.142495+00:00"
+    "timestamp": "2026-09-03T22:14:48.626316+00:00"
   },
   {
-    "id": "log_37390782",
+    "id": "log_365ecc64",
     "agent_name": "Finance Manager Agent",
     "action": "\u26a1 Message -> Order Management Agent",
-    "details": "[PAYMENT_RECEIVED] {\"order_id\": \"ORD-5132-0A65\", \"payment_id\": \"pay_TXicffnIdRDtX0\", \"amount\": 47.45, \"method\": \"AP2 Agentic Auto-Pay (Razorpay Verified)\"}",
+    "details": "[PAYMENT_RECEIVED] {\"order_id\": \"ORD-1444-51F3\", \"payment_id\": \"pay_TXj1Gx5Po4DlIJ\", \"amount\": 42.59, \"method\": \"AP2 Agentic Auto-Pay (Razorpay Verified)\"}",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:51:32.236077+00:00"
+    "timestamp": "2026-09-03T22:14:44.214733+00:00"
   },
   {
-    "id": "log_8108fc38",
+    "id": "log_7381f75f",
     "agent_name": "Order Management Agent",
     "action": "\u26a1 Message -> Finance Manager Agent",
-    "details": "[ORDER_PAYMENT_CAPTURED] {\"order_id\": \"ORD-5132-0A65\", \"total\": 47.45, \"payment_method\": \"Razorpay Gateway (Online)\", \"action_required\": \"Verify settlement and reconcile treasury ledger.\"}",
+    "details": "[ORDER_PAYMENT_CAPTURED] {\"order_id\": \"ORD-1444-51F3\", \"total\": 42.59, \"payment_method\": \"Razorpay Gateway (Online)\", \"action_required\": \"Verify settlement and reconcile treasury ledger.\"}",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:51:32.157148+00:00"
+    "timestamp": "2026-09-03T22:14:44.147528+00:00"
   },
   {
-    "id": "log_ff36b650",
+    "id": "log_245ac9a3",
     "agent_name": "Order Management Agent",
     "action": "\u26a1 Message -> Dispatcher Agent",
-    "details": "[ORDER_CONFIRMED] {\"order_id\": \"ORD-5132-0A65\", \"total\": 47.45, \"items_summary\": \"NOVA BoomPulse 360 Bluetooth Speaker (x1)\", \"shipping_address\": \"David Patel Residence, Innovation Hub Blvd, Sector 4\", \"action_required",
+    "details": "[ORDER_CONFIRMED] {\"order_id\": \"ORD-1444-51F3\", \"total\": 42.59, \"items_summary\": \"NOVA TitanVolt HyperCharge PowerBank 20k (x1)\", \"shipping_address\": \"Marcus Kim Residence, Innovation Hub Blvd, Sector 4\", \"action_requi",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:51:32.101490+00:00"
+    "timestamp": "2026-09-03T22:14:44.087893+00:00"
   },
   {
-    "id": "log_e31cba52",
+    "id": "log_28e153a0",
     "agent_name": "CEO Agent",
     "action": "CEO Strategic Cycle",
-    "details": "CEO cycle #82: Processed 8 messages. Bank Balance: \u20b9505,335.91. Directives issued: 0.",
+    "details": "CEO cycle #17: Processed 8 messages. Bank Balance: \u20b9509,690.36. Directives issued: 0.",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:51:16.668072+00:00"
+    "timestamp": "2026-09-03T22:14:33.831826+00:00"
   },
   {
-    "id": "log_b8dd37bf",
+    "id": "log_0f515703",
     "agent_name": "Review and Feedback Manager",
     "action": "Sentiment & Quality Audit",
     "details": "Audited sentiment across 27 catalog products. Store Average: 4.4\u2605. 0 quality alerts emitted.",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:51:16.641224+00:00"
+    "timestamp": "2026-09-03T22:14:33.799234+00:00"
   },
   {
-    "id": "log_3d76440a",
+    "id": "log_c25d558a",
     "agent_name": "Review and Feedback Manager",
     "action": "\u26a1 Message -> CEO Agent",
-    "details": "[SENTIMENT_STATUS_REPORT] {\"average_rating\": 4.4, \"total_reviews\": 173, \"issue_clusters\": {\"battery_performance\": 26, \"shipping_speed\": 12, \"audio_clarity\": 9, \"build_quality\": 12, \"general_satisfaction\": 114}, \"quality_alerts",
+    "details": "[SENTIMENT_STATUS_REPORT] {\"average_rating\": 4.4, \"total_reviews\": 217, \"issue_clusters\": {\"battery_performance\": 30, \"shipping_speed\": 14, \"audio_clarity\": 12, \"build_quality\": 17, \"general_satisfaction\": 144}, \"quality_alert",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:51:16.621639+00:00"
+    "timestamp": "2026-09-03T22:14:33.771479+00:00"
   },
   {
-    "id": "log_b8239596",
+    "id": "log_e4e6ccf8",
     "agent_name": "Order Management Agent",
     "action": "Order Pipeline Lifecycle",
-    "details": "Audited 178 orders. Auto-advanced 2 status transitions.",
+    "details": "Audited 223 orders. Auto-advanced 2 status transitions.",
     "affected_items": [
-      "ORD-4754-D13D: Shipped -> Delivered",
-      "ORD-4730-D686: Shipped -> Delivered"
+      "ORD-1317-CEE0: Dispatched -> Shipped",
+      "ORD-1112-A769: Shipped -> Delivered"
     ],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:51:16.572175+00:00"
+    "timestamp": "2026-09-03T22:14:33.721090+00:00"
   },
   {
-    "id": "log_1bbe1846",
+    "id": "log_cb64fcff",
     "agent_name": "Order Management Agent",
     "action": "\u26a1 Message -> CEO Agent",
-    "details": "[ORDER_PIPELINE_REPORT] {\"total_orders\": 178, \"status_breakdown\": {\"Dispatched\": 2, \"Shipped\": 1, \"Delivered\": 170, \"Refunded\": 5}, \"auto_advanced\": [\"ORD-4754-D13D: Shipped -> Delivered\", \"ORD-4730-D686: Shipped -> Delivere",
+    "details": "[ORDER_PIPELINE_REPORT] {\"total_orders\": 223, \"status_breakdown\": {\"Dispatched\": 3, \"Shipped\": 4, \"Refunded\": 8, \"Delivered\": 208}, \"auto_advanced\": [\"ORD-1317-CEE0: Dispatched -> Shipped\", \"ORD-1112-A769: Shipped -> Deliver",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:51:16.551848+00:00"
+    "timestamp": "2026-09-03T22:14:33.690574+00:00"
   },
   {
-    "id": "log_699b3cf9",
+    "id": "log_39d7dee6",
     "agent_name": "Order Management Agent",
     "action": "\u26a1 Message -> CEO Agent",
-    "details": "[ORDER_STATUS_UPDATED] {\"order_id\": \"ORD-4730-D686\", \"previous_status\": \"Shipped\", \"new_status\": \"Delivered\", \"reason\": \"Auto-advanced doorstep delivery lifecycle (2m)\"}",
+    "details": "[ORDER_STATUS_UPDATED] {\"order_id\": \"ORD-1112-A769\", \"previous_status\": \"Shipped\", \"new_status\": \"Delivered\", \"reason\": \"Auto-advanced doorstep delivery lifecycle (2m)\"}",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:51:16.486032+00:00"
+    "timestamp": "2026-09-03T22:14:33.611630+00:00"
   },
   {
-    "id": "log_42bc3861",
+    "id": "log_652e4dd3",
     "agent_name": "Order Management Agent",
     "action": "\u26a1 Message -> Review and Feedback Manager",
-    "details": "[ORDER_DELIVERED] {\"order_id\": \"ORD-4730-D686\", \"customer\": \"Sophia Miller\", \"action_required\": \"Track customer satisfaction and solicit verified review.\"}",
+    "details": "[ORDER_DELIVERED] {\"order_id\": \"ORD-1112-A769\", \"customer\": \"Sophia Miller\", \"action_required\": \"Track customer satisfaction and solicit verified review.\"}",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:51:16.439146+00:00"
+    "timestamp": "2026-09-03T22:14:33.546927+00:00"
   },
   {
-    "id": "log_0658f991",
+    "id": "log_adc154eb",
     "agent_name": "Order Management Agent",
     "action": "\u26a1 Message -> CEO Agent",
-    "details": "[ORDER_STATUS_UPDATED] {\"order_id\": \"ORD-4754-D13D\", \"previous_status\": \"Shipped\", \"new_status\": \"Delivered\", \"reason\": \"Auto-advanced doorstep delivery lifecycle (2m)\"}",
+    "details": "[ORDER_STATUS_UPDATED] {\"order_id\": \"ORD-1317-CEE0\", \"previous_status\": \"Dispatched\", \"new_status\": \"Shipped\", \"reason\": \"Auto-advanced carrier transit lifecycle (1m)\"}",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:51:16.346160+00:00"
+    "timestamp": "2026-09-03T22:14:33.406289+00:00"
   },
   {
-    "id": "log_0d2fbe23",
+    "id": "log_64fb76e5",
     "agent_name": "Order Management Agent",
-    "action": "\u26a1 Message -> Review and Feedback Manager",
-    "details": "[ORDER_DELIVERED] {\"order_id\": \"ORD-4754-D13D\", \"customer\": \"Marcus Kim\", \"action_required\": \"Track customer satisfaction and solicit verified review.\"}",
+    "action": "\u26a1 Message -> Dispatcher Agent",
+    "details": "[ORDER_SHIPPED] {\"order_id\": \"ORD-1317-CEE0\", \"status\": \"Shipped\", \"tracking_number\": \"TRK-2DBE40\"}",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:51:16.304033+00:00"
+    "timestamp": "2026-09-03T22:14:33.331911+00:00"
   },
   {
-    "id": "log_acabe52c",
+    "id": "log_cc22f8f8",
     "agent_name": "Price Manager Agent",
     "action": "\u26a1 Message -> CEO Agent",
     "details": "[PRICING_STATUS_REPORT] {\"total_skus\": 27, \"adjusted_count\": 0, \"adjusted_items\": [], \"anomalies_corrected\": 0, \"details\": \"Audited 27 catalog SKUs. Dynamically adjusted 0 prices. Corrected 0 anomalies.\"}",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:51:16.227790+00:00"
+    "timestamp": "2026-09-03T22:14:33.224125+00:00"
   },
   {
-    "id": "log_cdb36975",
+    "id": "log_b5ee5955",
     "agent_name": "Price Manager Agent",
     "action": "Dynamic Pricing Calibration",
     "details": "Audited 27 catalog SKUs. Dynamically adjusted 0 prices. Corrected 0 anomalies.",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:51:16.182387+00:00"
+    "timestamp": "2026-09-03T22:14:33.156428+00:00"
   },
   {
-    "id": "log_06a1a44f",
+    "id": "log_c029c9fa",
     "agent_name": "Finance Manager Agent",
     "action": "Financial Reconciliation",
-    "details": "Audited financial accounts. Bank Balance: \u20b9505,335.91. Processed 0 refunds. Payments reconciled: MATCHED.",
+    "details": "Audited financial accounts. Bank Balance: \u20b9509,690.36. Processed 0 refunds. Payments reconciled: MATCHED.",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:51:16.157087+00:00"
+    "timestamp": "2026-09-03T22:14:33.133385+00:00"
   },
   {
-    "id": "log_17173bfb",
+    "id": "log_4114518a",
     "agent_name": "Finance Manager Agent",
     "action": "\u26a1 Message -> CEO Agent",
-    "details": "[FINANCIAL_STATUS_REPORT] {\"bank_balance\": 505335.91, \"total_sales_revenue\": 6135.91, \"net_profit\": 5335.91, \"total_inventory_spend\": 0.0, \"total_salaries_paid\": 800.0, \"total_refunds_deducted\": 0.0, \"reconciliation_status\": \"",
+    "details": "[FINANCIAL_STATUS_REPORT] {\"bank_balance\": 509690.36, \"total_sales_revenue\": 10581.61, \"net_profit\": 9690.36, \"total_inventory_spend\": 0.0, \"total_salaries_paid\": 800.0, \"total_refunds_deducted\": 91.25, \"reconciliation_status\"",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:51:16.135209+00:00"
+    "timestamp": "2026-09-03T22:14:33.111297+00:00"
   },
   {
-    "id": "log_2ec0fa39",
+    "id": "log_f97d974c",
     "agent_name": "Dispatcher Agent",
     "action": "Logistics Dispatch Execution",
     "details": "Logistics fulfillment processed 1 confirmed orders with express tracking numbers.",
     "affected_items": [
-      "#ORD-5110-525C (TRK-9956A6)"
+      "#ORD-1426-DF6C (TRK-8118D8)"
     ],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:51:16.059806+00:00"
+    "timestamp": "2026-09-03T22:14:33.025198+00:00"
   },
   {
-    "id": "log_dcd2bdc7",
+    "id": "log_e21791db",
     "agent_name": "Dispatcher Agent",
     "action": "\u26a1 Message -> CEO Agent",
-    "details": "[LOGISTICS_STATUS_REPORT] {\"dispatched_count\": 1, \"dispatched_items\": [\"#ORD-5110-525C (TRK-9956A6)\"], \"queue_empty\": false, \"preferred_carrier\": \"BlueDart Express Logistics\"}",
+    "details": "[LOGISTICS_STATUS_REPORT] {\"dispatched_count\": 1, \"dispatched_items\": [\"#ORD-1426-DF6C (TRK-8118D8)\"], \"queue_empty\": false, \"preferred_carrier\": \"BlueDart Express Logistics\"}",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:51:16.028316+00:00"
+    "timestamp": "2026-09-03T22:14:33.002420+00:00"
   },
   {
-    "id": "log_1cce6dc9",
+    "id": "log_c5d1107e",
     "agent_name": "Dispatcher Agent",
     "action": "\u26a1 Message -> CEO Agent",
-    "details": "[DISPATCH_COMPLETED] {\"order_id\": \"ORD-5110-525C\", \"tracking_number\": \"TRK-9956A6\", \"carrier\": \"BlueDart Express Logistics\"}",
+    "details": "[DISPATCH_COMPLETED] {\"order_id\": \"ORD-1426-DF6C\", \"tracking_number\": \"TRK-8118D8\", \"carrier\": \"BlueDart Express Logistics\"}",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:51:15.981756+00:00"
+    "timestamp": "2026-09-03T22:14:32.944818+00:00"
   },
   {
-    "id": "log_be233d44",
+    "id": "log_0ee93f88",
     "agent_name": "Dispatcher Agent",
     "action": "\u26a1 Message -> Order Management Agent",
-    "details": "[ORDER_DISPATCHED] {\"order_id\": \"ORD-5110-525C\", \"tracking_number\": \"TRK-9956A6\", \"carrier\": \"BlueDart Express Logistics\", \"eta\": \"2-3 Business Days\"}",
+    "details": "[ORDER_DISPATCHED] {\"order_id\": \"ORD-1426-DF6C\", \"tracking_number\": \"TRK-8118D8\", \"carrier\": \"BlueDart Express Logistics\", \"eta\": \"2-3 Business Days\"}",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:51:15.937339+00:00"
+    "timestamp": "2026-09-03T22:14:32.881918+00:00"
   },
   {
-    "id": "log_c18ebbe4",
+    "id": "log_04f7450d",
     "agent_name": "Dispatcher Agent",
     "action": "\u26a1 Message -> Order Management Agent",
-    "details": "[ORDER_DISPATCHED] {\"order_id\": \"ORD-5110-525C\", \"tracking_number\": \"TRK-9956A6\", \"carrier\": \"BlueDart Express Logistics\", \"eta\": \"2-3 Business Days\", \"details\": \"Parcel handed to BlueDart Express Logistics under tracki",
+    "details": "[ORDER_DISPATCHED] {\"order_id\": \"ORD-1426-DF6C\", \"tracking_number\": \"TRK-8118D8\", \"carrier\": \"BlueDart Express Logistics\", \"eta\": \"2-3 Business Days\", \"details\": \"Parcel handed to BlueDart Express Logistics under tracki",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:51:15.889154+00:00"
+    "timestamp": "2026-09-03T22:14:32.825873+00:00"
   },
   {
-    "id": "log_cd71c395",
+    "id": "log_b365acef",
     "agent_name": "AI Buyer (David Patel)",
     "action": "Autonomous AP2 Purchase",
-    "details": "\ud83d\udecd\ufe0f AI Buyer David Patel (Audiophile & Gadget Geek) purchased 1x 'NOVA AirType Low-Profile Wireless Keyboard' for \u20b951.10 via AP2 + Razorpay Gateway (Order #ORD-5110-525C). Rated 4\u2605.",
+    "details": "\ud83d\udecd\ufe0f AI Buyer David Patel (Audiophile & Gadget Geek) purchased 1x 'NOVA TitanVolt HyperCharge PowerBank 20k' for \u20b942.59 via AP2 + Razorpay Gateway (Order #ORD-1426-DF6C). Rated 5\u2605.",
     "affected_items": [
-      "prod_017",
-      "ORD-5110-525C"
+      "prod_021",
+      "ORD-1426-DF6C"
     ],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:51:14.798339+00:00"
+    "timestamp": "2026-09-03T22:14:31.713619+00:00"
   },
   {
-    "id": "log_261ee694",
+    "id": "log_fb3f887a",
     "agent_name": "Review and Feedback Manager",
     "action": "\u26a1 Message -> Price Manager Agent",
-    "details": "[REVIEW_SUBMITTED] {\"product_id\": \"prod_017\", \"product_name\": \"NOVA AirType Low-Profile Wireless Keyboard\", \"rating\": 4, \"review\": \"The NOVA AirType is a game-changer for anyone looking for a slim, responsive keyboard. ",
+    "details": "[REVIEW_SUBMITTED] {\"product_id\": \"prod_021\", \"product_name\": \"NOVA TitanVolt HyperCharge PowerBank 20k\", \"rating\": 5, \"review\": \"The NOVA TitanVolt HyperCharge PowerBank 20k is a beast! With its 65W Power Delivery and ",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:51:14.777147+00:00"
+    "timestamp": "2026-09-03T22:14:31.686191+00:00"
   },
   {
-    "id": "log_42dadbaa",
-    "agent_name": "Price Manager Agent",
-    "action": "\u26a1 Message -> Inventory Manager Agent",
-    "details": "[PRICE_ADJUSTED] {\"product_id\": \"prod_006\", \"product_name\": \"NOVA AeroBook Slim i7 Ultrabook\", \"old_price\": 82.12, \"new_price\": 75.0, \"reason\": \"Dynamic price recalibration\"}",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:51:13.046777+00:00"
-  },
-  {
-    "id": "log_3c736531",
-    "agent_name": "Price Manager Agent",
-    "action": "\u26a1 Message -> Inventory Manager Agent",
-    "details": "[PRICE_ADJUSTED] {\"product_id\": \"prod_005\", \"product_name\": \"NOVA BladeForge RTX 4080 Gaming Laptop\", \"old_price\": 109.5, \"new_price\": 100.0, \"reason\": \"Dynamic price recalibration\"}",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:51:12.975212+00:00"
-  },
-  {
-    "id": "log_8dadd870",
-    "agent_name": "Price Manager Agent",
-    "action": "\u26a1 Message -> Inventory Manager Agent",
-    "details": "[PRICE_ADJUSTED] {\"product_id\": \"prod_004\", \"product_name\": \"NOVA ZenBook Ultra 14 M3 Laptop\", \"old_price\": 93.08, \"new_price\": 85.0, \"reason\": \"Dynamic price recalibration\"}",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:51:12.907265+00:00"
-  },
-  {
-    "id": "log_a5cdc815",
+    "id": "log_a66e6d5c",
     "agent_name": "Finance Manager Agent",
     "action": "\u26a1 Message -> Order Management Agent",
-    "details": "[PAYMENT_RECEIVED] {\"order_id\": \"ORD-5110-525C\", \"payment_id\": \"pay_TXicIC0REQn2eO\", \"amount\": 51.1, \"method\": \"AP2 Agentic Auto-Pay (Razorpay Verified)\"}",
+    "details": "[PAYMENT_RECEIVED] {\"order_id\": \"ORD-1426-DF6C\", \"payment_id\": \"pay_TXj0sR4BlLNDRZ\", \"amount\": 42.59, \"method\": \"AP2 Agentic Auto-Pay (Razorpay Verified)\"}",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:51:10.960303+00:00"
+    "timestamp": "2026-09-03T22:14:27.030240+00:00"
   },
   {
-    "id": "log_ded8f523",
+    "id": "log_a30f7cf8",
     "agent_name": "Order Management Agent",
     "action": "\u26a1 Message -> Finance Manager Agent",
-    "details": "[ORDER_PAYMENT_CAPTURED] {\"order_id\": \"ORD-5110-525C\", \"total\": 51.1, \"payment_method\": \"Razorpay Gateway (Online)\", \"action_required\": \"Verify settlement and reconcile treasury ledger.\"}",
+    "details": "[ORDER_PAYMENT_CAPTURED] {\"order_id\": \"ORD-1426-DF6C\", \"total\": 42.59, \"payment_method\": \"Razorpay Gateway (Online)\", \"action_required\": \"Verify settlement and reconcile treasury ledger.\"}",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:51:10.889473+00:00"
+    "timestamp": "2026-09-03T22:14:26.950558+00:00"
   },
   {
-    "id": "log_d2ff4fe7",
+    "id": "log_fa866996",
     "agent_name": "Order Management Agent",
     "action": "\u26a1 Message -> Dispatcher Agent",
-    "details": "[ORDER_CONFIRMED] {\"order_id\": \"ORD-5110-525C\", \"total\": 51.1, \"items_summary\": \"NOVA AirType Low-Profile Wireless Keyboard (x1)\", \"shipping_address\": \"David Patel Residence, Innovation Hub Blvd, Sector 4\", \"action_req",
+    "details": "[ORDER_CONFIRMED] {\"order_id\": \"ORD-1426-DF6C\", \"total\": 42.59, \"items_summary\": \"NOVA TitanVolt HyperCharge PowerBank 20k (x1)\", \"shipping_address\": \"David Patel Residence, Innovation Hub Blvd, Sector 4\", \"action_requ",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:51:10.840809+00:00"
+    "timestamp": "2026-09-03T22:14:26.891393+00:00"
   },
   {
-    "id": "log_c6942bfa",
+    "id": "log_84fdc01e",
     "agent_name": "CEO Agent",
     "action": "CEO Strategic Cycle",
-    "details": "CEO cycle #81: Processed 13 messages. Bank Balance: \u20b9505,284.81. Directives issued: 0.",
+    "details": "CEO cycle #16: Processed 9 messages. Bank Balance: \u20b9509,647.77. Directives issued: 0.",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:50:55.029434+00:00"
+    "timestamp": "2026-09-03T22:14:11.312816+00:00"
   },
   {
-    "id": "log_ffa90f75",
-    "agent_name": "Order Management Agent",
-    "action": "Order Pipeline Lifecycle",
-    "details": "Audited 177 orders. Auto-advanced 0 status transitions.",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:50:55.002319+00:00"
-  },
-  {
-    "id": "log_9d106708",
-    "agent_name": "Order Management Agent",
-    "action": "\u26a1 Message -> CEO Agent",
-    "details": "[ORDER_PIPELINE_REPORT] {\"total_orders\": 177, \"status_breakdown\": {\"Dispatched\": 1, \"Shipped\": 3, \"Delivered\": 168, \"Refunded\": 5}, \"auto_advanced\": [], \"sla_breaches\": 0}",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:50:54.982076+00:00"
-  },
-  {
-    "id": "log_0c6a3db3",
-    "agent_name": "Price Manager Agent",
-    "action": "\u26a1 Message -> CEO Agent",
-    "details": "[PRICING_STATUS_REPORT] {\"total_skus\": 27, \"adjusted_count\": 21, \"adjusted_items\": [\"NOVA ClarityFlow Studio Wired In-Ear Monitors -> \\u20b927.99 (Overstock Promo)\", \"NOVA AeroPods Pro ANC Wireless Earbuds -> \\u20b950.37 (Ov",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:50:54.925541+00:00"
-  },
-  {
-    "id": "log_791cd9aa",
-    "agent_name": "Price Manager Agent",
-    "action": "Dynamic Pricing Calibration",
-    "details": "Audited 27 catalog SKUs. Dynamically adjusted 21 prices. Corrected 0 anomalies.",
-    "affected_items": [
-      "NOVA ClarityFlow Studio Wired In-Ear Monitors -> \u20b927.99 (Overstock Promo)",
-      "NOVA AeroPods Pro ANC Wireless Earbuds -> \u20b950.37 (Overstock Promo)",
-      "NOVA BoomPulse 360 Bluetooth Speaker -> \u20b943.65 (Overstock Promo)",
-      "NOVA StudioMaster Pro Hi-Fi Wired Headphones -> \u20b961.57 (Overstock Promo)",
-      "NOVA SonicFlow ANC Pro Wireless Headphones -> \u20b966.05 (Overstock Promo)",
-      "NOVA VoiceCraft XLR Studio Condenser Wired Mic -> \u20b954.85 (Overstock Promo)",
-      "NOVA StreamAir Dual Wireless Lavalier Mic System -> \u20b958.21 (Overstock Promo)",
-      "NOVA Pulse Ultra Smartwatch -> \u20b972.75 (Overstock Promo)",
-      "NOVA Pulse Slim Smartwatch -> \u20b954.85 (Overstock Promo)",
-      "NOVA Vortex Pro RGB Wired Mechanical Keyboard -> \u20b939.18 (Overstock Promo)",
-      "NOVA AirType Low-Profile Wireless Keyboard -> \u20b947.01 (Overstock Promo)",
-      "NOVA ErgoMaster Silent Wireless Mouse -> \u20b922.38 (Overstock Promo)",
-      "NOVA ViperBlade 26K DPI Gaming Mouse -> \u20b931.34 (Overstock Promo)",
-      "NOVA TitanVolt MagSafe PowerBank 10k -> \u20b927.99 (Overstock Promo)",
-      "NOVA TitanVolt HyperCharge PowerBank 20k -> \u20b939.18 (Overstock Promo)",
-      "NOVA Stealth Commuter Smart Backpack -> \u20b933.58 (Overstock Promo)",
-      "NOVA Stealth Travel Expandable Smart Backpack -> \u20b944.78 (Overstock Promo)",
-      "NOVA PowerStream 100W USB-C Laptop Charger -> \u20b927.99 (Overstock Promo)",
-      "NOVA TurboFlash 30W Mobile Fast Charger -> \u20b916.79 (Overstock Promo)",
-      "NOVA HyperGaN 65W 3-Port Fast Charger -> \u20b924.62 (Overstock Promo)",
-      "NOVA HyperGaN 140W Quad-Port Pro Charger -> \u20b942.53 (Overstock Promo)"
-    ],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:50:54.877941+00:00"
-  },
-  {
-    "id": "log_641ab6d1",
-    "agent_name": "Finance Manager Agent",
-    "action": "Financial Reconciliation",
-    "details": "Audited financial accounts. Bank Balance: \u20b9505,284.81. Processed 0 refunds. Payments reconciled: MATCHED.",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:50:54.639462+00:00"
-  },
-  {
-    "id": "log_edec24a9",
-    "agent_name": "Finance Manager Agent",
-    "action": "\u26a1 Message -> CEO Agent",
-    "details": "[FINANCIAL_STATUS_REPORT] {\"bank_balance\": 505284.81, \"total_sales_revenue\": 6084.81, \"net_profit\": 5284.81, \"total_inventory_spend\": 0.0, \"total_salaries_paid\": 800.0, \"total_refunds_deducted\": 0.0, \"reconciliation_status\": \"",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:50:54.610671+00:00"
-  },
-  {
-    "id": "log_f41efff1",
-    "agent_name": "Inventory Manager Agent",
-    "action": "Warehouse Audit",
-    "details": "Audited 27 products. Executed 0 approved restocks. Submitted 0 restock requests to CEO.",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:50:54.535376+00:00"
-  },
-  {
-    "id": "log_abd9fac8",
-    "agent_name": "Inventory Manager Agent",
-    "action": "\u26a1 Message -> CEO Agent",
-    "details": "[WAREHOUSE_STATUS_REPORT] {\"total_skus\": 27, \"total_units\": 687, \"low_stock_count\": 0, \"low_stock_items\": [], \"restocked_items\": [], \"requests_submitted\": []}",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:50:54.513943+00:00"
-  },
-  {
-    "id": "log_7cd55af5",
-    "agent_name": "Inventory Manager Agent",
-    "action": "\u26a1 Message -> Price Manager Agent",
-    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_027\", \"product_name\": \"NOVA HyperGaN 140W Quad-Port Pro Charger\", \"current_stock\": 29}",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:50:54.464654+00:00"
-  },
-  {
-    "id": "log_1d1f7371",
-    "agent_name": "Inventory Manager Agent",
-    "action": "\u26a1 Message -> Price Manager Agent",
-    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_026\", \"product_name\": \"NOVA HyperGaN 65W 3-Port Fast Charger\", \"current_stock\": 29}",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:50:54.415609+00:00"
-  },
-  {
-    "id": "log_4bb818a3",
-    "agent_name": "Inventory Manager Agent",
-    "action": "\u26a1 Message -> Price Manager Agent",
-    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_025\", \"product_name\": \"NOVA TurboFlash 30W Mobile Fast Charger\", \"current_stock\": 29}",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:50:54.354318+00:00"
-  },
-  {
-    "id": "log_dceee0c6",
-    "agent_name": "Inventory Manager Agent",
-    "action": "\u26a1 Message -> Price Manager Agent",
-    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_024\", \"product_name\": \"NOVA PowerStream 100W USB-C Laptop Charger\", \"current_stock\": 29}",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:50:54.309432+00:00"
-  },
-  {
-    "id": "log_a29130a4",
-    "agent_name": "Inventory Manager Agent",
-    "action": "\u26a1 Message -> Price Manager Agent",
-    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_023\", \"product_name\": \"NOVA Stealth Travel Expandable Smart Backpack\", \"current_stock\": 30}",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:50:54.264495+00:00"
-  },
-  {
-    "id": "log_e7faca1b",
-    "agent_name": "Inventory Manager Agent",
-    "action": "\u26a1 Message -> Price Manager Agent",
-    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_022\", \"product_name\": \"NOVA Stealth Commuter Smart Backpack\", \"current_stock\": 30}",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:50:54.217631+00:00"
-  },
-  {
-    "id": "log_4b4137f6",
-    "agent_name": "Inventory Manager Agent",
-    "action": "\u26a1 Message -> Price Manager Agent",
-    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_021\", \"product_name\": \"NOVA TitanVolt HyperCharge PowerBank 20k\", \"current_stock\": 30}",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:50:54.168132+00:00"
-  },
-  {
-    "id": "log_f21df443",
-    "agent_name": "Inventory Manager Agent",
-    "action": "\u26a1 Message -> Price Manager Agent",
-    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_020\", \"product_name\": \"NOVA TitanVolt MagSafe PowerBank 10k\", \"current_stock\": 30}",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:50:54.122607+00:00"
-  },
-  {
-    "id": "log_8658886c",
-    "agent_name": "Inventory Manager Agent",
-    "action": "\u26a1 Message -> Price Manager Agent",
-    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_019\", \"product_name\": \"NOVA ViperBlade 26K DPI Gaming Mouse\", \"current_stock\": 28}",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:50:54.075697+00:00"
-  },
-  {
-    "id": "log_67e741bc",
-    "agent_name": "Inventory Manager Agent",
-    "action": "\u26a1 Message -> Price Manager Agent",
-    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_018\", \"product_name\": \"NOVA ErgoMaster Silent Wireless Mouse\", \"current_stock\": 29}",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:50:54.029316+00:00"
-  },
-  {
-    "id": "log_a2bfcc27",
-    "agent_name": "Inventory Manager Agent",
-    "action": "\u26a1 Message -> Price Manager Agent",
-    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_017\", \"product_name\": \"NOVA AirType Low-Profile Wireless Keyboard\", \"current_stock\": 26}",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:50:53.985772+00:00"
-  },
-  {
-    "id": "log_d6da4e09",
-    "agent_name": "Inventory Manager Agent",
-    "action": "\u26a1 Message -> Price Manager Agent",
-    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_016\", \"product_name\": \"NOVA Vortex Pro RGB Wired Mechanical Keyboard\", \"current_stock\": 28}",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:50:53.928229+00:00"
-  },
-  {
-    "id": "log_50607269",
-    "agent_name": "Inventory Manager Agent",
-    "action": "\u26a1 Message -> Price Manager Agent",
-    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_015\", \"product_name\": \"NOVA Pulse Slim Smartwatch\", \"current_stock\": 28}",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:50:53.881194+00:00"
-  },
-  {
-    "id": "log_ce77dbea",
-    "agent_name": "Inventory Manager Agent",
-    "action": "\u26a1 Message -> Price Manager Agent",
-    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_014\", \"product_name\": \"NOVA Pulse Ultra Smartwatch\", \"current_stock\": 28}",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:50:53.837592+00:00"
-  },
-  {
-    "id": "log_052c3e59",
-    "agent_name": "Inventory Manager Agent",
-    "action": "\u26a1 Message -> Price Manager Agent",
-    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_013\", \"product_name\": \"NOVA StreamAir Dual Wireless Lavalier Mic System\", \"current_stock\": 29}",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:50:53.790605+00:00"
-  },
-  {
-    "id": "log_50bab0ad",
-    "agent_name": "Inventory Manager Agent",
-    "action": "\u26a1 Message -> Price Manager Agent",
-    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_012\", \"product_name\": \"NOVA VoiceCraft XLR Studio Condenser Wired Mic\", \"current_stock\": 30}",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:50:53.743959+00:00"
-  },
-  {
-    "id": "log_ac913a59",
-    "agent_name": "Inventory Manager Agent",
-    "action": "\u26a1 Message -> Price Manager Agent",
-    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_011\", \"product_name\": \"NOVA SonicFlow ANC Pro Wireless Headphones\", \"current_stock\": 29}",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:50:53.692441+00:00"
-  },
-  {
-    "id": "log_85c00b3b",
-    "agent_name": "Inventory Manager Agent",
-    "action": "\u26a1 Message -> Price Manager Agent",
-    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_010\", \"product_name\": \"NOVA StudioMaster Pro Hi-Fi Wired Headphones\", \"current_stock\": 29}",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:50:53.647285+00:00"
-  },
-  {
-    "id": "log_6cd01ea0",
-    "agent_name": "Inventory Manager Agent",
-    "action": "\u26a1 Message -> Price Manager Agent",
-    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_009\", \"product_name\": \"NOVA BoomPulse 360 Bluetooth Speaker\", \"current_stock\": 30}",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:50:53.600828+00:00"
-  },
-  {
-    "id": "log_18898abd",
-    "agent_name": "Inventory Manager Agent",
-    "action": "\u26a1 Message -> Price Manager Agent",
-    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_008\", \"product_name\": \"NOVA AeroPods Pro ANC Wireless Earbuds\", \"current_stock\": 30}",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:50:53.552073+00:00"
-  },
-  {
-    "id": "log_8e166d0e",
-    "agent_name": "Inventory Manager Agent",
-    "action": "\u26a1 Message -> Price Manager Agent",
-    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_007\", \"product_name\": \"NOVA ClarityFlow Studio Wired In-Ear Monitors\", \"current_stock\": 29}",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:50:53.504285+00:00"
-  },
-  {
-    "id": "log_28cc9bc0",
-    "agent_name": "Dispatcher Agent",
-    "action": "Logistics Dispatch Execution",
-    "details": "Logistics fulfillment processed 1 confirmed orders with express tracking numbers.",
-    "affected_items": [
-      "#ORD-5048-5527 (TRK-EC273F)"
-    ],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:50:53.458543+00:00"
-  },
-  {
-    "id": "log_4aa5ed2d",
-    "agent_name": "Dispatcher Agent",
-    "action": "\u26a1 Message -> CEO Agent",
-    "details": "[LOGISTICS_STATUS_REPORT] {\"dispatched_count\": 1, \"dispatched_items\": [\"#ORD-5048-5527 (TRK-EC273F)\"], \"queue_empty\": false, \"preferred_carrier\": \"BlueDart Express Logistics\"}",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:50:53.437042+00:00"
-  },
-  {
-    "id": "log_fb754afa",
-    "agent_name": "Dispatcher Agent",
-    "action": "\u26a1 Message -> CEO Agent",
-    "details": "[DISPATCH_COMPLETED] {\"order_id\": \"ORD-5048-5527\", \"tracking_number\": \"TRK-EC273F\", \"carrier\": \"BlueDart Express Logistics\"}",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:50:53.389418+00:00"
-  },
-  {
-    "id": "log_32269521",
-    "agent_name": "Dispatcher Agent",
-    "action": "\u26a1 Message -> Order Management Agent",
-    "details": "[ORDER_DISPATCHED] {\"order_id\": \"ORD-5048-5527\", \"tracking_number\": \"TRK-EC273F\", \"carrier\": \"BlueDart Express Logistics\", \"eta\": \"2-3 Business Days\"}",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:50:53.340596+00:00"
-  },
-  {
-    "id": "log_5f0dc18b",
-    "agent_name": "Dispatcher Agent",
-    "action": "\u26a1 Message -> Order Management Agent",
-    "details": "[ORDER_DISPATCHED] {\"order_id\": \"ORD-5048-5527\", \"tracking_number\": \"TRK-EC273F\", \"carrier\": \"BlueDart Express Logistics\", \"eta\": \"2-3 Business Days\", \"details\": \"Parcel handed to BlueDart Express Logistics under tracki",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:50:53.292905+00:00"
-  },
-  {
-    "id": "log_f89e2b8e",
-    "agent_name": "AI Buyer (Alex Chen)",
-    "action": "Autonomous AP2 Purchase",
-    "details": "\ud83d\udecd\ufe0f AI Buyer Alex Chen (Flagship Tech Enthusiast) purchased 1x 'NOVA Prime 5G Smartphone' for \u20b983.95 via AP2 + Razorpay Gateway (Order #ORD-5048-5527). Rated 5\u2605.",
-    "affected_items": [
-      "prod_003",
-      "ORD-5048-5527"
-    ],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:50:52.207089+00:00"
-  },
-  {
-    "id": "log_bc69812c",
-    "agent_name": "Review and Feedback Manager",
-    "action": "\u26a1 Message -> Price Manager Agent",
-    "details": "[REVIEW_SUBMITTED] {\"product_id\": \"prod_003\", \"product_name\": \"NOVA Prime 5G Smartphone\", \"rating\": 5, \"review\": \"The NOVA Prime 5G is a beast! That 6.67-inch 120Hz AMOLED display is a game changer, and the Dimensi\"}",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:50:52.181295+00:00"
-  },
-  {
-    "id": "log_fc016ef1",
-    "agent_name": "Finance Manager Agent",
-    "action": "\u26a1 Message -> Order Management Agent",
-    "details": "[PAYMENT_RECEIVED] {\"order_id\": \"ORD-5048-5527\", \"payment_id\": \"pay_TXibsjZnjjdgoA\", \"amount\": 83.95, \"method\": \"AP2 Agentic Auto-Pay (Razorpay Verified)\"}",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:50:48.252428+00:00"
-  },
-  {
-    "id": "log_0b957603",
-    "agent_name": "Order Management Agent",
-    "action": "\u26a1 Message -> Finance Manager Agent",
-    "details": "[ORDER_PAYMENT_CAPTURED] {\"order_id\": \"ORD-5048-5527\", \"total\": 83.95, \"payment_method\": \"Razorpay Gateway (Online)\", \"action_required\": \"Verify settlement and reconcile treasury ledger.\"}",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:50:48.192885+00:00"
-  },
-  {
-    "id": "log_cfc3a98f",
-    "agent_name": "Order Management Agent",
-    "action": "\u26a1 Message -> Dispatcher Agent",
-    "details": "[ORDER_CONFIRMED] {\"order_id\": \"ORD-5048-5527\", \"total\": 83.95, \"items_summary\": \"NOVA Prime 5G Smartphone (x1)\", \"shipping_address\": \"Alex Chen Residence, Innovation Hub Blvd, Sector 4\", \"action_required\": \"Assign exp",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:50:48.143914+00:00"
-  },
-  {
-    "id": "log_6b8e54ae",
+    "id": "log_5efb72c8",
     "agent_name": "Review and Feedback Manager",
     "action": "Sentiment & Quality Audit",
     "details": "Audited sentiment across 27 catalog products. Store Average: 4.4\u2605. 0 quality alerts emitted.",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:50:31.960616+00:00"
+    "timestamp": "2026-09-03T22:14:11.285924+00:00"
   },
   {
-    "id": "log_26977065",
+    "id": "log_897c75ba",
     "agent_name": "Review and Feedback Manager",
     "action": "\u26a1 Message -> CEO Agent",
-    "details": "[SENTIMENT_STATUS_REPORT] {\"average_rating\": 4.4, \"total_reviews\": 171, \"issue_clusters\": {\"battery_performance\": 26, \"shipping_speed\": 11, \"audio_clarity\": 9, \"build_quality\": 12, \"general_satisfaction\": 113}, \"quality_alerts",
+    "details": "[SENTIMENT_STATUS_REPORT] {\"average_rating\": 4.4, \"total_reviews\": 216, \"issue_clusters\": {\"battery_performance\": 30, \"shipping_speed\": 13, \"audio_clarity\": 12, \"build_quality\": 17, \"general_satisfaction\": 144}, \"quality_alert",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:50:31.938100+00:00"
+    "timestamp": "2026-09-03T22:14:11.261949+00:00"
   },
   {
-    "id": "log_a0a46e30",
+    "id": "log_4a0e8bbb",
     "agent_name": "Order Management Agent",
     "action": "Order Pipeline Lifecycle",
-    "details": "Audited 176 orders. Auto-advanced 1 status transitions.",
+    "details": "Audited 222 orders. Auto-advanced 2 status transitions.",
     "affected_items": [
-      "ORD-4702-C0BE: Shipped -> Delivered"
+      "ORD-1254-5383: Dispatched -> Shipped",
+      "ORD-1051-41B7: Shipped -> Delivered"
     ],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:50:31.891209+00:00"
+    "timestamp": "2026-09-03T22:14:11.191104+00:00"
   },
   {
-    "id": "log_5b7ce698",
+    "id": "log_b72a08b1",
     "agent_name": "Order Management Agent",
     "action": "\u26a1 Message -> CEO Agent",
-    "details": "[ORDER_PIPELINE_REPORT] {\"total_orders\": 176, \"status_breakdown\": {\"Shipped\": 3, \"Delivered\": 168, \"Refunded\": 5}, \"auto_advanced\": [\"ORD-4702-C0BE: Shipped -> Delivered\"], \"sla_breaches\": 0}",
+    "details": "[ORDER_PIPELINE_REPORT] {\"total_orders\": 222, \"status_breakdown\": {\"Dispatched\": 3, \"Shipped\": 4, \"Refunded\": 8, \"Delivered\": 207}, \"auto_advanced\": [\"ORD-1254-5383: Dispatched -> Shipped\", \"ORD-1051-41B7: Shipped -> Deliver",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:50:31.870777+00:00"
+    "timestamp": "2026-09-03T22:14:11.175412+00:00"
   },
   {
-    "id": "log_bc5a4ec3",
+    "id": "log_a6280637",
     "agent_name": "Order Management Agent",
     "action": "\u26a1 Message -> CEO Agent",
-    "details": "[ORDER_STATUS_UPDATED] {\"order_id\": \"ORD-4702-C0BE\", \"previous_status\": \"Shipped\", \"new_status\": \"Delivered\", \"reason\": \"Auto-advanced doorstep delivery lifecycle (2m)\"}",
+    "details": "[ORDER_STATUS_UPDATED] {\"order_id\": \"ORD-1051-41B7\", \"previous_status\": \"Shipped\", \"new_status\": \"Delivered\", \"reason\": \"Auto-advanced doorstep delivery lifecycle (2m)\"}",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:50:31.799418+00:00"
+    "timestamp": "2026-09-03T22:14:11.097530+00:00"
   },
   {
-    "id": "log_936619e1",
+    "id": "log_9051fd20",
     "agent_name": "Order Management Agent",
     "action": "\u26a1 Message -> Review and Feedback Manager",
-    "details": "[ORDER_DELIVERED] {\"order_id\": \"ORD-4702-C0BE\", \"customer\": \"Sophia Miller\", \"action_required\": \"Track customer satisfaction and solicit verified review.\"}",
+    "details": "[ORDER_DELIVERED] {\"order_id\": \"ORD-1051-41B7\", \"customer\": \"Elena Rostova\", \"action_required\": \"Track customer satisfaction and solicit verified review.\"}",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:50:31.751298+00:00"
+    "timestamp": "2026-09-03T22:14:11.043609+00:00"
   },
   {
-    "id": "log_f6356823",
+    "id": "log_82b32541",
+    "agent_name": "Order Management Agent",
+    "action": "\u26a1 Message -> CEO Agent",
+    "details": "[ORDER_STATUS_UPDATED] {\"order_id\": \"ORD-1254-5383\", \"previous_status\": \"Dispatched\", \"new_status\": \"Shipped\", \"reason\": \"Auto-advanced carrier transit lifecycle (1m)\"}",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:14:10.923682+00:00"
+  },
+  {
+    "id": "log_38da8d95",
+    "agent_name": "Order Management Agent",
+    "action": "\u26a1 Message -> Dispatcher Agent",
+    "details": "[ORDER_SHIPPED] {\"order_id\": \"ORD-1254-5383\", \"status\": \"Shipped\", \"tracking_number\": \"TRK-D8FEB6\"}",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:14:10.852032+00:00"
+  },
+  {
+    "id": "log_d43ca794",
     "agent_name": "Price Manager Agent",
     "action": "\u26a1 Message -> CEO Agent",
-    "details": "[PRICING_STATUS_REPORT] {\"total_skus\": 27, \"adjusted_count\": 21, \"adjusted_items\": [\"NOVA ClarityFlow Studio Wired In-Ear Monitors -> \\u20b927.99 (Overstock Promo)\", \"NOVA AeroPods Pro ANC Wireless Earbuds -> \\u20b950.37 (Ov",
+    "details": "[PRICING_STATUS_REPORT] {\"total_skus\": 27, \"adjusted_count\": 19, \"adjusted_items\": [\"NOVA ClarityFlow Studio Wired In-Ear Monitors -> \\u20b927.99 (Overstock Promo)\", \"NOVA AeroPods Pro ANC Wireless Earbuds -> \\u20b950.37 (Ov",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:50:31.677053+00:00"
+    "timestamp": "2026-09-03T22:14:10.734264+00:00"
   },
   {
-    "id": "log_3ca98327",
+    "id": "log_369439ef",
     "agent_name": "Price Manager Agent",
     "action": "Dynamic Pricing Calibration",
-    "details": "Audited 27 catalog SKUs. Dynamically adjusted 21 prices. Corrected 0 anomalies.",
+    "details": "Audited 27 catalog SKUs. Dynamically adjusted 19 prices. Corrected 0 anomalies.",
     "affected_items": [
       "NOVA ClarityFlow Studio Wired In-Ear Monitors -> \u20b927.99 (Overstock Promo)",
       "NOVA AeroPods Pro ANC Wireless Earbuds -> \u20b950.37 (Overstock Promo)",
@@ -1094,9 +479,7 @@
       "NOVA VoiceCraft XLR Studio Condenser Wired Mic -> \u20b954.85 (Overstock Promo)",
       "NOVA StreamAir Dual Wireless Lavalier Mic System -> \u20b958.21 (Overstock Promo)",
       "NOVA Pulse Ultra Smartwatch -> \u20b972.75 (Overstock Promo)",
-      "NOVA Pulse Slim Smartwatch -> \u20b954.85 (Overstock Promo)",
       "NOVA Vortex Pro RGB Wired Mechanical Keyboard -> \u20b939.18 (Overstock Promo)",
-      "NOVA AirType Low-Profile Wireless Keyboard -> \u20b947.01 (Overstock Promo)",
       "NOVA ErgoMaster Silent Wireless Mouse -> \u20b922.38 (Overstock Promo)",
       "NOVA ViperBlade 26K DPI Gaming Mouse -> \u20b931.34 (Overstock Promo)",
       "NOVA TitanVolt MagSafe PowerBank 10k -> \u20b927.99 (Overstock Promo)",
@@ -1109,767 +492,613 @@
       "NOVA HyperGaN 140W Quad-Port Pro Charger -> \u20b942.53 (Overstock Promo)"
     ],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:50:31.631403+00:00"
+    "timestamp": "2026-09-03T22:14:10.666292+00:00"
   },
   {
-    "id": "log_eac2a2b4",
+    "id": "log_5b511e67",
     "agent_name": "Finance Manager Agent",
     "action": "Financial Reconciliation",
-    "details": "Audited financial accounts. Bank Balance: \u20b9505,200.86. Processed 0 refunds. Payments reconciled: MATCHED.",
+    "details": "Audited financial accounts. Bank Balance: \u20b9509,647.77. Processed 0 refunds. Payments reconciled: MATCHED.",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:50:31.399681+00:00"
+    "timestamp": "2026-09-03T22:14:10.336416+00:00"
   },
   {
-    "id": "log_0635b145",
+    "id": "log_03273df9",
     "agent_name": "Finance Manager Agent",
     "action": "\u26a1 Message -> CEO Agent",
-    "details": "[FINANCIAL_STATUS_REPORT] {\"bank_balance\": 505200.86, \"total_sales_revenue\": 6000.86, \"net_profit\": 5200.86, \"total_inventory_spend\": 0.0, \"total_salaries_paid\": 800.0, \"total_refunds_deducted\": 0.0, \"reconciliation_status\": \"",
+    "details": "[FINANCIAL_STATUS_REPORT] {\"bank_balance\": 509647.77, \"total_sales_revenue\": 10539.02, \"net_profit\": 9647.77, \"total_inventory_spend\": 0.0, \"total_salaries_paid\": 800.0, \"total_refunds_deducted\": 91.25, \"reconciliation_status\"",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:50:31.380979+00:00"
+    "timestamp": "2026-09-03T22:14:10.319909+00:00"
   },
   {
-    "id": "log_70c3ef3d",
+    "id": "log_8eddcf7d",
     "agent_name": "Inventory Manager Agent",
     "action": "Warehouse Audit",
     "details": "Audited 27 products. Executed 0 approved restocks. Submitted 0 restock requests to CEO.",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:50:31.328797+00:00"
+    "timestamp": "2026-09-03T22:14:10.244933+00:00"
   },
   {
-    "id": "log_42d4c0b8",
+    "id": "log_38ef5e48",
     "agent_name": "Inventory Manager Agent",
     "action": "\u26a1 Message -> CEO Agent",
-    "details": "[WAREHOUSE_STATUS_REPORT] {\"total_skus\": 27, \"total_units\": 688, \"low_stock_count\": 0, \"low_stock_items\": [], \"restocked_items\": [], \"requests_submitted\": []}",
+    "details": "[WAREHOUSE_STATUS_REPORT] {\"total_skus\": 27, \"total_units\": 640, \"low_stock_count\": 0, \"low_stock_items\": [], \"restocked_items\": [], \"requests_submitted\": []}",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:50:31.303907+00:00"
+    "timestamp": "2026-09-03T22:14:10.218260+00:00"
   },
   {
-    "id": "log_ce8ce522",
+    "id": "log_261f83df",
     "agent_name": "Inventory Manager Agent",
     "action": "\u26a1 Message -> Price Manager Agent",
     "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_027\", \"product_name\": \"NOVA HyperGaN 140W Quad-Port Pro Charger\", \"current_stock\": 29}",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:50:31.258064+00:00"
+    "timestamp": "2026-09-03T22:14:10.166389+00:00"
   },
   {
-    "id": "log_9c1f43fc",
+    "id": "log_54a48010",
     "agent_name": "Inventory Manager Agent",
     "action": "\u26a1 Message -> Price Manager Agent",
-    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_026\", \"product_name\": \"NOVA HyperGaN 65W 3-Port Fast Charger\", \"current_stock\": 29}",
+    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_026\", \"product_name\": \"NOVA HyperGaN 65W 3-Port Fast Charger\", \"current_stock\": 28}",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:50:31.209297+00:00"
+    "timestamp": "2026-09-03T22:14:10.115481+00:00"
   },
   {
-    "id": "log_38cc0ada",
+    "id": "log_89d3ccab",
     "agent_name": "Inventory Manager Agent",
     "action": "\u26a1 Message -> Price Manager Agent",
     "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_025\", \"product_name\": \"NOVA TurboFlash 30W Mobile Fast Charger\", \"current_stock\": 29}",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:50:31.162461+00:00"
+    "timestamp": "2026-09-03T22:14:10.055834+00:00"
   },
   {
-    "id": "log_8e2bd571",
+    "id": "log_1bb1dfe9",
     "agent_name": "Inventory Manager Agent",
     "action": "\u26a1 Message -> Price Manager Agent",
-    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_024\", \"product_name\": \"NOVA PowerStream 100W USB-C Laptop Charger\", \"current_stock\": 29}",
+    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_024\", \"product_name\": \"NOVA PowerStream 100W USB-C Laptop Charger\", \"current_stock\": 28}",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:50:31.117872+00:00"
+    "timestamp": "2026-09-03T22:14:09.992197+00:00"
   },
   {
-    "id": "log_78f3f75d",
+    "id": "log_4d525982",
     "agent_name": "Inventory Manager Agent",
     "action": "\u26a1 Message -> Price Manager Agent",
     "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_023\", \"product_name\": \"NOVA Stealth Travel Expandable Smart Backpack\", \"current_stock\": 30}",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:50:31.072619+00:00"
+    "timestamp": "2026-09-03T22:14:09.932850+00:00"
   },
   {
-    "id": "log_5e720f0a",
+    "id": "log_0b627328",
     "agent_name": "Inventory Manager Agent",
     "action": "\u26a1 Message -> Price Manager Agent",
     "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_022\", \"product_name\": \"NOVA Stealth Commuter Smart Backpack\", \"current_stock\": 30}",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:50:31.027508+00:00"
+    "timestamp": "2026-09-03T22:14:09.868711+00:00"
   },
   {
-    "id": "log_75686f53",
+    "id": "log_e3c6b9c1",
     "agent_name": "Inventory Manager Agent",
     "action": "\u26a1 Message -> Price Manager Agent",
     "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_021\", \"product_name\": \"NOVA TitanVolt HyperCharge PowerBank 20k\", \"current_stock\": 30}",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:50:30.979236+00:00"
+    "timestamp": "2026-09-03T22:14:09.809955+00:00"
   },
   {
-    "id": "log_1b059fef",
+    "id": "log_a6ac9e4d",
     "agent_name": "Inventory Manager Agent",
     "action": "\u26a1 Message -> Price Manager Agent",
     "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_020\", \"product_name\": \"NOVA TitanVolt MagSafe PowerBank 10k\", \"current_stock\": 30}",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:50:30.929552+00:00"
+    "timestamp": "2026-09-03T22:14:09.730891+00:00"
   },
   {
-    "id": "log_8fd762c3",
+    "id": "log_d38d6614",
     "agent_name": "Inventory Manager Agent",
     "action": "\u26a1 Message -> Price Manager Agent",
-    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_019\", \"product_name\": \"NOVA ViperBlade 26K DPI Gaming Mouse\", \"current_stock\": 28}",
+    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_019\", \"product_name\": \"NOVA ViperBlade 26K DPI Gaming Mouse\", \"current_stock\": 27}",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:50:30.886119+00:00"
+    "timestamp": "2026-09-03T22:14:09.667281+00:00"
   },
   {
-    "id": "log_3abd96f2",
+    "id": "log_d727736b",
     "agent_name": "Inventory Manager Agent",
     "action": "\u26a1 Message -> Price Manager Agent",
-    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_018\", \"product_name\": \"NOVA ErgoMaster Silent Wireless Mouse\", \"current_stock\": 29}",
+    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_018\", \"product_name\": \"NOVA ErgoMaster Silent Wireless Mouse\", \"current_stock\": 28}",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:50:30.839092+00:00"
+    "timestamp": "2026-09-03T22:14:09.609222+00:00"
   },
   {
-    "id": "log_a4fb17fd",
-    "agent_name": "Inventory Manager Agent",
-    "action": "\u26a1 Message -> Price Manager Agent",
-    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_017\", \"product_name\": \"NOVA AirType Low-Profile Wireless Keyboard\", \"current_stock\": 26}",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:50:30.792666+00:00"
-  },
-  {
-    "id": "log_cec9da9a",
+    "id": "log_1a9ae92d",
     "agent_name": "Inventory Manager Agent",
     "action": "\u26a1 Message -> Price Manager Agent",
     "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_016\", \"product_name\": \"NOVA Vortex Pro RGB Wired Mechanical Keyboard\", \"current_stock\": 28}",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:50:30.745656+00:00"
+    "timestamp": "2026-09-03T22:14:09.549550+00:00"
   },
   {
-    "id": "log_5e8ac8c5",
-    "agent_name": "Inventory Manager Agent",
-    "action": "\u26a1 Message -> Price Manager Agent",
-    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_015\", \"product_name\": \"NOVA Pulse Slim Smartwatch\", \"current_stock\": 28}",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:50:30.704350+00:00"
-  },
-  {
-    "id": "log_0f67908b",
+    "id": "log_999d9523",
     "agent_name": "Inventory Manager Agent",
     "action": "\u26a1 Message -> Price Manager Agent",
     "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_014\", \"product_name\": \"NOVA Pulse Ultra Smartwatch\", \"current_stock\": 28}",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:50:30.655719+00:00"
+    "timestamp": "2026-09-03T22:14:09.487034+00:00"
   },
   {
-    "id": "log_1bfb529c",
+    "id": "log_cc274d77",
     "agent_name": "Inventory Manager Agent",
     "action": "\u26a1 Message -> Price Manager Agent",
     "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_013\", \"product_name\": \"NOVA StreamAir Dual Wireless Lavalier Mic System\", \"current_stock\": 29}",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:50:30.609982+00:00"
+    "timestamp": "2026-09-03T22:14:09.423738+00:00"
   },
   {
-    "id": "log_ce34df9c",
+    "id": "log_b3b76cfa",
     "agent_name": "Inventory Manager Agent",
     "action": "\u26a1 Message -> Price Manager Agent",
     "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_012\", \"product_name\": \"NOVA VoiceCraft XLR Studio Condenser Wired Mic\", \"current_stock\": 30}",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:50:30.564251+00:00"
+    "timestamp": "2026-09-03T22:14:09.358494+00:00"
   },
   {
-    "id": "log_f1225cbe",
+    "id": "log_abbe2c9d",
     "agent_name": "Inventory Manager Agent",
     "action": "\u26a1 Message -> Price Manager Agent",
     "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_011\", \"product_name\": \"NOVA SonicFlow ANC Pro Wireless Headphones\", \"current_stock\": 29}",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:50:30.515391+00:00"
+    "timestamp": "2026-09-03T22:14:09.300393+00:00"
   },
   {
-    "id": "log_f75d976c",
+    "id": "log_860a3bf7",
     "agent_name": "Inventory Manager Agent",
     "action": "\u26a1 Message -> Price Manager Agent",
-    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_010\", \"product_name\": \"NOVA StudioMaster Pro Hi-Fi Wired Headphones\", \"current_stock\": 29}",
+    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_010\", \"product_name\": \"NOVA StudioMaster Pro Hi-Fi Wired Headphones\", \"current_stock\": 27}",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:50:30.466618+00:00"
+    "timestamp": "2026-09-03T22:14:09.243866+00:00"
   },
   {
-    "id": "log_5ae538f1",
+    "id": "log_791c944c",
     "agent_name": "Inventory Manager Agent",
     "action": "\u26a1 Message -> Price Manager Agent",
-    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_009\", \"product_name\": \"NOVA BoomPulse 360 Bluetooth Speaker\", \"current_stock\": 30}",
+    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_009\", \"product_name\": \"NOVA BoomPulse 360 Bluetooth Speaker\", \"current_stock\": 29}",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:50:30.419531+00:00"
+    "timestamp": "2026-09-03T22:14:09.194318+00:00"
   },
   {
-    "id": "log_c989fc0f",
+    "id": "log_1e095e34",
     "agent_name": "Inventory Manager Agent",
     "action": "\u26a1 Message -> Price Manager Agent",
     "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_008\", \"product_name\": \"NOVA AeroPods Pro ANC Wireless Earbuds\", \"current_stock\": 30}",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:50:30.376870+00:00"
+    "timestamp": "2026-09-03T22:14:09.141940+00:00"
   },
   {
-    "id": "log_c46a9320",
+    "id": "log_749ad410",
     "agent_name": "Inventory Manager Agent",
     "action": "\u26a1 Message -> Price Manager Agent",
     "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_007\", \"product_name\": \"NOVA ClarityFlow Studio Wired In-Ear Monitors\", \"current_stock\": 29}",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:50:30.330081+00:00"
+    "timestamp": "2026-09-03T22:14:09.084990+00:00"
   },
   {
-    "id": "log_b3ae0f55",
+    "id": "log_08c17747",
     "agent_name": "Dispatcher Agent",
     "action": "Logistics Dispatch Execution",
-    "details": "Logistics fulfillment processed 0 confirmed orders with express tracking numbers.",
-    "affected_items": [],
+    "details": "Logistics fulfillment processed 1 confirmed orders with express tracking numbers.",
+    "affected_items": [
+      "#ORD-1403-DBD3 (TRK-03B35A)"
+    ],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:50:30.281154+00:00"
+    "timestamp": "2026-09-03T22:14:09.027064+00:00"
   },
   {
-    "id": "log_c0262706",
+    "id": "log_cc546b33",
     "agent_name": "Dispatcher Agent",
     "action": "\u26a1 Message -> CEO Agent",
-    "details": "[LOGISTICS_STATUS_REPORT] {\"dispatched_count\": 0, \"dispatched_items\": [], \"queue_empty\": true, \"preferred_carrier\": \"BlueDart Express Logistics\"}",
+    "details": "[LOGISTICS_STATUS_REPORT] {\"dispatched_count\": 1, \"dispatched_items\": [\"#ORD-1403-DBD3 (TRK-03B35A)\"], \"queue_empty\": false, \"preferred_carrier\": \"BlueDart Express Logistics\"}",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:50:30.258211+00:00"
+    "timestamp": "2026-09-03T22:14:09.006173+00:00"
   },
   {
-    "id": "log_a0bc8a2c",
+    "id": "log_09db7619",
+    "agent_name": "Dispatcher Agent",
+    "action": "\u26a1 Message -> CEO Agent",
+    "details": "[DISPATCH_COMPLETED] {\"order_id\": \"ORD-1403-DBD3\", \"tracking_number\": \"TRK-03B35A\", \"carrier\": \"BlueDart Express Logistics\"}",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:14:08.950175+00:00"
+  },
+  {
+    "id": "log_091179ad",
+    "agent_name": "Dispatcher Agent",
+    "action": "\u26a1 Message -> Order Management Agent",
+    "details": "[ORDER_DISPATCHED] {\"order_id\": \"ORD-1403-DBD3\", \"tracking_number\": \"TRK-03B35A\", \"carrier\": \"BlueDart Express Logistics\", \"eta\": \"2-3 Business Days\"}",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:14:08.889074+00:00"
+  },
+  {
+    "id": "log_379ebcac",
+    "agent_name": "Dispatcher Agent",
+    "action": "\u26a1 Message -> Order Management Agent",
+    "details": "[ORDER_DISPATCHED] {\"order_id\": \"ORD-1403-DBD3\", \"tracking_number\": \"TRK-03B35A\", \"carrier\": \"BlueDart Express Logistics\", \"eta\": \"2-3 Business Days\", \"details\": \"Parcel handed to BlueDart Express Logistics under tracki",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:14:08.827250+00:00"
+  },
+  {
+    "id": "log_8faed316",
+    "agent_name": "AI Buyer (David Patel)",
+    "action": "Autonomous AP2 Purchase",
+    "details": "\ud83d\udecd\ufe0f AI Buyer David Patel (Audiophile & Gadget Geek) purchased 1x 'NOVA StudioMaster Pro Hi-Fi Wired Headphones' for \u20b966.92 via AP2 + Razorpay Gateway (Order #ORD-1403-DBD3). Rated 5\u2605.",
+    "affected_items": [
+      "prod_010",
+      "ORD-1403-DBD3"
+    ],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:14:07.726384+00:00"
+  },
+  {
+    "id": "log_39fdd92e",
+    "agent_name": "Review and Feedback Manager",
+    "action": "\u26a1 Message -> Price Manager Agent",
+    "details": "[REVIEW_SUBMITTED] {\"product_id\": \"prod_010\", \"product_name\": \"NOVA StudioMaster Pro Hi-Fi Wired Headphones\", \"rating\": 5, \"review\": \"These NOVA StudioMaster Pro headphones are a revelation. The 50mm neodymium drivers d",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:14:07.699856+00:00"
+  },
+  {
+    "id": "log_9f7b77da",
+    "agent_name": "Finance Manager Agent",
+    "action": "\u26a1 Message -> Order Management Agent",
+    "details": "[PAYMENT_RECEIVED] {\"order_id\": \"ORD-1403-DBD3\", \"payment_id\": \"pay_TXj0Rd7uYtx4hp\", \"amount\": 66.92, \"method\": \"AP2 Agentic Auto-Pay (Razorpay Verified)\"}",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:14:03.358126+00:00"
+  },
+  {
+    "id": "log_3b159508",
+    "agent_name": "Order Management Agent",
+    "action": "\u26a1 Message -> Finance Manager Agent",
+    "details": "[ORDER_PAYMENT_CAPTURED] {\"order_id\": \"ORD-1403-DBD3\", \"total\": 66.92, \"payment_method\": \"Razorpay Gateway (Online)\", \"action_required\": \"Verify settlement and reconcile treasury ledger.\"}",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:14:03.277034+00:00"
+  },
+  {
+    "id": "log_e5f9fecc",
+    "agent_name": "Order Management Agent",
+    "action": "\u26a1 Message -> Dispatcher Agent",
+    "details": "[ORDER_CONFIRMED] {\"order_id\": \"ORD-1403-DBD3\", \"total\": 66.92, \"items_summary\": \"NOVA StudioMaster Pro Hi-Fi Wired Headphones (x1)\", \"shipping_address\": \"David Patel Residence, Innovation Hub Blvd, Sector 4\", \"action_",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:14:03.217802+00:00"
+  },
+  {
+    "id": "log_40650f7d",
     "agent_name": "CEO Agent",
     "action": "CEO Strategic Cycle",
-    "details": "CEO cycle #80: Processed 1 messages. Bank Balance: \u20b9505,200.86. Directives issued: 1.",
+    "details": "CEO cycle #15: Processed 7 messages. Bank Balance: \u20b9509,580.85. Directives issued: 1.",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:50:29.201338+00:00"
+    "timestamp": "2026-09-03T22:13:46.930009+00:00"
   },
   {
-    "id": "log_2b536884",
+    "id": "log_40439447",
     "agent_name": "CEO Agent",
     "action": "\u26a1 Message -> ALL_AGENTS",
-    "details": "[CEO_FLEET_DIRECTIVE] {\"cycle\": 80, \"directive\": \"Maintain order fulfillment velocity, enforce BASE_PRICE floors, and preserve treasury solvency.\", \"bank_balance\": 505200.86, \"active_orders\": 176}",
+    "details": "[CEO_FLEET_DIRECTIVE] {\"cycle\": 15, \"directive\": \"Maintain order fulfillment velocity, enforce BASE_PRICE floors, and preserve treasury solvency.\", \"bank_balance\": 509580.85, \"active_orders\": 221}",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:50:29.176938+00:00"
+    "timestamp": "2026-09-03T22:13:46.908525+00:00"
   },
   {
-    "id": "log_f69285dd",
-    "agent_name": "Finance Manager Agent",
-    "action": "Financial Reconciliation",
-    "details": "Audited financial accounts. Bank Balance: \u20b9505,200.86. Processed 0 refunds. Payments reconciled: MATCHED.",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:50:26.063115+00:00"
-  },
-  {
-    "id": "log_14f6a210",
-    "agent_name": "Finance Manager Agent",
-    "action": "\u26a1 Message -> CEO Agent",
-    "details": "[FINANCIAL_STATUS_REPORT] {\"bank_balance\": 505200.86, \"total_sales_revenue\": 6000.86, \"net_profit\": 5200.86, \"total_inventory_spend\": 0.0, \"total_salaries_paid\": 800.0, \"total_refunds_deducted\": 0.0, \"reconciliation_status\": \"",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:50:26.039593+00:00"
-  },
-  {
-    "id": "log_0d9c0dd8",
-    "agent_name": "CEO Agent",
-    "action": "CEO Strategic Cycle",
-    "details": "CEO cycle #79: Processed 1 messages. Bank Balance: \u20b9505,200.86. Directives issued: 0.",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:50:24.981395+00:00"
-  },
-  {
-    "id": "log_b7b7200d",
-    "agent_name": "Price Manager Agent",
-    "action": "\u26a1 Message -> CEO Agent",
-    "details": "[PRICING_STATUS_REPORT] {\"total_skus\": 27, \"adjusted_count\": 21, \"adjusted_items\": [\"NOVA ClarityFlow Studio Wired In-Ear Monitors -> \\u20b927.99 (Overstock Promo)\", \"NOVA AeroPods Pro ANC Wireless Earbuds -> \\u20b950.37 (Ov",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:50:21.920545+00:00"
-  },
-  {
-    "id": "log_0f790ee2",
-    "agent_name": "Price Manager Agent",
-    "action": "Dynamic Pricing Calibration",
-    "details": "Audited 27 catalog SKUs. Dynamically adjusted 21 prices. Corrected 0 anomalies.",
-    "affected_items": [
-      "NOVA ClarityFlow Studio Wired In-Ear Monitors -> \u20b927.99 (Overstock Promo)",
-      "NOVA AeroPods Pro ANC Wireless Earbuds -> \u20b950.37 (Overstock Promo)",
-      "NOVA BoomPulse 360 Bluetooth Speaker -> \u20b943.65 (Overstock Promo)",
-      "NOVA StudioMaster Pro Hi-Fi Wired Headphones -> \u20b961.57 (Overstock Promo)",
-      "NOVA SonicFlow ANC Pro Wireless Headphones -> \u20b966.05 (Overstock Promo)",
-      "NOVA VoiceCraft XLR Studio Condenser Wired Mic -> \u20b954.85 (Overstock Promo)",
-      "NOVA StreamAir Dual Wireless Lavalier Mic System -> \u20b958.21 (Overstock Promo)",
-      "NOVA Pulse Ultra Smartwatch -> \u20b972.75 (Overstock Promo)",
-      "NOVA Pulse Slim Smartwatch -> \u20b954.85 (Overstock Promo)",
-      "NOVA Vortex Pro RGB Wired Mechanical Keyboard -> \u20b939.18 (Overstock Promo)",
-      "NOVA AirType Low-Profile Wireless Keyboard -> \u20b947.01 (Overstock Promo)",
-      "NOVA ErgoMaster Silent Wireless Mouse -> \u20b922.38 (Overstock Promo)",
-      "NOVA ViperBlade 26K DPI Gaming Mouse -> \u20b931.34 (Overstock Promo)",
-      "NOVA TitanVolt MagSafe PowerBank 10k -> \u20b927.99 (Overstock Promo)",
-      "NOVA TitanVolt HyperCharge PowerBank 20k -> \u20b939.18 (Overstock Promo)",
-      "NOVA Stealth Commuter Smart Backpack -> \u20b933.58 (Overstock Promo)",
-      "NOVA Stealth Travel Expandable Smart Backpack -> \u20b944.78 (Overstock Promo)",
-      "NOVA PowerStream 100W USB-C Laptop Charger -> \u20b927.99 (Overstock Promo)",
-      "NOVA TurboFlash 30W Mobile Fast Charger -> \u20b916.79 (Overstock Promo)",
-      "NOVA HyperGaN 65W 3-Port Fast Charger -> \u20b924.62 (Overstock Promo)",
-      "NOVA HyperGaN 140W Quad-Port Pro Charger -> \u20b942.53 (Overstock Promo)"
-    ],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:50:21.872893+00:00"
-  },
-  {
-    "id": "log_ba22935f",
-    "agent_name": "CEO Agent",
-    "action": "CEO Strategic Cycle",
-    "details": "CEO cycle #78: Processed 7 messages. Bank Balance: \u20b9505,200.86. Directives issued: 0.",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:50:20.633123+00:00"
-  },
-  {
-    "id": "log_39fbdde4",
-    "agent_name": "Inventory Manager Agent",
-    "action": "Warehouse Audit",
-    "details": "Audited 27 products. Executed 0 approved restocks. Submitted 0 restock requests to CEO.",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:50:20.607429+00:00"
-  },
-  {
-    "id": "log_e9bdf9fc",
-    "agent_name": "Inventory Manager Agent",
-    "action": "\u26a1 Message -> CEO Agent",
-    "details": "[WAREHOUSE_STATUS_REPORT] {\"total_skus\": 27, \"total_units\": 688, \"low_stock_count\": 0, \"low_stock_items\": [], \"restocked_items\": [], \"requests_submitted\": []}",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:50:20.584678+00:00"
-  },
-  {
-    "id": "log_34680913",
-    "agent_name": "Inventory Manager Agent",
-    "action": "\u26a1 Message -> Price Manager Agent",
-    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_027\", \"product_name\": \"NOVA HyperGaN 140W Quad-Port Pro Charger\", \"current_stock\": 29}",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:50:20.538446+00:00"
-  },
-  {
-    "id": "log_9e309d34",
-    "agent_name": "Inventory Manager Agent",
-    "action": "\u26a1 Message -> Price Manager Agent",
-    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_026\", \"product_name\": \"NOVA HyperGaN 65W 3-Port Fast Charger\", \"current_stock\": 29}",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:50:20.494892+00:00"
-  },
-  {
-    "id": "log_9fb47221",
-    "agent_name": "Inventory Manager Agent",
-    "action": "\u26a1 Message -> Price Manager Agent",
-    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_025\", \"product_name\": \"NOVA TurboFlash 30W Mobile Fast Charger\", \"current_stock\": 29}",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:50:20.445047+00:00"
-  },
-  {
-    "id": "log_dbb8e8b8",
-    "agent_name": "Inventory Manager Agent",
-    "action": "\u26a1 Message -> Price Manager Agent",
-    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_024\", \"product_name\": \"NOVA PowerStream 100W USB-C Laptop Charger\", \"current_stock\": 29}",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:50:20.401486+00:00"
-  },
-  {
-    "id": "log_9de07937",
-    "agent_name": "Inventory Manager Agent",
-    "action": "\u26a1 Message -> Price Manager Agent",
-    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_023\", \"product_name\": \"NOVA Stealth Travel Expandable Smart Backpack\", \"current_stock\": 30}",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:50:20.348122+00:00"
-  },
-  {
-    "id": "log_0e3bcd38",
-    "agent_name": "Inventory Manager Agent",
-    "action": "\u26a1 Message -> Price Manager Agent",
-    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_022\", \"product_name\": \"NOVA Stealth Commuter Smart Backpack\", \"current_stock\": 30}",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:50:20.297547+00:00"
-  },
-  {
-    "id": "log_c5b1bacd",
-    "agent_name": "Inventory Manager Agent",
-    "action": "\u26a1 Message -> Price Manager Agent",
-    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_021\", \"product_name\": \"NOVA TitanVolt HyperCharge PowerBank 20k\", \"current_stock\": 30}",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:50:20.252885+00:00"
-  },
-  {
-    "id": "log_7a046444",
-    "agent_name": "Inventory Manager Agent",
-    "action": "\u26a1 Message -> Price Manager Agent",
-    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_020\", \"product_name\": \"NOVA TitanVolt MagSafe PowerBank 10k\", \"current_stock\": 30}",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:50:20.204374+00:00"
-  },
-  {
-    "id": "log_eb7ef709",
-    "agent_name": "Inventory Manager Agent",
-    "action": "\u26a1 Message -> Price Manager Agent",
-    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_019\", \"product_name\": \"NOVA ViperBlade 26K DPI Gaming Mouse\", \"current_stock\": 28}",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:50:20.159399+00:00"
-  },
-  {
-    "id": "log_995ab1b3",
-    "agent_name": "Inventory Manager Agent",
-    "action": "\u26a1 Message -> Price Manager Agent",
-    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_018\", \"product_name\": \"NOVA ErgoMaster Silent Wireless Mouse\", \"current_stock\": 29}",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:50:20.112943+00:00"
-  },
-  {
-    "id": "log_82fd9ec2",
-    "agent_name": "Inventory Manager Agent",
-    "action": "\u26a1 Message -> Price Manager Agent",
-    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_017\", \"product_name\": \"NOVA AirType Low-Profile Wireless Keyboard\", \"current_stock\": 26}",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:50:20.067673+00:00"
-  },
-  {
-    "id": "log_3c3e8aa1",
-    "agent_name": "Inventory Manager Agent",
-    "action": "\u26a1 Message -> Price Manager Agent",
-    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_016\", \"product_name\": \"NOVA Vortex Pro RGB Wired Mechanical Keyboard\", \"current_stock\": 28}",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:50:20.021014+00:00"
-  },
-  {
-    "id": "log_d7416404",
-    "agent_name": "Inventory Manager Agent",
-    "action": "\u26a1 Message -> Price Manager Agent",
-    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_015\", \"product_name\": \"NOVA Pulse Slim Smartwatch\", \"current_stock\": 28}",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:50:19.972369+00:00"
-  },
-  {
-    "id": "log_def93ffb",
-    "agent_name": "Inventory Manager Agent",
-    "action": "\u26a1 Message -> Price Manager Agent",
-    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_014\", \"product_name\": \"NOVA Pulse Ultra Smartwatch\", \"current_stock\": 28}",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:50:19.925743+00:00"
-  },
-  {
-    "id": "log_d487caf7",
-    "agent_name": "Inventory Manager Agent",
-    "action": "\u26a1 Message -> Price Manager Agent",
-    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_013\", \"product_name\": \"NOVA StreamAir Dual Wireless Lavalier Mic System\", \"current_stock\": 29}",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:50:19.879611+00:00"
-  },
-  {
-    "id": "log_640cb37c",
-    "agent_name": "Inventory Manager Agent",
-    "action": "\u26a1 Message -> Price Manager Agent",
-    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_012\", \"product_name\": \"NOVA VoiceCraft XLR Studio Condenser Wired Mic\", \"current_stock\": 30}",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:50:19.828461+00:00"
-  },
-  {
-    "id": "log_0eb96c94",
-    "agent_name": "Inventory Manager Agent",
-    "action": "\u26a1 Message -> Price Manager Agent",
-    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_011\", \"product_name\": \"NOVA SonicFlow ANC Pro Wireless Headphones\", \"current_stock\": 29}",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:50:19.782505+00:00"
-  },
-  {
-    "id": "log_71a4b99b",
-    "agent_name": "Inventory Manager Agent",
-    "action": "\u26a1 Message -> Price Manager Agent",
-    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_010\", \"product_name\": \"NOVA StudioMaster Pro Hi-Fi Wired Headphones\", \"current_stock\": 29}",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:50:19.734406+00:00"
-  },
-  {
-    "id": "log_62b7e0c0",
-    "agent_name": "Inventory Manager Agent",
-    "action": "\u26a1 Message -> Price Manager Agent",
-    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_009\", \"product_name\": \"NOVA BoomPulse 360 Bluetooth Speaker\", \"current_stock\": 30}",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:50:19.686912+00:00"
-  },
-  {
-    "id": "log_84e131d8",
-    "agent_name": "Inventory Manager Agent",
-    "action": "\u26a1 Message -> Price Manager Agent",
-    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_008\", \"product_name\": \"NOVA AeroPods Pro ANC Wireless Earbuds\", \"current_stock\": 30}",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:50:19.640000+00:00"
-  },
-  {
-    "id": "log_fad682a8",
-    "agent_name": "Inventory Manager Agent",
-    "action": "\u26a1 Message -> Price Manager Agent",
-    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_007\", \"product_name\": \"NOVA ClarityFlow Studio Wired In-Ear Monitors\", \"current_stock\": 29}",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:50:19.602620+00:00"
-  },
-  {
-    "id": "log_49058a27",
-    "agent_name": "Dispatcher Agent",
-    "action": "Logistics Dispatch Execution",
-    "details": "Logistics fulfillment processed 0 confirmed orders with express tracking numbers.",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:50:19.550510+00:00"
-  },
-  {
-    "id": "log_1134d2e9",
-    "agent_name": "Dispatcher Agent",
-    "action": "\u26a1 Message -> CEO Agent",
-    "details": "[LOGISTICS_STATUS_REPORT] {\"dispatched_count\": 0, \"dispatched_items\": [], \"queue_empty\": true, \"preferred_carrier\": \"BlueDart Express Logistics\"}",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:50:19.528088+00:00"
-  },
-  {
-    "id": "log_fdd883a5",
+    "id": "log_edc275a9",
     "agent_name": "Review and Feedback Manager",
     "action": "Sentiment & Quality Audit",
     "details": "Audited sentiment across 27 catalog products. Store Average: 4.4\u2605. 0 quality alerts emitted.",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:50:18.463930+00:00"
+    "timestamp": "2026-09-03T22:13:46.811869+00:00"
   },
   {
-    "id": "log_eef63362",
+    "id": "log_bbb269c2",
     "agent_name": "Review and Feedback Manager",
     "action": "\u26a1 Message -> CEO Agent",
-    "details": "[SENTIMENT_STATUS_REPORT] {\"average_rating\": 4.4, \"total_reviews\": 171, \"issue_clusters\": {\"battery_performance\": 26, \"shipping_speed\": 11, \"audio_clarity\": 9, \"build_quality\": 12, \"general_satisfaction\": 113}, \"quality_alerts",
+    "details": "[SENTIMENT_STATUS_REPORT] {\"average_rating\": 4.4, \"total_reviews\": 215, \"issue_clusters\": {\"battery_performance\": 30, \"shipping_speed\": 13, \"audio_clarity\": 11, \"build_quality\": 17, \"general_satisfaction\": 144}, \"quality_alert",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:50:18.439420+00:00"
+    "timestamp": "2026-09-03T22:13:46.786036+00:00"
   },
   {
-    "id": "log_178e7416",
+    "id": "log_5c835d4f",
     "agent_name": "Order Management Agent",
     "action": "Order Pipeline Lifecycle",
-    "details": "Audited 176 orders. Auto-advanced 2 status transitions.",
+    "details": "Audited 221 orders. Auto-advanced 1 status transitions.",
     "affected_items": [
-      "ORD-4854-558D: Dispatched -> Shipped",
-      "ORD-4636-2B95: Shipped -> Delivered"
+      "ORD-1031-7C68: Shipped -> Delivered"
     ],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:50:18.386693+00:00"
+    "timestamp": "2026-09-03T22:13:46.734398+00:00"
   },
   {
-    "id": "log_02f1c22d",
+    "id": "log_088425c3",
     "agent_name": "Order Management Agent",
     "action": "\u26a1 Message -> CEO Agent",
-    "details": "[ORDER_PIPELINE_REPORT] {\"total_orders\": 176, \"status_breakdown\": {\"Dispatched\": 0, \"Shipped\": 4, \"Delivered\": 167, \"Refunded\": 5}, \"auto_advanced\": [\"ORD-4854-558D: Dispatched -> Shipped\", \"ORD-4636-2B95: Shipped -> Deliver",
+    "details": "[ORDER_PIPELINE_REPORT] {\"total_orders\": 221, \"status_breakdown\": {\"Dispatched\": 3, \"Refunded\": 8, \"Shipped\": 4, \"Delivered\": 206}, \"auto_advanced\": [\"ORD-1031-7C68: Shipped -> Delivered\"], \"sla_breaches\": 0}",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:50:18.362766+00:00"
+    "timestamp": "2026-09-03T22:13:46.712866+00:00"
   },
   {
-    "id": "log_cb71ec1d",
+    "id": "log_bfce1ab2",
     "agent_name": "Order Management Agent",
     "action": "\u26a1 Message -> CEO Agent",
-    "details": "[ORDER_STATUS_UPDATED] {\"order_id\": \"ORD-4636-2B95\", \"previous_status\": \"Shipped\", \"new_status\": \"Delivered\", \"reason\": \"Auto-advanced doorstep delivery lifecycle (2m)\"}",
+    "details": "[ORDER_STATUS_UPDATED] {\"order_id\": \"ORD-1031-7C68\", \"previous_status\": \"Shipped\", \"new_status\": \"Delivered\", \"reason\": \"Auto-advanced doorstep delivery lifecycle (2m)\"}",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:50:18.296863+00:00"
+    "timestamp": "2026-09-03T22:13:46.627190+00:00"
   },
   {
-    "id": "log_1f8a8a75",
+    "id": "log_68b14ba4",
     "agent_name": "Order Management Agent",
     "action": "\u26a1 Message -> Review and Feedback Manager",
-    "details": "[ORDER_DELIVERED] {\"order_id\": \"ORD-4636-2B95\", \"customer\": \"Elena Rostova\", \"action_required\": \"Track customer satisfaction and solicit verified review.\"}",
+    "details": "[ORDER_DELIVERED] {\"order_id\": \"ORD-1031-7C68\", \"customer\": \"Alex Chen\", \"action_required\": \"Track customer satisfaction and solicit verified review.\"}",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:50:18.247184+00:00"
+    "timestamp": "2026-09-03T22:13:46.563796+00:00"
   },
   {
-    "id": "log_aa3de21f",
-    "agent_name": "Order Management Agent",
-    "action": "\u26a1 Message -> CEO Agent",
-    "details": "[ORDER_STATUS_UPDATED] {\"order_id\": \"ORD-4854-558D\", \"previous_status\": \"Dispatched\", \"new_status\": \"Shipped\", \"reason\": \"Auto-advanced carrier transit lifecycle (1m)\"}",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:50:18.153654+00:00"
-  },
-  {
-    "id": "log_e26501df",
-    "agent_name": "Order Management Agent",
-    "action": "\u26a1 Message -> Dispatcher Agent",
-    "details": "[ORDER_SHIPPED] {\"order_id\": \"ORD-4854-558D\", \"status\": \"Shipped\", \"tracking_number\": \"TRK-2E5064\"}",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:50:18.108690+00:00"
-  },
-  {
-    "id": "log_4fc25c15",
+    "id": "log_6cc3a085",
     "agent_name": "Price Manager Agent",
     "action": "\u26a1 Message -> CEO Agent",
     "details": "[PRICING_STATUS_REPORT] {\"total_skus\": 27, \"adjusted_count\": 0, \"adjusted_items\": [], \"anomalies_corrected\": 0, \"details\": \"Audited 27 catalog SKUs. Dynamically adjusted 0 prices. Corrected 0 anomalies.\"}",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:50:16.020024+00:00"
+    "timestamp": "2026-09-03T22:13:46.478953+00:00"
   },
   {
-    "id": "log_2e371747",
+    "id": "log_36d91b0b",
     "agent_name": "Price Manager Agent",
     "action": "Dynamic Pricing Calibration",
     "details": "Audited 27 catalog SKUs. Dynamically adjusted 0 prices. Corrected 0 anomalies.",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:50:15.973344+00:00"
+    "timestamp": "2026-09-03T22:13:46.436547+00:00"
   },
   {
-    "id": "log_b72f5fba",
-    "agent_name": "CEO Agent",
-    "action": "CEO Strategic Cycle",
-    "details": "CEO cycle #77: Processed 1 messages. Bank Balance: \u20b9505,200.86. Directives issued: 0.",
+    "id": "log_2b4c100b",
+    "agent_name": "Finance Manager Agent",
+    "action": "Financial Reconciliation",
+    "details": "Audited financial accounts. Bank Balance: \u20b9509,580.85. Processed 0 refunds. Payments reconciled: MATCHED.",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:50:14.916162+00:00"
+    "timestamp": "2026-09-03T22:13:46.410076+00:00"
   },
   {
-    "id": "log_70310f95",
+    "id": "log_1e09a448",
+    "agent_name": "Finance Manager Agent",
+    "action": "\u26a1 Message -> CEO Agent",
+    "details": "[FINANCIAL_STATUS_REPORT] {\"bank_balance\": 509580.85, \"total_sales_revenue\": 10472.1, \"net_profit\": 9580.85, \"total_inventory_spend\": 0.0, \"total_salaries_paid\": 800.0, \"total_refunds_deducted\": 91.25, \"reconciliation_status\":",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:13:46.385284+00:00"
+  },
+  {
+    "id": "log_3442f90a",
     "agent_name": "Dispatcher Agent",
     "action": "Logistics Dispatch Execution",
-    "details": "Logistics fulfillment processed 0 confirmed orders with express tracking numbers.",
-    "affected_items": [],
+    "details": "Logistics fulfillment processed 1 confirmed orders with express tracking numbers.",
+    "affected_items": [
+      "#ORD-1340-0F51 (TRK-37D5E9)"
+    ],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:50:14.891290+00:00"
+    "timestamp": "2026-09-03T22:13:46.317176+00:00"
   },
   {
-    "id": "log_d5540570",
+    "id": "log_9857c583",
     "agent_name": "Dispatcher Agent",
     "action": "\u26a1 Message -> CEO Agent",
-    "details": "[LOGISTICS_STATUS_REPORT] {\"dispatched_count\": 0, \"dispatched_items\": [], \"queue_empty\": true, \"preferred_carrier\": \"BlueDart Express Logistics\"}",
+    "details": "[LOGISTICS_STATUS_REPORT] {\"dispatched_count\": 1, \"dispatched_items\": [\"#ORD-1340-0F51 (TRK-37D5E9)\"], \"queue_empty\": false, \"preferred_carrier\": \"BlueDart Express Logistics\"}",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:50:14.867748+00:00"
+    "timestamp": "2026-09-03T22:13:46.291936+00:00"
   },
   {
-    "id": "log_e7c79625",
+    "id": "log_8efafebc",
+    "agent_name": "Dispatcher Agent",
+    "action": "\u26a1 Message -> CEO Agent",
+    "details": "[DISPATCH_COMPLETED] {\"order_id\": \"ORD-1340-0F51\", \"tracking_number\": \"TRK-37D5E9\", \"carrier\": \"BlueDart Express Logistics\"}",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:13:46.188246+00:00"
+  },
+  {
+    "id": "log_1f0090e6",
+    "agent_name": "Dispatcher Agent",
+    "action": "\u26a1 Message -> Order Management Agent",
+    "details": "[ORDER_DISPATCHED] {\"order_id\": \"ORD-1340-0F51\", \"tracking_number\": \"TRK-37D5E9\", \"carrier\": \"BlueDart Express Logistics\", \"eta\": \"2-3 Business Days\"}",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:13:46.123947+00:00"
+  },
+  {
+    "id": "log_7ecdd9fd",
+    "agent_name": "Dispatcher Agent",
+    "action": "\u26a1 Message -> Order Management Agent",
+    "details": "[ORDER_DISPATCHED] {\"order_id\": \"ORD-1340-0F51\", \"tracking_number\": \"TRK-37D5E9\", \"carrier\": \"BlueDart Express Logistics\", \"eta\": \"2-3 Business Days\", \"details\": \"Parcel handed to BlueDart Express Logistics under tracki",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:13:46.076641+00:00"
+  },
+  {
+    "id": "log_60b8c3b4",
+    "agent_name": "AI Buyer (David Patel)",
+    "action": "Autonomous AP2 Purchase",
+    "details": "\ud83d\udecd\ufe0f AI Buyer David Patel (Audiophile & Gadget Geek) purchased 1x 'NOVA Pulse Slim Smartwatch' for \u20b959.62 via AP2 + Razorpay Gateway (Order #ORD-1340-0F51). Rated 4\u2605.",
+    "affected_items": [
+      "prod_015",
+      "ORD-1340-0F51"
+    ],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:13:45.001685+00:00"
+  },
+  {
+    "id": "log_16b912b9",
+    "agent_name": "Review and Feedback Manager",
+    "action": "\u26a1 Message -> Price Manager Agent",
+    "details": "[REVIEW_SUBMITTED] {\"product_id\": \"prod_015\", \"product_name\": \"NOVA Pulse Slim Smartwatch\", \"rating\": 4, \"review\": \"The NOVA Pulse Slim is a sleek upgrade, perfect for fitness obsessives like me. The AMOLED display i\"}",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:13:44.975389+00:00"
+  },
+  {
+    "id": "log_8bec4fc0",
+    "agent_name": "Finance Manager Agent",
+    "action": "\u26a1 Message -> Order Management Agent",
+    "details": "[PAYMENT_RECEIVED] {\"order_id\": \"ORD-1340-0F51\", \"payment_id\": \"pay_TXj04PwWy7iI5l\", \"amount\": 59.62, \"method\": \"AP2 Agentic Auto-Pay (Razorpay Verified)\"}",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:13:41.198580+00:00"
+  },
+  {
+    "id": "log_338b1d46",
+    "agent_name": "Order Management Agent",
+    "action": "\u26a1 Message -> Finance Manager Agent",
+    "details": "[ORDER_PAYMENT_CAPTURED] {\"order_id\": \"ORD-1340-0F51\", \"total\": 59.62, \"payment_method\": \"Razorpay Gateway (Online)\", \"action_required\": \"Verify settlement and reconcile treasury ledger.\"}",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:13:41.132236+00:00"
+  },
+  {
+    "id": "log_433a8934",
+    "agent_name": "Order Management Agent",
+    "action": "\u26a1 Message -> Dispatcher Agent",
+    "details": "[ORDER_CONFIRMED] {\"order_id\": \"ORD-1340-0F51\", \"total\": 59.62, \"items_summary\": \"NOVA Pulse Slim Smartwatch (x1)\", \"shipping_address\": \"David Patel Residence, Innovation Hub Blvd, Sector 4\", \"action_required\": \"Assign",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:13:41.069835+00:00"
+  },
+  {
+    "id": "log_7909c5fe",
     "agent_name": "CEO Agent",
     "action": "CEO Strategic Cycle",
-    "details": "CEO cycle #76: Processed 6 messages. Bank Balance: \u20b9505,200.86. Directives issued: 0.",
+    "details": "CEO cycle #14: Processed 12 messages. Bank Balance: \u20b9509,521.23. Directives issued: 0.",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:50:01.689022+00:00"
+    "timestamp": "2026-09-03T22:13:25.344670+00:00"
   },
   {
-    "id": "log_94c6d9cf",
-    "agent_name": "Dispatcher Agent",
-    "action": "Logistics Dispatch Execution",
-    "details": "Logistics fulfillment processed 0 confirmed orders with express tracking numbers.",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:50:00.662887+00:00"
-  },
-  {
-    "id": "log_cb5520ad",
-    "agent_name": "Dispatcher Agent",
-    "action": "\u26a1 Message -> CEO Agent",
-    "details": "[LOGISTICS_STATUS_REPORT] {\"dispatched_count\": 0, \"dispatched_items\": [], \"queue_empty\": true, \"preferred_carrier\": \"BlueDart Express Logistics\"}",
-    "affected_items": [],
-    "autonomous": true,
-    "timestamp": "2026-09-03T21:50:00.641768+00:00"
-  },
-  {
-    "id": "log_2910c4bf",
+    "id": "log_fac5db64",
     "agent_name": "Review and Feedback Manager",
     "action": "Sentiment & Quality Audit",
     "details": "Audited sentiment across 27 catalog products. Store Average: 4.4\u2605. 0 quality alerts emitted.",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:49:59.581412+00:00"
+    "timestamp": "2026-09-03T22:13:25.308988+00:00"
   },
   {
-    "id": "log_5a532136",
+    "id": "log_502d995b",
     "agent_name": "Review and Feedback Manager",
     "action": "\u26a1 Message -> CEO Agent",
-    "details": "[SENTIMENT_STATUS_REPORT] {\"average_rating\": 4.4, \"total_reviews\": 171, \"issue_clusters\": {\"battery_performance\": 26, \"shipping_speed\": 11, \"audio_clarity\": 9, \"build_quality\": 12, \"general_satisfaction\": 113}, \"quality_alerts",
+    "details": "[SENTIMENT_STATUS_REPORT] {\"average_rating\": 4.4, \"total_reviews\": 214, \"issue_clusters\": {\"battery_performance\": 30, \"shipping_speed\": 13, \"audio_clarity\": 11, \"build_quality\": 17, \"general_satisfaction\": 143}, \"quality_alert",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:49:59.562143+00:00"
+    "timestamp": "2026-09-03T22:13:25.284312+00:00"
   },
   {
-    "id": "log_0198de21",
+    "id": "log_6a488fbd",
     "agent_name": "Order Management Agent",
     "action": "Order Pipeline Lifecycle",
-    "details": "Audited 176 orders. Auto-advanced 0 status transitions.",
-    "affected_items": [],
+    "details": "Audited 220 orders. Auto-advanced 2 status transitions.",
+    "affected_items": [
+      "ORD-1155-E6D9: Dispatched -> Shipped",
+      "ORD-1006-B1EC: Shipped -> Delivered"
+    ],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:49:59.512938+00:00"
+    "timestamp": "2026-09-03T22:13:25.210826+00:00"
   },
   {
-    "id": "log_ab22d1c1",
+    "id": "log_fa14b4f9",
     "agent_name": "Order Management Agent",
     "action": "\u26a1 Message -> CEO Agent",
-    "details": "[ORDER_PIPELINE_REPORT] {\"total_orders\": 176, \"status_breakdown\": {\"Dispatched\": 1, \"Shipped\": 4, \"Delivered\": 166, \"Refunded\": 5}, \"auto_advanced\": [], \"sla_breaches\": 0}",
+    "details": "[ORDER_PIPELINE_REPORT] {\"total_orders\": 220, \"status_breakdown\": {\"Dispatched\": 2, \"Refunded\": 8, \"Shipped\": 5, \"Delivered\": 205}, \"auto_advanced\": [\"ORD-1155-E6D9: Dispatched -> Shipped\", \"ORD-1006-B1EC: Shipped -> Deliver",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:49:59.492581+00:00"
+    "timestamp": "2026-09-03T22:13:25.187547+00:00"
   },
   {
-    "id": "log_032d282b",
+    "id": "log_aacd6ea9",
+    "agent_name": "Order Management Agent",
+    "action": "\u26a1 Message -> CEO Agent",
+    "details": "[ORDER_STATUS_UPDATED] {\"order_id\": \"ORD-1006-B1EC\", \"previous_status\": \"Shipped\", \"new_status\": \"Delivered\", \"reason\": \"Auto-advanced doorstep delivery lifecycle (2m)\"}",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:13:25.097689+00:00"
+  },
+  {
+    "id": "log_a7d32c36",
+    "agent_name": "Order Management Agent",
+    "action": "\u26a1 Message -> Review and Feedback Manager",
+    "details": "[ORDER_DELIVERED] {\"order_id\": \"ORD-1006-B1EC\", \"customer\": \"Alex Chen\", \"action_required\": \"Track customer satisfaction and solicit verified review.\"}",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:13:25.014117+00:00"
+  },
+  {
+    "id": "log_a7afc9aa",
+    "agent_name": "Order Management Agent",
+    "action": "\u26a1 Message -> CEO Agent",
+    "details": "[ORDER_STATUS_UPDATED] {\"order_id\": \"ORD-1155-E6D9\", \"previous_status\": \"Dispatched\", \"new_status\": \"Shipped\", \"reason\": \"Auto-advanced carrier transit lifecycle (1m)\"}",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:13:24.881587+00:00"
+  },
+  {
+    "id": "log_0c5274e6",
+    "agent_name": "Order Management Agent",
+    "action": "\u26a1 Message -> Dispatcher Agent",
+    "details": "[ORDER_SHIPPED] {\"order_id\": \"ORD-1155-E6D9\", \"status\": \"Shipped\", \"tracking_number\": \"TRK-C3F879\"}",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:13:24.808450+00:00"
+  },
+  {
+    "id": "log_837c5d80",
     "agent_name": "Price Manager Agent",
     "action": "\u26a1 Message -> CEO Agent",
-    "details": "[PRICING_STATUS_REPORT] {\"total_skus\": 27, \"adjusted_count\": 21, \"adjusted_items\": [\"NOVA ClarityFlow Studio Wired In-Ear Monitors -> \\u20b927.99 (Overstock Promo)\", \"NOVA AeroPods Pro ANC Wireless Earbuds -> \\u20b950.37 (Ov",
+    "details": "[PRICING_STATUS_REPORT] {\"total_skus\": 27, \"adjusted_count\": 20, \"adjusted_items\": [\"NOVA ClarityFlow Studio Wired In-Ear Monitors -> \\u20b927.99 (Overstock Promo)\", \"NOVA AeroPods Pro ANC Wireless Earbuds -> \\u20b950.37 (Ov",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:49:59.438162+00:00"
+    "timestamp": "2026-09-03T22:13:24.663348+00:00"
   },
   {
-    "id": "log_7294ed54",
+    "id": "log_c3572ac6",
     "agent_name": "Price Manager Agent",
     "action": "Dynamic Pricing Calibration",
-    "details": "Audited 27 catalog SKUs. Dynamically adjusted 21 prices. Corrected 0 anomalies.",
+    "details": "Audited 27 catalog SKUs. Dynamically adjusted 20 prices. Corrected 0 anomalies.",
     "affected_items": [
       "NOVA ClarityFlow Studio Wired In-Ear Monitors -> \u20b927.99 (Overstock Promo)",
       "NOVA AeroPods Pro ANC Wireless Earbuds -> \u20b950.37 (Overstock Promo)",
@@ -1881,7 +1110,6 @@
       "NOVA Pulse Ultra Smartwatch -> \u20b972.75 (Overstock Promo)",
       "NOVA Pulse Slim Smartwatch -> \u20b954.85 (Overstock Promo)",
       "NOVA Vortex Pro RGB Wired Mechanical Keyboard -> \u20b939.18 (Overstock Promo)",
-      "NOVA AirType Low-Profile Wireless Keyboard -> \u20b947.01 (Overstock Promo)",
       "NOVA ErgoMaster Silent Wireless Mouse -> \u20b922.38 (Overstock Promo)",
       "NOVA ViperBlade 26K DPI Gaming Mouse -> \u20b931.34 (Overstock Promo)",
       "NOVA TitanVolt MagSafe PowerBank 10k -> \u20b927.99 (Overstock Promo)",
@@ -1894,42 +1122,793 @@
       "NOVA HyperGaN 140W Quad-Port Pro Charger -> \u20b942.53 (Overstock Promo)"
     ],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:49:59.394227+00:00"
+    "timestamp": "2026-09-03T22:13:24.591604+00:00"
   },
   {
-    "id": "log_c89d8751",
+    "id": "log_821ba6a2",
     "agent_name": "Finance Manager Agent",
     "action": "Financial Reconciliation",
-    "details": "Audited financial accounts. Bank Balance: \u20b9505,200.86. Processed 0 refunds. Payments reconciled: MATCHED.",
-    "affected_items": [],
+    "details": "Audited financial accounts. Bank Balance: \u20b9509,521.23. Processed 2 refunds. Payments reconciled: MATCHED.",
+    "affected_items": [
+      "ORD-1238-24F9",
+      "ORD-1220-923E"
+    ],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:49:59.152878+00:00"
+    "timestamp": "2026-09-03T22:13:24.210336+00:00"
   },
   {
-    "id": "log_659d7f58",
+    "id": "log_f7f164e2",
     "agent_name": "Finance Manager Agent",
     "action": "\u26a1 Message -> CEO Agent",
-    "details": "[FINANCIAL_STATUS_REPORT] {\"bank_balance\": 505200.86, \"total_sales_revenue\": 6000.86, \"net_profit\": 5200.86, \"total_inventory_spend\": 0.0, \"total_salaries_paid\": 800.0, \"total_refunds_deducted\": 0.0, \"reconciliation_status\": \"",
+    "details": "[FINANCIAL_STATUS_REPORT] {\"bank_balance\": 509521.23, \"total_sales_revenue\": 10412.48, \"net_profit\": 9521.23, \"total_inventory_spend\": 0.0, \"total_salaries_paid\": 800.0, \"total_refunds_deducted\": 91.25, \"reconciliation_status\"",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:49:59.132653+00:00"
+    "timestamp": "2026-09-03T22:13:24.188277+00:00"
   },
   {
-    "id": "log_332da763",
+    "id": "log_e21e852b",
     "agent_name": "Inventory Manager Agent",
     "action": "Warehouse Audit",
     "details": "Audited 27 products. Executed 0 approved restocks. Submitted 0 restock requests to CEO.",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:49:59.083165+00:00"
+    "timestamp": "2026-09-03T22:13:24.093129+00:00"
   },
   {
-    "id": "log_34be2dac",
+    "id": "log_1df295b6",
     "agent_name": "Inventory Manager Agent",
     "action": "\u26a1 Message -> CEO Agent",
-    "details": "[WAREHOUSE_STATUS_REPORT] {\"total_skus\": 27, \"total_units\": 688, \"low_stock_count\": 0, \"low_stock_items\": [], \"restocked_items\": [], \"requests_submitted\": []}",
+    "details": "[WAREHOUSE_STATUS_REPORT] {\"total_skus\": 27, \"total_units\": 642, \"low_stock_count\": 0, \"low_stock_items\": [], \"restocked_items\": [], \"requests_submitted\": []}",
     "affected_items": [],
     "autonomous": true,
-    "timestamp": "2026-09-03T21:49:59.062512+00:00"
+    "timestamp": "2026-09-03T22:13:24.070174+00:00"
+  },
+  {
+    "id": "log_d9d429b4",
+    "agent_name": "Inventory Manager Agent",
+    "action": "\u26a1 Message -> Price Manager Agent",
+    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_027\", \"product_name\": \"NOVA HyperGaN 140W Quad-Port Pro Charger\", \"current_stock\": 29}",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:13:24.010756+00:00"
+  },
+  {
+    "id": "log_0f5aa321",
+    "agent_name": "Inventory Manager Agent",
+    "action": "\u26a1 Message -> Price Manager Agent",
+    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_026\", \"product_name\": \"NOVA HyperGaN 65W 3-Port Fast Charger\", \"current_stock\": 28}",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:13:23.939154+00:00"
+  },
+  {
+    "id": "log_d18427e3",
+    "agent_name": "Inventory Manager Agent",
+    "action": "\u26a1 Message -> Price Manager Agent",
+    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_025\", \"product_name\": \"NOVA TurboFlash 30W Mobile Fast Charger\", \"current_stock\": 29}",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:13:23.875058+00:00"
+  },
+  {
+    "id": "log_5c381536",
+    "agent_name": "Inventory Manager Agent",
+    "action": "\u26a1 Message -> Price Manager Agent",
+    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_024\", \"product_name\": \"NOVA PowerStream 100W USB-C Laptop Charger\", \"current_stock\": 28}",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:13:23.805358+00:00"
+  },
+  {
+    "id": "log_a41a1405",
+    "agent_name": "Inventory Manager Agent",
+    "action": "\u26a1 Message -> Price Manager Agent",
+    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_023\", \"product_name\": \"NOVA Stealth Travel Expandable Smart Backpack\", \"current_stock\": 30}",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:13:23.743671+00:00"
+  },
+  {
+    "id": "log_0d7c026d",
+    "agent_name": "Inventory Manager Agent",
+    "action": "\u26a1 Message -> Price Manager Agent",
+    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_022\", \"product_name\": \"NOVA Stealth Commuter Smart Backpack\", \"current_stock\": 30}",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:13:23.675542+00:00"
+  },
+  {
+    "id": "log_d896905f",
+    "agent_name": "Inventory Manager Agent",
+    "action": "\u26a1 Message -> Price Manager Agent",
+    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_021\", \"product_name\": \"NOVA TitanVolt HyperCharge PowerBank 20k\", \"current_stock\": 30}",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:13:23.607503+00:00"
+  },
+  {
+    "id": "log_283c658c",
+    "agent_name": "Inventory Manager Agent",
+    "action": "\u26a1 Message -> Price Manager Agent",
+    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_020\", \"product_name\": \"NOVA TitanVolt MagSafe PowerBank 10k\", \"current_stock\": 30}",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:13:23.539560+00:00"
+  },
+  {
+    "id": "log_806d11af",
+    "agent_name": "Inventory Manager Agent",
+    "action": "\u26a1 Message -> Price Manager Agent",
+    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_019\", \"product_name\": \"NOVA ViperBlade 26K DPI Gaming Mouse\", \"current_stock\": 27}",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:13:23.467564+00:00"
+  },
+  {
+    "id": "log_6a8ea853",
+    "agent_name": "Inventory Manager Agent",
+    "action": "\u26a1 Message -> Price Manager Agent",
+    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_018\", \"product_name\": \"NOVA ErgoMaster Silent Wireless Mouse\", \"current_stock\": 28}",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:13:23.405699+00:00"
+  },
+  {
+    "id": "log_ac7a4748",
+    "agent_name": "Inventory Manager Agent",
+    "action": "\u26a1 Message -> Price Manager Agent",
+    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_016\", \"product_name\": \"NOVA Vortex Pro RGB Wired Mechanical Keyboard\", \"current_stock\": 28}",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:13:23.343312+00:00"
+  },
+  {
+    "id": "log_ff628076",
+    "agent_name": "Inventory Manager Agent",
+    "action": "\u26a1 Message -> Price Manager Agent",
+    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_015\", \"product_name\": \"NOVA Pulse Slim Smartwatch\", \"current_stock\": 25}",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:13:23.272301+00:00"
+  },
+  {
+    "id": "log_0802dd3c",
+    "agent_name": "Inventory Manager Agent",
+    "action": "\u26a1 Message -> Price Manager Agent",
+    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_014\", \"product_name\": \"NOVA Pulse Ultra Smartwatch\", \"current_stock\": 28}",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:13:23.210217+00:00"
+  },
+  {
+    "id": "log_de56b9ef",
+    "agent_name": "Inventory Manager Agent",
+    "action": "\u26a1 Message -> Price Manager Agent",
+    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_013\", \"product_name\": \"NOVA StreamAir Dual Wireless Lavalier Mic System\", \"current_stock\": 29}",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:13:23.144302+00:00"
+  },
+  {
+    "id": "log_2b75942c",
+    "agent_name": "Inventory Manager Agent",
+    "action": "\u26a1 Message -> Price Manager Agent",
+    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_012\", \"product_name\": \"NOVA VoiceCraft XLR Studio Condenser Wired Mic\", \"current_stock\": 30}",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:13:23.083344+00:00"
+  },
+  {
+    "id": "log_a9553052",
+    "agent_name": "Inventory Manager Agent",
+    "action": "\u26a1 Message -> Price Manager Agent",
+    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_011\", \"product_name\": \"NOVA SonicFlow ANC Pro Wireless Headphones\", \"current_stock\": 29}",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:13:23.014220+00:00"
+  },
+  {
+    "id": "log_c0696fcc",
+    "agent_name": "Inventory Manager Agent",
+    "action": "\u26a1 Message -> Price Manager Agent",
+    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_010\", \"product_name\": \"NOVA StudioMaster Pro Hi-Fi Wired Headphones\", \"current_stock\": 28}",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:13:22.950657+00:00"
+  },
+  {
+    "id": "log_5b344157",
+    "agent_name": "Inventory Manager Agent",
+    "action": "\u26a1 Message -> Price Manager Agent",
+    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_009\", \"product_name\": \"NOVA BoomPulse 360 Bluetooth Speaker\", \"current_stock\": 29}",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:13:22.876762+00:00"
+  },
+  {
+    "id": "log_c8a08546",
+    "agent_name": "Inventory Manager Agent",
+    "action": "\u26a1 Message -> Price Manager Agent",
+    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_008\", \"product_name\": \"NOVA AeroPods Pro ANC Wireless Earbuds\", \"current_stock\": 30}",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:13:22.808001+00:00"
+  },
+  {
+    "id": "log_72bb25c1",
+    "agent_name": "Inventory Manager Agent",
+    "action": "\u26a1 Message -> Price Manager Agent",
+    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_007\", \"product_name\": \"NOVA ClarityFlow Studio Wired In-Ear Monitors\", \"current_stock\": 29}",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:13:22.739996+00:00"
+  },
+  {
+    "id": "log_ec5ad3b3",
+    "agent_name": "Dispatcher Agent",
+    "action": "Logistics Dispatch Execution",
+    "details": "Logistics fulfillment processed 1 confirmed orders with express tracking numbers.",
+    "affected_items": [
+      "#ORD-1317-CEE0 (TRK-2DBE40)"
+    ],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:13:22.679918+00:00"
+  },
+  {
+    "id": "log_bf9b11b2",
+    "agent_name": "Dispatcher Agent",
+    "action": "\u26a1 Message -> CEO Agent",
+    "details": "[LOGISTICS_STATUS_REPORT] {\"dispatched_count\": 1, \"dispatched_items\": [\"#ORD-1317-CEE0 (TRK-2DBE40)\"], \"queue_empty\": false, \"preferred_carrier\": \"BlueDart Express Logistics\"}",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:13:22.654524+00:00"
+  },
+  {
+    "id": "log_7977c60c",
+    "agent_name": "Dispatcher Agent",
+    "action": "\u26a1 Message -> CEO Agent",
+    "details": "[DISPATCH_COMPLETED] {\"order_id\": \"ORD-1317-CEE0\", \"tracking_number\": \"TRK-2DBE40\", \"carrier\": \"BlueDart Express Logistics\"}",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:13:22.587202+00:00"
+  },
+  {
+    "id": "log_6d8a36ab",
+    "agent_name": "Dispatcher Agent",
+    "action": "\u26a1 Message -> Order Management Agent",
+    "details": "[ORDER_DISPATCHED] {\"order_id\": \"ORD-1317-CEE0\", \"tracking_number\": \"TRK-2DBE40\", \"carrier\": \"BlueDart Express Logistics\", \"eta\": \"2-3 Business Days\"}",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:13:22.516592+00:00"
+  },
+  {
+    "id": "log_27d20e91",
+    "agent_name": "Dispatcher Agent",
+    "action": "\u26a1 Message -> Order Management Agent",
+    "details": "[ORDER_DISPATCHED] {\"order_id\": \"ORD-1317-CEE0\", \"tracking_number\": \"TRK-2DBE40\", \"carrier\": \"BlueDart Express Logistics\", \"eta\": \"2-3 Business Days\", \"details\": \"Parcel handed to BlueDart Express Logistics under tracki",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:13:22.451394+00:00"
+  },
+  {
+    "id": "log_504fb700",
+    "agent_name": "AI Buyer (Sophia Miller)",
+    "action": "Autonomous AP2 Purchase",
+    "details": "\ud83d\udecd\ufe0f AI Buyer Sophia Miller (Smart Bargain Hunter) purchased 1x 'NOVA PowerStream 100W USB-C Laptop Charger' for \u20b930.42 via AP2 + Razorpay Gateway (Order #ORD-1317-CEE0). Rated 4\u2605.",
+    "affected_items": [
+      "prod_024",
+      "ORD-1317-CEE0"
+    ],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:13:21.336717+00:00"
+  },
+  {
+    "id": "log_1e093097",
+    "agent_name": "Review and Feedback Manager",
+    "action": "\u26a1 Message -> Price Manager Agent",
+    "details": "[REVIEW_SUBMITTED] {\"product_id\": \"prod_024\", \"product_name\": \"NOVA PowerStream 100W USB-C Laptop Charger\", \"rating\": 4, \"review\": \"This NOVA PowerStream 100W charger is a steal at \\u20b930.42! The 2-meter cable and 100",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:13:21.311486+00:00"
+  },
+  {
+    "id": "log_096288ad",
+    "agent_name": "Finance Manager Agent",
+    "action": "\u26a1 Message -> Order Management Agent",
+    "details": "[PAYMENT_RECEIVED] {\"order_id\": \"ORD-1317-CEE0\", \"payment_id\": \"pay_TXizdeJKWLvYIv\", \"amount\": 30.42, \"method\": \"AP2 Agentic Auto-Pay (Razorpay Verified)\"}",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:13:17.386245+00:00"
+  },
+  {
+    "id": "log_2159fb56",
+    "agent_name": "Order Management Agent",
+    "action": "\u26a1 Message -> Finance Manager Agent",
+    "details": "[ORDER_PAYMENT_CAPTURED] {\"order_id\": \"ORD-1317-CEE0\", \"total\": 30.42, \"payment_method\": \"Razorpay Gateway (Online)\", \"action_required\": \"Verify settlement and reconcile treasury ledger.\"}",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:13:17.268883+00:00"
+  },
+  {
+    "id": "log_6b6a75ae",
+    "agent_name": "Order Management Agent",
+    "action": "\u26a1 Message -> Dispatcher Agent",
+    "details": "[ORDER_CONFIRMED] {\"order_id\": \"ORD-1317-CEE0\", \"total\": 30.42, \"items_summary\": \"NOVA PowerStream 100W USB-C Laptop Charger (x1)\", \"shipping_address\": \"Sophia Miller Residence, Innovation Hub Blvd, Sector 4\", \"action_",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:13:17.208186+00:00"
+  },
+  {
+    "id": "log_44509ccc",
+    "agent_name": "Finance Manager Agent",
+    "action": "Refund Completed",
+    "details": "Processed \u20b926.76 refund for #ORD-1220-923E. Treasury updated.",
+    "affected_items": [
+      "ORD-1220-923E"
+    ],
+    "autonomous": false,
+    "timestamp": "2026-09-03T22:12:59.710003+00:00"
+  },
+  {
+    "id": "log_74df8777",
+    "agent_name": "Finance Manager Agent",
+    "action": "\u26a1 Message -> CEO Agent",
+    "details": "[REFUND_COMPLETED] {\"order_id\": \"ORD-1220-923E\", \"amount\": 26.76, \"reason\": \"Buyer Sophia Miller testing 24-hour return policy (Smart Bargain Hunter)\"}",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:12:59.685515+00:00"
+  },
+  {
+    "id": "log_97164b7c",
+    "agent_name": "Order Management Agent",
+    "action": "\u26a1 Message -> Finance Manager Agent",
+    "details": "[REFUND_REQUEST] {\"order_id\": \"ORD-1220-923E\", \"reason\": \"Refund of \\u20b926.76 processed by Finance Manager.\", \"total\": 26.76, \"action_required\": \"Evaluate 24h non-shipped refund policy and disburse funds.\"}",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:12:59.623507+00:00"
+  },
+  {
+    "id": "log_b0e2d978",
+    "agent_name": "Dispatcher Agent",
+    "action": "Logistics Dispatch Execution",
+    "details": "Logistics fulfillment processed 0 confirmed orders with express tracking numbers.",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:12:59.485559+00:00"
+  },
+  {
+    "id": "log_e1865e8e",
+    "agent_name": "Dispatcher Agent",
+    "action": "\u26a1 Message -> CEO Agent",
+    "details": "[LOGISTICS_STATUS_REPORT] {\"dispatched_count\": 0, \"dispatched_items\": [], \"queue_empty\": true, \"preferred_carrier\": \"BlueDart Express Logistics\"}",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:12:59.458290+00:00"
+  },
+  {
+    "id": "log_8a4036ef",
+    "agent_name": "Finance Manager Agent",
+    "action": "Refund Completed",
+    "details": "Processed \u20b930.42 refund for #ORD-1238-24F9. Treasury updated.",
+    "affected_items": [
+      "ORD-1238-24F9"
+    ],
+    "autonomous": false,
+    "timestamp": "2026-09-03T22:12:58.260237+00:00"
+  },
+  {
+    "id": "log_78c03a4f",
+    "agent_name": "Finance Manager Agent",
+    "action": "\u26a1 Message -> CEO Agent",
+    "details": "[REFUND_COMPLETED] {\"order_id\": \"ORD-1238-24F9\", \"amount\": 30.42, \"reason\": \"Buyer Sophia Miller testing 24-hour return policy (Smart Bargain Hunter)\"}",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:12:58.227728+00:00"
+  },
+  {
+    "id": "log_906cad39",
+    "agent_name": "Order Management Agent",
+    "action": "\u26a1 Message -> Finance Manager Agent",
+    "details": "[REFUND_REQUEST] {\"order_id\": \"ORD-1238-24F9\", \"reason\": \"Refund of \\u20b930.42 processed by Finance Manager.\", \"total\": 30.42, \"action_required\": \"Evaluate 24h non-shipped refund policy and disburse funds.\"}",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:12:58.168259+00:00"
+  },
+  {
+    "id": "log_0eb410b6",
+    "agent_name": "CEO Agent",
+    "action": "CEO Strategic Cycle",
+    "details": "CEO cycle #13: Processed 11 messages. Bank Balance: \u20b9509,547.99. Directives issued: 0.",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:12:58.037905+00:00"
+  },
+  {
+    "id": "log_9de5963f",
+    "agent_name": "Review and Feedback Manager",
+    "action": "Sentiment & Quality Audit",
+    "details": "Audited sentiment across 27 catalog products. Store Average: 4.4\u2605. 0 quality alerts emitted.",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:12:58.004364+00:00"
+  },
+  {
+    "id": "log_2383f614",
+    "agent_name": "Review and Feedback Manager",
+    "action": "\u26a1 Message -> CEO Agent",
+    "details": "[SENTIMENT_STATUS_REPORT] {\"average_rating\": 4.4, \"total_reviews\": 213, \"issue_clusters\": {\"battery_performance\": 30, \"shipping_speed\": 13, \"audio_clarity\": 11, \"build_quality\": 17, \"general_satisfaction\": 142}, \"quality_alert",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:12:57.977656+00:00"
+  },
+  {
+    "id": "log_7fb31f4a",
+    "agent_name": "Order Management Agent",
+    "action": "Order Pipeline Lifecycle",
+    "details": "Audited 219 orders. Auto-advanced 3 status transitions.",
+    "affected_items": [
+      "ORD-1136-F4E8: Dispatched -> Shipped",
+      "ORD-0949-A528: Shipped -> Delivered",
+      "ORD-0925-5D2F: Shipped -> Delivered"
+    ],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:12:57.907988+00:00"
+  },
+  {
+    "id": "log_d26f6f62",
+    "agent_name": "Order Management Agent",
+    "action": "\u26a1 Message -> CEO Agent",
+    "details": "[ORDER_PIPELINE_REPORT] {\"total_orders\": 219, \"status_breakdown\": {\"Dispatched\": 4, \"Shipped\": 5, \"Delivered\": 204, \"Refunded\": 6}, \"auto_advanced\": [\"ORD-1136-F4E8: Dispatched -> Shipped\", \"ORD-0949-A528: Shipped -> Deliver",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:12:57.879422+00:00"
+  },
+  {
+    "id": "log_2a067699",
+    "agent_name": "Order Management Agent",
+    "action": "\u26a1 Message -> CEO Agent",
+    "details": "[ORDER_STATUS_UPDATED] {\"order_id\": \"ORD-0925-5D2F\", \"previous_status\": \"Shipped\", \"new_status\": \"Delivered\", \"reason\": \"Auto-advanced doorstep delivery lifecycle (2m)\"}",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:12:57.783691+00:00"
+  },
+  {
+    "id": "log_46080dc8",
+    "agent_name": "Order Management Agent",
+    "action": "\u26a1 Message -> Review and Feedback Manager",
+    "details": "[ORDER_DELIVERED] {\"order_id\": \"ORD-0925-5D2F\", \"customer\": \"Alex Chen\", \"action_required\": \"Track customer satisfaction and solicit verified review.\"}",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:12:57.714110+00:00"
+  },
+  {
+    "id": "log_30ace371",
+    "agent_name": "Order Management Agent",
+    "action": "\u26a1 Message -> CEO Agent",
+    "details": "[ORDER_STATUS_UPDATED] {\"order_id\": \"ORD-0949-A528\", \"previous_status\": \"Shipped\", \"new_status\": \"Delivered\", \"reason\": \"Auto-advanced doorstep delivery lifecycle (2m)\"}",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:12:57.575199+00:00"
+  },
+  {
+    "id": "log_34b0edda",
+    "agent_name": "Order Management Agent",
+    "action": "\u26a1 Message -> Review and Feedback Manager",
+    "details": "[ORDER_DELIVERED] {\"order_id\": \"ORD-0949-A528\", \"customer\": \"Alex Chen\", \"action_required\": \"Track customer satisfaction and solicit verified review.\"}",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:12:57.504216+00:00"
+  },
+  {
+    "id": "log_c175885c",
+    "agent_name": "Order Management Agent",
+    "action": "\u26a1 Message -> CEO Agent",
+    "details": "[ORDER_STATUS_UPDATED] {\"order_id\": \"ORD-1136-F4E8\", \"previous_status\": \"Dispatched\", \"new_status\": \"Shipped\", \"reason\": \"Auto-advanced carrier transit lifecycle (1m)\"}",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:12:57.364969+00:00"
+  },
+  {
+    "id": "log_443241e7",
+    "agent_name": "Order Management Agent",
+    "action": "\u26a1 Message -> Dispatcher Agent",
+    "details": "[ORDER_SHIPPED] {\"order_id\": \"ORD-1136-F4E8\", \"status\": \"Shipped\", \"tracking_number\": \"TRK-11FD10\"}",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:12:57.288395+00:00"
+  },
+  {
+    "id": "log_9e20243b",
+    "agent_name": "Price Manager Agent",
+    "action": "\u26a1 Message -> CEO Agent",
+    "details": "[PRICING_STATUS_REPORT] {\"total_skus\": 27, \"adjusted_count\": 20, \"adjusted_items\": [\"NOVA ClarityFlow Studio Wired In-Ear Monitors -> \\u20b927.99 (Overstock Promo)\", \"NOVA AeroPods Pro ANC Wireless Earbuds -> \\u20b950.37 (Ov",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:12:57.169452+00:00"
+  },
+  {
+    "id": "log_2d914c51",
+    "agent_name": "Price Manager Agent",
+    "action": "Dynamic Pricing Calibration",
+    "details": "Audited 27 catalog SKUs. Dynamically adjusted 20 prices. Corrected 0 anomalies.",
+    "affected_items": [
+      "NOVA ClarityFlow Studio Wired In-Ear Monitors -> \u20b927.99 (Overstock Promo)",
+      "NOVA AeroPods Pro ANC Wireless Earbuds -> \u20b950.37 (Overstock Promo)",
+      "NOVA BoomPulse 360 Bluetooth Speaker -> \u20b943.65 (Overstock Promo)",
+      "NOVA StudioMaster Pro Hi-Fi Wired Headphones -> \u20b961.57 (Overstock Promo)",
+      "NOVA SonicFlow ANC Pro Wireless Headphones -> \u20b966.05 (Overstock Promo)",
+      "NOVA VoiceCraft XLR Studio Condenser Wired Mic -> \u20b954.85 (Overstock Promo)",
+      "NOVA StreamAir Dual Wireless Lavalier Mic System -> \u20b958.21 (Overstock Promo)",
+      "NOVA Pulse Ultra Smartwatch -> \u20b972.75 (Overstock Promo)",
+      "NOVA Pulse Slim Smartwatch -> \u20b954.85 (Overstock Promo)",
+      "NOVA Vortex Pro RGB Wired Mechanical Keyboard -> \u20b939.18 (Overstock Promo)",
+      "NOVA ErgoMaster Silent Wireless Mouse -> \u20b922.38 (Overstock Promo)",
+      "NOVA ViperBlade 26K DPI Gaming Mouse -> \u20b931.34 (Overstock Promo)",
+      "NOVA TitanVolt MagSafe PowerBank 10k -> \u20b927.99 (Overstock Promo)",
+      "NOVA TitanVolt HyperCharge PowerBank 20k -> \u20b939.18 (Overstock Promo)",
+      "NOVA Stealth Commuter Smart Backpack -> \u20b933.58 (Overstock Promo)",
+      "NOVA Stealth Travel Expandable Smart Backpack -> \u20b944.78 (Overstock Promo)",
+      "NOVA PowerStream 100W USB-C Laptop Charger -> \u20b927.99 (Overstock Promo)",
+      "NOVA TurboFlash 30W Mobile Fast Charger -> \u20b916.79 (Overstock Promo)",
+      "NOVA HyperGaN 65W 3-Port Fast Charger -> \u20b924.62 (Overstock Promo)",
+      "NOVA HyperGaN 140W Quad-Port Pro Charger -> \u20b942.53 (Overstock Promo)"
+    ],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:12:57.106185+00:00"
+  },
+  {
+    "id": "log_cc641dba",
+    "agent_name": "Finance Manager Agent",
+    "action": "Financial Reconciliation",
+    "details": "Audited financial accounts. Bank Balance: \u20b9509,547.99. Processed 0 refunds. Payments reconciled: MATCHED.",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:12:56.730559+00:00"
+  },
+  {
+    "id": "log_00bd0d6c",
+    "agent_name": "Finance Manager Agent",
+    "action": "\u26a1 Message -> CEO Agent",
+    "details": "[FINANCIAL_STATUS_REPORT] {\"bank_balance\": 509547.99, \"total_sales_revenue\": 10382.06, \"net_profit\": 9547.99, \"total_inventory_spend\": 0.0, \"total_salaries_paid\": 800.0, \"total_refunds_deducted\": 34.07, \"reconciliation_status\"",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:12:56.704538+00:00"
+  },
+  {
+    "id": "log_d05ca276",
+    "agent_name": "Inventory Manager Agent",
+    "action": "Warehouse Audit",
+    "details": "Audited 27 products. Executed 0 approved restocks. Submitted 0 restock requests to CEO.",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:12:56.606285+00:00"
+  },
+  {
+    "id": "log_550d0096",
+    "agent_name": "Inventory Manager Agent",
+    "action": "\u26a1 Message -> CEO Agent",
+    "details": "[WAREHOUSE_STATUS_REPORT] {\"total_skus\": 27, \"total_units\": 641, \"low_stock_count\": 0, \"low_stock_items\": [], \"restocked_items\": [], \"requests_submitted\": []}",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:12:56.581081+00:00"
+  },
+  {
+    "id": "log_cdc85a3a",
+    "agent_name": "Inventory Manager Agent",
+    "action": "\u26a1 Message -> Price Manager Agent",
+    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_027\", \"product_name\": \"NOVA HyperGaN 140W Quad-Port Pro Charger\", \"current_stock\": 29}",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:12:56.509061+00:00"
+  },
+  {
+    "id": "log_c03804a9",
+    "agent_name": "Inventory Manager Agent",
+    "action": "\u26a1 Message -> Price Manager Agent",
+    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_026\", \"product_name\": \"NOVA HyperGaN 65W 3-Port Fast Charger\", \"current_stock\": 27}",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:12:56.442877+00:00"
+  },
+  {
+    "id": "log_9a23e120",
+    "agent_name": "Inventory Manager Agent",
+    "action": "\u26a1 Message -> Price Manager Agent",
+    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_025\", \"product_name\": \"NOVA TurboFlash 30W Mobile Fast Charger\", \"current_stock\": 29}",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:12:56.364115+00:00"
+  },
+  {
+    "id": "log_1573dbbd",
+    "agent_name": "Inventory Manager Agent",
+    "action": "\u26a1 Message -> Price Manager Agent",
+    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_024\", \"product_name\": \"NOVA PowerStream 100W USB-C Laptop Charger\", \"current_stock\": 28}",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:12:56.291849+00:00"
+  },
+  {
+    "id": "log_c1ed37c0",
+    "agent_name": "Inventory Manager Agent",
+    "action": "\u26a1 Message -> Price Manager Agent",
+    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_023\", \"product_name\": \"NOVA Stealth Travel Expandable Smart Backpack\", \"current_stock\": 30}",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:12:56.223114+00:00"
+  },
+  {
+    "id": "log_f4913ca0",
+    "agent_name": "Inventory Manager Agent",
+    "action": "\u26a1 Message -> Price Manager Agent",
+    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_022\", \"product_name\": \"NOVA Stealth Commuter Smart Backpack\", \"current_stock\": 30}",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:12:56.152883+00:00"
+  },
+  {
+    "id": "log_d138d306",
+    "agent_name": "Inventory Manager Agent",
+    "action": "\u26a1 Message -> Price Manager Agent",
+    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_021\", \"product_name\": \"NOVA TitanVolt HyperCharge PowerBank 20k\", \"current_stock\": 30}",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:12:56.082735+00:00"
+  },
+  {
+    "id": "log_104880cc",
+    "agent_name": "Inventory Manager Agent",
+    "action": "\u26a1 Message -> Price Manager Agent",
+    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_020\", \"product_name\": \"NOVA TitanVolt MagSafe PowerBank 10k\", \"current_stock\": 30}",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:12:56.010823+00:00"
+  },
+  {
+    "id": "log_9bfdc635",
+    "agent_name": "Inventory Manager Agent",
+    "action": "\u26a1 Message -> Price Manager Agent",
+    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_019\", \"product_name\": \"NOVA ViperBlade 26K DPI Gaming Mouse\", \"current_stock\": 27}",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:12:55.938269+00:00"
+  },
+  {
+    "id": "log_43682034",
+    "agent_name": "Inventory Manager Agent",
+    "action": "\u26a1 Message -> Price Manager Agent",
+    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_018\", \"product_name\": \"NOVA ErgoMaster Silent Wireless Mouse\", \"current_stock\": 28}",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:12:55.880125+00:00"
+  },
+  {
+    "id": "log_dd5d782b",
+    "agent_name": "Inventory Manager Agent",
+    "action": "\u26a1 Message -> Price Manager Agent",
+    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_016\", \"product_name\": \"NOVA Vortex Pro RGB Wired Mechanical Keyboard\", \"current_stock\": 28}",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:12:55.818077+00:00"
+  },
+  {
+    "id": "log_bc76eca8",
+    "agent_name": "Inventory Manager Agent",
+    "action": "\u26a1 Message -> Price Manager Agent",
+    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_015\", \"product_name\": \"NOVA Pulse Slim Smartwatch\", \"current_stock\": 25}",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:12:55.750206+00:00"
+  },
+  {
+    "id": "log_70df2fb9",
+    "agent_name": "Inventory Manager Agent",
+    "action": "\u26a1 Message -> Price Manager Agent",
+    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_014\", \"product_name\": \"NOVA Pulse Ultra Smartwatch\", \"current_stock\": 28}",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:12:55.676945+00:00"
+  },
+  {
+    "id": "log_60afa0a1",
+    "agent_name": "Inventory Manager Agent",
+    "action": "\u26a1 Message -> Price Manager Agent",
+    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_013\", \"product_name\": \"NOVA StreamAir Dual Wireless Lavalier Mic System\", \"current_stock\": 29}",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:12:55.607952+00:00"
+  },
+  {
+    "id": "log_ea36f4ca",
+    "agent_name": "Inventory Manager Agent",
+    "action": "\u26a1 Message -> Price Manager Agent",
+    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_012\", \"product_name\": \"NOVA VoiceCraft XLR Studio Condenser Wired Mic\", \"current_stock\": 30}",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:12:55.542013+00:00"
+  },
+  {
+    "id": "log_041d1e19",
+    "agent_name": "Inventory Manager Agent",
+    "action": "\u26a1 Message -> Price Manager Agent",
+    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_011\", \"product_name\": \"NOVA SonicFlow ANC Pro Wireless Headphones\", \"current_stock\": 29}",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:12:55.477472+00:00"
+  },
+  {
+    "id": "log_d99e253d",
+    "agent_name": "Inventory Manager Agent",
+    "action": "\u26a1 Message -> Price Manager Agent",
+    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_010\", \"product_name\": \"NOVA StudioMaster Pro Hi-Fi Wired Headphones\", \"current_stock\": 28}",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:12:55.401595+00:00"
+  },
+  {
+    "id": "log_73d76e26",
+    "agent_name": "Inventory Manager Agent",
+    "action": "\u26a1 Message -> Price Manager Agent",
+    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_009\", \"product_name\": \"NOVA BoomPulse 360 Bluetooth Speaker\", \"current_stock\": 29}",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:12:55.321793+00:00"
+  },
+  {
+    "id": "log_d7cb3a45",
+    "agent_name": "Inventory Manager Agent",
+    "action": "\u26a1 Message -> Price Manager Agent",
+    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_008\", \"product_name\": \"NOVA AeroPods Pro ANC Wireless Earbuds\", \"current_stock\": 30}",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:12:55.248694+00:00"
+  },
+  {
+    "id": "log_4f1b3a79",
+    "agent_name": "Inventory Manager Agent",
+    "action": "\u26a1 Message -> Price Manager Agent",
+    "details": "[OVERSTOCK_PROMOTION_RECOMMENDED] {\"product_id\": \"prod_007\", \"product_name\": \"NOVA ClarityFlow Studio Wired In-Ear Monitors\", \"current_stock\": 29}",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:12:55.170121+00:00"
+  },
+  {
+    "id": "log_340c0df6",
+    "agent_name": "Dispatcher Agent",
+    "action": "Logistics Dispatch Execution",
+    "details": "Logistics fulfillment processed 2 confirmed orders with express tracking numbers.",
+    "affected_items": [
+      "#ORD-1254-5383 (TRK-D8FEB6)",
+      "#ORD-1238-24F9 (TRK-FF99A5)"
+    ],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:12:55.103909+00:00"
+  },
+  {
+    "id": "log_453cfe0d",
+    "agent_name": "Dispatcher Agent",
+    "action": "\u26a1 Message -> CEO Agent",
+    "details": "[LOGISTICS_STATUS_REPORT] {\"dispatched_count\": 2, \"dispatched_items\": [\"#ORD-1254-5383 (TRK-D8FEB6)\", \"#ORD-1238-24F9 (TRK-FF99A5)\"], \"queue_empty\": false, \"preferred_carrier\": \"BlueDart Express Logistics\"}",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:12:55.077219+00:00"
+  },
+  {
+    "id": "log_e0a6418b",
+    "agent_name": "Dispatcher Agent",
+    "action": "\u26a1 Message -> CEO Agent",
+    "details": "[DISPATCH_COMPLETED] {\"order_id\": \"ORD-1238-24F9\", \"tracking_number\": \"TRK-FF99A5\", \"carrier\": \"BlueDart Express Logistics\"}",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:12:55.008984+00:00"
+  },
+  {
+    "id": "log_c4156278",
+    "agent_name": "Dispatcher Agent",
+    "action": "\u26a1 Message -> Order Management Agent",
+    "details": "[ORDER_DISPATCHED] {\"order_id\": \"ORD-1238-24F9\", \"tracking_number\": \"TRK-FF99A5\", \"carrier\": \"BlueDart Express Logistics\", \"eta\": \"2-3 Business Days\"}",
+    "affected_items": [],
+    "autonomous": true,
+    "timestamp": "2026-09-03T22:12:54.936155+00:00"
   }
-]
+]                                                                           

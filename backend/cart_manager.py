@@ -176,12 +176,20 @@ class CartManager:
         target_prod = None
 
         for idx, item in enumerate(cart):
+            item_id = str(item.get("id", "")).lower().strip()
+            if item_id == ident_clean:
+                target_item_idx = idx
+                target_prod = inventory_manager.get_product_by_id(item["id"]) or {
+                    "id": item["id"],
+                    "PRODUCT_NAME": item.get("name", item.get("id", "Item"))
+                }
+                break
             prod = inventory_manager.get_product_by_id(item["id"])
-            if prod:
-                if prod["id"].lower() == ident_clean or ident_clean in prod["PRODUCT_NAME"].lower():
-                    target_item_idx = idx
-                    target_prod = prod
-                    break
+            if prod and (prod["id"].lower() == ident_clean or ident_clean in prod["PRODUCT_NAME"].lower()):
+                target_item_idx = idx
+                target_prod = prod
+                break
+
 
         if target_item_idx is None:
             return {"success": False, "error": f"Item '{product_identifier}' was not found in your cart."}

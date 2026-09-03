@@ -128,9 +128,10 @@ function MainApp() {
 
       {/* View 2: Store Owner Command Studio */}
       {currentView === 'admin' && (
-        <div className="admin-layout" style={{ background: '#fbfbfb' }}>
+        <div className="admin-layout">
           <AdminSidebar onOpenStorefront={() => setCurrentView('store')} />
-          <section className="admin-main-view" style={{ color: '#111' }}>
+          <section className="admin-main-view">
+
             {activeTab === 'overview' && <OverviewTab />}
             {activeTab === 'campaigns' && <CampaignsTab />}
             {activeTab === 'audit' && <AuditTrailTab />}

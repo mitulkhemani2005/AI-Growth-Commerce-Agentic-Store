@@ -5,18 +5,7 @@
     "email": "alex.rivera@growthcommerce.ai",
     "shipping_address": "742 Evergreen Terrace, San Francisco, CA 94107",
     "auto_pay_enabled": true,
-    "cart": [
-      {
-        "id": "prod_007",
-        "quantity": 1,
-        "size": "3.5mm Gold Jack"
-      },
-      {
-        "id": "prod_001",
-        "quantity": 1,
-        "size": "12GB RAM / 256GB"
-      }
-    ],
+    "cart": [],
     "payment_details": {
       "card_holder_name": "Alex Rivera",
       "card_number_masked": "1111 1111 1111 1111",
@@ -137,13 +126,7 @@
     "email": "buyer_elena@growthcommerce.ai",
     "shipping_address": "Elena Rostova Residence, Innovation Hub Blvd, Sector 4",
     "auto_pay_enabled": true,
-    "cart": [
-      {
-        "id": "prod_001",
-        "quantity": 1,
-        "size": "12GB RAM / 256GB"
-      }
-    ],
+    "cart": [],
     "payment_details": {
       "card_holder_name": "Elena Rostova",
       "card_number_masked": "4242 \u2022\u2022\u2022\u2022 \u2022\u2022\u2022\u2022 4242",
