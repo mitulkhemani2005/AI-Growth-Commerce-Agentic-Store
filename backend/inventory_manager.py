@@ -280,6 +280,10 @@ class InventoryManager:
                 "product": target
             }
 
+    def update_product_price(self, product_id: str, new_price: float) -> Dict[str, Any]:
+        """Convenience alias for update_price."""
+        return self.update_price(product_id, new_price)
+
     def update_price(self, product_id: str, new_price: float, base_price: Optional[float] = None, enforce_base_price: bool = True) -> Dict[str, Any]:
         """Directly sets PRICE for a product, ensuring it meets or exceeds BASE_PRICE floor if enforced."""
         with _lock:

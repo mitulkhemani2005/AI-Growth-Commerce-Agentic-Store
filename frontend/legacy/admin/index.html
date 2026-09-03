@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>👑 Store Owner Command Center | 24/7 AI Autonomous Admin</title>
+  
+  <!-- Modern Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <!-- Admin Styles -->
+  <link rel="stylesheet" href="/frontend/admin/css/admin.css?v=3.0">
+</head>
+<body class="admin-body">
+  
+  <!-- App Container -->
+  <div class="admin-container">
+    
+    <!-- Sidebar Navigation -->
+    <aside class="admin-sidebar">
+      <div class="sidebar-header">
+        <div class="logo-badge">
+          <i data-lucide="crown" class="crown-icon"></i>
+        </div>
+        <div class="logo-text">
+          <h2>COMMAND CENTER</h2>
+          <span>24/7 Autonomous Store</span>
+        </div>
+      </div>
+
+      <div class="live-fleet-indicator">
+        <span class="pulsing-dot"></span>
+        <div class="fleet-text">
+          <strong>7 AI AGENTS ACTIVE</strong>
+          <span>24/7 Collaborative Multi-Agent Mesh</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <button class="nav-item active" data-tab="overview">
+          <i data-lucide="layout-dashboard"></i>
+          <span>Overview</span>
+        </button>
+        <button class="nav-item highlight-treasury" data-tab="treasury">
+          <i data-lucide="wallet"></i>
+          <span>CEO Treasury & Salaries</span>
+          <span class="badge emerald" id="treasuryBadge">₹500K</span>
+        </button>
+        <button class="nav-item highlight-buyers" data-tab="buyers">
+          <i data-lucide="users"></i>
+          <span>5 AI Shoppers Fleet</span>
+          <span class="badge purple" id="buyersBadge">5 Active</span>
+        </button>
+        <button class="nav-item" data-tab="agents">
+          <i data-lucide="bot"></i>
+          <span>24/7 Agent Fleet</span>
+          <span class="badge green" id="agentCountBadge">7 Active</span>
+        </button>
+        <button class="nav-item" data-tab="orders">
+          <i data-lucide="shopping-cart"></i>
+          <span>Orders & Dispatch</span>
+          <span class="badge blue" id="ordersCountBadge">0</span>
+        </button>
+        <button class="nav-item" data-tab="inventory">
+          <i data-lucide="package"></i>
+          <span>Inventory & Pricing</span>
+        </button>
+        <button class="nav-item" data-tab="refunds">
+          <i data-lucide="rotate-ccw"></i>
+          <span>Refunds & 24h Policy</span>
+        </button>
+        <button class="nav-item" data-tab="reviews">
+          <i data-lucide="star"></i>
+          <span>AI Reviews & Feedback</span>
+        </button>
+        <button class="nav-item highlight" data-tab="chat">
+          <i data-lucide="sparkles"></i>
+          <span>CEO Command Chat</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer" style="display: flex; flex-direction: column; gap: 8px;">
+        <a href="/office" target="_blank" class="storefront-link" style="background: rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.4); color: #c084fc;">
+          <i data-lucide="building-2"></i>
+          <span>🏢 Open Agents Office</span>
+        </a>
+        <a href="/" target="_blank" class="storefront-link">
+          <i data-lucide="external-link"></i>
+          <span>Open Live Storefront</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="admin-main">
+      
+      <!-- Top Header Bar -->
+      <header class="admin-header">
+        <div class="header-left">
+          <h1 id="pageTitle">Store Overview</h1>
+          <p id="pageSubtitle">Real-time telemetry, automated agent actions, treasury P&L, and 5 AI buyers (INR ₹, 0% Tax)</p>
+        </div>
+        <div class="header-right">
+          <a href="/office" target="_blank" class="action-btn-sm" style="background: rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.4); color: #c084fc; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 6px;" title="Open AgentsOffice Pixel RPG Live Simulation">
+            <i data-lucide="building-2" style="width: 14px; height: 14px;"></i>
+            <span>🏢 Agents Office</span>
+          </a>
+          <button class="action-btn-sm warning" id="resetStoreBtn" title="Reset all inventory to 0 stock and reset CEO Bank Balance" onclick="openResetStoreConfirm()">
+            <i data-lucide="rotate-cw"></i>
+            <span>Reset 0-Stock State</span>
+          </button>
+          <button class="refresh-btn" id="refreshDataBtn" title="Sync Live Data">
+            <i data-lucide="refresh-cw"></i>
+            <span>Live Sync</span>
+          </button>
+          <div class="server-status-badge">
+            <span class="status-dot"></span>
+            <span>Razorpay Connected</span>
+          </div>
+        </div>
+
+      </header>
+
+      <!-- TAB 1: OVERVIEW -->
+      <section class="tab-pane active" id="tab-overview">
+        <!-- KPI Cards Grid (6 Enhanced Metric Cards) -->
+        <div class="kpi-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
+          <div class="kpi-card gradient-cyan">
+            <div class="kpi-icon"><i data-lucide="landmark"></i></div>
+            <div class="kpi-meta">
+              <span class="kpi-label">CEO Bank Balance</span>
+              <h3 class="kpi-value" id="kpiBankBalance">₹500,000.00</h3>
+              <span class="kpi-subtext" id="kpiBankBalanceSub">Treasury Capital (.env)</span>
+            </div>
+          </div>
+
+          <div class="kpi-card gradient-emerald">
+            <div class="kpi-icon"><i data-lucide="indian-rupee"></i></div>
+            <div class="kpi-meta">
+              <span class="kpi-label">Total Sales Revenue</span>
+              <h3 class="kpi-value" id="kpiRevenue">₹0.00</h3>
+              <span class="kpi-subtext">Online captured orders (0% Tax)</span>
+            </div>
+          </div>
+
+          <div class="kpi-card gradient-green">
+            <div class="kpi-icon"><i data-lucide="trending-up"></i></div>
+            <div class="kpi-meta">
+              <span class="kpi-label">Net Realized Profit</span>
+              <h3 class="kpi-value" id="kpiNetProfit">₹0.00</h3>
+              <span class="kpi-subtext" id="kpiProfitMargin">Margin: 0.0%</span>
+            </div>
+          </div>
+
+          <div class="kpi-card gradient-purple">
+            <div class="kpi-icon"><i data-lucide="shopping-bag"></i></div>
+            <div class="kpi-meta">
+              <span class="kpi-label">Wholesale Stock Spend</span>
+              <h3 class="kpi-value" id="kpiInventorySpend">₹0.00</h3>
+              <span class="kpi-subtext">Acquired at Base Price floor</span>
+            </div>
+          </div>
+
+          <div class="kpi-card gradient-blue">
+            <div class="kpi-icon"><i data-lucide="package-check"></i></div>
+            <div class="kpi-meta">
+              <span class="kpi-label">Total Orders</span>
+              <h3 class="kpi-value" id="kpiTotalOrders">0</h3>
+              <span class="kpi-subtext" id="kpiActiveOrdersSub">0 active pipeline</span>
+            </div>
+          </div>
+
+          <div class="kpi-card gradient-amber">
+            <div class="kpi-icon"><i data-lucide="alert-triangle"></i></div>
+            <div class="kpi-meta">
+              <span class="kpi-label">0-Stock / Low Stock</span>
+              <h3 class="kpi-value" id="kpiLowStock">27</h3>
+              <span class="kpi-subtext">Awaiting CEO Restock</span>
+            </div>
+          </div>
+        </div>
+
+
+        <!-- 2 Column Section: 7 Agents Status & Live Inter-Agent Communications -->
+        <div class="dashboard-grid-2col">
+          <!-- 7 Agents Quick Grid -->
+          <div class="panel-card">
+            <div class="panel-header">
+              <div class="panel-title">
+                <i data-lucide="cpu" class="panel-icon"></i>
+                <h3>Autonomous Agent Fleet Status (7 Agents)</h3>
+              </div>
+              <button class="action-btn-sm" onclick="switchTab('agents')">View Hub →</button>
+            </div>
+            <div class="quick-agent-list" id="overviewAgentList">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+
+          <!-- Live Inter-Agent Communication Bus -->
+          <div class="panel-card">
+            <div class="panel-header">
+              <div class="panel-title">
+                <i data-lucide="radio" class="panel-icon" style="color: #a855f7;"></i>
+                <h3>⚡ Inter-Agent Real-Time Message Bus</h3>
+              </div>
+              <span class="live-pulse-badge">COLLABORATING</span>
+            </div>
+            <div class="audit-log-terminal" id="overviewMessageBusLogs" style="height: 320px;">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Live Audit Log Feed -->
+        <div class="panel-card" style="margin-top: 1.25rem;">
+          <div class="panel-header">
+            <div class="panel-title">
+              <i data-lucide="terminal" class="panel-icon"></i>
+              <h3>📜 24/7 Agent Decisions & Audit Activity Stream</h3>
+            </div>
+            <span class="live-pulse-badge">LIVE STREAM</span>
+          </div>
+          <div class="audit-log-terminal" id="overviewAuditLogs" style="height: 280px;">
+            <!-- Rendered via JS -->
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB: CEO TREASURY, WHOLESALE ACQUISITION & AGENT SALARIES -->
+      <section class="tab-pane" id="tab-treasury">
+        <div class="section-intro">
+          <div class="intro-text">
+            <h2>💰 CEO Treasury, Wholesale Stock Acquisition & Agent Salaries</h2>
+            <p>The CEO manages the store <strong>Treasury Bank Balance</strong> (default: ₹1,000). Inventory starts at <strong>0 stock</strong> — the CEO acquires wholesale inventory at <strong>BASE_PRICE floor</strong> to generate profit when sold to customers and 5 AI buyers. Staff agent salaries are negotiated and paid from this treasury balance (min ₹50 / 100 cycles).</p>
+          </div>
+          <div class="action-buttons-group">
+            <button class="action-btn primary" onclick="openAcquireStockModal()">
+              <i data-lucide="plus-circle"></i>
+              <span>Acquire Wholesale Stock</span>
+            </button>
+            <button class="action-btn emerald" id="payAllSalariesBtn" onclick="disburseFullPayroll()">
+              <i data-lucide="send"></i>
+              <span>Disburse Full Payroll</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Treasury Ledger Cards -->
+        <div class="treasury-cards-grid">
+          <div class="treasury-card cyan">
+            <div class="treasury-card-header">
+              <span>CEO Bank Balance</span>
+              <i data-lucide="landmark"></i>
+            </div>
+            <h2 id="treasuryBankBalance">₹1,000.00</h2>
+            <div class="treasury-card-footer">
+              <span class="badge cyan">Liquid Treasury</span>
+              <span id="treasuryStartingCapital">Capital: ₹1,000 (.env)</span>
+            </div>
+          </div>
+
+
+          <div class="treasury-card emerald">
+            <div class="treasury-card-header">
+              <span>Total Sales Revenue</span>
+              <i data-lucide="trending-up"></i>
+            </div>
+            <h2 id="treasurySalesRevenue">₹0.00</h2>
+            <div class="treasury-card-footer">
+              <span class="badge emerald" id="treasurySalesCount">0 Sales</span>
+              <span>Deposited to Treasury</span>
+            </div>
+          </div>
+
+          <div class="treasury-card green">
+            <div class="treasury-card-header">
+              <span>Net Realized Profit</span>
+              <i data-lucide="pie-chart"></i>
+            </div>
+            <h2 id="treasuryNetProfit">₹0.00</h2>
+            <div class="treasury-card-footer">
+              <span class="badge green" id="treasuryMarginBadge">0.0% Margin</span>
+              <span id="treasuryRoiText">ROI: 0.0%</span>
+            </div>
+          </div>
+
+          <div class="treasury-card purple">
+            <div class="treasury-card-header">
+              <span>Wholesale Stock Spend</span>
+              <i data-lucide="shopping-bag"></i>
+            </div>
+            <h2 id="treasuryStockSpend">₹0.00</h2>
+            <div class="treasury-card-footer">
+              <span class="badge purple" id="treasuryUnitsAcquired">0 Units Acquired</span>
+              <span>Cost at BASE_PRICE</span>
+            </div>
+          </div>
+
+          <div class="treasury-card amber">
+            <div class="treasury-card-header">
+              <span>Agent Salaries Paid</span>
+              <i data-lucide="award"></i>
+            </div>
+            <h2 id="treasurySalariesPaid">₹0.00</h2>
+            <div class="treasury-card-footer">
+              <span class="badge amber" id="treasuryTeamLiability">6 Agents Liability</span>
+              <span>Paid from Balance</span>
+            </div>
+          </div>
+
+          <div class="treasury-card rose">
+            <div class="treasury-card-header">
+              <span>Refunds Processed</span>
+              <i data-lucide="rotate-ccw"></i>
+            </div>
+            <h2 id="treasuryRefunds">₹0.00</h2>
+            <div class="treasury-card-footer">
+              <span class="badge rose" id="treasuryRefundCount">0 Refunds</span>
+              <span>24h Pre-Shipment Only</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2 Column Section: Stock Acquisition Console & Recent Treasury Ledger -->
+        <div class="dashboard-grid-2col" style="margin-top: 1.5rem;">
+          <!-- Quick Wholesale Acquisition Console -->
+          <div class="panel-card">
+            <div class="panel-header">
+              <div class="panel-title">
+                <i data-lucide="package-plus" class="panel-icon" style="color: #06b6d4;"></i>
+                <h3>📦 Wholesale Inventory Stock Acquisition Console</h3>
+              </div>
+              <span class="badge blue">BASE_PRICE Floor</span>
+            </div>
+            <div class="stock-console-body">
+              <p class="console-desc">The store began at <strong>0 stock</strong>. Acquire inventory at the fixed wholesale <code>BASE_PRICE</code>. When sold to customers or the 5 AI buyers at selling <code>PRICE</code>, the gross margin <code>(PRICE - BASE_PRICE)</code> is realized as net profit.</p>
+              
+              <div class="form-group" style="margin-top: 1rem;">
+                <label>Select Product to Restock</label>
+                <select id="quickAcquireSelect" class="admin-select" onchange="onQuickAcquireProductChange()">
+                  <!-- Populated via JS -->
+                </select>
+              </div>
+
+              <div class="stock-calc-preview" id="quickAcquirePreview">
+                <div class="calc-row">
+                  <span>Current Catalog Stock:</span>
+                  <strong id="previewCurrentStock" class="highlight-red">0 Units (OUT OF STOCK)</strong>
+                </div>
+                <div class="calc-row">
+                  <span>Wholesale Base Price (Cost):</span>
+                  <strong id="previewBasePrice">₹0.00</strong>
+                </div>
+                <div class="calc-row">
+                  <span>Current Selling Price:</span>
+                  <strong id="previewSellingPrice">₹0.00</strong>
+                </div>
+                <div class="calc-row">
+                  <span>Gross Profit Per Unit:</span>
+                  <strong id="previewUnitMargin" class="highlight-green">+₹0.00</strong>
+                </div>
+              </div>
+
+              <div class="form-row" style="margin-top: 1rem;">
+                <div class="form-group">
+                  <label>Units to Purchase Wholesale</label>
+                  <input type="number" id="quickAcquireQty" value="20" min="1" max="500" class="admin-input" oninput="recalculateQuickAcquireCost()">
+                </div>
+                <div class="form-group">
+                  <label>Total Acquisition Cost</label>
+                  <input type="text" id="quickAcquireTotalCost" value="₹0.00" readonly class="admin-input readonly-input">
+                </div>
+              </div>
+
+              <div class="bank-impact-preview">
+                <span>Remaining Bank Balance after purchase:</span>
+                <strong id="previewRemainingBalance">₹500,000.00</strong>
+              </div>
+
+              <button class="action-btn primary" style="width: 100%; justify-content: center; margin-top: 1rem;" onclick="submitQuickAcquire()">
+                <i data-lucide="check-circle"></i>
+                <span>Acquire Stock from Wholesale & Pay from Bank</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Treasury Transaction Ledger -->
+          <div class="panel-card">
+            <div class="panel-header">
+              <div class="panel-title">
+                <i data-lucide="receipt" class="panel-icon" style="color: #10b981;"></i>
+                <h3>📑 Live Treasury Cash-Flow Ledger</h3>
+              </div>
+              <span class="live-pulse-badge">AUDITED</span>
+            </div>
+            <div class="treasury-ledger-feed" id="treasuryLedgerFeed" style="max-height: 440px; overflow-y: auto;">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Section B: Agent Salaries & Interactive Negotiation Board -->
+        <div class="panel-card" style="margin-top: 1.5rem;">
+          <div class="panel-header">
+            <div class="panel-title">
+              <i data-lucide="users-2" class="panel-icon" style="color: #f59e0b;"></i>
+              <h3>💼 Specialist Agent Salary Management & Interactive Negotiation</h3>
+            </div>
+            <div class="header-actions">
+              <span class="badge amber" id="totalPayrollLabel">Total Payroll: ₹44,500.00 / cycle</span>
+            </div>
+          </div>
+          <p class="panel-subtitle" style="padding: 0 1.25rem 0.5rem; color: #94a3b8; font-size: 0.85rem;">
+            Specialist agents receive compensation from the CEO Treasury Bank Balance. Store Owner and CEO can dynamically propose salary adjustments and conduct <strong>interactive negotiations</strong> — agents will formulate intelligent counter-proposals based on their performance scores and store profitability.
+          </p>
+
+          <div class="admin-table-container">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Agent Specialist</th>
+                  <th>Domain Role</th>
+                  <th>Rate (₹ / 100 Cycles)</th>
+                  <th>Total Salary Paid (₹)</th>
+                  <th>Performance Rating</th>
+                  <th>Status</th>
+                  <th>Last Paid At</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="salariesTableBody">
+                <!-- Rendered via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+
+        <!-- Section C: CEO Multi-Agent Roundtable Meeting Room -->
+        <div class="panel-card" style="margin-top: 1.5rem;">
+          <div class="panel-header">
+            <div class="panel-title">
+              <i data-lucide="messages-square" class="panel-icon" style="color: #ec4899;"></i>
+              <h3>👔 CEO Strategic Multi-Agent Roundtable Discussion Room</h3>
+            </div>
+            <span class="badge purple">LLM Multi-Agent Synthesis</span>
+          </div>
+          
+          <div class="meeting-room-container">
+            <div class="meeting-controls-row">
+              <div class="form-group flex-2">
+                <label>Discussion Agenda / Topic</label>
+                <input type="text" id="meetingTopicInput" class="admin-input" placeholder="e.g. Wholesale restock budget, dynamic pricing adjustments, and AI buyer growth" value="Wholesale inventory restock budget, base price margins, and autonomous buyer demand">
+              </div>
+              <div class="form-group flex-1">
+                <label>Preset Agendas</label>
+                <select id="meetingPresetSelect" class="admin-select" onchange="onMeetingPresetChange()">
+                  <option value="custom">Custom Agenda...</option>
+                  <option value="restock">📦 Restock Budget & Base Price Margins</option>
+                  <option value="pricing">🏷️ Dynamic Pricing & Scarcity Calibration</option>
+                  <option value="salaries">💼 Performance Evaluation & Salary Review</option>
+                  <option value="buyers">🛍️ AI Buyer Traffic & Return Policy Compliance</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>&nbsp;</label>
+                <button class="action-btn primary" id="conveneMeetingBtn" onclick="startCEOMeeting()">
+                  <i data-lucide="play"></i>
+                  <span>Convene Meeting</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Live Discussion Transcript -->
+            <div class="meeting-transcript-box" id="meetingTranscriptBox">
+              <div class="meeting-empty-placeholder">
+                <i data-lucide="users" style="width: 48px; height: 48px; opacity: 0.3; margin-bottom: 0.5rem;"></i>
+                <p>No meeting in session. Enter an agenda above and click <strong>Convene Meeting</strong> to gather all specialist agents for a strategic roundtable.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB: 5 AI AUTONOMOUS SHOPPERS FLEET -->
+      <section class="tab-pane" id="tab-buyers">
+        <div class="section-intro">
+          <div class="intro-text">
+            <h2>🛍️ 5 AI Autonomous Shoppers Fleet</h2>
+            <p>5 distinct AI consumer personas with <strong>unlimited budgets</strong> continuously browse catalog inventory, make purchase decisions based on their personality traits, check out via 1-click AP2 protocol, publish verified reviews, and stress-test 24h refund policies.</p>
+          </div>
+          <div class="action-buttons-group">
+            <button class="action-btn emerald" id="toggleBuyersSimulationBtn" onclick="toggleBuyersSimulation()">
+              <i data-lucide="power"></i>
+              <span id="toggleBuyersText">Simulation: ACTIVE</span>
+            </button>
+            <button class="action-btn primary" id="triggerAllBuyersBtn" onclick="triggerAllBuyers()">
+              <i data-lucide="shopping-bag"></i>
+              <span>Trigger All 5 Shoppers Now</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 5 AI Buyer Persona Cards Grid -->
+        <div class="buyer-cards-grid" id="buyersCardsGrid">
+          <!-- 5 Buyer Cards Rendered via JS -->
+        </div>
+
+        <!-- Live AI Shoppers Activity & Orders Stream -->
+        <div class="panel-card" style="margin-top: 1.5rem;">
+          <div class="panel-header">
+            <div class="panel-title">
+              <i data-lucide="activity" class="panel-icon" style="color: #a855f7;"></i>
+              <h3>🛒 Live AI Shopper Activity & Transaction Stream</h3>
+            </div>
+            <span class="live-pulse-badge">REAL-TIME AP2 STREAM</span>
+          </div>
+          <div class="admin-table-container">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Shopper Persona</th>
+                  <th>Action</th>
+                  <th>Target Product</th>
+                  <th>Amount (₹)</th>
+                  <th>Payment Type</th>
+                  <th>Customer Review</th>
+                  <th>Status</th>
+                  <th>Timestamp</th>
+                </tr>
+              </thead>
+              <tbody id="buyersActivityTableBody">
+                <!-- Rendered via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 2: 24/7 AGENT FLEET HUB -->
+      <section class="tab-pane" id="tab-agents">
+
+        <div class="section-intro">
+          <div class="intro-text">
+            <h2>Autonomous Agent Fleet (7 Collaborative Agents)</h2>
+            <p>Each agent executes continuous monitoring cycles. All 7 agents communicate via the <strong>Inter-Agent Message Bus</strong> and hold direct commit authority to optimize selling prices, restock items, assign logistics tracking, and auto-refund eligible orders.</p>
+          </div>
+          <button class="action-btn primary" id="triggerAllAgentsBtn">
+            <i data-lucide="play-circle"></i>
+            <span>Trigger Full Fleet Scan</span>
+          </button>
+        </div>
+
+        <div class="agents-cards-grid" id="fullAgentsGrid">
+          <!-- 7 Detailed Agent Cards Rendered via JS -->
+        </div>
+
+        <!-- Inter-Agent Communication History -->
+        <div class="panel-card" style="margin-top: 1.5rem;">
+          <div class="panel-header">
+            <div class="panel-title">
+              <i data-lucide="messages-square" class="panel-icon" style="color: #c084fc;"></i>
+              <h3>⚡ Live Inter-Agent Messages & Directive Bus History</h3>
+            </div>
+          </div>
+          <div class="full-log-table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Timestamp</th>
+                  <th>From Agent</th>
+                  <th>To Agent</th>
+                  <th>Subject</th>
+                  <th>Message Payload & Strategic Context</th>
+                </tr>
+              </thead>
+              <tbody id="fullMessageBusBody">
+                <!-- Rendered via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Full Execution Audit Trail -->
+        <div class="panel-card" style="margin-top: 1.5rem;">
+          <div class="panel-header">
+            <div class="panel-title">
+              <i data-lucide="list-checks" class="panel-icon"></i>
+              <h3>📜 Full Agent Execution & Decision Audit Trail</h3>
+            </div>
+          </div>
+          <div class="full-log-table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Timestamp</th>
+                  <th>Agent Name</th>
+                  <th>Action / Decision</th>
+                  <th>Details & Changes Committed</th>
+                  <th>Type</th>
+                </tr>
+              </thead>
+              <tbody id="fullAgentLogsBody">
+                <!-- Rendered via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 3: ORDERS & DISPATCH -->
+      <section class="tab-pane" id="tab-orders">
+        <div class="section-intro">
+          <div class="intro-text">
+            <h2>Orders & Dispatch Pipeline</h2>
+            <p>Lifecycle state transitions: <code>Pending</code> ➔ <code>Confirmed</code> (Stock Deducted) ➔ <code>Dispatched</code> ➔ <code>Shipped</code> ➔ <code>Delivered</code>.</p>
+          </div>
+          <div class="filter-controls">
+            <select id="orderStatusFilter" class="admin-select">
+              <option value="ALL">All Statuses</option>
+              <option value="Pending">Pending</option>
+              <option value="Confirmed">Confirmed</option>
+              <option value="Dispatched">Dispatched</option>
+              <option value="Shipped">Shipped</option>
+              <option value="Delivered">Delivered</option>
+              <option value="Cancelled">Cancelled</option>
+              <option value="Refunded">Refunded</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="panel-card">
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Order ID & Date</th>
+                  <th>Customer</th>
+                  <th>Items Purchased</th>
+                  <th>Total</th>
+                  <th>Tracking #</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="ordersTableBody">
+                <!-- Rendered via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 4: INVENTORY & PRICING STUDIO -->
+      <section class="tab-pane" id="tab-inventory">
+        <div class="section-intro">
+          <div class="intro-text">
+            <h2>Inventory & Dual-Pricing Studio (INR ₹, 0% Tax)</h2>
+            <p><strong>Two-Tier Pricing Engine:</strong> 1) <strong>Base Price 🔒</strong> is set <u>strictly by the Store Owner</u> as an immutable floor. 2) <strong>Selling Price 📈</strong> is autonomously optimized by the Price Manager Agent to maximize store growth, revenue, and margins without breaching the base floor.</p>
+          </div>
+          <div class="btn-group">
+            <button class="action-btn secondary" id="openBulkPriceModalBtn">
+              <i data-lucide="percent"></i>
+              <span>Bulk % Adjust Selling Prices</span>
+            </button>
+            <button class="action-btn primary" id="openAddProductModalBtn">
+              <i data-lucide="plus-circle"></i>
+              <span>Add New Product</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="panel-card">
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Product & SKU</th>
+                  <th>Category</th>
+                  <th>Size</th>
+                  <th>Stock Units</th>
+                  <th>Base Price (₹ - Floor set by Owner 🔒)</th>
+                  <th>Selling Price (₹ - Dynamic AI Optimized 📈)</th>
+                  <th>Rating</th>
+                  <th>Inline Quick Actions</th>
+                </tr>
+              </thead>
+              <tbody id="inventoryTableBody">
+                <!-- Rendered via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 5: REFUNDS & 24H POLICY -->
+      <section class="tab-pane" id="tab-refunds">
+        <div class="section-intro">
+          <div class="intro-text">
+            <h2>Refunds & Cancellation Engine</h2>
+            <p>Strict Rule: Orders cancelled <strong>within 24 hours</strong> of creation AND <strong>not yet shipped</strong> are auto-approved for Razorpay refund + inventory restock.</p>
+          </div>
+        </div>
+
+        <div class="panel-card">
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Order ID</th>
+                  <th>Order Date</th>
+                  <th>Age (Hours)</th>
+                  <th>Status</th>
+                  <th>24h & Non-Shipped Rule</th>
+                  <th>Total</th>
+                  <th>Refund Action</th>
+                </tr>
+              </thead>
+              <tbody id="refundsTableBody">
+                <!-- Rendered via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 6: AI REVIEWS & FEEDBACK -->
+      <section class="tab-pane" id="tab-reviews">
+        <div class="section-intro">
+          <div class="intro-text">
+            <h2>AI Review & Feedback Synthesis</h2>
+            <p>Customer reviews with automated Ollama LLM sentiment analysis, pro/con extraction, and live catalog summary synchronization.</p>
+          </div>
+        </div>
+
+        <div class="dashboard-grid-2col">
+          <!-- Product Summaries -->
+          <div class="panel-card">
+            <div class="panel-header">
+              <div class="panel-title">
+                <i data-lucide="sparkles" class="panel-icon"></i>
+                <h3>AI Generated Product Summaries</h3>
+              </div>
+            </div>
+            <div class="product-summaries-list" id="productSummariesList">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+
+          <!-- Customer Reviews List -->
+          <div class="panel-card">
+            <div class="panel-header">
+              <div class="panel-title">
+                <i data-lucide="message-square" class="panel-icon"></i>
+                <h3>Verified Customer Reviews</h3>
+              </div>
+              <button class="action-btn-sm" id="openAddReviewModalBtn">+ Add Review</button>
+            </div>
+            <div class="customer-reviews-feed" id="customerReviewsFeed">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 7: ADMIN AI CHATBOT (OMNIPOTENT COMMAND CENTER) -->
+      <section class="tab-pane" id="tab-chat">
+        <div class="chat-command-layout">
+          <!-- Chat Messages Window -->
+          <div class="admin-chat-window">
+            <div class="chat-window-header">
+              <div class="chat-agent-info">
+                <div class="chat-agent-avatar">👑</div>
+                <div>
+                  <h4>Omnipotent Store Owner AI Command Center</h4>
+                  <span>Direct Natural Language & Multi-Agent Executive Command over all 7 specialist agents & databases</span>
+                </div>
+              </div>
+              <span class="live-pulse-badge">OLLAMA GEMMA 4 POWERED</span>
+            </div>
+
+            <div class="admin-chat-messages" id="adminChatMessages">
+              <div class="chat-bubble agent">
+                <div class="bubble-avatar">👑</div>
+                <div class="bubble-content">
+                  <p>Welcome, Store Owner! I am your <strong>Omnipotent AI Executive Command Agent</strong>. I have direct executive control over the 7 autonomous specialist agents, databases, and the Inter-Agent Message Bus.</p>
+                  <p>You can chat, consult, or order any specialist agent in natural language:</p>
+                  <ul>
+                    <li>👔 <strong>CEO Agent</strong>: <em>"CEO, give me a strategic briefing and team alignment report"</em></li>
+                    <li>🏷️ <strong>Price Manager</strong>: <em>"Price Manager, discount all Mobiles by 10% while keeping BASE_PRICE floor"</em></li>
+                    <li>📦 <strong>Inventory Manager</strong>: <em>"Inventory Manager, restock 20 units of NOVA ZenBook Laptop"</em></li>
+                    <li>🚚 <strong>Dispatcher Agent</strong>: <em>"Dispatcher, package and dispatch all confirmed orders"</em></li>
+                    <li>💰 <strong>Finance Manager</strong>: <em>"Finance Manager, analyze our refund rate and margin targets"</em></li>
+                    <li>📋 <strong>Order Manager</strong>: <em>"Change status of ORD-1001 to Delivered"</em></li>
+                    <li>⭐ <strong>Review Manager</strong>: <em>"Review Manager, analyze customer sentiment for laptops"</em></li>
+                    <li>⚡ <strong>Message Bus</strong>: <em>"Show me recent messages exchanged between agents"</em></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <!-- Suggested Quick Chips -->
+            <div class="admin-prompt-chips">
+              <button class="admin-chip" data-cmd="CEO, provide an executive strategic briefing on store health and team alignment">👔 CEO Briefing</button>
+              <button class="admin-chip" data-cmd="Price manager, discount Mobiles by 10% while enforcing BASE_PRICE floor">🏷️ Discount Mobiles 10%</button>
+              <button class="admin-chip" data-cmd="Inventory manager, audit warehouse and restock low inventory items">📦 Restock Low Stock</button>
+              <button class="admin-chip" data-cmd="Dispatcher, assign tracking numbers and dispatch all confirmed orders">🚚 Dispatch Logistics</button>
+              <button class="admin-chip" data-cmd="Finance manager, audit revenue, GMV, profit margins, and refund rate">💰 Audit Financials</button>
+              <button class="admin-chip" data-cmd="Review manager, analyze customer sentiment and summarize reviews">⭐ Sentiment Analysis</button>
+              <button class="admin-chip" data-cmd="Show me recent inter-agent communications from the message bus">⚡ Inter-Agent Messages</button>
+              <button class="admin-chip" data-cmd="Give me real-time store telemetry metrics">📊 Store Telemetry</button>
+            </div>
+
+            <!-- Chat Input -->
+            <form class="admin-chat-form" id="adminChatForm">
+              <input 
+                type="text" 
+                id="adminChatInput" 
+                class="admin-prompt-input" 
+                placeholder="Give an order to any AI agent or store database..." 
+                autocomplete="off"
+              />
+              <button type="submit" class="admin-send-btn" id="adminSendBtn">
+                <i data-lucide="send"></i>
+              </button>
+            </form>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- MODALS -->
+
+  <!-- Add Product Modal -->
+  <div class="admin-modal-overlay" id="addProductModal">
+    <div class="admin-modal">
+      <div class="modal-header">
+        <h3><i data-lucide="plus-circle"></i> Add New Catalog Product</h3>
+        <button class="modal-close-btn" onclick="closeModal('addProductModal')"><i data-lucide="x"></i></button>
+      </div>
+      <form id="addProductForm" class="modal-form">
+        <div class="form-group">
+          <label>Product Name</label>
+          <input type="text" id="newProdName" required placeholder="e.g. Apex HyperLight Hoodie">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Category</label>
+            <select id="newProdCategory" class="admin-select">
+              <option value="Mobiles">Mobiles</option>
+              <option value="Laptops">Laptops</option>
+              <option value="Audio">Audio</option>
+              <option value="Accessories">Accessories</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Size / Specs</label>
+            <input type="text" id="newProdSize" value="Standard" placeholder="e.g. 16GB/512GB, 45mm, One Size">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Base Price (₹ Floor - Set by Owner)</label>
+            <input type="number" step="0.01" id="newProdBasePrice" required placeholder="2499.00">
+          </div>
+          <div class="form-group">
+            <label>Initial Price (₹ INR)</label>
+            <input type="number" step="0.01" id="newProdPrice" required placeholder="2999.00">
+          </div>
+          <div class="form-group">
+            <label>Initial Stock Units</label>
+            <input type="number" id="newProdStock" value="20" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <textarea id="newProdDesc" rows="3" placeholder="Specs, hardware details, and features..."></textarea>
+        </div>
+        <button type="submit" class="action-btn primary" style="width: 100%; justify-content: center;">Add Product to Inventory</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Bulk Price Adjustment Modal -->
+  <div class="admin-modal-overlay" id="bulkPriceModal">
+    <div class="admin-modal">
+      <div class="modal-header">
+        <h3><i data-lucide="percent"></i> Bulk Price Adjustment</h3>
+        <button class="modal-close-btn" onclick="closeModal('bulkPriceModal')"><i data-lucide="x"></i></button>
+      </div>
+      <form id="bulkPriceForm" class="modal-form">
+        <div class="form-group">
+          <label>Target Category</label>
+          <select id="bulkCategory" class="admin-select">
+            <option value="all">All Catalog Categories</option>
+            <option value="Mobiles">Mobiles</option>
+            <option value="Laptops">Laptops</option>
+            <option value="Audio">Audio</option>
+            <option value="Accessories">Accessories</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Percentage Change (+ for Increase, - for Discount)</label>
+          <input type="number" step="0.5" id="bulkPercentage" required placeholder="e.g. -10 for 10% discount, 5 for 5% raise">
+        </div>
+        <p style="font-size: 0.8rem; color: #94a3b8;">Example: entering <code>-15</code> applies a 15% discount across the target category.</p>
+        <button type="submit" class="action-btn primary" style="width: 100%; justify-content: center;">Apply Price Adjustments</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Add Review Modal -->
+  <div class="admin-modal-overlay" id="addReviewModal">
+    <div class="admin-modal">
+      <div class="modal-header">
+        <h3><i data-lucide="message-square"></i> Add Customer Review</h3>
+        <button class="modal-close-btn" onclick="closeModal('addReviewModal')"><i data-lucide="x"></i></button>
+      </div>
+      <form id="addReviewForm" class="modal-form">
+        <div class="form-group">
+          <label>Select Product</label>
+          <select id="reviewProdSelect" class="admin-select"></select>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Customer Name</label>
+            <input type="text" id="reviewCustomerName" required placeholder="e.g. Marcus Vance">
+          </div>
+          <div class="form-group">
+            <label>Rating (1 to 5 Stars)</label>
+            <select id="reviewRating" class="admin-select">
+              <option value="5">⭐⭐⭐⭐⭐ (5 Stars)</option>
+              <option value="4">⭐⭐⭐⭐ (4 Stars)</option>
+              <option value="3">⭐⭐⭐ (3 Stars)</option>
+              <option value="2">⭐⭐ (2 Stars)</option>
+              <option value="1">⭐ (1 Star)</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Review Text</label>
+          <textarea id="reviewText" rows="3" required placeholder="Customer feedback..."></textarea>
+        </div>
+        <button type="submit" class="action-btn primary" style="width: 100%; justify-content: center;">Submit Review & Recalculate Rating</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Wholesale Stock Acquisition Modal -->
+  <div class="admin-modal-overlay" id="acquireStockModal">
+    <div class="admin-modal" style="max-width: 540px;">
+      <div class="modal-header">
+        <h3><i data-lucide="package-plus"></i> Acquire Wholesale Stock at Base Price</h3>
+        <button class="modal-close-btn" onclick="closeModal('acquireStockModal')"><i data-lucide="x"></i></button>
+      </div>
+      <form id="acquireStockForm" class="modal-form" onsubmit="event.preventDefault(); submitModalAcquireStock();">
+        <div class="form-group">
+          <label>Target Product</label>
+          <select id="modalAcquireProductSelect" class="admin-select" onchange="onModalAcquireProductChange()">
+            <!-- Populated via JS -->
+          </select>
+        </div>
+        
+        <div class="stock-calc-preview" id="modalAcquirePreview" style="margin: 0.75rem 0;">
+          <div class="calc-row">
+            <span>Wholesale Base Price:</span>
+            <strong id="modalPreviewBasePrice">₹0.00</strong>
+          </div>
+          <div class="calc-row">
+            <span>Current Stock:</span>
+            <strong id="modalPreviewCurrentStock">0 Units</strong>
+          </div>
+          <div class="calc-row">
+            <span>Selling Price:</span>
+            <strong id="modalPreviewSellingPrice">₹0.00</strong>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Units to Purchase</label>
+            <input type="number" id="modalAcquireQty" value="20" min="1" max="500" required oninput="recalculateModalAcquireCost()">
+          </div>
+          <div class="form-group">
+            <label>Total Acquisition Cost</label>
+            <input type="text" id="modalAcquireTotalCost" value="₹0.00" readonly class="readonly-input">
+          </div>
+        </div>
+
+        <div class="bank-impact-preview" style="margin-top: 0.5rem;">
+          <span>Current Bank Balance:</span>
+          <strong id="modalCurrentBankBalance">₹500,000.00</strong>
+        </div>
+
+        <button type="submit" class="action-btn primary" style="width: 100%; justify-content: center; margin-top: 1rem;">
+          <i data-lucide="check-circle"></i>
+          <span>Confirm Wholesale Purchase</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Interactive Agent Salary Negotiation Modal -->
+  <div class="admin-modal-overlay" id="negotiateSalaryModal">
+    <div class="admin-modal" style="max-width: 650px;">
+      <div class="modal-header">
+        <h3><i data-lucide="briefcase"></i> Interactive Agent Salary Negotiation</h3>
+        <button class="modal-close-btn" onclick="closeModal('negotiateSalaryModal')"><i data-lucide="x"></i></button>
+      </div>
+      <div class="salary-negotiation-body">
+        <div class="agent-profile-bar" id="negModalAgentHeader">
+          <!-- Filled via JS -->
+        </div>
+
+        <div class="negotiation-chat-thread" id="negChatThread" style="max-height: 240px; overflow-y: auto; margin: 1rem 0; padding: 0.75rem; background: rgba(15, 23, 42, 0.6); border-radius: 8px; border: 1px solid rgba(255,255,255,0.08);">
+          <!-- Dialogue messages -->
+        </div>
+
+        <form id="negotiateSalaryForm" class="modal-form" onsubmit="event.preventDefault(); submitSalaryProposal();">
+          <input type="hidden" id="negAgentName">
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label>Proposed Salary (₹ / cycle)</label>
+              <input type="number" id="negProposedSalary" step="100" min="1000" required placeholder="e.g. 7500">
+            </div>
+            <div class="form-group flex-2">
+              <label>Owner Rationale / Performance Justification</label>
+              <input type="text" id="negRationale" placeholder="e.g. Store profitability increased 15% this week" value="High SLA adherence and proactive store management">
+            </div>
+          </div>
+
+          <div class="form-actions-row" style="display: flex; gap: 0.75rem; margin-top: 0.75rem;">
+            <button type="submit" class="action-btn primary" id="negSubmitBtn" style="flex: 1; justify-content: center;">
+              <i data-lucide="send"></i>
+              <span>Send Salary Proposal</span>
+            </button>
+            <button type="button" class="action-btn emerald" id="negAcceptBtn" style="justify-content: center;" onclick="acceptCounterProposal()">
+              <i data-lucide="check"></i>
+              <span>Accept Agreement</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reset Store State Confirm Modal -->
+  <div class="admin-modal-overlay" id="resetStoreConfirmModal">
+    <div class="admin-modal" style="max-width: 480px;">
+      <div class="modal-header">
+        <h3 style="color: #f43f5e;"><i data-lucide="alert-triangle"></i> Reset Store to Initial Clean State?</h3>
+        <button class="modal-close-btn" onclick="closeModal('resetStoreConfirmModal')"><i data-lucide="x"></i></button>
+      </div>
+      <div class="modal-body" style="padding: 1rem 0; color: #cbd5e1; font-size: 0.9rem;">
+        <p>This action will completely reset the store:</p>
+        <ul style="margin: 0.75rem 0 1rem 1.5rem; line-height: 1.6;">
+          <li>Set all 27 catalog products to <strong>0 STOCK</strong> (Wholesale restock required).</li>
+          <li>Reset Treasury Bank Balance to default <strong>₹1,000.00</strong>.</li>
+          <li>Clear all Orders & Dispatches (reset to 0).</li>
+          <li>Reset Staff Agent Salaries to CEO minimum <strong>₹50.00 / 100 cycles</strong> (₹0 paid).</li>
+          <li>Reset 5 AI buyers with staggered random <strong>0 to 5 minutes</strong> purchase schedules.</li>
+        </ul>
+        <p>The CEO will then acquire stock at wholesale base price and run automated commerce operations.</p>
+      </div>
+      <div class="modal-footer" style="display: flex; gap: 0.75rem; justify-content: flex-end;">
+        <button class="action-btn" onclick="closeModal('resetStoreConfirmModal')">Cancel</button>
+        <button class="action-btn warning" onclick="confirmResetStoreComplete()">Confirm Reset</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Admin Scripts -->
+  <script src="/frontend/admin/js/admin.js?v=4.0"></script>
+</body>
+</html>
+

@@ -1,0 +1,58 @@
+[
+  {
+    "id": "camp_1788472272",
+    "title": "Weekend Titanium Drop",
+    "category": "Laptops",
+    "discount_percent": 10.0,
+    "banner_text": "\ud83d\udd25 WEEKEND TITANIUM DROP: UP TO 10% OFF LAPTOPS \u2022 0% TAX STOREWIDE",
+    "duration_hours": 48,
+    "status": "ACTIVE",
+    "launched_at": "2026-09-03T21:51:12.853516",
+    "total_revenue_generated": 0.0,
+    "orders_count": 0
+  },
+  {
+    "id": "camp_1788471951",
+    "title": "Weekend Titanium Drop",
+    "category": "Laptops",
+    "discount_percent": 10.0,
+    "banner_text": "\ud83d\udd25 WEEKEND TITANIUM DROP: UP TO 10% OFF LAPTOPS \u2022 0% TAX STOREWIDE",
+    "duration_hours": 48,
+    "status": "COMPLETED",
+    "launched_at": "2026-09-03T21:45:51.381049",
+    "total_revenue_generated": 0.0,
+    "orders_count": 0
+  },
+  {
+    "id": "camp_1788471911",
+    "title": "Weekend Titanium Drop",
+    "category": "Laptops",
+    "discount_percent": 10.0,
+    "banner_text": "\ud83d\udd25 WEEKEND TITANIUM DROP: UP TO 10% OFF LAPTOPS \u2022 0% TAX STOREWIDE",
+    "duration_hours": 48,
+    "status": "COMPLETED",
+    "launched_at": "2026-09-03T21:45:11.171682",
+    "total_revenue_generated": 0.0,
+    "orders_count": 0
+  },
+  {
+    "id": "camp_5g_surge",
+    "title": "5G FLAGSHIP POWER DROP",
+    "category": "Mobiles",
+    "discount_percent": 8.0,
+    "banner_text": "\u26a1 5G FLAGSHIP POWER DROP: 8% OFF MOBILES (0% TAX) \u2022 AUTONOMOUS FLASH SALE ACTIVE",
+    "status": "COMPLETED",
+    "launched_at": "2026-09-03T21:45:10.597668",
+    "total_revenue_generated": 142850.0
+  },
+  {
+    "id": "camp_audio_immersion",
+    "title": "STUDIO ACOUSTICS FESTIVAL",
+    "category": "Audio",
+    "discount_percent": 12.0,
+    "banner_text": "\ud83c\udfa7 STUDIO ACOUSTICS FESTIVAL: 12% OFF ANC AUDIO GEAR \u2022 VERIFIED AUDIOPHILE DROPS",
+    "status": "SCHEDULED",
+    "launched_at": "2026-09-03T21:45:10.597679",
+    "total_revenue_generated": 48200.0
+  }
+]

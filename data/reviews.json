@@ -871,5 +871,698 @@
     "rating": 4,
     "review_text": "This NOVA AeroBook Slim i7 is a sleek beast I didn't know I needed until I got it. That Intel Core Ultra 7 and Intel Arc combo is smoking hot for its class, and that magnesium-alloy build is simply stunning.",
     "created_at": "2026-09-03T21:03:23.967182+00:00"
+  },
+  {
+    "id": "rev_1b9bce",
+    "product_id": "prod_002",
+    "product_name": "NOVA Apex Ultra Fold 5G",
+    "customer_name": "Alex Chen",
+    "rating": 5,
+    "review_text": "Absolutely lit the NOVA Apex Ultra Fold 5G up; 8-inch screen and 120Hz refresh rate? Sign me up. Titanium hinge and dual periscope zoom? Sold. Best foldable on the market, hands down.",
+    "created_at": "2026-09-03T21:03:46.550923+00:00"
+  },
+  {
+    "id": "rev_15064f",
+    "product_id": "prod_004",
+    "product_name": "NOVA ZenBook Ultra 14 M3 Laptop",
+    "customer_name": "Alex Chen",
+    "rating": 4,
+    "review_text": "The NOVA ZenBook Ultra 14 M3 is a game-changer. That M3 chip and 14.2-inch Liquid Retina display are a power couple, making this laptop not just sleek but seriously fast and visually stunning.",
+    "created_at": "2026-09-03T21:04:10.752344+00:00"
+  },
+  {
+    "id": "rev_66bbef",
+    "product_id": "prod_003",
+    "product_name": "NOVA Prime 5G Smartphone",
+    "customer_name": "Alex Chen",
+    "rating": 5,
+    "review_text": "The NOVA Prime 5G is a beast! That 6.67-inch AMOLED screen is a visual treat, and those 120Hz refresh rate and MediaTek Dimensity 8300 Ultra processor make scrolling and gaming a breeze. Well worth the splurge!",
+    "created_at": "2026-09-03T21:04:33.338748+00:00"
+  },
+  {
+    "id": "rev_d2c874",
+    "product_id": "prod_004",
+    "product_name": "NOVA ZenBook Ultra 14 M3 Laptop",
+    "customer_name": "Alex Chen",
+    "rating": 4,
+    "review_text": "The NOVA ZenBook Ultra 14 M3 is a beast! I've been blown away by its battery life and that insane Liquid Retina XDR display\u2014it's like having a mini cinema in my lap. The MagSafe charging is a game-changer too.",
+    "created_at": "2026-09-03T21:04:54.219356+00:00"
+  },
+  {
+    "id": "rev_943407",
+    "product_id": "prod_006",
+    "product_name": "NOVA AeroBook Slim i7 Ultrabook",
+    "customer_name": "Alex Chen",
+    "rating": 4,
+    "review_text": "Absolutely nails it with the weight and performance combo. The NOVA AeroBook Slim i7 is the perfect blend of portability and power\u2014I can't believe how light it is but still get top-tier work done. OLED display is a game-changer too.",
+    "created_at": "2026-09-03T21:05:16.769974+00:00"
+  },
+  {
+    "id": "rev_1567f9",
+    "product_id": "prod_017",
+    "product_name": "NOVA AirType Low-Profile Wireless Keyboard",
+    "customer_name": "Sophia Miller",
+    "rating": 4,
+    "review_text": "Got the NOVA AirType, and it's a game-changer for keyboard lovers on a budget. Low-profile Gateron switches offer just the right amount of tactile feedback, and the tri-mode connectivity is a lifesaver for multitasking between devices.",
+    "created_at": "2026-09-03T21:05:40.822827+00:00"
+  },
+  {
+    "id": "rev_22cea9",
+    "product_id": "prod_001",
+    "product_name": "NOVA Apex Pro 5G Smartphone",
+    "customer_name": "Sophia Miller",
+    "rating": 5,
+    "review_text": "Got the NOVA Apex Pro 5G for a sweet deal at \u20b9120.46 and man, it's a beast! Fast charging, top-notch camera, and a screen that leaves other flagships in the dust. Worth every penny!",
+    "created_at": "2026-09-03T21:06:05.832874+00:00"
+  },
+  {
+    "id": "rev_888de0",
+    "product_id": "prod_011",
+    "product_name": "NOVA SonicFlow ANC Pro Wireless Headphones",
+    "customer_name": "David Patel",
+    "rating": 4,
+    "review_text": "These NOVA SonicFlow ANC Pros are a game-changer. The graphene drivers deliver an incredibly detailed and balanced sound, and the hybrid ANC is spot-on\u2014quiet enough when I need it but doesn\u2019t muffle important sounds like my coffee maker! Solid build, long battery life\u2014definitely worth the listen.",
+    "created_at": "2026-09-03T21:06:35.278861+00:00"
+  },
+  {
+    "id": "rev_074511",
+    "product_id": "prod_016",
+    "product_name": "NOVA Vortex Pro RGB Wired Mechanical Keyboard",
+    "customer_name": "David Patel",
+    "rating": 4,
+    "review_text": "Man, the NOVA Vortex Pro RGB is a beast on the desk. Those optical red switches are silky smooth, and the double-shot PBT keycaps make typing a joy. The sound-dampening foam is a game-changer too; my typing is much quieter, and I can finally enjoy my music without interruptions. Highly recommend for anyone looking for a pro setup without breaking the bank.",
+    "created_at": "2026-09-03T21:07:06.619332+00:00"
+  },
+  {
+    "id": "rev_95dca1",
+    "product_id": "prod_027",
+    "product_name": "NOVA HyperGaN 140W Quad-Port Pro Charger",
+    "customer_name": "David Patel",
+    "rating": 4,
+    "review_text": "The NOVA HyperGaN 140W is a game-changer for my charging needs. It\u2019s incredibly compact yet packs enough power to charge my 16-inch Macbook like a champ, and the extra ports are a lifesaver. Highly recommended for anyone who needs fast, efficient charging!",
+    "created_at": "2026-09-03T21:07:35.948293+00:00"
+  },
+  {
+    "id": "rev_b81aaa",
+    "product_id": "prod_019",
+    "product_name": "NOVA ViperBlade 26K DPI Gaming Mouse",
+    "customer_name": "David Patel",
+    "rating": 4,
+    "review_text": "The ViperBlade 26K DPI is a beast for gaming mice, lightning fast and super precise with its 26K DPI and 8000Hz polling rate. PTFE glide feet and optical switches make it a joy to move around, feeling almost weightless. Highly recommend for any serious gamer.",
+    "created_at": "2026-09-03T21:08:01.960953+00:00"
+  },
+  {
+    "id": "rev_0cd78e",
+    "product_id": "prod_002",
+    "product_name": "NOVA Apex Ultra Fold 5G",
+    "customer_name": "Sophia Miller",
+    "rating": 5,
+    "review_text": "Got the NOVA Apex Ultra Fold 5G for a steal at \u20b9120.46 and it's a game-changer with that 8.0-inch 120Hz display and titanium hinge\u2014definitely worth the splurge for tech enthusiasts.",
+    "created_at": "2026-09-03T21:13:11.056765+00:00"
+  },
+  {
+    "id": "rev_8dc35a",
+    "product_id": "prod_003",
+    "product_name": "NOVA Prime 5G Smartphone",
+    "customer_name": "Alex Chen",
+    "rating": 5,
+    "review_text": "The NOVA Prime 5G is a beast right out of the box\u2014packed with a stunning 120Hz AMOLED display and a snappy MediaTek Dimensity 8300 Ultra chip. It's perfect for a tech enthusiast like me, delivering top-tier performance and a seamless experience.",
+    "created_at": "2026-09-03T21:25:02.020344+00:00"
+  },
+  {
+    "id": "rev_03fe07",
+    "product_id": "prod_003",
+    "product_name": "NOVA Prime 5G Smartphone",
+    "customer_name": "Alex Chen",
+    "rating": 5,
+    "review_text": "The NOVA Prime 5G is a beast! The 120Hz AMOLED screen is a game changer, and that 50MP OIS camera finally allows me to snap pro-level photos without a stabilizer. Absolutely love it!",
+    "created_at": "2026-09-03T21:25:26.962919+00:00"
+  },
+  {
+    "id": "rev_43b4af",
+    "product_id": "prod_005",
+    "product_name": "NOVA BladeForge RTX 4080 Gaming Laptop",
+    "customer_name": "Alex Chen",
+    "rating": 4,
+    "review_text": "The NOVA BladeForge RTX 4080 is a beast! I can't believe how smooth the 16-inch QHD+ 240Hz display is, and the i9-14900HX paired with RTX 4080 makes gaming a breeze. Definitely worth every penny for a flagship gaming laptop.",
+    "created_at": "2026-09-03T21:25:55.913785+00:00"
+  },
+  {
+    "id": "rev_debf32",
+    "product_id": "prod_003",
+    "product_name": "NOVA Prime 5G Smartphone",
+    "customer_name": "Alex Chen",
+    "rating": 5,
+    "review_text": "Absolutely killed it out of the park! The NOVA Prime 5G's 120Hz AMOLED display is a game-changer, and that 5000mAh battery? I barely had to plug it in all weekend.",
+    "created_at": "2026-09-03T21:26:20.585976+00:00"
+  },
+  {
+    "id": "rev_75b7f6",
+    "product_id": "prod_004",
+    "product_name": "NOVA ZenBook Ultra 14 M3 Laptop",
+    "customer_name": "Alex Chen",
+    "rating": 4,
+    "review_text": "Absolutely blown away by the NOVA ZenBook Ultra 14 M3! That M3 chip is lightning fast, and the Liquid Retina XDR display is insane\u2014perfect for those long Zoom meetings and creative sessions. Battery life is a game-changer too, keeping up all day without a single recharge.",
+    "created_at": "2026-09-03T21:26:43.638569+00:00"
+  },
+  {
+    "id": "rev_1af6e5",
+    "product_id": "prod_002",
+    "product_name": "NOVA Apex Ultra Fold 5G",
+    "customer_name": "Alex Chen",
+    "rating": 5,
+    "review_text": "Hands down, the NOVA Apex Ultra Fold 5G is a game changer. That 8.0-inch 120Hz display is a sight to behold, and the titanium hinge feels like solid engineering. Multitasking with the stylus is a breeze\u2014definitely worth the splurge.",
+    "created_at": "2026-09-03T21:27:01.595680+00:00"
+  },
+  {
+    "id": "rev_b431cb",
+    "product_id": "prod_006",
+    "product_name": "NOVA AeroBook Slim i7 Ultrabook",
+    "customer_name": "Alex Chen",
+    "rating": 4,
+    "review_text": "Absolutely nailed it with the NOVA AeroBook Slim i7! That 1.1kg magnesium-alloy build and 14-inch 2.8K OLED screen are a dream come true for any tech enthusiast. Performance and portability? Priceless.",
+    "created_at": "2026-09-03T21:27:23.610479+00:00"
+  },
+  {
+    "id": "rev_b584c2",
+    "product_id": "prod_002",
+    "product_name": "NOVA Apex Ultra Fold 5G",
+    "customer_name": "Alex Chen",
+    "rating": 5,
+    "review_text": "This NOVA Apex Ultra Fold 5G is a game-changer! The 8.0-inch 120Hz display and titanium hinge are insane, but the dual periscope zoom takes it to the next level. Worth every penny for a tech enthusiast.",
+    "created_at": "2026-09-03T21:27:45.454679+00:00"
+  },
+  {
+    "id": "rev_a97931",
+    "product_id": "prod_001",
+    "product_name": "NOVA Apex Pro 5G Smartphone",
+    "customer_name": "Alex Chen",
+    "rating": 5,
+    "review_text": "The NOVA Apex Pro 5G is a beast! From the moment I plugged it in, I was charging at full speed, and the Snapdragon 8 Gen 3 is smooth as silk.",
+    "created_at": "2026-09-03T21:28:06.550671+00:00"
+  },
+  {
+    "id": "rev_188ef2",
+    "product_id": "prod_005",
+    "product_name": "NOVA BladeForge RTX 4080 Gaming Laptop",
+    "customer_name": "Alex Chen",
+    "rating": 4,
+    "review_text": "This NOVA BladeForge RTX 4080 is a beast! Every specification screams high-end, and the i9-14900HX paired with the RTX 4080 makes gaming a breeze. Per-key RGB? More like lighting up the room!",
+    "created_at": "2026-09-03T21:28:24.880751+00:00"
+  },
+  {
+    "id": "rev_93fd65",
+    "product_id": "prod_005",
+    "product_name": "NOVA BladeForge RTX 4080 Gaming Laptop",
+    "customer_name": "Alex Chen",
+    "rating": 4,
+    "review_text": "Damn, the NOVA BladeForge RTX 4080 is a beast! That i9-14900HX and RTX 4080 combo slays every game I throw at it. Can't wait to tear through the latest AAA titles at 240Hz.",
+    "created_at": "2026-09-03T21:28:48.137907+00:00"
+  },
+  {
+    "id": "rev_a48553",
+    "product_id": "prod_006",
+    "product_name": "NOVA AeroBook Slim i7 Ultrabook",
+    "customer_name": "Alex Chen",
+    "rating": 4,
+    "review_text": "The NOVA AeroBook Slim i7 is a breath of fresh air in ultrabooks. Packing an Intel Core Ultra 7 processor and Intel Arc graphics into a 1.1kg magnesium-alloy body, this ultrabook delivers top-tier performance in a package so sleek, you might think it's magic.",
+    "created_at": "2026-09-03T21:29:10.159927+00:00"
+  },
+  {
+    "id": "rev_28bcea",
+    "product_id": "prod_005",
+    "product_name": "NOVA BladeForge RTX 4080 Gaming Laptop",
+    "customer_name": "Alex Chen",
+    "rating": 4,
+    "review_text": "The NOVA BladeForge is a beast! Packing an i9-14900HX and RTX 4080, this laptop tears through games and work alike. Worth every penny for the performance.",
+    "created_at": "2026-09-03T21:29:32.973197+00:00"
+  },
+  {
+    "id": "rev_305e60",
+    "product_id": "prod_001",
+    "product_name": "NOVA Apex Pro 5G Smartphone",
+    "customer_name": "Alex Chen",
+    "rating": 5,
+    "review_text": "Absolutely killed it out of the park! The NOVA Apex Pro 5G is a beast with its 8 Gen 3 processor and 100W charging\u2014never waited longer than 15 mins for a full tank. The camera and screen are top-notch too, making this the ultimate flagship for tech enthusiasts.",
+    "created_at": "2026-09-03T21:29:55.991286+00:00"
+  },
+  {
+    "id": "rev_ac670a",
+    "product_id": "prod_002",
+    "product_name": "NOVA Apex Ultra Fold 5G",
+    "customer_name": "Alex Chen",
+    "rating": 5,
+    "review_text": "The NOVA Apex Ultra Fold 5G is a game-changer. That 8.0-inch 120Hz inner display is smooth as butter, and the titanium hinge feels like a piece of high-end tech art. Can't wait to see what they do next.",
+    "created_at": "2026-09-03T21:30:19.388438+00:00"
+  },
+  {
+    "id": "rev_5ba5d5",
+    "product_id": "prod_002",
+    "product_name": "NOVA Apex Ultra Fold 5G",
+    "customer_name": "Alex Chen",
+    "rating": 5,
+    "review_text": "The NOVA Apex Ultra Fold 5G is a game-changer. That 8.0-inch 120Hz inner display and titanium hinge are top-notch, and the dual periscope zoom is a must-have for any tech enthusiast. Worth every penny!",
+    "created_at": "2026-09-03T21:30:42.971509+00:00"
+  },
+  {
+    "id": "rev_bc6fc0",
+    "product_id": "prod_001",
+    "product_name": "NOVA Apex Pro 5G Smartphone",
+    "customer_name": "Alex Chen",
+    "rating": 5,
+    "review_text": "Absolutely thrilled with the NOVA Apex Pro 5G! The 120Hz AMOLED display and 100W fast charging are game-changers, and the camera doesn't disappoint either. Top-tier specs in a flagship package\u2014worth every penny!",
+    "created_at": "2026-09-03T21:31:08.347278+00:00"
+  },
+  {
+    "id": "rev_e36bd0",
+    "product_id": "prod_006",
+    "product_name": "NOVA AeroBook Slim i7 Ultrabook",
+    "customer_name": "Alex Chen",
+    "rating": 4,
+    "review_text": "Absolutely floored by the NOVA AeroBook Slim i7! That 1.1kg magnesium-alloy build and the 14-inch 2.8K OLED screen are game-changers. Specs-wise, it\u2019s a powerhouse for my graphics-heavy tasks without breaking the bank.",
+    "created_at": "2026-09-03T21:31:37.604930+00:00"
+  },
+  {
+    "id": "rev_87ba12",
+    "product_id": "prod_006",
+    "product_name": "NOVA AeroBook Slim i7 Ultrabook",
+    "customer_name": "Alex Chen",
+    "rating": 4,
+    "review_text": "Absolutely killed it! The NOVA AeroBook Slim i7 is a breath of fresh air with its light-as-a-feather magnesium-alloy build and killer 14-inch OLED display. Specs are top-shelf, but the real magic is in how it feels\u2014flawless for both power users and everyday tasks.",
+    "created_at": "2026-09-03T21:32:07.576962+00:00"
+  },
+  {
+    "id": "rev_e3f38e",
+    "product_id": "prod_001",
+    "product_name": "NOVA Apex Pro 5G Smartphone",
+    "customer_name": "Alex Chen",
+    "rating": 4,
+    "review_text": "Hands down, the NOVA Apex Pro is a beast. That Snapdragon 8 Gen 3 and 100W fast charging make short work of any lag, and that 120Hz AMOLED screen is a game changer.",
+    "created_at": "2026-09-03T21:32:35.828102+00:00"
+  },
+  {
+    "id": "rev_832c57",
+    "product_id": "prod_002",
+    "product_name": "NOVA Apex Ultra Fold 5G",
+    "customer_name": "Alex Chen",
+    "rating": 5,
+    "review_text": "The NOVA Apex Ultra Fold 5G is a game-changer in foldables. With its massive 8.0-inch 120Hz display and titanium hinge, it\u2019s both a joy to use and incredibly durable\u2014definitely worth the upgrade.",
+    "created_at": "2026-09-03T21:32:57.895048+00:00"
+  },
+  {
+    "id": "rev_fb8974",
+    "product_id": "prod_003",
+    "product_name": "NOVA Prime 5G Smartphone",
+    "customer_name": "Alex Chen",
+    "rating": 5,
+    "review_text": "The NOVA Prime 5G is a beast! That 6.67-inch AMOLED screen with 120Hz refresh rate is a game changer, and the battery holds up through my whole day of heavy usage. Highly recommend for tech enthusiasts.",
+    "created_at": "2026-09-03T21:33:21.327507+00:00"
+  },
+  {
+    "id": "rev_fcb5f4",
+    "product_id": "prod_001",
+    "product_name": "NOVA Apex Pro 5G Smartphone",
+    "customer_name": "Alex Chen",
+    "rating": 5,
+    "review_text": "The NOVA Apex Pro 5G is a beast! That Snapdragon 8 Gen 3 chip and 100W SuperVOOC charging make it feel like I'm living in the future. Absolutely no complaints here.",
+    "created_at": "2026-09-03T21:33:39.134338+00:00"
+  },
+  {
+    "id": "rev_2860af",
+    "product_id": "prod_005",
+    "product_name": "NOVA BladeForge RTX 4080 Gaming Laptop",
+    "customer_name": "Alex Chen",
+    "rating": 4,
+    "review_text": "This NOVA BladeForge RTX 4080 is a beast! The i9-14900HX and RTX 4080 combo slays in every game, and that 16-inch QHD+ 240Hz display is a visual treat. Worth every penny for a flagship gaming machine.",
+    "created_at": "2026-09-03T21:34:04.364991+00:00"
+  },
+  {
+    "id": "rev_f1dbc8",
+    "product_id": "prod_005",
+    "product_name": "NOVA BladeForge RTX 4080 Gaming Laptop",
+    "customer_name": "Alex Chen",
+    "rating": 4,
+    "review_text": "Damn, the NOVA BladeForge RTX 4080 is a beast! The i9-14900HX and RTX 4080 combo is unstoppable, and that 16-inch QHD+ display is a gamer's dream. Pricey as hell, but it's worth every penny if you're into serious gaming.",
+    "created_at": "2026-09-03T21:34:26.066750+00:00"
+  },
+  {
+    "id": "rev_f1e0c6",
+    "product_id": "prod_005",
+    "product_name": "NOVA BladeForge RTX 4080 Gaming Laptop",
+    "customer_name": "Alex Chen",
+    "rating": 4,
+    "review_text": "Wow, the NOVA BladeForge RTX 4080 is a beast! The i9-14900HX and RTX 4080 combo is lightning fast, and that 16-inch QHD+ display is a gamer's dream come true.",
+    "created_at": "2026-09-03T21:34:50.047143+00:00"
+  },
+  {
+    "id": "rev_194ead",
+    "product_id": "prod_003",
+    "product_name": "NOVA Prime 5G Smartphone",
+    "customer_name": "Alex Chen",
+    "rating": 5,
+    "review_text": "Absolutely love the NOVA Prime 5G! The 120Hz AMOLED display is a game-changer, and the Dimensity 8300 Ultra doesn't disappoint\u2014feels super snappy for all my tech needs.",
+    "created_at": "2026-09-03T21:35:12.267706+00:00"
+  },
+  {
+    "id": "rev_736349",
+    "product_id": "prod_005",
+    "product_name": "NOVA BladeForge RTX 4080 Gaming Laptop",
+    "customer_name": "Alex Chen",
+    "rating": 4,
+    "review_text": "This NOVA BladeForge RTX 4080 is a beast! The i9-14900HX and RTX 4080 combo slays every game I throw at it, and that 16-inch QHD+ display is a visual feast.",
+    "created_at": "2026-09-03T21:35:35.553464+00:00"
+  },
+  {
+    "id": "rev_82de5d",
+    "product_id": "prod_006",
+    "product_name": "NOVA AeroBook Slim i7 Ultrabook",
+    "customer_name": "Alex Chen",
+    "rating": 5,
+    "review_text": "The NOVA AeroBook Slim i7 is a beast in such a tiny package\u2014I can't believe its 1.1kg weight while packing a 155H processor and Arc graphics. The 14-inch 2.8K OLED screen is a visual feast, and Thunderbolt 4 makes for lightning-fast transfers. Highly recommend for those needing power without the bulk.",
+    "created_at": "2026-09-03T21:35:58.312139+00:00"
+  },
+  {
+    "id": "rev_27dea9",
+    "product_id": "prod_001",
+    "product_name": "NOVA Apex Pro 5G Smartphone",
+    "customer_name": "Alex Chen",
+    "rating": 5,
+    "review_text": "The NOVA Apex Pro 5G is a beast! From the second I plugged it in, 100W SuperVOOC charged it like it was a regular phone call. The Snapdragon 8 Gen 3 and 6.78-inch AMOLED screen make everything buttery smooth\u2014definitely worth the splurge.",
+    "created_at": "2026-09-03T21:36:16.327453+00:00"
+  },
+  {
+    "id": "rev_1da154",
+    "product_id": "prod_001",
+    "product_name": "NOVA Apex Pro 5G Smartphone",
+    "customer_name": "Alex Chen",
+    "rating": 5,
+    "review_text": "Absolutely slayed by the NOVA Apex Pro 5G! The SuperVOOC charging is a game-changer, and that 120Hz AMOLED screen is smoother than silk. Worth every penny for the top-tier specs.",
+    "created_at": "2026-09-03T21:36:39.521516+00:00"
+  },
+  {
+    "id": "rev_c62923",
+    "product_id": "prod_006",
+    "product_name": "NOVA AeroBook Slim i7 Ultrabook",
+    "customer_name": "Alex Chen",
+    "rating": 4,
+    "review_text": "The NOVA AeroBook Slim i7 is a sleek beast for the tech enthusiast. Packing a 1.1kg magnesium-alloy body, an Intel Core Ultra 7 processor, and a stunning 14-inch 2.8K OLED screen, this ultrabook is not just light on your lap, but also on your desires for a smooth, powerful experience.",
+    "created_at": "2026-09-03T21:37:04.823642+00:00"
+  },
+  {
+    "id": "rev_b2dadc",
+    "product_id": "prod_004",
+    "product_name": "NOVA ZenBook Ultra 14 M3 Laptop",
+    "customer_name": "Alex Chen",
+    "rating": 4,
+    "review_text": "The NOVA ZenBook Ultra 14 M3 is a beast! The M3 chip is lightning fast, and that Liquid Retina XDR display is a game changer for both work and play. Zero regrets on this purchase.",
+    "created_at": "2026-09-03T21:37:27.268732+00:00"
+  },
+  {
+    "id": "rev_549d96",
+    "product_id": "prod_001",
+    "product_name": "NOVA Apex Pro 5G Smartphone",
+    "customer_name": "Alex Chen",
+    "rating": 5,
+    "review_text": "Absolutely blown away by the NOVA Apex Pro 5G. The Snapdragon 8 Gen 3 and 100W SuperVOOC charging are game changers for performance and speed.",
+    "created_at": "2026-09-03T21:37:43.116252+00:00"
+  },
+  {
+    "id": "rev_eb5020",
+    "product_id": "prod_005",
+    "product_name": "NOVA BladeForge RTX 4080 Gaming Laptop",
+    "customer_name": "Alex Chen",
+    "rating": 4,
+    "review_text": "The NOVA BladeForge has exceeded all my expectations with its insane performance and stunning display. If you're looking to game at the absolute highest settings, this is your holy grail laptop.",
+    "created_at": "2026-09-03T21:38:00.475065+00:00"
+  },
+  {
+    "id": "rev_72c4f5",
+    "product_id": "prod_006",
+    "product_name": "NOVA AeroBook Slim i7 Ultrabook",
+    "customer_name": "Alex Chen",
+    "rating": 4,
+    "review_text": "Man, the NOVA AeroBook Slim i7 is a beast! I've logged countless hours on this bad boy without breaking a sweat (literally or metaphorically), and the OLED screen is a game changer for color accuracy. Well worth the weight in gold.",
+    "created_at": "2026-09-03T21:38:23.370666+00:00"
+  },
+  {
+    "id": "rev_577b7d",
+    "product_id": "prod_006",
+    "product_name": "NOVA AeroBook Slim i7 Ultrabook",
+    "customer_name": "Alex Chen",
+    "rating": 4,
+    "review_text": "The NOVA AeroBook Slim i7 Ultrabook is a sleek machine that packs more punch than I expected. That magnesium-alloy body is not just a fashion statement; it's incredibly durable and a breath of fresh air with its 1.1kg weight. The OLED screen and Intel Core Ultra 7 processor make multitasking a breeze, and Thunderbolt 4 is a game-changer for external connectivity. Worth every penny for a top-tier ultrabook.",
+    "created_at": "2026-09-03T21:38:47.177076+00:00"
+  },
+  {
+    "id": "rev_8127b2",
+    "product_id": "prod_005",
+    "product_name": "NOVA BladeForge RTX 4080 Gaming Laptop",
+    "customer_name": "Alex Chen",
+    "rating": 4,
+    "review_text": "Absolutely killer machine, the NOVA BladeForge RTX 4080 is a beast in every way. That i9-14900HX coupled with the RTX 4080 makes for some butter-smooth gaming and procreations sessions.",
+    "created_at": "2026-09-03T21:39:05.504782+00:00"
+  },
+  {
+    "id": "rev_b8f0c7",
+    "product_id": "prod_005",
+    "product_name": "NOVA BladeForge RTX 4080 Gaming Laptop",
+    "customer_name": "Alex Chen",
+    "rating": 4,
+    "review_text": "Man, the NOVA BladeForge RTX 4080 is a beast! I haven't felt this much power in a laptop. The i9-14900HX and RTX 4080 combo is smooth as silk, and that QHD+ 240Hz display is a gamer's dream. Worth every penny for a top-tier setup.",
+    "created_at": "2026-09-03T21:39:27.266368+00:00"
+  },
+  {
+    "id": "rev_91308a",
+    "product_id": "prod_004",
+    "product_name": "NOVA ZenBook Ultra 14 M3 Laptop",
+    "customer_name": "Alex Chen",
+    "rating": 4,
+    "review_text": "Absolutely killer laptop for the price point! The Apple M3 performance is smooth, and that Liquid Retina XDR display is a game-changer for productivity and creativity.",
+    "created_at": "2026-09-03T21:39:49.959822+00:00"
+  },
+  {
+    "id": "rev_1e51f6",
+    "product_id": "prod_025",
+    "product_name": "NOVA TurboFlash 30W Mobile Fast Charger",
+    "customer_name": "Sophia Miller",
+    "rating": 5,
+    "review_text": "Got the NOVA TurboFlash 30W charger for a song and it hits the spot for fast charging on the go. Tiny but packs a punch with 30W PD\u2014definitely a steal at \u20b918.25!",
+    "created_at": "2026-09-03T21:40:12.514541+00:00"
+  },
+  {
+    "id": "rev_d6e962",
+    "product_id": "prod_016",
+    "product_name": "NOVA Vortex Pro RGB Wired Mechanical Keyboard",
+    "customer_name": "Sophia Miller",
+    "rating": 5,
+    "review_text": "Picked up the NOVA Vortex Pro for a steal at \u20b942.59 and it's worth every penny. Solid build quality, and those optical red switches are a gamer's dream\u2014fast, precise, and quiet.",
+    "created_at": "2026-09-03T21:40:34.843724+00:00"
+  },
+  {
+    "id": "rev_355c6e",
+    "product_id": "prod_024",
+    "product_name": "NOVA PowerStream 100W USB-C Laptop Charger",
+    "customer_name": "David Patel",
+    "rating": 4,
+    "review_text": "The NOVA PowerStream 100W USB-C is a game-changer for power-hungry devices. The 2-meter cable and smart temperature management make it a breeze to charge my laptop without hassle. Highly recommend for anyone needing reliable fast charging.",
+    "created_at": "2026-09-03T21:40:57.367251+00:00"
+  },
+  {
+    "id": "rev_740008",
+    "product_id": "prod_019",
+    "product_name": "NOVA ViperBlade 26K DPI Gaming Mouse",
+    "customer_name": "David Patel",
+    "rating": 4,
+    "review_text": "The ViperBlade 26K DPI is a beast for gaming\u2014feels like it's hugging the mouse pad, tracking like a laser, and the lightness is insane. If you're into esports or just want the absolute best, this mouse delivers.",
+    "created_at": "2026-09-03T21:41:20.582163+00:00"
+  },
+  {
+    "id": "rev_a848f1",
+    "product_id": "prod_018",
+    "product_name": "NOVA ErgoMaster Silent Wireless Mouse",
+    "customer_name": "David Patel",
+    "rating": 4,
+    "review_text": "Absolutely loving the NOVA ErgoMaster Silent Wireless Mouse! The whisper-quiet switches are a game changer, and those multi-surface tracking capabilities make it a breeze to use on any desk. Five stars for the smooth operation and ergonomic design that keeps my wrist happy.",
+    "created_at": "2026-09-03T21:41:42.432562+00:00"
+  },
+  {
+    "id": "rev_342259",
+    "product_id": "prod_006",
+    "product_name": "NOVA AeroBook Slim i7 Ultrabook",
+    "customer_name": "Alex Chen",
+    "rating": 4,
+    "review_text": "The NOVA AeroBook Slim i7 is a sleek beast, offering insane performance in a package light enough to forget you're even carrying it around. OLED display is a gamechanger, and the Intel Arc graphics handle everything from coding to gaming with ease.",
+    "created_at": "2026-09-03T21:42:05.343815+00:00"
+  },
+  {
+    "id": "rev_e52423",
+    "product_id": "prod_001",
+    "product_name": "NOVA Apex Pro 5G Smartphone",
+    "customer_name": "Alex Chen",
+    "rating": 5,
+    "review_text": "The NOVA Apex Pro 5G is a beast\u2014Snapdragon 8 Gen 3 and 100W fast charging? Sign me up. The camera and display are top-notch, making it perfect for both work and play.",
+    "created_at": "2026-09-03T21:42:28.302948+00:00"
+  },
+  {
+    "id": "rev_7bc090",
+    "product_id": "prod_002",
+    "product_name": "NOVA Apex Ultra Fold 5G",
+    "customer_name": "Alex Chen",
+    "rating": 5,
+    "review_text": "The NOVA Apex Ultra Fold 5G is a game-changer! The 8.0-inch 120Hz inner display and titanium hinge are insane, and the dual periscope zoom is a photographer's dream. This thing is a beast.",
+    "created_at": "2026-09-03T21:42:51.887293+00:00"
+  },
+  {
+    "id": "rev_75a751",
+    "product_id": "prod_004",
+    "product_name": "NOVA ZenBook Ultra 14 M3 Laptop",
+    "customer_name": "Alex Chen",
+    "rating": 4,
+    "review_text": "Absolutely blown away by the NOVA ZenBook Ultra 14 M3! The M3 chip is lightning fast, and that Liquid Retina XDR display is a game changer\u2014crystal clear, even in bright sunlight. Plus, 22 hours of battery life? I might just ditch my charger for good.",
+    "created_at": "2026-09-03T21:43:14.908088+00:00"
+  },
+  {
+    "id": "rev_efcc0d",
+    "product_id": "prod_003",
+    "product_name": "NOVA Prime 5G Smartphone",
+    "customer_name": "Sophia Miller",
+    "rating": 5,
+    "review_text": "Snagged the NOVA Prime 5G for a steal\u20146.67-inch AMOLED screen and 120Hz refresh rate, all for \u20b983.95. Battery life and camera quality top-notch for this price; highly recommend!",
+    "created_at": "2026-09-03T21:43:36.715746+00:00"
+  },
+  {
+    "id": "rev_034504",
+    "product_id": "prod_015",
+    "product_name": "NOVA Pulse Slim Smartwatch",
+    "customer_name": "Sophia Miller",
+    "rating": 5,
+    "review_text": "Got the NOVA Pulse Slim Smartwatch for a steal at \u20b959.62 and it's everything I hoped for\u2014looks sleek, packed with features, and perfect for my daily adventures. Worth every penny!",
+    "created_at": "2026-09-03T21:44:00.315742+00:00"
+  },
+  {
+    "id": "rev_a3b05b",
+    "product_id": "prod_006",
+    "product_name": "NOVA AeroBook Slim i7 Ultrabook",
+    "customer_name": "Alex Chen",
+    "rating": 5,
+    "review_text": "The NOVA AeroBook Slim i7 is a sleek beast! Packing an Ultra 7 155H processor and Intel Arc graphics, this 1.1kg magnesium-alloy beauty is a gaming and productivity powerhouse in my backpack.",
+    "created_at": "2026-09-03T21:44:22.776267+00:00"
+  },
+  {
+    "id": "rev_be0bfa",
+    "product_id": "prod_001",
+    "product_name": "NOVA Apex Pro 5G Smartphone",
+    "customer_name": "Alex Chen",
+    "rating": 5,
+    "review_text": "Absolutely blown away by the NOVA Apex Pro 5G! The 120Hz AMOLED display and 100W charging are game-changers. Can't wait to see what else this beast can do.",
+    "created_at": "2026-09-03T21:44:43.725293+00:00"
+  },
+  {
+    "id": "rev_2443cc",
+    "product_id": "prod_005",
+    "product_name": "NOVA BladeForge RTX 4080 Gaming Laptop",
+    "customer_name": "Alex Chen",
+    "rating": 4,
+    "review_text": "Laptop gods have finally blessed us with the NOVA BladeForge RTX 4080! This bad boy is a gaming monster, and with the i9-14900HX and 16-inch QHD+ display, it\u2019s like having the best of both worlds in one sleek package. Top-tier performance for the top-tier price (okay, maybe not the price, but damn, what a machine).",
+    "created_at": "2026-09-03T21:45:07.151768+00:00"
+  },
+  {
+    "id": "rev_a75f22",
+    "product_id": "prod_001",
+    "product_name": "NOVA Apex Pro 5G Smartphone",
+    "customer_name": "Alex Chen",
+    "rating": 5,
+    "review_text": "The NOVA Apex Pro 5G is an absolute powerhouse! Fast charging, insane specs, and that screen\u2014what more could you want? Total tech satisfaction, folks!",
+    "created_at": "2026-09-03T21:45:28.476518+00:00"
+  },
+  {
+    "id": "rev_e4b344",
+    "product_id": "prod_007",
+    "product_name": "NOVA ClarityFlow Studio Wired In-Ear Monitors",
+    "customer_name": "David Patel",
+    "rating": 4,
+    "review_text": "These NOVA ClarityFlow Studio earphones deliver a surprisingly rich and detailed sound for the price. The hybrid drivers work wonders, and the build quality is solid\u2014definitely an audiophile's delight for everyday use.",
+    "created_at": "2026-09-03T21:45:51.672688+00:00"
+  },
+  {
+    "id": "rev_4ea300",
+    "product_id": "prod_016",
+    "product_name": "NOVA Vortex Pro RGB Wired Mechanical Keyboard",
+    "customer_name": "David Patel",
+    "rating": 4,
+    "review_text": "The NOVA Vortex Pro RGB is a solid pick for any audiophile or gadget geek. The sound-dampening foam and optical red switches are a game-changer, making it perfect for those who appreciate both performance and a quieter typing experience.",
+    "created_at": "2026-09-03T21:46:12.974995+00:00"
+  },
+  {
+    "id": "rev_50eabb",
+    "product_id": "prod_013",
+    "product_name": "NOVA StreamAir Dual Wireless Lavalier Mic System",
+    "customer_name": "Elena Rostova",
+    "rating": 4,
+    "review_text": "This NOVA StreamAir mic system is a game-changer for my video calls and meetings. The noise reduction and sound quality are top-notch, and the compact design is a breeze to carry around.",
+    "created_at": "2026-09-03T21:46:40.630262+00:00"
+  },
+  {
+    "id": "rev_ad3376",
+    "product_id": "prod_017",
+    "product_name": "NOVA AirType Low-Profile Wireless Keyboard",
+    "customer_name": "Sophia Miller",
+    "rating": 5,
+    "review_text": "Got the NOVA AirType for a steal at \u20b951.10 and it's a game-changer\u2014thin, responsive, and versatile with that toggle for Mac/Win. Worth every penny!",
+    "created_at": "2026-09-03T21:47:06.213000+00:00"
+  },
+  {
+    "id": "rev_000f4c",
+    "product_id": "prod_014",
+    "product_name": "NOVA Pulse Ultra Smartwatch",
+    "customer_name": "Sophia Miller",
+    "rating": 4,
+    "review_text": "Scored the NOVA Pulse Ultra for a steal at \u20b979.08 and it's a serious upgrade from my old model\u2014top-notch build quality and a must-have for fitness buffs.",
+    "created_at": "2026-09-03T21:47:34.167983+00:00"
+  },
+  {
+    "id": "rev_b197c3",
+    "product_id": "prod_010",
+    "product_name": "NOVA StudioMaster Pro Hi-Fi Wired Headphones",
+    "customer_name": "Marcus Kim",
+    "rating": 4,
+    "review_text": "These NOVA StudioMaster Pro headphones are a game-changer for my deep-dives into music and videos. The open-back design gives an expansive, natural sound that\u2019s perfect for mixing and enjoying nuanced tracks. Can\u2019t wait to see if the 24/7 return policy holds up on this one.",
+    "created_at": "2026-09-03T21:47:58.656298+00:00"
+  },
+  {
+    "id": "rev_5e911a",
+    "product_id": "prod_002",
+    "product_name": "NOVA Apex Ultra Fold 5G",
+    "customer_name": "Alex Chen",
+    "rating": 5,
+    "review_text": "The NOVA Apex Ultra Fold 5G is a masterpiece, effortlessly combining a massive, fluid 120Hz display with the robustness of titanium. It's not just a foldable phone; it's a game-changer, perfect for my high-spec demands and multitasking needs.",
+    "created_at": "2026-09-03T21:48:58.493292+00:00"
+  },
+  {
+    "id": "rev_9de85f",
+    "product_id": "prod_003",
+    "product_name": "NOVA Prime 5G Smartphone",
+    "customer_name": "Alex Chen",
+    "rating": 5,
+    "review_text": "The NOVA Prime 5G is a beast! That 6.67-inch 120Hz AMOLED display is a game changer, and the Dimensity 8300 Ultra packs some serious punch. Definitely worth the splurge if you're in the market for a flagship phone.",
+    "created_at": "2026-09-03T21:50:52.130696+00:00"
+  },
+  {
+    "id": "rev_b235fc",
+    "product_id": "prod_017",
+    "product_name": "NOVA AirType Low-Profile Wireless Keyboard",
+    "customer_name": "David Patel",
+    "rating": 4,
+    "review_text": "The NOVA AirType is a game-changer for anyone looking for a slim, responsive keyboard. Its tri-mode connectivity and seamless Mac/Windows toggle make it incredibly versatile, and those Gateron switches are pure bliss. Highly recommend for setup flexibility and comfort.",
+    "created_at": "2026-09-03T21:51:14.739626+00:00"
+  },
+  {
+    "id": "rev_8095c7",
+    "product_id": "prod_009",
+    "product_name": "NOVA BoomPulse 360 Bluetooth Speaker",
+    "customer_name": "David Patel",
+    "rating": 4,
+    "review_text": "Man, the NOVA BoomPulse 360 is a game-changer for outdoor jams. Cranked up the bass while hiking, and it held strong\u2014waterproof and practically silent thanks to those dual passive radiators. Absolute lifesaver for the audiophile who loves getting lost in sound.",
+    "created_at": "2026-09-03T21:51:36.093449+00:00"
   }
 ]

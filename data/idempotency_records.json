@@ -45,5 +45,24 @@
     "retry_count": 0,
     "metadata": {},
     "allow_retry": true
+  },
+  "refund:ORD-0700-F868": {
+    "operation_id": "refund:ORD-0700-F868",
+    "operation_type": "REFUND",
+    "actor": "Finance Manager Agent",
+    "status": "SUCCESS",
+    "started_at": "2026-09-03T21:08:06.263677+00:00",
+    "started_at_ts": 1788469686.263715,
+    "completed_at": "2026-09-03T21:08:06.424584+00:00",
+    "result": {
+      "success": true,
+      "order_id": "ORD-0700-F868",
+      "refund_amount": 42.59,
+      "status": "Refunded",
+      "message": "Successfully refunded \u20b942.59 for Order #ORD-0700-F868 via Razorpay Gateway. Inventory restocked."
+    },
+    "error": null,
+    "retry_count": 0,
+    "metadata": {}
   }
 }

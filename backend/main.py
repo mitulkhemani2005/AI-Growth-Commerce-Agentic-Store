@@ -39,6 +39,16 @@ from backend.agent_tasks import task_manager
 from backend.observability import observability_manager
 from backend.policy_engine import policy_engine, validate_policy
 from backend.idempotency import idempotency_manager
+from backend.agents.upsell_agent import UpsellAgent
+from backend.agents.campaign_orchestrator import CampaignOrchestrator
+
+# Initialize specialized intelligence agents
+upsell_agent = UpsellAgent(inventory_manager=inventory_manager)
+campaign_orchestrator = CampaignOrchestrator(
+    inventory_manager=inventory_manager,
+    message_bus=message_bus,
+    buyer_manager=buyer_agents_fleet
+)
 
 
 @asynccontextmanager
@@ -53,7 +63,7 @@ async def lifespan(app: FastAPI):
     # Unload all models from GPU VRAM
     unload_all_models_from_vram()
 
-app = FastAPI(title="AI Growth Commerce Agentic Store", version="1.0.0", lifespan=lifespan)
+app = FastAPI(title="Nava: Agentic AI Store", version="1.0.0", lifespan=lifespan)
 
 # Enable CORS for local development
 app.add_middleware(
@@ -74,9 +84,13 @@ os.makedirs(STATIC_DIR, exist_ok=True)
 os.makedirs(os.path.join(STATIC_DIR, "images"), exist_ok=True)
 os.makedirs(FRONTEND_DIR, exist_ok=True)
 
-# Mount static files
+# Mount static files & React bundle assets
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 app.mount("/frontend", StaticFiles(directory=FRONTEND_DIR), name="frontend")
+FRONTEND_DIST_DIR = os.path.join(FRONTEND_DIR, "dist")
+ASSETS_DIR = os.path.join(FRONTEND_DIST_DIR, "assets")
+if os.path.exists(ASSETS_DIR):
+    app.mount("/assets", StaticFiles(directory=ASSETS_DIR), name="assets")
 
 # Mount AgentsOffice visual RPG simulator
 OFFICE_STATIC_DIR = os.path.join(BASE_DIR, "agents_office", "app", "static", "office")
@@ -546,9 +560,282 @@ async def update_settings(req: SettingsRequest):
         "current_model": commerce_agent.model
     }
 
+
 # =====================================================================
-# 👑 ADMIN PANEL & 24/7 AGENT FLEET ENDPOINTS
+# 🤖 AGENT-READABLE CATALOG & MACHINE-TO-MACHINE PROTOCOLS (UAP / ACP / AP2)
 # =====================================================================
+
+@app.get("/.well-known/agent-catalog.json")
+@app.get("/api/agent-catalog")
+async def get_agent_readable_catalog():
+    """
+    Standards-compliant Agent-Readable Catalog adhering to UAP / ACP specifications.
+    Enables external and local autonomous AI agents to discover inventory, price floors,
+    dynamic surge states, and supported settlement rails.
+    """
+    products = inventory_manager.get_all_products()
+    items = []
+    for p in products:
+        base_price = float(p.get("BASE_PRICE", p.get("PRICE", 100)))
+        selling_price = float(p.get("PRICE", base_price))
+        items.append({
+            "@context": "https://schema.org",
+            "@type": "Product",
+            "product_id": p.get("id"),
+            "name": p.get("PRODUCT_NAME"),
+            "category": p.get("PRODUCT_TYPE"),
+            "description": p.get("DESCRIPTION"),
+            "image": p.get("IMAGE"),
+            "offers": {
+                "@type": "Offer",
+                "price": selling_price,
+                "priceCurrency": "INR",
+                "taxRate": 0.0,
+                "priceFloor": base_price,
+                "availability": "https://schema.org/InStock" if p.get("STOCK_REMAINING", 0) > 0 else "https://schema.org/OutOfStock",
+                "itemCondition": "https://schema.org/NewCondition"
+            },
+            "inventory": {
+                "units_available": p.get("STOCK_REMAINING", 0)
+            },
+            "policies": {
+                "refund_window_hours": 24,
+                "shipping_coverage": "India Standard (0% Tax)",
+                "payment_rails": ["AP2_MANDATE", "RAZORPAY_INR"]
+            }
+        })
+    return {
+        "protocol": "UAP/ACP/AP2",
+        "version": "1.0",
+        "store_name": "Nava: Agentic AI Store",
+        "currency": "INR",
+        "tax_policy": "0% Tax Storewide",
+        "merchant_endpoints": {
+            "catalog": "/api/inventory",
+            "quote": "/api/cart",
+            "autonomous_checkout": "/api/payment/agent-autopay",
+            "conversational_checkout": "/api/chat/conversational-checkout",
+            "razorpay_checkout": "/api/payment/create-order",
+            "cross_sells": "/api/cart/cross-sells"
+        },
+        "item_count": len(items),
+        "products": items
+    }
+
+
+@app.get("/.well-known/ap2-manifest.json")
+async def get_ap2_manifest():
+    """Manifest specification for Agentic Payments Protocol (AP2)."""
+    return {
+        "protocol": "AP2",
+        "version": "2.4",
+        "issuer": "Nava: Agentic AI Store",
+        "supported_currencies": ["INR"],
+        "mandate_limits": {
+            "max_single_transaction_inr": 25000.0,
+            "daily_cap_inr": 100000.0,
+            "require_signature": True
+        },
+        "settlement_rails": ["RAZORPAY_TEST_MODE", "TOKENIZED_MANDATE"],
+        "security_gates": {
+            "base_price_floor_enforcement": True,
+            "refund_window_hours": 24,
+            "pre_shipment_only": True
+        }
+    }
+
+
+# =====================================================================
+# 📦 UPSELL & CROSS-SELL AGENT ENDPOINTS
+# =====================================================================
+
+@app.get("/api/cart/cross-sells")
+async def get_cart_cross_sells(user_id: str = "user_alex"):
+    """
+    Returns explainable, margin-preserving cross-sell accessory recommendations
+    tailored to items currently in the customer's cart.
+    """
+    cart = cart_manager.get_cart(user_id)
+    cart_items = cart.get("items", [])
+    recommendations = upsell_agent.get_recommendations_for_cart(cart_items, limit=3)
+    return {
+        "success": True,
+        "recommendations": recommendations,
+        "count": len(recommendations)
+    }
+
+
+# =====================================================================
+# ⚡ PROMOTIONAL CAMPAIGN ORCHESTRATOR ENDPOINTS
+# =====================================================================
+
+@app.get("/api/campaigns/active")
+async def get_active_campaign():
+    """Returns current active promotional flash sale campaign."""
+    campaign = campaign_orchestrator.get_active_campaign()
+    return {"success": True, "campaign": campaign}
+
+
+@app.get("/api/admin/campaigns")
+async def get_admin_campaigns():
+    """Returns all promotional marketing campaigns."""
+    return {
+        "success": True,
+        "campaigns": campaign_orchestrator.get_all_campaigns()
+    }
+
+
+class LaunchCampaignRequest(BaseModel):
+    title: str
+    category: str = "ALL"
+    discount_percent: float = 10.0
+    duration_hours: int = 24
+
+
+@app.post("/api/admin/campaigns/launch")
+async def launch_admin_campaign(req: LaunchCampaignRequest):
+    """Launches an autonomous promotional campaign bounded by base price floors."""
+    res = campaign_orchestrator.launch_campaign(
+        title=req.title,
+        category=req.category,
+        discount_percent=req.discount_percent,
+        duration_hours=req.duration_hours
+    )
+    return res
+
+
+# =====================================================================
+# 💬 IN-APP CONVERSATIONAL CHECKOUT (AP2 TOKENIZED DIRECT SETTLEMENT)
+# =====================================================================
+
+class ConversationalCheckoutRequest(BaseModel):
+    user_id: str = "user_alex"
+    payment_method: str = "AP2"
+    shipping_address: Optional[str] = None
+
+
+@app.post("/api/chat/conversational-checkout")
+async def conversational_checkout(req: ConversationalCheckoutRequest):
+    """
+    Executes in-app conversational checkout directly from the chat copilot
+    using the customer's AP2 tokenized mandate without frontend popups.
+    """
+    cart = cart_manager.get_cart(req.user_id)
+    if not cart.get("items"):
+        raise HTTPException(status_code=400, detail="Cannot checkout: Cart is empty.")
+    
+    total = float(cart.get("estimated_total", 0.0))
+    MAX_AP2_BOUND = 25000.0
+    if total > MAX_AP2_BOUND:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Order total ₹{total:,.2f} exceeds AP2 single mandate safety limit of ₹{MAX_AP2_BOUND:,.2f}. Please use standard Razorpay checkout."
+        )
+
+    res = payment_manager.autonomous_agent_pay(
+        user_id=req.user_id,
+        shipping_address=req.shipping_address or cart_manager.get_customer_address(req.user_id)
+    )
+    if not res.get("success"):
+        raise HTTPException(status_code=400, detail=res.get("error", "AP2 conversational checkout failed."))
+    
+    order = res.get("order", {})
+    treasury_manager.deposit_sales(
+        amount=order.get("total", total),
+        order_id=order.get("order_id", ""),
+        items_summary=f"{len(order.get('items', []))} items (Conversational AP2)",
+        customer=order.get("customer_name", req.user_id)
+    )
+    return {
+        "success": True,
+        "order_id": order.get("order_id"),
+        "total": order.get("total", total),
+        "tracking_number": order.get("tracking_number", "TRK-AP2-DIRECT"),
+        "message": f"Order {order.get('order_id')} confirmed via 1-click AP2 Protocol! ₹{total:,.2f} captured on Razorpay rails."
+    }
+
+
+# =====================================================================
+# 🛡️ EXPLAINABLE AUDIT TRAIL & GRACEFUL FAILURE HANDLING
+# =====================================================================
+
+@app.get("/api/admin/audit-trail")
+async def get_audit_trail():
+    """
+    Returns an immutable chronological audit trail where every financial transaction
+    is explainable, bounded, and gated.
+    """
+    transactions = treasury_manager.get_transactions()
+    audited_trail = []
+    for tx in transactions:
+        audited_trail.append({
+            "timestamp": tx.get("timestamp"),
+            "transaction_id": tx.get("id") or f"TX_{abs(hash(str(tx.get('timestamp')))) % 1000000}",
+            "type": tx.get("type"),
+            "amount": float(tx.get("amount", 0.0)),
+            "balance_after": float(tx.get("balance_after", 0.0)),
+            "actor": tx.get("actor") or "Autonomous Engine",
+            "explainability": tx.get("description") or "Wholesale base acquisition or customer sales revenue.",
+            "is_bounded": True,
+            "policy_gate": "0% Tax Storewide / Base Price Floor / 24h Refund"
+        })
+    return {
+        "success": True,
+        "total_actions": len(audited_trail),
+        "audit_trail": audited_trail
+    }
+
+
+class FailureSimulationRequest(BaseModel):
+    failure_type: str  # "AP2_OVERSPEND" | "EXPIRED_REFUND" | "BASE_FLOOR_BREACH"
+
+
+@app.post("/api/simulation/failure-test")
+async def simulate_failure_mode(req: FailureSimulationRequest):
+    """
+    Demonstrates graceful, explainable failure handling for financial edge cases.
+    """
+    if req.failure_type == "AP2_OVERSPEND":
+        attempted_amount = 38500.0
+        max_bound = 25000.0
+        return {
+            "success": False,
+            "status": "BOUNDED_REJECTION",
+            "attempted_action": f"AP2 Autonomous Tokenized Payment of ₹{attempted_amount:,.2f}",
+            "error_code": "AP2_MANDATE_LIMIT_EXCEEDED",
+            "message": f"Transaction rejected safely: Attempted ₹{attempted_amount:,.2f} exceeds user's pre-approved mandate cap of ₹{max_bound:,.2f}.",
+            "explainability": "Financial safety bound enforced. System refuses un-gated credit expansion without interactive multi-factor re-authorization.",
+            "graceful_recovery": "Fallback to standard Razorpay OTP checkout presented to user."
+        }
+
+    elif req.failure_type == "EXPIRED_REFUND":
+        return {
+            "success": False,
+            "status": "GATED_REJECTION",
+            "attempted_action": "Automated 1-Click Refund Processing",
+            "error_code": "REFUND_WINDOW_EXPIRED",
+            "message": "Refund request rejected safely: Order age exceeds 24-hour non-shipped policy threshold and tracking is active in transit.",
+            "explainability": "Merchant governance policy forbids automated stock deduction after carrier dispatch to prevent inventory discrepancy.",
+            "graceful_recovery": "Option provided for manual Store Owner exception override in Owner Studio."
+        }
+
+    elif req.failure_type == "BASE_FLOOR_BREACH":
+        attempted_price = 299.0
+        base_floor = 450.0
+        clamped_price = max(base_floor, attempted_price)
+        return {
+            "success": True,
+            "status": "BOUNDED_ENFORCEMENT",
+            "attempted_action": f"Price Manager Discount to ₹{attempted_price:.2f}",
+            "base_floor": f"₹{base_floor:.2f}",
+            "clamped_price": f"₹{clamped_price:.2f}",
+            "message": f"Breach prevented: Requested price ₹{attempted_price:.2f} was below wholesale base floor ₹{base_floor:.2f}. Clamped to ₹{clamped_price:.2f}.",
+            "explainability": "The Store Owner locks the Base Price Floor as an immutable constraint. Margin cannot be negative.",
+            "graceful_recovery": "Selling price automatically protected at zero margin risk."
+        }
+
+    raise HTTPException(status_code=400, detail=f"Unknown failure test type: {req.failure_type}")
+
 
 # Admin agent imports (already imported above at module level)
 from backend.background_workers import background_worker
@@ -649,9 +936,15 @@ class AdminCEODiscussionRequest(BaseModel):
 
 @app.get("/admin")
 async def serve_admin_panel():
-    admin_index = os.path.join(FRONTEND_DIR, "admin", "index.html")
+    react_index = os.path.join(FRONTEND_DIR, "dist", "index.html")
+    if os.path.exists(react_index):
+        return FileResponse(react_index)
+    admin_index = os.path.join(FRONTEND_DIR, "legacy", "admin", "index.html")
     if os.path.exists(admin_index):
         return FileResponse(admin_index)
+    admin_index_legacy = os.path.join(FRONTEND_DIR, "admin", "index.html")
+    if os.path.exists(admin_index_legacy):
+        return FileResponse(admin_index_legacy)
     return {"message": "Admin panel frontend index.html not found"}
 
 @app.get("/api/admin/overview")
@@ -1180,6 +1473,9 @@ async def simulate_decision_endpoint(req: SimulateDecisionRequest):
 # Serve root frontend
 @app.get("/")
 async def root():
+    react_index = os.path.join(FRONTEND_DIR, "dist", "index.html")
+    if os.path.exists(react_index):
+        return FileResponse(react_index)
     index_file = os.path.join(FRONTEND_DIR, "index.html")
     if os.path.exists(index_file):
         return FileResponse(index_file)

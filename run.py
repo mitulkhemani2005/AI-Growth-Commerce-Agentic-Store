@@ -17,7 +17,7 @@ if __name__ == "__main__":
     print("  Powered by Ollama Local AI & Autonomous Agent Fleet")
     print("=" * 60)
     print("  - Web Storefront & Prompt Interface: http://127.0.0.1:8000")
-    print("  - Admin Intelligence Center:         http://127.0.0.1:8000/frontend/admin/index.html")
+    print("  - Admin Command Center:              http://127.0.0.1:8000/admin")
     print("  - AgentsOffice Visual RPG Simulator: http://127.0.0.1:8000/office")
     print("  - API Documentation:                 http://127.0.0.1:8000/docs")
     print("=" * 60)

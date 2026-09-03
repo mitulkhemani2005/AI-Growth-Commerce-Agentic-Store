@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Growth Commerce AI | Autonomous Agentic Store</title>
+  <meta name="description" content="AI Growth Commerce Agentic Store featuring multi-product search, instant inventory checks, dual-tier dynamic pricing, and autonomous Razorpay Gateway ordering." />
+  
+  <!-- Modern Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Razorpay Official Checkout SDK -->
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  
+  <!-- Redesigned Modern Stylesheet -->
+  <link rel="stylesheet" href="/frontend/css/styles.css?v=3.0" />
+</head>
+<body class="store-body">
+
+  <!-- Top App Navigation -->
+  <header class="app-header">
+    <div class="header-left">
+      <div class="brand-container">
+        <div class="brand-icon">
+          <i data-lucide="sparkles"></i>
+        </div>
+        <div class="brand-text">
+          <div class="brand-title-row">
+            <h1>GROWTH COMMERCE <span class="brand-badge">AI 24/7</span></h1>
+          </div>
+          <p class="brand-subtitle">Autonomous Multi-Agent Store • Razorpay Gateway</p>
+        </div>
+      </div>
+
+      <!-- Live Fleet Status Pill -->
+      <div class="fleet-status-pill" onclick="window.open('/office', '_blank')" style="cursor: pointer;" title="Open AgentsOffice Pixel RPG Live Simulation">
+        <span class="pulse-dot"></span>
+        <span class="fleet-text">7 AGENTS AUTONOMOUS 🏢</span>
+      </div>
+    </div>
+
+    <!-- Store Policy Badges -->
+    <div class="header-center-badges">
+      <div class="policy-badge" title="Storewide Zero Tax Policy">
+        <i data-lucide="shield-check" class="badge-icon"></i>
+        <span>0% Tax Free</span>
+      </div>
+      <div class="policy-badge" title="All Transactions in Indian Rupees">
+        <span class="currency-symbol">₹</span>
+        <span>INR Official</span>
+      </div>
+      <div class="policy-badge ap2-badge" title="Agentic Payments Protocol Enabled">
+        <i data-lucide="zap" class="badge-icon"></i>
+        <span>AP2 Auto-Pay</span>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <!-- AgentsOffice RPG Simulator Link -->
+      <a href="/office" target="_blank" class="nav-btn office-link" style="background: rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.4); color: #c084fc; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 600;" title="Open AgentsOffice Pixel RPG Live Simulation">
+        <i data-lucide="building-2" style="width: 15px; height: 15px;"></i>
+        <span>🏢 Agents Office</span>
+      </a>
+
+      <!-- Admin Panel Link -->
+      <a href="/admin" class="nav-btn admin-link" title="Open Store Owner Command Center">
+        <i data-lucide="crown" class="crown-icon"></i>
+        <span>Admin Studio</span>
+      </a>
+
+
+      <!-- Razorpay Keys Configuration Button -->
+      <button class="nav-btn secondary-btn" id="openRazorpayConfigBtn" title="Configure Razorpay API Keys & Sandbox">
+        <i data-lucide="credit-card"></i>
+        <span>Razorpay</span>
+      </button>
+
+      <!-- Active User Profile Switcher -->
+      <div class="user-selector-btn" id="userSelectorBtn" title="Switch User Profile">
+        <div class="user-avatar-badge" id="userAvatarText">AR</div>
+        <span class="user-name-label" id="userNameText">Alex Rivera</span>
+        <i data-lucide="chevron-down" class="dropdown-chevron"></i>
+      </div>
+
+      <!-- Orders Button -->
+      <button class="nav-btn icon-btn" id="openOrdersBtn" title="View Order History & Live Tracking">
+        <i data-lucide="package-check"></i>
+        <span>Orders</span>
+        <span class="count-badge" id="ordersCountBadge">0</span>
+      </button>
+
+      <!-- Cart Button -->
+      <button class="nav-btn primary-cart-btn" id="openCartBtn" title="View Shopping Cart">
+        <i data-lucide="shopping-bag"></i>
+        <span>Cart</span>
+        <span class="count-badge glow-badge" id="cartCountBadge">0</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Hero Feature Strip -->
+  <section class="hero-strip">
+    <div class="hero-content">
+      <div class="hero-badge-tag">
+        <i data-lucide="cpu"></i>
+        <span>AGENTIC E-COMMERCE ENGINE</span>
+      </div>
+      <h2>Intelligent Shopping Powered by Autonomous AI Agents</h2>
+      <p>Continuous dynamic pricing optimization, atomic warehouse sync, real-time dispatch tracking, and seamless 1-click Razorpay checkout.</p>
+    </div>
+    <div class="hero-stats-grid">
+      <div class="hero-stat-card">
+        <span class="stat-value">24/7</span>
+        <span class="stat-label">Autonomous Cycles</span>
+      </div>
+      <div class="hero-stat-card">
+        <span class="stat-value">₹ 0.00</span>
+        <span class="stat-label">Tax Storewide</span>
+      </div>
+      <div class="hero-stat-card">
+        <span class="stat-value">100%</span>
+        <span class="stat-label">Owner Floor Safe</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Grid Workspace -->
+  <main class="main-workspace">
+
+    <!-- Left Column: Product Catalog & Search -->
+    <section class="catalog-section">
+      <div class="catalog-top-bar">
+        <div class="catalog-heading">
+          <div class="heading-title-row">
+            <i data-lucide="layout-grid" class="heading-icon"></i>
+            <h2>Live Product Catalog</h2>
+            <span class="catalog-total-pill" id="catalogCountBadge">0 Products</span>
+          </div>
+          <div class="live-sync-indicator">
+            <span class="pulse-dot emerald"></span>
+            <span>Live Agent Price & Stock Sync</span>
+          </div>
+        </div>
+
+        <!-- Search Input -->
+        <div class="search-box-wrapper">
+          <i data-lucide="search" class="search-icon"></i>
+          <input type="text" id="catalogSearchInput" class="catalog-search-input" placeholder="Search catalog by device, specs, or brand (e.g. 5G phone, M3 laptop, ANC earbuds, GaN charger)..." />
+          <button class="search-clear-btn" id="searchClearBtn" style="display: none;" title="Clear Search">
+            <i data-lucide="x"></i>
+          </button>
+        </div>
+
+        <!-- Category Filter Pills -->
+        <div class="category-filter-strip" id="categoryPillsContainer">
+          <button class="cat-pill active" data-category="ALL">
+            <i data-lucide="layers"></i> All Devices
+          </button>
+          <button class="cat-pill" data-category="Mobiles">
+            <i data-lucide="smartphone"></i> Mobiles
+          </button>
+          <button class="cat-pill" data-category="Laptops">
+            <i data-lucide="laptop"></i> Laptops
+          </button>
+          <button class="cat-pill" data-category="Audio">
+            <i data-lucide="headphones"></i> Audio
+          </button>
+          <button class="cat-pill" data-category="Accessories">
+            <i data-lucide="watch"></i> Accessories
+          </button>
+        </div>
+      </div>
+
+      <!-- Products Grid Display -->
+      <div class="products-grid-scroll">
+        <div class="products-grid" id="productsGrid">
+          <!-- Dynamically populated product cards -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Right Column: Nova AI Copilot Assistant -->
+    <section class="copilot-section">
+      <div class="copilot-header">
+        <div class="copilot-identity">
+          <div class="copilot-avatar">
+            <i data-lucide="bot"></i>
+          </div>
+          <div class="copilot-meta">
+            <h3>Nova AI Copilot</h3>
+            <div class="copilot-status">
+              <span class="pulse-dot"></span>
+              <span>Autonomous & Ready</span>
+            </div>
+          </div>
+        </div>
+        <div class="model-badge" id="agentModelTag">Ollama • Gemma 4 e2b</div>
+      </div>
+
+      <!-- Chat Stream Area -->
+      <div class="chat-messages-container" id="chatMessages">
+        <!-- Initial Welcome Message -->
+        <div class="chat-bubble agent-bubble">
+          <div class="bubble-avatar-wrapper">
+            <i data-lucide="sparkles"></i>
+          </div>
+          <div class="bubble-content-body">
+            <p><strong>Welcome Alex! I am Nova, your Autonomous Commerce AI Copilot.</strong></p>
+            <p style="margin-top: 0.35rem; color: var(--text-secondary);">I can discover products across mobiles, laptops, audio gear, and accessories, add items to your cart, and place orders directly via <strong>Razorpay Gateway</strong> or autonomously via <strong>AP2 Protocol</strong>.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Suggested Quick Prompt Chips -->
+      <div class="quick-prompts-bar">
+        <span class="prompts-label"><i data-lucide="zap"></i> Quick Prompts:</span>
+        <div class="prompt-chips-wrapper">
+          <button class="prompt-chip" data-prompt="Find all Mobiles and Laptops in stock">📱 Search Phones & Laptops</button>
+          <button class="prompt-chip" data-prompt="Add Nexus Apex Pro 5G to my cart">🛒 Add Nexus Pro 5G to Cart</button>
+          <button class="prompt-chip" data-prompt="Find GaN chargers and power banks, and add to my cart">⚡ Add GaN Charger to Cart</button>
+          <button class="prompt-chip" data-prompt="Show my order history and live tracking">📦 Where is my order?</button>
+          <button class="prompt-chip" data-prompt="What are the reviews for SonicFlow ANC Pro Headphones?">⭐ Check Headphone Reviews</button>
+        </div>
+      </div>
+
+      <!-- Prompt Input Form -->
+      <form class="copilot-input-form" id="chatForm">
+        <div class="copilot-input-box">
+          <input 
+            type="text" 
+            id="chatPromptInput" 
+            class="copilot-text-input" 
+            placeholder="Ask Nova anything (e.g. 'Show me running shoes', 'Add to cart', 'Pay with Razorpay')..." 
+            autocomplete="off"
+          />
+          <button type="submit" class="copilot-submit-btn" id="sendPromptBtn" title="Send Prompt to Nova">
+            <i data-lucide="arrow-up"></i>
+          </button>
+        </div>
+      </form>
+    </section>
+
+  </main>
+
+  <!-- Slide-Over Glassmorphic Cart Drawer -->
+  <div class="cart-drawer-backdrop" id="cartDrawerOverlay">
+    <div class="cart-drawer-panel">
+      <div class="cart-drawer-header">
+        <div class="drawer-title-group">
+          <i data-lucide="shopping-bag" class="drawer-icon"></i>
+          <h3>Your Shopping Cart</h3>
+        </div>
+        <button class="drawer-close-btn" id="closeCartBtn" title="Close Cart">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+
+      <!-- Cart Items Scroll Area -->
+      <div class="cart-items-wrapper" id="cartItemsList">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <!-- Cart Footer & Checkout Action -->
+      <div class="cart-drawer-footer">
+        <!-- AP2 Status Banner -->
+        <div id="ap2StatusBanner" class="ap2-status-card">
+          <div class="ap2-card-header">
+            <i data-lucide="shield-check" class="ap2-icon"></i>
+            <span id="ap2StatusText">Checking AP2 Auto-Pay status...</span>
+          </div>
+          <span id="ap2StatusSub" class="ap2-card-sub">Razorpay • Cryptographic AP2 Protocol</span>
+        </div>
+
+        <div class="cart-price-breakdown">
+          <div class="breakdown-row">
+            <span>Items Subtotal</span>
+            <span id="cartSubtotalText">₹0.00</span>
+          </div>
+          <div class="breakdown-row tax-free">
+            <span>Estimated Tax (0% Storewide)</span>
+            <span id="cartTaxText">₹0.00</span>
+          </div>
+          <div class="breakdown-row total-row">
+            <span>Total Payable (INR)</span>
+            <span id="cartTotalText" class="total-amount">₹0.00</span>
+          </div>
+        </div>
+
+        <div class="cart-checkout-actions">
+          <!-- AP2 One-Click Setup Button (Conditional) -->
+          <button class="action-button ap2-setup-btn" id="authorizeAutoPayBtn" style="display: none;">
+            <i data-lucide="shield"></i>
+            <span>🔐 Authorize AP2 Auto-Pay (One-Time)</span>
+          </button>
+          
+          <!-- Standard Razorpay Checkout Button -->
+          <button class="action-button primary-rzp-btn" id="razorpayCheckoutBtn">
+            <i data-lucide="credit-card"></i>
+            <span>Pay with Razorpay Gateway</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Orders History & Live Tracking Modal -->
+  <div class="modal-backdrop" id="ordersModalOverlay">
+    <div class="modal-window">
+      <div class="modal-header-bar">
+        <div class="modal-title-group">
+          <i data-lucide="clipboard-list" class="modal-icon"></i>
+          <h3>Order History & Real-Time Tracking</h3>
+        </div>
+        <button class="modal-close-btn" id="closeOrdersModalBtn" title="Close Modal">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <div class="modal-scroll-body" id="ordersModalBody">
+        <!-- Rendered via JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Razorpay Gateway Setup Modal -->
+  <div class="modal-backdrop" id="razorpayModalOverlay">
+    <div class="modal-window modal-sm">
+      <div class="modal-header-bar">
+        <div class="modal-title-group">
+          <i data-lucide="credit-card" class="modal-icon blue"></i>
+          <h3>Razorpay Gateway Credentials</h3>
+        </div>
+        <button class="modal-close-btn" id="closeRazorpayModalBtn" title="Close Modal">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <div class="modal-scroll-body">
+        <div class="notice-box blue-notice">
+          <strong>⚡ Sandbox & Live Ready:</strong><br/>
+          The store is connected with sandbox credentials for instant testing. You can also paste your live or test <strong>Key ID</strong> and <strong>Key Secret</strong> below.
+        </div>
+
+        <form id="razorpaySettingsForm" class="modal-form">
+          <div class="form-field">
+            <label>Razorpay Key ID (e.g. <code>rzp_test_...</code>):</label>
+            <input type="text" id="rzpKeyIdInput" class="modal-input" placeholder="rzp_test_..." />
+          </div>
+          <div class="form-field">
+            <label>Razorpay Key Secret:</label>
+            <input type="password" id="rzpKeySecretInput" class="modal-input" placeholder="Enter Key Secret" />
+          </div>
+          <button type="submit" class="action-button primary-rzp-btn" style="margin-top: 0.5rem;">
+            Save Razorpay Credentials
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- User Switch Modal -->
+  <div class="modal-backdrop" id="userModalOverlay">
+    <div class="modal-window modal-xs">
+      <div class="modal-header-bar">
+        <div class="modal-title-group">
+          <i data-lucide="users" class="modal-icon purple"></i>
+          <h3>Switch Active Profile</h3>
+        </div>
+        <button class="modal-close-btn" id="closeUserModalBtn" title="Close Modal">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <div class="modal-scroll-body">
+        <div class="user-profiles-list">
+          <button class="user-profile-card active" onclick="switchUser('user_alex', 'Alex Rivera', 'AR')">
+            <div class="user-avatar-badge">AR</div>
+            <div class="user-profile-info">
+              <span class="user-profile-name">Alex Rivera (Default)</span>
+              <span class="user-profile-email">alex.rivera@growthcommerce.ai</span>
+            </div>
+          </button>
+          <button class="user-profile-card" onclick="switchUser('user_sarah', 'Sarah Chen', 'SC')">
+            <div class="user-avatar-badge emerald-avatar">SC</div>
+            <div class="user-profile-info">
+              <span class="user-profile-name">Sarah Chen</span>
+              <span class="user-profile-email">sarah.chen@techventures.io</span>
+            </div>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Seamless Razorpay Simulator Modal -->
+  <div class="modal-backdrop" id="razorpaySimulatorModalOverlay">
+    <div class="modal-window modal-sm">
+      <div class="modal-header-bar">
+        <div class="modal-title-group">
+          <i data-lucide="shield-check" class="modal-icon blue"></i>
+          <h3>Razorpay Test Gateway</h3>
+        </div>
+        <button class="modal-close-btn" id="closeRazorpaySimBtn" title="Close Modal">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <div class="modal-scroll-body">
+        <div class="rzp-sim-summary">
+          <div class="rzp-sim-amount-box">
+            <span class="rzp-sim-label">Amount Payable:</span>
+            <span class="rzp-sim-amount" id="rzpSimAmountText">₹0.00</span>
+          </div>
+          <div class="rzp-sim-pill"><i data-lucide="zap"></i> 0% Tax • INR Direct Settlement</div>
+        </div>
+
+        <div class="rzp-sim-methods">
+          <div class="rzp-sim-method active" onclick="selectRzpMethod(this)">
+            <i data-lucide="smartphone"></i>
+            <div>
+              <strong>Instant UPI / QR</strong>
+              <span>GPay, PhonePe, Paytm, BHIM</span>
+            </div>
+          </div>
+          <div class="rzp-sim-method" onclick="selectRzpMethod(this)">
+            <i data-lucide="credit-card"></i>
+            <div>
+              <strong>Cards (Credit / Debit)</strong>
+              <span>Visa, Mastercard, RuPay</span>
+            </div>
+          </div>
+          <div class="rzp-sim-method" onclick="selectRzpMethod(this)">
+            <i data-lucide="building"></i>
+            <div>
+              <strong>Net Banking</strong>
+              <span>HDFC, ICICI, SBI, Axis</span>
+            </div>
+          </div>
+        </div>
+
+        <button class="action-button primary-rzp-btn" id="confirmRzpSimPaymentBtn" style="margin-top: 1.25rem;">
+          <i data-lucide="lock"></i>
+          <span id="confirmRzpSimBtnText">Pay & Confirm Order</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Client Script -->
+  <script src="/frontend/js/app.js?v=3.2"></script>
+</body>
+</html>

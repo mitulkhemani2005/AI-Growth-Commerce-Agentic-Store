@@ -1,8 +1,8 @@
 """
 Reinforcement Learning (RL) Engine for AI Agents
 =================================================
-Inspired by OpenOfficeRL (OpenEnv Hackathon 2026):
 Environment-in-the-loop Reinforcement Learning for Autonomous Agent Fleets.
+
 
 Key Components:
 1. Environment State Representation: Discretized / hashed multi-feature business state.
