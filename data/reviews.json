@@ -1960,5 +1960,374 @@
     "rating": 4,
     "review_text": "This HyperCharge PowerBank is a game-changer! I\u2019ve tested it with multiple devices and it delivers the juice when I need it most. The smart screen is a nice touch, and the 24-hour return policy from the seller was a relief. Overall, it\u2019s a solid investment for those who need reliable power on the go.",
     "created_at": "2026-09-03T22:14:48.584164+00:00"
+  },
+  {
+    "id": "rev_9f2162",
+    "product_id": "prod_005",
+    "product_name": "NOVA BladeForge RTX 4080 Gaming Laptop",
+    "customer_name": "Elena Rostova",
+    "rating": 4,
+    "review_text": "Well, what a purchase! The NOVA BladeForge RTX 4080 is a beast, no doubt. The i9-14900HX and RTX 4080 combo delivers seamless performance, and that 16-inch QHD+ screen is a visual treat.",
+    "created_at": "2026-09-03T22:15:24.047789+00:00"
+  },
+  {
+    "id": "rev_c20b08",
+    "product_id": "prod_004",
+    "product_name": "NOVA ZenBook Ultra 14 M3 Laptop",
+    "customer_name": "Alex Chen",
+    "rating": 4,
+    "review_text": "Absolutely smitten with the NOVA ZenBook Ultra 14 M3! That M3 chip and 14.2-inch Liquid Retina XDR display are a power duo I didn't know I needed until I had it. Eight hours of binge-watching and 14 hours of work\u2014this laptop\u2019s battery life is legendary.",
+    "created_at": "2026-09-03T22:15:42.349597+00:00"
+  },
+  {
+    "id": "rev_49ea93",
+    "product_id": "prod_018",
+    "product_name": "NOVA ErgoMaster Silent Wireless Mouse",
+    "customer_name": "Sophia Miller",
+    "rating": 4,
+    "review_text": "Got the NOVA ErgoMaster Silent Wireless Mouse for a steal at \u20b924.33 and let me tell ya, the whisper-quiet switches are a game-changer! Solid build and perfect for those long coding sessions without a mouse pad.",
+    "created_at": "2026-09-03T22:16:50.511172+00:00"
+  },
+  {
+    "id": "rev_3bd519",
+    "product_id": "prod_018",
+    "product_name": "NOVA ErgoMaster Silent Wireless Mouse",
+    "customer_name": "David Patel",
+    "rating": 4,
+    "review_text": "This NOVA ErgoMaster Silent Wireless Mouse is a game-changer for anyone looking for a smooth and almost silent mouse experience. The whisper-quiet micro-switches and ergonomic design make it a joy to use all day, and the 4000 DPI tracking ensures precision in every click and swipe.",
+    "created_at": "2026-09-03T22:17:13.359241+00:00"
+  },
+  {
+    "id": "rev_1706b9",
+    "product_id": "prod_022",
+    "product_name": "NOVA Stealth Commuter Smart Backpack",
+    "customer_name": "Marcus Kim",
+    "rating": 4,
+    "review_text": "Man, this NOVA Stealth Commuter Smart Backpack is a game-changer for the daily grind. The weatherproof fabric and anti-theft pocket already gave me peace of mind, and the charging port is a lifesaver. Def worth the cash for a tech-savvy commuter like me.",
+    "created_at": "2026-09-03T22:17:54.493727+00:00"
+  },
+  {
+    "id": "rev_9e3974",
+    "product_id": "prod_021",
+    "product_name": "NOVA TitanVolt HyperCharge PowerBank 20k",
+    "customer_name": "Sophia Miller",
+    "rating": 5,
+    "review_text": "I snagged the NOVA TitanVolt HyperCharge PowerBank 20k for a steal at \u20b942.59, and it's become my go-to for charging on the go. The 65W output and smart TFT screen make it a solid, no-frills investment that doesn't skimp on performance.",
+    "created_at": "2026-09-03T22:18:23.481876+00:00"
+  },
+  {
+    "id": "rev_616473",
+    "product_id": "prod_006",
+    "product_name": "NOVA AeroBook Slim i7 Ultrabook",
+    "customer_name": "Alex Chen",
+    "rating": 4,
+    "review_text": "Absolutely crushing it with the NOVA AeroBook Slim i7! The performance and display are top-notch, and that magnesium-alloy build is a dream to hold. Worth every penny for the ultimate portable powerhouse.",
+    "created_at": "2026-09-03T22:19:54.047599+00:00"
+  },
+  {
+    "id": "rev_fc8b62",
+    "product_id": "prod_001",
+    "product_name": "NOVA Apex Pro 5G Smartphone",
+    "customer_name": "Elena Rostova",
+    "rating": 5,
+    "review_text": "Absolutely top-tier in every aspect, the NOVA Apex Pro 5G is a swift, stylish, and supremely powerful addition to my arsenal. No doubt, it sets a new standard for what an executive smartphone should be.",
+    "created_at": "2026-09-03T22:20:10.977961+00:00"
+  },
+  {
+    "id": "rev_c59067",
+    "product_id": "prod_017",
+    "product_name": "NOVA AirType Low-Profile Wireless Keyboard",
+    "customer_name": "David Patel",
+    "rating": 4,
+    "review_text": "Damn, the NOVA AirType is a game-changer. Those low-profile Gateron switches provide just the right amount of tactile feedback, and the tri-mode connectivity is a lifesaver whether I'm on Windows or Mac. Worth every penny for the seamless experience.",
+    "created_at": "2026-09-03T22:20:35.518194+00:00"
+  },
+  {
+    "id": "rev_48d51b",
+    "product_id": "prod_027",
+    "product_name": "NOVA HyperGaN 140W Quad-Port Pro Charger",
+    "customer_name": "Marcus Kim",
+    "rating": 4,
+    "review_text": "Damn, this NOVA HyperGaN is a beast! Plugged in my 16-inch laptop and it charged like I hit a fast lane on a Sunday drive. Worth every penny for the speed and the fact that it fits seamlessly in my desk setup.",
+    "created_at": "2026-09-03T22:20:59.725997+00:00"
+  },
+  {
+    "id": "rev_ae8510",
+    "product_id": "prod_001",
+    "product_name": "NOVA Apex Pro 5G Smartphone",
+    "customer_name": "Alex Chen",
+    "rating": 5,
+    "review_text": "Absolutely blown away by the NOVA Apex Pro 5G! The specs are off the charts, and the 100W fast charging is a game-changer\u2014literally charged it from zero to full in under 20 minutes.",
+    "created_at": "2026-09-03T22:21:21.418372+00:00"
+  },
+  {
+    "id": "rev_62060e",
+    "product_id": "prod_025",
+    "product_name": "NOVA TurboFlash 30W Mobile Fast Charger",
+    "customer_name": "David Patel",
+    "rating": 4,
+    "review_text": "The NOVA TurboFlash 30W charger is a game-changer. So small, yet it packs a powerful punch\u201430W PD is perfect for my flagships and wireless earbuds. Highly recommended for anyone needing a quick, compact charging solution.",
+    "created_at": "2026-09-03T22:22:19.083438+00:00"
+  },
+  {
+    "id": "rev_0314aa",
+    "product_id": "prod_022",
+    "product_name": "NOVA Stealth Commuter Smart Backpack",
+    "customer_name": "Sophia Miller",
+    "rating": 4,
+    "review_text": "Solid pick for the price, Sophia's got this one saved for daily commutes. The weatherproof fabric and robust laptop compartment are game-changers, and the USB-C pass-through is a nice touch.",
+    "created_at": "2026-09-03T22:23:00.003773+00:00"
+  },
+  {
+    "id": "rev_533744",
+    "product_id": "prod_004",
+    "product_name": "NOVA ZenBook Ultra 14 M3 Laptop",
+    "customer_name": "Elena Rostova",
+    "rating": 4,
+    "review_text": "The NOVA ZenBook Ultra 14 M3 is a game-changer. From its liquid smooth Liquid Retina XDR display to the unnoticeable thickness, it's perfect for both pitch decks and personal browsing. Battery life is a luxury I didn't know I needed until now.",
+    "created_at": "2026-09-03T22:23:22.392739+00:00"
+  },
+  {
+    "id": "rev_df0d9d",
+    "product_id": "prod_011",
+    "product_name": "NOVA SonicFlow ANC Pro Wireless Headphones",
+    "customer_name": "Marcus Kim",
+    "rating": 4,
+    "review_text": "These NOVA SonicFlow ANC Pro are the bomb! Perfect for my non-stop streaming and gaming sessions. Zero complaints, except maybe I wish the color options were a bit more vibrant. Still, they're the bees' knees for sure.",
+    "created_at": "2026-09-03T22:23:44.929115+00:00"
+  },
+  {
+    "id": "rev_42d3e9",
+    "product_id": "prod_003",
+    "product_name": "NOVA Prime 5G Smartphone",
+    "customer_name": "Sophia Miller",
+    "rating": 5,
+    "review_text": "Got myself the NOVA Prime 5G for a song at \u20b983.95 and wow, it\u2019s a smooth ride with its 120Hz AMOLED and Dimensity 8300. Definitely worth the splurge for the value.",
+    "created_at": "2026-09-03T22:24:07.289509+00:00"
+  },
+  {
+    "id": "rev_22d984",
+    "product_id": "prod_012",
+    "product_name": "NOVA VoiceCraft XLR Studio Condenser Wired Mic",
+    "customer_name": "Elena Rostova",
+    "rating": 4,
+    "review_text": "This mic is a game changer. The sound quality is pristine, and the gold-plated diaphragm ensures it can handle any recording. Worth every penny for a professional setup.",
+    "created_at": "2026-09-03T22:24:45.860393+00:00"
+  },
+  {
+    "id": "rev_3adee9",
+    "product_id": "prod_003",
+    "product_name": "NOVA Prime 5G Smartphone",
+    "customer_name": "Alex Chen",
+    "rating": 5,
+    "review_text": "Hands down, the NOVA Prime 5G is a beast on paper and in real life. That 6.67-inch AMOLED screen with 120Hz refresh rate is a game changer, and the Dimensity 8300 Ultra chip keeps up with the latest apps without breaking a sweat.",
+    "created_at": "2026-09-03T22:25:46.241178+00:00"
+  },
+  {
+    "id": "rev_4dabb3",
+    "product_id": "prod_003",
+    "product_name": "NOVA Prime 5G Smartphone",
+    "customer_name": "Marcus Kim",
+    "rating": 5,
+    "review_text": "Wow, the NOVA Prime 5G is a beast! The 120Hz AMOLED screen is a game changer, and the 50MP OIS camera really delivers. Solid buy for the price.",
+    "created_at": "2026-09-03T22:26:04.049888+00:00"
+  },
+  {
+    "id": "rev_e1d4c8",
+    "product_id": "prod_003",
+    "product_name": "NOVA Prime 5G Smartphone",
+    "customer_name": "Sophia Miller",
+    "rating": 5,
+    "review_text": "Scored a sweet deal on the NOVA Prime 5G, and the specs are definitely living up to the price point. Smooth display, snappy processor, and a battery that lasts all day\u2014what more could I ask for?",
+    "created_at": "2026-09-03T22:26:54.034246+00:00"
+  },
+  {
+    "id": "rev_73581f",
+    "product_id": "prod_017",
+    "product_name": "NOVA AirType Low-Profile Wireless Keyboard",
+    "customer_name": "David Patel",
+    "rating": 4,
+    "review_text": "The NOVA AirType Keyboard is a breath of fresh air with its slim profile and Gateron switches that deliver a satisfying tactile response. The tri-mode connectivity is a game-changer, offering flexibility across devices. Highly recommend for those looking for a sleek, high-performance keyboard.",
+    "created_at": "2026-09-03T22:27:10.819425+00:00"
+  },
+  {
+    "id": "rev_ca42c8",
+    "product_id": "prod_020",
+    "product_name": "NOVA TitanVolt MagSafe PowerBank 10k",
+    "customer_name": "Marcus Kim",
+    "rating": 4,
+    "review_text": "The Nova TitanVolt MagSafe PowerBank 10k is a sleek addition to my gadget arsenal. Fast charging and that magnetic kickstand save me from fumbling for cables\u2014definitely worth the switch from my old clunker.",
+    "created_at": "2026-09-03T22:27:33.043125+00:00"
+  },
+  {
+    "id": "rev_4de249",
+    "product_id": "prod_010",
+    "product_name": "NOVA StudioMaster Pro Hi-Fi Wired Headphones",
+    "customer_name": "Marcus Kim",
+    "rating": 5,
+    "review_text": "These NOVA StudioMaster Pro headphones deliver the goods with their open-back design and 50mm neos, giving me a sweet, expansive sound that\u2019s perfect for mixing. Got the 24-hour return policy tested, and man, am I glad I did\u2014found a slight flaw that got swapped out super quick. Solid buy, but always best to test those returns.",
+    "created_at": "2026-09-03T22:28:29.861499+00:00"
+  },
+  {
+    "id": "rev_48b763",
+    "product_id": "prod_009",
+    "product_name": "NOVA BoomPulse 360 Bluetooth Speaker",
+    "customer_name": "Elena Rostova",
+    "rating": 4,
+    "review_text": "This NOVA BoomPulse 360 is a game-changer for my executive outings. The 360-degree sound and rugged design make it perfect for any occasion, and the battery life is simply astounding.",
+    "created_at": "2026-09-03T22:29:07.162699+00:00"
+  },
+  {
+    "id": "rev_57dd7c",
+    "product_id": "prod_002",
+    "product_name": "NOVA Apex Ultra Fold 5G",
+    "customer_name": "Alex Chen",
+    "rating": 5,
+    "review_text": "The NOVA Apex Ultra Fold 5G is a game-changer. That 8.0-inch 120Hz display is insane, and the titanium hinge feels like a million bucks. Worth every penny for a tech enthusiast like me.",
+    "created_at": "2026-09-03T22:30:26.785326+00:00"
+  },
+  {
+    "id": "rev_9b735d",
+    "product_id": "prod_026",
+    "product_name": "NOVA HyperGaN 65W 3-Port Fast Charger",
+    "customer_name": "David Patel",
+    "rating": 4,
+    "review_text": "The NOVA HyperGaN is a game-changer. I can charge my laptop and two phones simultaneously with ease, and the compact design doesn\u2019t take up much space on my desk. Highly recommend for anyone needing quick, efficient charging on the go.",
+    "created_at": "2026-09-03T22:30:51.126208+00:00"
+  },
+  {
+    "id": "rev_a31646",
+    "product_id": "prod_025",
+    "product_name": "NOVA TurboFlash 30W Mobile Fast Charger",
+    "customer_name": "Marcus Kim",
+    "rating": 4,
+    "review_text": "Trendy and tiny, the NOVA TurboFlash 30W is a must-have for my busy lifestyle. Fast charge all my devices without taking up precious backpack space\u2014definitely worth the quick switch from my old clunker.",
+    "created_at": "2026-09-03T22:31:43.098341+00:00"
+  },
+  {
+    "id": "rev_44573d",
+    "product_id": "prod_018",
+    "product_name": "NOVA ErgoMaster Silent Wireless Mouse",
+    "customer_name": "Sophia Miller",
+    "rating": 4,
+    "review_text": "This NOVA ErgoMaster Silent Wireless Mouse is a game-changer for productivity. The whisper-quiet switches and ergonomic design make every click a pleasure, and the multi-surface tracking is spot-on. Worth every penny if you value a smooth user experience.",
+    "created_at": "2026-09-03T22:32:05.396399+00:00"
+  },
+  {
+    "id": "rev_913240",
+    "product_id": "prod_012",
+    "product_name": "NOVA VoiceCraft XLR Studio Condenser Wired Mic",
+    "customer_name": "Elena Rostova",
+    "rating": 4,
+    "review_text": "This mic is a game-changer for my high-stakes calls and recordings. The sound quality is pristine, and the shock mount handles pops and background noise like a champ. Worth every penny.",
+    "created_at": "2026-09-03T22:32:26.905586+00:00"
+  },
+  {
+    "id": "rev_da239e",
+    "product_id": "prod_021",
+    "product_name": "NOVA TitanVolt HyperCharge PowerBank 20k",
+    "customer_name": "David Patel",
+    "rating": 5,
+    "review_text": "The NOVA TitanVolt HyperCharge has been a game-changer for my tech stack. With its robust 20k mAh capacity and 65W PD, it's like having a mini laptop charger in my pocket. Highly recommend for power-hungry gadgets on the go!",
+    "created_at": "2026-09-03T22:33:36.693695+00:00"
+  },
+  {
+    "id": "rev_40c651",
+    "product_id": "prod_006",
+    "product_name": "NOVA AeroBook Slim i7 Ultrabook",
+    "customer_name": "Alex Chen",
+    "rating": 4,
+    "review_text": "The NOVA AeroBook Slim i7 is a beast in such a small package. That OLED screen is pure magic, and the build quality is top-notch. Worth every penny for the performance and portability.",
+    "created_at": "2026-09-03T22:35:06.632794+00:00"
+  },
+  {
+    "id": "rev_772245",
+    "product_id": "prod_002",
+    "product_name": "NOVA Apex Ultra Fold 5G",
+    "customer_name": "Alex Chen",
+    "rating": 5,
+    "review_text": "Absolutely blown away by the NOVA Apex Ultra Fold 5G! That 8.0-inch 120Hz inner display is a game-changer, and the multitasking stylus support is a genius addition. Worth every penny for a tech enthusiast like me.",
+    "created_at": "2026-09-03T22:35:30.464328+00:00"
+  },
+  {
+    "id": "rev_e27cb4",
+    "product_id": "prod_001",
+    "product_name": "NOVA Apex Pro 5G Smartphone",
+    "customer_name": "Alex Chen",
+    "rating": 5,
+    "review_text": "The NOVA Apex Pro 5G is a beast straight out of the box. That Snapdragon 8 Gen 3 and 100W SuperVOOC charging combo ensure you're never stuck waiting for a power-down, and that 120Hz AMOLED screen is a treat for the eyes.",
+    "created_at": "2026-09-03T22:36:18.101976+00:00"
+  },
+  {
+    "id": "rev_adcba9",
+    "product_id": "prod_006",
+    "product_name": "NOVA AeroBook Slim i7 Ultrabook",
+    "customer_name": "Alex Chen",
+    "rating": 4,
+    "review_text": "Hands down, the NOVA AeroBook Slim i7 is a game changer. That Intel Core Ultra 7 and Intel Arc combo slays in both performance and efficiency, and that 14-inch OLED screen is a visual feast\u2014worth every penny.",
+    "created_at": "2026-09-03T22:36:37.538604+00:00"
+  },
+  {
+    "id": "rev_3b9709",
+    "product_id": "prod_003",
+    "product_name": "NOVA Prime 5G Smartphone",
+    "customer_name": "Sophia Miller",
+    "rating": 5,
+    "review_text": "This NOVA Prime 5G is a solid steal at the price. The AMOLED display and battery life are top-notch for daily use, and the camera quality is better than expected.",
+    "created_at": "2026-09-03T22:36:57.350709+00:00"
+  },
+  {
+    "id": "rev_ce3acd",
+    "product_id": "prod_027",
+    "product_name": "NOVA HyperGaN 140W Quad-Port Pro Charger",
+    "customer_name": "Sophia Miller",
+    "rating": 4,
+    "review_text": "Got the NOVA HyperGaN 140W charger and it's a game-changer for charging multiple devices quickly. Perfect for the tech-savvy who wants top-tier PD 3.1 speeds without breaking the bank.",
+    "created_at": "2026-09-03T22:37:19.500533+00:00"
+  },
+  {
+    "id": "rev_8ac1e7",
+    "product_id": "prod_004",
+    "product_name": "NOVA ZenBook Ultra 14 M3 Laptop",
+    "customer_name": "Elena Rostova",
+    "rating": 4,
+    "review_text": "Absolutely thrilled with the NOVA ZenBook Ultra 14 M3! The M3 chip delivers lightning-fast performance, and the battery life is a game-changer\u2014perfect for my busy schedule. The Liquid Retina display is a sight to behold, making every presentation pop.",
+    "created_at": "2026-09-03T22:37:43.500630+00:00"
+  },
+  {
+    "id": "rev_557e82",
+    "product_id": "prod_009",
+    "product_name": "NOVA BoomPulse 360 Bluetooth Speaker",
+    "customer_name": "Elena Rostova",
+    "rating": 4,
+    "review_text": "The NOVA BoomPulse 360 is a game-changer for outdoor events. The sound quality is impeccable, and its rugged build ensures it can withstand any weather. Highly recommend for the executive on the go.",
+    "created_at": "2026-09-03T22:38:07.201802+00:00"
+  },
+  {
+    "id": "rev_06a378",
+    "product_id": "prod_027",
+    "product_name": "NOVA HyperGaN 140W Quad-Port Pro Charger",
+    "customer_name": "Marcus Kim",
+    "rating": 4,
+    "review_text": "This NOVA HyperGaN charger is a game-changer, packing 140W of power into a compact form factor. The 3 USB-C ports are a lifesaver, handling everything from my 16-inch laptop to my phone with ease. Highly recommend for anyone looking to streamline their charging routine.",
+    "created_at": "2026-09-03T22:38:31.055524+00:00"
+  },
+  {
+    "id": "rev_d6d564",
+    "product_id": "prod_012",
+    "product_name": "NOVA VoiceCraft XLR Studio Condenser Wired Mic",
+    "customer_name": "David Patel",
+    "rating": 5,
+    "review_text": "This NOVA VoiceCraft XLR mic delivers incredible clarity and low noise, perfect for my studio setup. The gold-plated diaphragm and shock mount really make a difference in sound quality.",
+    "created_at": "2026-09-03T22:38:54.087427+00:00"
+  },
+  {
+    "id": "rev_a75992",
+    "product_id": "prod_014",
+    "product_name": "NOVA Pulse Ultra Smartwatch",
+    "customer_name": "Sophia Miller",
+    "rating": 4,
+    "review_text": "Got the NOVA Pulse Ultra for a steal at \u20b979.08 and let me tell ya, it\u2019s a game-changer. Titanium build, sapphire crystal display\u2014this smartwatch packs a punch and doesn\u2019t skimp on features.",
+    "created_at": "2026-09-03T22:40:00.046928+00:00"
   }
 ]

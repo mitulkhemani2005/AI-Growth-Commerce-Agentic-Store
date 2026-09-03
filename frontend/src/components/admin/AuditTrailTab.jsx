@@ -5,8 +5,7 @@ import { api } from '../../api/client';
 export default function AuditTrailTab() {
   const [auditData, setAuditData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [simResult, setSimResult] = useState(null);
-  const [simLoading, setSimLoading] = useState(false);
+
 
   const fetchAudit = async () => {
     setIsLoading(true);
@@ -26,108 +25,26 @@ export default function AuditTrailTab() {
     fetchAudit();
   }, []);
 
-  const runFailureTest = async (failureType) => {
-    setSimLoading(true);
-    try {
-      const res = await api.simulateFailure(failureType);
-      setSimResult(res);
-    } catch (e) {
-      setSimResult({ error: e.message });
-    } finally {
-      setSimLoading(false);
-    }
-  };
-
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.75rem' }}>
-      <div>
-        <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.4rem', fontWeight: 800, color: '#fff' }}>
-          🛡️ Explainable Money Actions, Bounds & Financial Guardrails
-        </h2>
-        <p style={{ fontSize: '0.82rem', color: '#94a3b8' }}>
-          Every financial movement is <strong>explainable</strong> (with algorithmic rationale), <strong>bounded</strong> (strictly capped by immutable limits), and <strong>gated</strong> (pre-approved policies). Below is the live immutable audit trail and interactive failure recovery tests.
-        </p>
-      </div>
-
-      {/* Interactive Failure Handling Test Simulator */}
-      <div className="glass-panel">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.75rem' }}>
-          <div>
-            <h4 style={{ fontSize: '1rem', fontWeight: 800, color: '#fff', textTransform: 'uppercase' }}>
-              Graceful Financial Failure Handling Simulator
-            </h4>
-            <span style={{ fontSize: '0.76rem', color: '#94a3b8' }}>
-              Test how the system intercepts out-of-bounds or invalid financial actions safely without breaking.
-            </span>
-          </div>
-
-          <div style={{ display: 'flex', gap: '0.65rem', flexWrap: 'wrap' }}>
-            <button 
-              className="action-btn"
-              style={{ fontSize: '0.78rem', padding: '0.45rem 1rem' }}
-              onClick={() => runFailureTest('AP2_OVERSPEND')}
-              disabled={simLoading}
-            >
-              1. Test AP2 Overspend (&gt;₹25k)
-            </button>
-
-            <button 
-              className="action-btn"
-              style={{ fontSize: '0.78rem', padding: '0.45rem 1rem' }}
-              onClick={() => runFailureTest('EXPIRED_REFUND')}
-              disabled={simLoading}
-            >
-              2. Test Expired Refund (&gt;24h)
-            </button>
-
-            <button 
-              className="action-btn"
-              style={{ fontSize: '0.78rem', padding: '0.45rem 1rem' }}
-              onClick={() => runFailureTest('BASE_FLOOR_BREACH')}
-              disabled={simLoading}
-            >
-              3. Test Base Floor Breach (&lt; Cost)
-            </button>
-          </div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+        <div>
+          <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.4rem', fontWeight: 800, color: '#fff' }}>
+            🛡️ Explainable Money Actions, Bounds & Financial Guardrails
+          </h2>
+          <p style={{ fontSize: '0.82rem', color: '#94a3b8' }}>
+            Every financial movement is <strong>explainable</strong> (with algorithmic rationale), <strong>bounded</strong> (strictly capped by immutable limits), and <strong>gated</strong> (pre-approved policies). Below is the live immutable audit trail.
+          </p>
         </div>
 
-        {/* Simulator Results Output */}
-        {simResult && (
-          <div style={{
-            background: 'rgba(15, 23, 42, 0.9)',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
-            borderRadius: '8px',
-            padding: '1.25rem',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '0.5rem',
-            fontSize: '0.82rem',
-            marginTop: '0.75rem'
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-              <span style={{
-                fontSize: '0.72rem',
-                fontWeight: 800,
-                padding: '0.2rem 0.6rem',
-                borderRadius: '9999px',
-                background: simResult.status?.includes('REJECTION') ? 'rgba(239, 68, 68, 0.2)' : 'rgba(16, 185, 129, 0.2)',
-                color: simResult.status?.includes('REJECTION') ? '#fb7185' : '#34d399',
-                border: `1px solid ${simResult.status?.includes('REJECTION') ? 'rgba(239, 68, 68, 0.4)' : 'rgba(16, 185, 129, 0.4)'}`
-              }}>
-                {simResult.status || 'PROCESSED'}
-              </span>
-              <strong style={{ color: '#fff' }}>{simResult.attempted_action}</strong>
-            </div>
-
-            <div style={{ color: '#f8fafc', fontWeight: 600 }}>{simResult.message}</div>
-            <div style={{ color: '#94a3b8' }}>
-              <strong style={{ color: '#cbd5e1' }}>Explainability:</strong> {simResult.explainability}
-            </div>
-            <div style={{ color: '#60a5fa', fontWeight: 600 }}>
-              <strong style={{ color: '#93c5fd' }}>Graceful Recovery:</strong> {simResult.graceful_recovery}
-            </div>
-          </div>
-        )}
+        <button 
+          onClick={fetchAudit}
+          className="action-btn"
+          style={{ fontSize: '0.78rem' }}
+        >
+          <RefreshCw size={14} className={isLoading ? 'spin' : ''} />
+          <span>Refresh Ledger</span>
+        </button>
       </div>
 
       {/* Chronological Audit Trail Table */}
@@ -136,14 +53,9 @@ export default function AuditTrailTab() {
           <h4 style={{ fontSize: '1rem', fontWeight: 800, color: '#fff', textTransform: 'uppercase' }}>
             Immutable Financial Transaction Ledger ({auditData.length})
           </h4>
-          <button 
-            onClick={fetchAudit}
-            className="action-btn"
-            style={{ fontSize: '0.74rem' }}
-          >
-            <RefreshCw size={12} className={isLoading ? 'spin' : ''} />
-            <span>Refresh Ledger</span>
-          </button>
+          <span style={{ fontSize: '0.72rem', background: 'rgba(16, 185, 129, 0.15)', color: '#34d399', padding: '0.2rem 0.6rem', borderRadius: '4px', fontWeight: 700 }}>
+            BOUNDS ENFORCED ✓
+          </span>
         </div>
 
         <div className="admin-table-wrap">

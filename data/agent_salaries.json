@@ -9,8 +9,8 @@
     "performance_score": 99,
     "salary_period": "Per 100 Cycles (Owner-Set Premium)",
     "owner_decided": true,
-    "total_earned": 500.0,
-    "last_paid_at": "2026-09-03T21:43:16.872135+00:00",
+    "total_earned": 1500.0,
+    "last_paid_at": "2026-09-03T22:21:25.077616+00:00",
     "negotiation_history": [
       {
         "timestamp": "2026-09-03T18:00:44.557396+00:00",
@@ -29,8 +29,8 @@
     "performance_score": 94,
     "salary_period": "Per 100 Cycles (Min \u20b950)",
     "owner_decided": false,
-    "total_earned": 50.0,
-    "last_paid_at": "2026-09-03T21:43:16.872135+00:00",
+    "total_earned": 150.0,
+    "last_paid_at": "2026-09-03T22:21:25.077616+00:00",
     "negotiation_history": [
       {
         "timestamp": "2026-09-03T18:00:44.557421+00:00",
@@ -49,8 +49,8 @@
     "performance_score": 91,
     "salary_period": "Per 100 Cycles (Min \u20b950)",
     "owner_decided": false,
-    "total_earned": 50.0,
-    "last_paid_at": "2026-09-03T21:43:16.872135+00:00",
+    "total_earned": 150.0,
+    "last_paid_at": "2026-09-03T22:21:25.077616+00:00",
     "negotiation_history": [
       {
         "timestamp": "2026-09-03T18:00:44.557424+00:00",
@@ -69,8 +69,8 @@
     "performance_score": 93,
     "salary_period": "Per 100 Cycles (Min \u20b950)",
     "owner_decided": false,
-    "total_earned": 50.0,
-    "last_paid_at": "2026-09-03T21:43:16.872135+00:00",
+    "total_earned": 150.0,
+    "last_paid_at": "2026-09-03T22:21:25.077616+00:00",
     "negotiation_history": [
       {
         "timestamp": "2026-09-03T18:00:44.557427+00:00",
@@ -89,8 +89,8 @@
     "performance_score": 96,
     "salary_period": "Per 100 Cycles (Min \u20b950)",
     "owner_decided": false,
-    "total_earned": 50.0,
-    "last_paid_at": "2026-09-03T21:43:16.872135+00:00",
+    "total_earned": 150.0,
+    "last_paid_at": "2026-09-03T22:21:25.077616+00:00",
     "negotiation_history": [
       {
         "timestamp": "2026-09-03T18:00:44.557431+00:00",
@@ -109,8 +109,8 @@
     "performance_score": 92,
     "salary_period": "Per 100 Cycles (Min \u20b950)",
     "owner_decided": false,
-    "total_earned": 50.0,
-    "last_paid_at": "2026-09-03T21:43:16.872135+00:00",
+    "total_earned": 150.0,
+    "last_paid_at": "2026-09-03T22:21:25.077616+00:00",
     "negotiation_history": [
       {
         "timestamp": "2026-09-03T18:00:44.557433+00:00",
@@ -129,8 +129,8 @@
     "performance_score": 90,
     "salary_period": "Per 100 Cycles (Min \u20b950)",
     "owner_decided": false,
-    "total_earned": 50.0,
-    "last_paid_at": "2026-09-03T21:43:16.872135+00:00",
+    "total_earned": 150.0,
+    "last_paid_at": "2026-09-03T22:21:25.077616+00:00",
     "negotiation_history": [
       {
         "timestamp": "2026-09-03T18:00:44.557436+00:00",

@@ -19,6 +19,9 @@ export default function BuyersTab() {
 
   const [isSimActive, setIsSimActive] = useState(true);
   const [triggeringId, setTriggeringId] = useState(null);
+  const [fleetInterval, setFleetInterval] = useState(60);
+  const [buyerIntervals, setBuyerIntervals] = useState({});
+  const [savingIntervalId, setSavingIntervalId] = useState(null);
 
   // Toggle master simulation
   const handleToggleSimulation = async () => {
@@ -46,6 +49,28 @@ export default function BuyersTab() {
     }
   };
 
+  // Update interval
+  const handleUpdateInterval = async (buyerId = 'all', explicitVal = null) => {
+    const rawVal = explicitVal !== null ? explicitVal : (buyerId === 'all' ? fleetInterval : buyerIntervals[buyerId]);
+    const val = parseInt(rawVal);
+    if (!val || val < 5) {
+      showToast('Interval must be at least 5 seconds', 'error');
+      return;
+    }
+
+    setSavingIntervalId(buyerId);
+    try {
+      const res = await api.updateBuyerInterval(buyerId, val);
+      if (buyerId === 'all') setFleetInterval(val);
+      showToast(res.message || `Shopper interval set to ${val}s!`, 'success');
+      await loadAllAdminData();
+    } catch (e) {
+      showToast(e.message, 'error');
+    } finally {
+      setSavingIntervalId(null);
+    }
+  };
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.75rem' }}>
       {/* Intro & Master Controls */}
@@ -59,7 +84,7 @@ export default function BuyersTab() {
           </p>
         </div>
 
-        <div style={{ display: 'flex', gap: '0.75rem' }}>
+        <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
           <button 
             className="action-btn"
             style={{ 
@@ -84,6 +109,58 @@ export default function BuyersTab() {
         </div>
       </div>
 
+      {/* Fleet Browsing Interval Control Panel */}
+      <div className="glass-panel" style={{ padding: '1rem 1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+          <Clock size={18} style={{ color: '#c084fc' }} />
+          <div>
+            <strong style={{ fontSize: '0.9rem', color: '#fff' }}>Autonomous Fleet Browsing Schedule</strong>
+            <div style={{ fontSize: '0.74rem', color: '#94a3b8' }}>Control how frequently AI personas make autonomous purchase and evaluation runs.</div>
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+          <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Presets:</span>
+          {[30, 60, 120, 300].map(sec => (
+            <button
+              key={sec}
+              type="button"
+              className="action-btn"
+              style={{
+                padding: '0.2rem 0.55rem',
+                fontSize: '0.72rem',
+                background: fleetInterval === sec ? 'rgba(192, 132, 252, 0.25)' : 'rgba(255, 255, 255, 0.05)',
+                borderColor: fleetInterval === sec ? 'rgba(192, 132, 252, 0.5)' : 'rgba(255, 255, 255, 0.1)',
+                color: fleetInterval === sec ? '#c084fc' : '#94a3b8'
+              }}
+              onClick={() => handleUpdateInterval('all', sec)}
+            >
+              {sec}s
+            </button>
+          ))}
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginLeft: '0.5rem' }}>
+            <input 
+              type="number"
+              min="5"
+              max="3600"
+              className="form-input"
+              style={{ width: '80px', padding: '0.35rem 0.5rem', fontSize: '0.8rem' }}
+              value={fleetInterval}
+              onChange={(e) => setFleetInterval(e.target.value)}
+            />
+            <button 
+              className="action-btn"
+              style={{ padding: '0.35rem 0.75rem', fontSize: '0.75rem' }}
+              onClick={() => handleUpdateInterval('all')}
+              disabled={savingIntervalId === 'all'}
+            >
+              {savingIntervalId === 'all' ? 'Saving...' : 'Set Fleet Interval'}
+            </button>
+          </div>
+        </div>
+      </div>
+
       {/* 5 AI Buyer Persona Cards Grid */}
       <div style={{
         display: 'grid',
@@ -91,11 +168,15 @@ export default function BuyersTab() {
         gap: '1.25rem'
       }}>
         {buyers.map((buyer) => {
+          const buyerInterval = buyerIntervals[buyer.id] !== undefined 
+            ? buyerIntervals[buyer.id] 
+            : (buyer.interval_seconds || 60);
+
           return (
             <div 
               key={buyer.id}
               className="product-card"
-              style={{ padding: '1.25rem', gap: '0.85rem' }}
+              style={{ padding: '1.25rem', gap: '0.85rem', display: 'flex', flexDirection: 'column' }}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
@@ -150,6 +231,33 @@ export default function BuyersTab() {
                     {buyer.orders_count || 0} orders • {buyer.returns_count || 0} returns
                   </strong>
                 </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <span style={{ color: '#94a3b8' }}>Cycle Interval:</span>
+                  <strong style={{ color: '#c084fc' }}>
+                    Every {buyer.interval_seconds || 60}s
+                  </strong>
+                </div>
+              </div>
+
+              {/* Individual Shopper Interval Row */}
+              <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
+                <input 
+                  type="number"
+                  min="5"
+                  max="3600"
+                  className="form-input"
+                  style={{ width: '75px', padding: '0.3rem 0.5rem', fontSize: '0.75rem' }}
+                  value={buyerInterval}
+                  onChange={(e) => setBuyerIntervals({ ...buyerIntervals, [buyer.id]: e.target.value })}
+                />
+                <button
+                  className="action-btn"
+                  style={{ padding: '0.3rem 0.6rem', fontSize: '0.72rem' }}
+                  onClick={() => handleUpdateInterval(buyer.id)}
+                  disabled={savingIntervalId === buyer.id}
+                >
+                  {savingIntervalId === buyer.id ? 'Saving...' : 'Set Interval'}
+                </button>
               </div>
 
               <div style={{ fontSize: '0.74rem', color: '#34d399', display: 'flex', alignItems: 'center', gap: '4px' }}>
@@ -173,3 +281,4 @@ export default function BuyersTab() {
     </div>
   );
 }
+

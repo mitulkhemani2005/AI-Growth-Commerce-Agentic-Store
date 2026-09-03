@@ -316,6 +316,49 @@ class TreasuryManager:
                 "transaction": tx
             }
 
+    def deduct_refund(
+        self,
+        amount: float,
+        order_id: str,
+        reason: str = "Customer Refund",
+        actor: str = "Payment Manager"
+    ) -> Dict[str, Any]:
+        """
+        Deducts a refund amount from the CEO Bank Balance and tracks it
+        under total_refunds_deducted. This is called by payment_manager.process_refund.
+        """
+        with _lock:
+            t = self._read_treasury()
+            amount_clean = round(float(amount), 2)
+            balance = float(t.get("bank_balance", 0.0))
+            new_balance = round(balance - amount_clean, 2)
+
+            t["bank_balance"] = new_balance
+            t["total_refunds_deducted"] = round(float(t.get("total_refunds_deducted", 0.0)) + amount_clean, 2)
+
+            tx = {
+                "id": f"tx_{uuid.uuid4().hex[:8]}",
+                "type": "REFUND_DEDUCTION",
+                "amount": amount_clean,
+                "balance_after": new_balance,
+                "order_id": order_id,
+                "description": f"Refund of ₹{amount_clean:,.2f} processed for Order #{order_id}. Reason: {reason}.",
+                "actor": actor,
+                "timestamp": datetime.now(timezone.utc).isoformat()
+            }
+            tx_list = t.get("transactions", [])
+            tx_list.insert(0, tx)
+            t["transactions"] = tx_list[:500]
+
+            self._write_treasury(t)
+
+            return {
+                "success": True,
+                "message": f"Refund of ₹{amount_clean:,.2f} deducted from treasury for Order #{order_id}.",
+                "new_balance": new_balance,
+                "transaction": tx
+            }
+
     def get_transactions(self, limit: int = 50, tx_type: Optional[str] = None) -> List[Dict[str, Any]]:
         with _lock:
             t = self._read_treasury()
@@ -354,3 +397,4 @@ class TreasuryManager:
 
 
 treasury_manager = TreasuryManager()
+

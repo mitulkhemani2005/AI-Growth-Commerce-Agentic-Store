@@ -65,21 +65,23 @@ class CampaignOrchestrator:
     def get_all_campaigns(self) -> List[Dict[str, Any]]:
         return self.campaigns
 
-    def launch_campaign(self, title: str, category: str, discount_percent: float, duration_hours: int = 24) -> Dict[str, Any]:
+    def launch_campaign(self, title: str, category: str, discount_percent: float, duration_hours: int = 24, auto_activate: bool = True) -> Dict[str, Any]:
         """
-        Launches an autonomous promotional campaign.
-        - Applies bounded price adjustments on the target category (never breaching BASE_PRICE floor).
-        - Broadcasts notification across the Inter-Agent Message Bus.
-        - Notifies the 5 AI shoppers fleet to evaluate new deals.
+        Creates a promotional campaign.
+        Enforces: AT MOST 1 ACTIVE CAMPAIGN PER CATEGORY.
         """
         discount_percent = min(max(float(discount_percent), 1.0), 25.0)  # Gated bounds: 1% to 25%
         campaign_id = f"camp_{int(time.time())}"
         banner_text = f"🔥 {title.upper()}: UP TO {discount_percent:.0f}% OFF {category.upper()} • 0% TAX STOREWIDE"
 
-        # Mark previous active campaigns as COMPLETED
-        for c in self.campaigns:
-            if c.get("status") == "ACTIVE":
-                c["status"] = "COMPLETED"
+        target_cat = category.upper()
+        # Enforce at most 1 active campaign per category
+        if auto_activate:
+            for c in self.campaigns:
+                if c.get("status") == "ACTIVE":
+                    cat = c.get("category", "ALL").upper()
+                    if target_cat == "ALL" or cat == "ALL" or cat == target_cat:
+                        c["status"] = "COMPLETED"
 
         new_campaign = {
             "id": campaign_id,
@@ -88,7 +90,7 @@ class CampaignOrchestrator:
             "discount_percent": discount_percent,
             "banner_text": banner_text,
             "duration_hours": duration_hours,
-            "status": "ACTIVE",
+            "status": "ACTIVE" if auto_activate else "SCHEDULED",
             "launched_at": datetime.utcnow().isoformat(),
             "total_revenue_generated": 0.0,
             "orders_count": 0
@@ -96,50 +98,141 @@ class CampaignOrchestrator:
         self.campaigns.insert(0, new_campaign)
         self._save_campaigns()
 
-        # 1. Adjust prices in inventory within immutable BASE_PRICE floor
-        products = self.inventory_manager.get_all_products()
+        # Adjust prices if active
         adjusted_count = 0
-        multiplier = 1.0 - (discount_percent / 100.0)
-
-        for p in products:
-            if category == "ALL" or (p.get("PRODUCT_TYPE", "").lower() == category.lower()):
-                base_price = float(p.get("BASE_PRICE", p.get("PRICE", 100)))
-                current_price = float(p.get("PRICE", base_price))
-                new_price = max(base_price, round(current_price * multiplier, 2))
-                
-                if new_price != current_price:
-                    self.inventory_manager.update_price(p.get("id"), new_price)
-                    adjusted_count += 1
-
-
-        # 2. Broadcast on Inter-Agent Message Bus
-        if self.message_bus:
-            try:
-                self.message_bus.send_message(
-                    from_agent="Campaign Orchestrator",
-                    to_agent="ALL_AGENTS",
-                    subject=f"CAMPAIGN_LAUNCH: {title}",
-                    content={
-                        "campaign_id": campaign_id,
-                        "category": category,
-                        "discount": f"{discount_percent}%",
-                        "adjusted_products": adjusted_count,
-                        "directive": "Price Manager & Inventory Manager align stock and dynamic margin protection."
-                    }
-                )
-            except Exception:
-                pass
-
-        # 3. Trigger 5 AI buyers to evaluate deals
-        if self.buyer_manager:
-            try:
-                self.buyer_manager.trigger_step()
-            except Exception:
-                pass
+        if auto_activate:
+            products = self.inventory_manager.get_all_products()
+            multiplier = 1.0 - (discount_percent / 100.0)
+            for p in products:
+                if category == "ALL" or (p.get("PRODUCT_TYPE", "").lower() == category.lower()):
+                    base_price = float(p.get("BASE_PRICE", p.get("PRICE", 100)))
+                    current_price = float(p.get("PRICE", base_price))
+                    new_price = max(base_price, round(current_price * multiplier, 2))
+                    if new_price != current_price:
+                        self.inventory_manager.update_price(p.get("id"), new_price)
+                        adjusted_count += 1
 
         return {
             "success": True,
             "campaign": new_campaign,
             "adjusted_products_count": adjusted_count,
-            "message": f"Campaign '{title}' launched successfully! {adjusted_count} products adjusted within base price floor."
+            "message": f"Campaign '{title}' created for {category} (At most 1 active campaign per category enforced)."
         }
+
+    def activate_campaign(self, campaign_id: str) -> Dict[str, Any]:
+        """
+        Activates a campaign selected by human store owner.
+        Enforces: AT MOST 1 ACTIVE CAMPAIGN PER CATEGORY.
+        """
+        target = None
+        for c in self.campaigns:
+            if c.get("id") == campaign_id:
+                target = c
+                break
+
+        if not target:
+            return {"success": False, "error": f"Campaign '{campaign_id}' not found."}
+
+        target_cat = target.get("category", "ALL").upper()
+        deactivated = []
+
+        # Enforce at most 1 active campaign per category
+        for c in self.campaigns:
+            if c.get("id") != campaign_id and c.get("status") == "ACTIVE":
+                cat = c.get("category", "ALL").upper()
+                if target_cat == "ALL" or cat == "ALL" or cat == target_cat:
+                    c["status"] = "COMPLETED"
+                    deactivated.append(c.get("title"))
+
+        target["status"] = "ACTIVE"
+        target["launched_at"] = datetime.utcnow().isoformat()
+        self._save_campaigns()
+
+        # Apply bounded price discounts for this category
+        discount_percent = float(target.get("discount_percent", 10.0))
+        multiplier = 1.0 - (discount_percent / 100.0)
+        products = self.inventory_manager.get_all_products()
+        adjusted_count = 0
+
+        for p in products:
+            p_cat = p.get("PRODUCT_TYPE", "").upper()
+            if target_cat == "ALL" or p_cat == target_cat:
+                base_price = float(p.get("BASE_PRICE", p.get("PRICE", 100)))
+                current_price = float(p.get("PRICE", base_price))
+                new_price = max(base_price, round(current_price * multiplier, 2))
+                if new_price != current_price:
+                    self.inventory_manager.update_price(p.get("id"), new_price)
+                    adjusted_count += 1
+
+        msg = f"Campaign '{target['title']}' is now ACTIVE for {target.get('category')}."
+        if deactivated:
+            msg += f" (Deactivated previous {', '.join(deactivated)} to enforce 1 active campaign per category rule)."
+
+        return {
+            "success": True,
+            "message": msg,
+            "campaign": target,
+            "adjusted_count": adjusted_count
+        }
+
+    def stop_campaign(self, campaign_id: str) -> Dict[str, Any]:
+        """
+        Stops/pauses an active campaign selected by human store owner.
+        Reverts category prices back to standard margin above base price floor.
+        """
+        target = None
+        for c in self.campaigns:
+            if c.get("id") == campaign_id:
+                target = c
+                break
+
+        if not target:
+            return {"success": False, "error": f"Campaign '{campaign_id}' not found."}
+
+        target["status"] = "COMPLETED"
+        self._save_campaigns()
+
+        target_cat = target.get("category", "ALL").upper()
+        products = self.inventory_manager.get_all_products()
+        reverted_count = 0
+
+        for p in products:
+            p_cat = p.get("PRODUCT_TYPE", "").upper()
+            if target_cat == "ALL" or p_cat == target_cat:
+                base_price = float(p.get("BASE_PRICE", 100))
+                standard_price = round(base_price * 1.217, 2)
+                self.inventory_manager.update_price(p.get("id"), standard_price)
+                reverted_count += 1
+
+        return {
+            "success": True,
+            "message": f"Campaign '{target['title']}' has been STOPPED. {reverted_count} product prices restored.",
+            "campaign": target
+        }
+
+    def delete_campaign(self, campaign_id: str) -> Dict[str, Any]:
+        """Deletes a campaign selected by human store owner."""
+        idx_to_remove = None
+        for idx, c in enumerate(self.campaigns):
+            if c.get("id") == campaign_id:
+                idx_to_remove = idx
+                break
+
+        if idx_to_remove is None:
+            return {"success": False, "error": f"Campaign '{campaign_id}' not found."}
+
+        removed = self.campaigns.pop(idx_to_remove)
+        if removed.get("status") == "ACTIVE":
+            target_cat = removed.get("category", "ALL").upper()
+            products = self.inventory_manager.get_all_products()
+            for p in products:
+                if target_cat == "ALL" or p.get("PRODUCT_TYPE", "").upper() == target_cat:
+                    base_price = float(p.get("BASE_PRICE", 100))
+                    self.inventory_manager.update_price(p.get("id"), round(base_price * 1.217, 2))
+
+        self._save_campaigns()
+        return {
+            "success": True,
+            "message": f"Campaign '{removed.get('title')}' deleted successfully."
+        }
+

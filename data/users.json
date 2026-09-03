@@ -5,7 +5,13 @@
     "email": "alex.rivera@growthcommerce.ai",
     "shipping_address": "742 Evergreen Terrace, San Francisco, CA 94107",
     "auto_pay_enabled": true,
-    "cart": [],
+    "cart": [
+      {
+        "id": "prod_005",
+        "quantity": 1,
+        "size": "32GB RAM / 1TB NVMe SSD"
+      }
+    ],
     "payment_details": {
       "card_holder_name": "Alex Rivera",
       "card_number_masked": "1111 1111 1111 1111",
@@ -154,7 +160,13 @@
     "email": "buyer_marcus@growthcommerce.ai",
     "shipping_address": "Marcus Kim Residence, Innovation Hub Blvd, Sector 4",
     "auto_pay_enabled": true,
-    "cart": [],
+    "cart": [
+      {
+        "id": "prod_001",
+        "quantity": 1,
+        "size": "12GB RAM / 256GB"
+      }
+    ],
     "payment_details": {
       "card_holder_name": "Marcus Kim",
       "card_number_masked": "4242 \u2022\u2022\u2022\u2022 \u2022\u2022\u2022\u2022 4242",

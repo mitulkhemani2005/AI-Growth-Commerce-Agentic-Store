@@ -741,27 +741,86 @@ class PaymentManager:
         )
 
 
-    def get_dashboard_info(self) -> Dict[str, Any]:
+    def process_refund(self, order_id: str, reason: str = "24h Auto-Approval") -> Dict[str, Any]:
         """
-        Returns info about current Razorpay configuration and tips for viewing in dashboard.
+        Executes order refund:
+        - Verifies 24-hour non-shipped policy
+        - Generates Razorpay / AP2 refund ID (e.g. rfnd_xxxxxxxxxxxx)
+        - Updates order status to Refunded in orders.json
+        - Restores stock in inventory.json
+        - Deducts refund from treasury
         """
-        is_test_mode = self.key_id.startswith("rzp_test_")
+        from backend.order_manager import order_manager
+        from backend.treasury_manager import treasury_manager
+        
+        order = order_manager.get_order_by_id(order_id)
+        if not order:
+            return {"success": False, "error": f"Order #{order_id} not found."}
+
+        # Status check
+        if order.get("status") in ["Shipped", "Delivered"]:
+            return {
+                "success": False,
+                "error": f"Refund REJECTED: Order #{order_id} has already been {order.get('status')} and is in transit."
+            }
+
+        # 24-Hour window check
+        created_str = order.get("created_at")
+        hours_elapsed = 0.0
+        if created_str:
+            try:
+                created_dt = datetime.fromisoformat(created_str.replace("Z", "+00:00"))
+                if created_dt.tzinfo is None:
+                    created_dt = created_dt.replace(tzinfo=timezone.utc)
+                now_dt = datetime.now(timezone.utc)
+                diff = now_dt - created_dt
+                hours_elapsed = round(diff.total_seconds() / 3600.0, 2)
+                if hours_elapsed > 24.0:
+                    return {
+                        "success": False,
+                        "error": f"Refund REJECTED: Order #{order_id} was placed {hours_elapsed:.1f} hours ago (exceeds the 24-hour return/cancellation window)."
+                    }
+            except Exception as e:
+                print(f"Date parse warning in process_refund: {e}")
+
+        # Generate verified refund ID
+        refund_id = f"rfnd_{uuid.uuid4().hex[:14]}"
+        total_refund_amount = float(order.get("total", 0.0))
+
+        refund_details = {
+            "refund_id": refund_id,
+            "order_id": order_id,
+            "amount": total_refund_amount,
+            "currency": order.get("currency", "INR"),
+            "reason": reason,
+            "status": "processed",
+            "processed_at": datetime.now(timezone.utc).isoformat(),
+            "hours_since_order": hours_elapsed,
+            "gateway": order.get("payment_method", "Razorpay Sandbox")
+        }
+
+        # Update order in order_manager (marks as Refunded and restocks inventory!)
+        order_res = order_manager.refund_order(order_id, refund_details)
+        if not order_res.get("success"):
+            return order_res
+
+        # Deduct from treasury
+        try:
+            treasury_manager.deduct_refund(
+                amount=total_refund_amount,
+                order_id=order_id,
+                reason=reason
+            )
+        except Exception as e:
+            print(f"Treasury refund record warning: {e}")
+
         return {
-            "key_id": self.key_id,
-            "mode": "Test Mode" if is_test_mode else "Live Mode",
-            "is_connected": self.client is not None,
-            "dashboard_url": "https://dashboard.razorpay.com/app/dashboard",
-            "orders_url": "https://dashboard.razorpay.com/app/orders",
-            "payments_url": "https://dashboard.razorpay.com/app/payments",
-            "refunds_url": "https://dashboard.razorpay.com/app/refunds",
-            "dashboard_instructions": [
-                "1. Log in to Razorpay at https://dashboard.razorpay.com",
-                "2. Ensure the toggle in the top-right / top navigation is set to 'Test Mode' (not 'Live Mode') to see test transactions.",
-                "3. View all created orders under 'Transactions -> Orders' (or https://dashboard.razorpay.com/app/orders).",
-                "4. View all completed payments under 'Transactions -> Payments' (or https://dashboard.razorpay.com/app/payments).",
-                "5. View all issued refunds under 'Transactions -> Refunds' (or https://dashboard.razorpay.com/app/refunds)."
-            ]
+            "success": True,
+            "message": f"Refund processed successfully for Order #{order_id}",
+            "refund_details": refund_details,
+            "order": order_res.get("order")
         }
 
 # Global singleton
 payment_manager = PaymentManager()
+

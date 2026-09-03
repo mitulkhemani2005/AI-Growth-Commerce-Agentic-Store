@@ -694,14 +694,40 @@ class LaunchCampaignRequest(BaseModel):
 
 @app.post("/api/admin/campaigns/launch")
 async def launch_admin_campaign(req: LaunchCampaignRequest):
-    """Launches an autonomous promotional campaign bounded by base price floors."""
+    """Launches or schedules a promotional campaign bounded by base price floors."""
     res = campaign_orchestrator.launch_campaign(
         title=req.title,
         category=req.category,
         discount_percent=req.discount_percent,
-        duration_hours=req.duration_hours
+        duration_hours=req.duration_hours,
+        auto_activate=True
     )
     return res
+
+@app.post("/api/admin/campaigns/{campaign_id}/activate")
+async def activate_admin_campaign(campaign_id: str):
+    """Activates a campaign ensuring at most 1 active campaign per category."""
+    res = campaign_orchestrator.activate_campaign(campaign_id)
+    if not res.get("success"):
+        raise HTTPException(status_code=400, detail=res.get("error", "Failed to activate campaign"))
+    return res
+
+@app.post("/api/admin/campaigns/{campaign_id}/stop")
+async def stop_admin_campaign(campaign_id: str):
+    """Stops an active campaign and restores baseline pricing."""
+    res = campaign_orchestrator.stop_campaign(campaign_id)
+    if not res.get("success"):
+        raise HTTPException(status_code=400, detail=res.get("error", "Failed to stop campaign"))
+    return res
+
+@app.delete("/api/admin/campaigns/{campaign_id}")
+async def delete_admin_campaign(campaign_id: str):
+    """Deletes a promotional campaign."""
+    res = campaign_orchestrator.delete_campaign(campaign_id)
+    if not res.get("success"):
+        raise HTTPException(status_code=400, detail=res.get("error", "Failed to delete campaign"))
+    return res
+
 
 
 # =====================================================================
@@ -1271,6 +1297,34 @@ async def toggle_ai_buyers(req: AdminBuyerToggleRequest):
         "enabled": b_state["enabled"],
         "message": f"Autonomous Buyer Simulation is now {'ENABLED' if b_state['enabled'] else 'PAUSED'}."
     }
+
+class AdminBuyerIntervalRequest(BaseModel):
+    buyer_id: Optional[str] = "all"
+    interval_seconds: int = 60
+
+@app.post("/api/admin/buyers/interval")
+async def update_ai_buyer_interval(req: AdminBuyerIntervalRequest):
+    """Updates browsing schedule interval for AI buyers fleet or a specific buyer."""
+    interval_sec = max(5, int(req.interval_seconds))
+    background_worker.update_agent_interval("buyer_agents", interval_sec)
+    b_id = (req.buyer_id or "all").lower().strip()
+    if b_id in ["all", "all_buyers"]:
+        for b in buyer_agents_fleet.buyers:
+            b["interval_seconds"] = interval_sec
+            b["next_action_ts"] = time.time() + interval_sec
+    else:
+        buyer = buyer_agents_fleet.get_buyer_by_id(b_id)
+        if buyer:
+            buyer["interval_seconds"] = interval_sec
+            buyer["next_action_ts"] = time.time() + interval_sec
+    buyer_agents_fleet._save_buyers()
+    return {
+        "success": True,
+        "buyer_id": req.buyer_id,
+        "interval_seconds": interval_sec,
+        "message": f"AI Buyer shopping interval updated to {interval_sec}s."
+    }
+
 
 
 # =====================================================================

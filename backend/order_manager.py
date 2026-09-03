@@ -341,15 +341,18 @@ class OrderManager:
 
         if created_str:
             try:
-                # Parse created_at safely
+                # Parse created_at safely ensuring timezone-awareness
                 created_dt = datetime.fromisoformat(created_str.replace("Z", "+00:00"))
+                if created_dt.tzinfo is None:
+                    created_dt = created_dt.replace(tzinfo=timezone.utc)
                 now_dt = datetime.now(timezone.utc)
                 diff = now_dt - created_dt
                 hours_elapsed = round(diff.total_seconds() / 3600.0, 2)
                 if diff.total_seconds() > 86400:  # 24 hours
                     is_within_24h = False
             except Exception as e:
-                print(f"Date parse warning: {e}")
+                print(f"Date parse warning in evaluate_24h: {e}")
+
 
         if not is_within_24h:
             return {

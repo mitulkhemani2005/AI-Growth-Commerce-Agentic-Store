@@ -24,9 +24,11 @@ export default function TreasuryTab() {
     salaries, 
     loadAllAdminData, 
     setNegotiatingAgent, 
-    setIsNegotiateModalOpen 
+    setIsNegotiateModalOpen,
+    setIsResetConfirmModalOpen 
   } = useAdmin();
   const { catalog, refreshCatalog, showToast } = useStore();
+
 
   // Stock Acquisition Console state
   const [selectedProdId, setSelectedProdId] = useState(catalog[0]?.id || 'prod_cyberflex_runner');
@@ -118,7 +120,16 @@ export default function TreasuryTab() {
           </p>
         </div>
 
-        <div style={{ display: 'flex', gap: '0.75rem' }}>
+        <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+          <button 
+            className="action-btn danger"
+            style={{ background: 'rgba(244, 63, 94, 0.12)', borderColor: 'rgba(244, 63, 94, 0.35)', color: '#fb7185' }}
+            onClick={() => setIsResetConfirmModalOpen(true)}
+          >
+            <RotateCcw size={14} />
+            <span>Reset to Base Condition</span>
+          </button>
+
           <button 
             className="action-btn"
             style={{ background: 'linear-gradient(135deg, #10b981, #059669)', color: '#fff', border: 'none' }}
@@ -129,6 +140,7 @@ export default function TreasuryTab() {
           </button>
         </div>
       </div>
+
 
       {/* Treasury Metric Cards */}
       <div className="kpi-cards-grid">
@@ -374,54 +386,78 @@ export default function TreasuryTab() {
               </tr>
             </thead>
             <tbody>
-              {Object.entries(salaries).map(([agentName, sal]) => {
-                return (
-                  <tr key={agentName}>
-                    <td>
-                      <strong style={{ color: '#fff' }}>{agentName}</strong>
-                    </td>
-                    <td style={{ fontSize: '0.78rem', color: '#94a3b8' }}>
-                      {sal.role_title || 'Specialist'}
-                    </td>
-                    <td style={{ fontFamily: 'monospace', fontWeight: 700, color: '#34d399' }}>
-                      ₹{Number(sal.current_salary || 50).toFixed(2)}
-                    </td>
-                    <td style={{ fontFamily: 'monospace', color: '#cbd5e1' }}>
-                      ₹{Number(sal.total_earned || 0).toFixed(2)}
-                    </td>
-                    <td>
-                      <span style={{
-                        background: 'rgba(16, 185, 129, 0.15)',
-                        color: '#34d399',
-                        padding: '0.15rem 0.45rem',
-                        borderRadius: '4px',
-                        fontWeight: 700,
-                        fontSize: '0.74rem'
-                      }}>
-                        {sal.performance_score || 95}%
-                      </span>
-                    </td>
-                    <td>
-                      <span style={{ fontSize: '0.74rem', color: '#94a3b8' }}>
-                        {sal.negotiation_status || 'Agreed'}
-                      </span>
-                    </td>
-                    <td>
-                      <button 
-                        className="action-btn"
-                        style={{ padding: '0.25rem 0.65rem', fontSize: '0.72rem' }}
-                        onClick={() => {
-                          setNegotiatingAgent({ name: agentName, ...sal });
-                          setIsNegotiateModalOpen(true);
-                        }}
-                      >
-                        Negotiate Salary
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
+              {(() => {
+                const salaryItems = Array.isArray(salaries?.salaries) 
+                  ? salaries.salaries 
+                  : (salaries?.salaries_map ? Object.entries(salaries.salaries_map).map(([k, v]) => ({ agent_name: k, ...v })) : []);
+
+                if (salaryItems.length === 0) {
+                  return (
+                    <tr>
+                      <td colSpan={7} style={{ textAlign: 'center', color: '#64748b', padding: '2rem' }}>
+                        Loading agent salary records...
+                      </td>
+                    </tr>
+                  );
+                }
+
+                return salaryItems.map((sal, idx) => {
+                  const agentName = sal.agent_name || sal.name || `Specialist Agent ${idx + 1}`;
+                  const roleTitle = sal.role || sal.role_title || 'Autonomous Specialist';
+                  const rate = Number(sal.salary_amount ?? sal.current_salary ?? 50);
+                  const totalEarned = Number(sal.total_earned ?? 0);
+                  const performance = sal.performance_score ?? 95;
+                  const status = sal.negotiation_status || (sal.owner_decided ? 'Owner-Decided' : 'Agreed');
+
+                  return (
+                    <tr key={agentName}>
+                      <td>
+                        <strong style={{ color: '#fff' }}>{agentName}</strong>
+                      </td>
+                      <td style={{ fontSize: '0.78rem', color: '#94a3b8' }}>
+                        {roleTitle}
+                      </td>
+                      <td style={{ fontFamily: 'monospace', fontWeight: 700, color: '#34d399' }}>
+                        ₹{rate.toFixed(2)}
+                      </td>
+                      <td style={{ fontFamily: 'monospace', color: '#cbd5e1' }}>
+                        ₹{totalEarned.toFixed(2)}
+                      </td>
+                      <td>
+                        <span style={{
+                          background: 'rgba(16, 185, 129, 0.15)',
+                          color: '#34d399',
+                          padding: '0.15rem 0.45rem',
+                          borderRadius: '4px',
+                          fontWeight: 700,
+                          fontSize: '0.74rem'
+                        }}>
+                          {performance}%
+                        </span>
+                      </td>
+                      <td>
+                        <span style={{ fontSize: '0.74rem', color: '#94a3b8' }}>
+                          {status}
+                        </span>
+                      </td>
+                      <td>
+                        <button 
+                          className="action-btn"
+                          style={{ padding: '0.25rem 0.65rem', fontSize: '0.72rem' }}
+                          onClick={() => {
+                            setNegotiatingAgent({ name: agentName, role_title: roleTitle, current_salary: rate, ...sal });
+                            setIsNegotiateModalOpen(true);
+                          }}
+                        >
+                          Negotiate Salary
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                });
+              })()}
             </tbody>
+
           </table>
         </div>
       </div>

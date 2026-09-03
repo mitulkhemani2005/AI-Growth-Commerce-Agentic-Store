@@ -1,13 +1,61 @@
 [
   {
-    "id": "camp_1788473655",
+    "id": "camp_1788475201",
     "title": "Weekend Titanium Drop",
     "category": "Laptops",
     "discount_percent": 10.0,
     "banner_text": "\ud83d\udd25 WEEKEND TITANIUM DROP: UP TO 10% OFF LAPTOPS \u2022 0% TAX STOREWIDE",
     "duration_hours": 48,
     "status": "ACTIVE",
-    "launched_at": "2026-09-03T22:14:15.873362",
+    "launched_at": "2026-09-03T22:40:01.440537",
+    "total_revenue_generated": 0.0,
+    "orders_count": 0
+  },
+  {
+    "id": "camp_1788475190",
+    "title": "Mobiles Mega Sale",
+    "category": "Mobiles",
+    "discount_percent": 10.0,
+    "banner_text": "\ud83d\udd25 MOBILES MEGA SALE: UP TO 10% OFF MOBILES \u2022 0% TAX STOREWIDE",
+    "duration_hours": 24,
+    "status": "COMPLETED",
+    "launched_at": "2026-09-03T22:39:50.144607",
+    "total_revenue_generated": 0.0,
+    "orders_count": 0
+  },
+  {
+    "id": "camp_1788474997",
+    "title": "Midnight 5G Flash Drop",
+    "category": "Mobiles",
+    "discount_percent": 8.0,
+    "banner_text": "\ud83d\udd25 MIDNIGHT 5G FLASH DROP: UP TO 8% OFF MOBILES \u2022 0% TAX STOREWIDE",
+    "duration_hours": 24,
+    "status": "COMPLETED",
+    "launched_at": "2026-09-03T22:36:37.936344",
+    "total_revenue_generated": 0.0,
+    "orders_count": 0
+  },
+  {
+    "id": "camp_1788474921",
+    "title": "Weekend Titanium Drop",
+    "category": "Laptops",
+    "discount_percent": 10.0,
+    "banner_text": "\ud83d\udd25 WEEKEND TITANIUM DROP: UP TO 10% OFF LAPTOPS \u2022 0% TAX STOREWIDE",
+    "duration_hours": 48,
+    "status": "COMPLETED",
+    "launched_at": "2026-09-03T22:35:21.969114",
+    "total_revenue_generated": 0.0,
+    "orders_count": 0
+  },
+  {
+    "id": "camp_1788473772",
+    "title": "Midnight 5G Flash Drop",
+    "category": "Audio",
+    "discount_percent": 8.0,
+    "banner_text": "\ud83d\udd25 MIDNIGHT 5G FLASH DROP: UP TO 8% OFF AUDIO \u2022 0% TAX STOREWIDE",
+    "duration_hours": 24,
+    "status": "ACTIVE",
+    "launched_at": "2026-09-03T22:16:12.095508",
     "total_revenue_generated": 0.0,
     "orders_count": 0
   },

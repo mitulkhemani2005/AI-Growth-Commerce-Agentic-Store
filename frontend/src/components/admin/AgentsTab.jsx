@@ -3,26 +3,29 @@ import {
   Bot, 
   PlayCircle, 
   Clock, 
-  Radio, 
   Terminal, 
   Sparkles, 
-  CheckCircle2 
+  CheckCircle2,
+  Check,
+  Zap
 } from 'lucide-react';
 import { useAdmin } from '../../context/AdminContext';
+import { useStore } from '../../context/StoreContext';
 import { api } from '../../api/client';
 
 export default function AgentsTab() {
   const { 
     agentsStatus, 
-    agentMessages, 
     agentLogs, 
     triggerAgent, 
     triggerAllAgents, 
     isScanningFleet,
     fetchTelemetry 
   } = useAdmin();
+  const { showToast } = useStore();
 
   const [intervalInputs, setIntervalInputs] = useState({});
+  const [savingKey, setSavingKey] = useState(null);
 
   const agentsMeta = [
     { key: 'price_manager', name: 'Price Manager Agent', role: 'Dynamic Pricing & Margin Floor Enforcement', defaultInterval: 25 },
@@ -34,15 +37,22 @@ export default function AgentsTab() {
     { key: 'ceo', name: 'CEO Agent', role: 'Executive Fleet Commander & Owner Strategic Briefings', defaultInterval: 30 }
   ];
 
-  const handleUpdateInterval = async (agentKey) => {
-    const val = parseInt(intervalInputs[agentKey]);
-    if (!val || val < 5) return;
+  const handleUpdateInterval = async (agentKey, explicitVal = null) => {
+    const rawVal = explicitVal !== null ? explicitVal : intervalInputs[agentKey];
+    const val = parseInt(rawVal);
+    if (!val || val < 5) {
+      showToast('Interval must be at least 5 seconds', 'error');
+      return;
+    }
+    setSavingKey(agentKey);
     try {
       await api.updateAgentInterval(agentKey, val);
       await fetchTelemetry();
-      alert(`Updated interval for ${agentKey} to ${val}s!`);
+      showToast(`Updated interval for ${agentKey.replace('_', ' ')} to ${val}s!`, 'success');
     } catch (e) {
-      alert(`Failed to update interval: ${e.message}`);
+      showToast(`Failed to update interval: ${e.message}`, 'error');
+    } finally {
+      setSavingKey(null);
     }
   };
 
@@ -55,7 +65,7 @@ export default function AgentsTab() {
             Autonomous Agent Fleet (7 Collaborative Agents)
           </h2>
           <p style={{ fontSize: '0.82rem', color: '#94a3b8' }}>
-            Each agent executes continuous monitoring cycles. All 7 agents communicate via the <strong>Inter-Agent Message Bus</strong> and hold direct commit authority to optimize selling prices, restock items, assign tracking, and auto-refund eligible orders.
+            Configure cycle intervals and execute immediate passes for all 7 specialist agents. Each agent maintains continuous vigilance over store pricing, stock velocity, order progression, and refund governance.
           </p>
         </div>
 
@@ -76,9 +86,10 @@ export default function AgentsTab() {
           const currentInterval = liveData.interval_seconds || ag.defaultInterval;
           const actionsCount = liveData.actions_count || 0;
           const lastAction = liveData.last_action_time ? new Date(liveData.last_action_time).toLocaleTimeString() : 'Recent';
+          const isSaving = savingKey === ag.key;
 
           return (
-            <div key={ag.key} className="glass-panel" style={{ padding: '1.25rem' }}>
+            <div key={ag.key} className="glass-panel" style={{ padding: '1.25rem', display: 'flex', flexDirection: 'column' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
                 <div>
                   <h4 style={{ color: '#fff', fontSize: '1.05rem', fontWeight: 700 }}>{ag.name}</h4>
@@ -108,25 +119,55 @@ export default function AgentsTab() {
                   <strong style={{ color: '#22d3ee' }}>{lastAction}</strong>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span style={{ color: '#94a3b8' }}>Schedule Cycle:</span>
-                  <strong style={{ color: '#c084fc' }}>Every {currentInterval}s</strong>
+                  <span style={{ color: '#94a3b8' }}>Configured Cycle:</span>
+                  <strong style={{ color: '#34d399' }}>Every {currentInterval}s</strong>
+                </div>
+              </div>
+
+              {/* Interval Preset Chips */}
+              <div style={{ marginBottom: '0.75rem' }}>
+                <span style={{ fontSize: '0.7rem', color: '#94a3b8', display: 'block', marginBottom: '0.35rem' }}>
+                  Quick Interval Presets:
+                </span>
+                <div style={{ display: 'flex', gap: '0.35rem', flexWrap: 'wrap' }}>
+                  {[15, 30, 60, 120].map((sec) => (
+                    <button
+                      key={sec}
+                      type="button"
+                      className="action-btn"
+                      style={{
+                        padding: '0.15rem 0.45rem',
+                        fontSize: '0.7rem',
+                        background: currentInterval === sec ? 'rgba(6, 182, 212, 0.25)' : 'rgba(255, 255, 255, 0.05)',
+                        borderColor: currentInterval === sec ? 'rgba(6, 182, 212, 0.5)' : 'rgba(255, 255, 255, 0.1)',
+                        color: currentInterval === sec ? '#38bdf8' : '#94a3b8'
+                      }}
+                      onClick={() => handleUpdateInterval(ag.key, sec)}
+                    >
+                      {sec}s
+                    </button>
+                  ))}
                 </div>
               </div>
 
               <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginTop: 'auto' }}>
                 <input 
                   type="number"
+                  min="5"
+                  max="3600"
                   placeholder={`${currentInterval}s`}
                   className="form-input"
-                  style={{ width: '80px', padding: '0.4rem 0.6rem', fontSize: '0.8rem' }}
+                  style={{ width: '85px', padding: '0.4rem 0.6rem', fontSize: '0.8rem' }}
+                  value={intervalInputs[ag.key] !== undefined ? intervalInputs[ag.key] : ''}
                   onChange={(e) => setIntervalInputs({ ...intervalInputs, [ag.key]: e.target.value })}
                 />
                 <button 
                   className="action-btn"
                   style={{ fontSize: '0.75rem', padding: '0.4rem 0.75rem' }}
                   onClick={() => handleUpdateInterval(ag.key)}
+                  disabled={isSaving}
                 >
-                  Set Interval
+                  {isSaving ? 'Saving...' : 'Set Interval'}
                 </button>
                 <button 
                   className="action-btn primary"
@@ -141,36 +182,48 @@ export default function AgentsTab() {
         })}
       </div>
 
-      {/* Inter-Agent Message Bus Log Table */}
+      {/* Recent Autonomous Agent Decisions Log */}
       <div className="glass-panel">
         <div className="panel-header-bar">
           <h4>
-            <Radio size={18} style={{ color: '#c084fc' }} />
-            <span>⚡ Live Inter-Agent Messages & Directive Bus History</span>
+            <Terminal size={18} style={{ color: '#06b6d4' }} />
+            <span>⚡ Recent Autonomous Agent Decisions & Execution Log</span>
           </h4>
+          <span style={{ fontSize: '0.72rem', background: 'rgba(6, 182, 212, 0.15)', color: '#38bdf8', padding: '0.2rem 0.6rem', borderRadius: '4px', fontWeight: 700 }}>
+            FLEET TELEMETRY
+          </span>
         </div>
         <div className="admin-table-wrap" style={{ maxHeight: '380px', overflowY: 'auto' }}>
           <table className="data-table">
             <thead>
               <tr>
                 <th>Timestamp</th>
-                <th>From Agent</th>
-                <th>To Agent</th>
-                <th>Subject</th>
-                <th>Message Content</th>
+                <th>Agent Specialist</th>
+                <th>Action Type</th>
+                <th>Autonomous Execution Details</th>
               </tr>
             </thead>
             <tbody>
-              {agentMessages.slice(0, 30).map((msg, idx) => {
-                const time = msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString() : 'Recent';
+              {agentLogs.slice(0, 30).map((log, idx) => {
+                const time = log.timestamp ? new Date(log.timestamp).toLocaleTimeString() : 'Recent';
                 return (
                   <tr key={idx}>
                     <td style={{ fontFamily: 'monospace', fontSize: '0.75rem' }}>{time}</td>
-                    <td><strong style={{ color: '#22d3ee' }}>{msg.from_agent}</strong></td>
-                    <td><span style={{ color: '#c084fc' }}>{msg.to_agent}</span></td>
-                    <td><strong style={{ color: '#fff' }}>{msg.subject}</strong></td>
+                    <td><strong style={{ color: '#22d3ee' }}>{log.agent_name}</strong></td>
+                    <td>
+                      <span style={{
+                        fontSize: '0.72rem',
+                        fontWeight: 700,
+                        padding: '0.15rem 0.45rem',
+                        borderRadius: '4px',
+                        background: 'rgba(255, 255, 255, 0.06)',
+                        color: '#f8fafc'
+                      }}>
+                        {log.action_type || 'DECISION'}
+                      </span>
+                    </td>
                     <td style={{ fontSize: '0.78rem', color: '#cbd5e1' }}>
-                      {typeof msg.content === 'object' ? JSON.stringify(msg.content) : String(msg.content || '')}
+                      {log.details || ''}
                     </td>
                   </tr>
                 );
@@ -182,3 +235,4 @@ export default function AgentsTab() {
     </div>
   );
 }
+

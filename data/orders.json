@@ -1,5 +1,59 @@
 [
   {
+    "order_id": "ORD-TEST-1788475190",
+    "items": [
+      {
+        "id": "prod_001",
+        "PRODUCT_NAME": "NOVA Apex Pro 5G Smartphone",
+        "quantity": 2,
+        "price": 100.0
+      }
+    ],
+    "total": 200.0,
+    "status": "Refunded",
+    "created_at": "2026-09-03T22:39:50Z",
+    "inventory_deducted": false,
+    "refund_details": {
+      "refund_id": "rfnd_39f9e090408446",
+      "order_id": "ORD-TEST-1788475190",
+      "amount": 200.0,
+      "currency": "INR",
+      "reason": "Customer Request within 24 hours",
+      "status": "processed",
+      "processed_at": "2026-09-03T22:39:50.912279+00:00",
+      "hours_since_order": 0.0,
+      "gateway": "Razorpay Sandbox"
+    },
+    "refunded_at": "2026-09-03T22:39:50.939795+00:00"
+  },
+  {
+    "order_id": "ORD-TEST-1788474951",
+    "items": [
+      {
+        "id": "prod_001",
+        "PRODUCT_NAME": "NOVA Apex Pro 5G Smartphone",
+        "quantity": 2,
+        "price": 100.0
+      }
+    ],
+    "total": 200.0,
+    "status": "Refunded",
+    "created_at": "2026-09-03T22:35:51Z",
+    "inventory_deducted": false,
+    "refund_details": {
+      "refund_id": "rfnd_2756c4fd0c2043",
+      "order_id": "ORD-TEST-1788474951",
+      "amount": 200.0,
+      "currency": "INR",
+      "reason": "Customer Request within 24 hours",
+      "status": "processed",
+      "processed_at": "2026-09-03T22:35:51.186940+00:00",
+      "hours_since_order": 0.0,
+      "gateway": "Razorpay Sandbox"
+    },
+    "refunded_at": "2026-09-03T22:35:51.211706+00:00"
+  },
+  {
     "order_id": "ORD-0524-96ED",
     "user_id": "buyer_alex",
     "customer_name": "Alex Chen",
@@ -13865,7 +13919,7 @@
     "user_id": "buyer_sophia",
     "customer_name": "Sophia Miller",
     "created_at": "2026-09-03T22:11:36.712796+00:00",
-    "status": "Shipped",
+    "status": "Delivered",
     "delivery_estimate": "2-3 Business Days",
     "tracking_number": "TRK-11FD10",
     "items": [
@@ -13922,15 +13976,15 @@
     },
     "shipping_address": "Sophia Miller Residence, Innovation Hub Blvd, Sector 4",
     "inventory_deducted": true,
-    "last_updated_at": "2026-09-03T22:12:57.196301+00:00",
-    "status_notes": "Auto-advanced carrier transit lifecycle (1m)"
+    "last_updated_at": "2026-09-03T22:15:27.333670+00:00",
+    "status_notes": "Auto-advanced doorstep delivery lifecycle (2m)"
   },
   {
     "order_id": "ORD-1155-E6D9",
     "user_id": "buyer_sophia",
     "customer_name": "Sophia Miller",
     "created_at": "2026-09-03T22:11:55.267565+00:00",
-    "status": "Shipped",
+    "status": "Delivered",
     "delivery_estimate": "2-3 Business Days",
     "tracking_number": "TRK-C3F879",
     "items": [
@@ -13987,8 +14041,8 @@
     },
     "shipping_address": "Sophia Miller Residence, Innovation Hub Blvd, Sector 4",
     "inventory_deducted": true,
-    "last_updated_at": "2026-09-03T22:13:24.696102+00:00",
-    "status_notes": "Auto-advanced carrier transit lifecycle (1m)"
+    "last_updated_at": "2026-09-03T22:15:27.161198+00:00",
+    "status_notes": "Auto-advanced doorstep delivery lifecycle (2m)"
   },
   {
     "order_id": "ORD-1220-923E",
@@ -14125,7 +14179,7 @@
     "user_id": "user_alex",
     "customer_name": "Alex Rivera",
     "created_at": "2026-09-03T22:12:54.101635+00:00",
-    "status": "Shipped",
+    "status": "Delivered",
     "delivery_estimate": "2-3 Business Days",
     "tracking_number": "TRK-D8FEB6",
     "items": [
@@ -14202,15 +14256,15 @@
     },
     "shipping_address": "742 Evergreen Terrace, San Francisco, CA",
     "inventory_deducted": true,
-    "last_updated_at": "2026-09-03T22:14:10.757876+00:00",
-    "status_notes": "Auto-advanced carrier transit lifecycle (1m)"
+    "last_updated_at": "2026-09-03T22:16:15.364063+00:00",
+    "status_notes": "Auto-advanced doorstep delivery lifecycle (2m)"
   },
   {
     "order_id": "ORD-1317-CEE0",
     "user_id": "buyer_sophia",
     "customer_name": "Sophia Miller",
     "created_at": "2026-09-03T22:13:17.106867+00:00",
-    "status": "Shipped",
+    "status": "Delivered",
     "delivery_estimate": "2-3 Business Days",
     "tracking_number": "TRK-2DBE40",
     "items": [
@@ -14267,15 +14321,15 @@
     },
     "shipping_address": "Sophia Miller Residence, Innovation Hub Blvd, Sector 4",
     "inventory_deducted": true,
-    "last_updated_at": "2026-09-03T22:14:33.244401+00:00",
-    "status_notes": "Auto-advanced carrier transit lifecycle (1m)"
+    "last_updated_at": "2026-09-03T22:16:53.594342+00:00",
+    "status_notes": "Auto-advanced doorstep delivery lifecycle (2m)"
   },
   {
     "order_id": "ORD-1340-0F51",
     "user_id": "buyer_david",
     "customer_name": "David Patel",
     "created_at": "2026-09-03T22:13:40.960153+00:00",
-    "status": "Dispatched",
+    "status": "Delivered",
     "delivery_estimate": "2-3 Business Days",
     "tracking_number": "TRK-37D5E9",
     "items": [
@@ -14332,14 +14386,15 @@
     },
     "shipping_address": "David Patel Residence, Innovation Hub Blvd, Sector 4",
     "inventory_deducted": true,
-    "last_updated_at": "2026-09-03T22:13:46.027361+00:00"
+    "last_updated_at": "2026-09-03T22:16:53.453486+00:00",
+    "status_notes": "Auto-advanced doorstep delivery lifecycle (2m)"
   },
   {
     "order_id": "ORD-1403-DBD3",
     "user_id": "buyer_david",
     "customer_name": "David Patel",
     "created_at": "2026-09-03T22:14:03.116811+00:00",
-    "status": "Dispatched",
+    "status": "Delivered",
     "delivery_estimate": "2-3 Business Days",
     "tracking_number": "TRK-03B35A",
     "items": [
@@ -14396,14 +14451,15 @@
     },
     "shipping_address": "David Patel Residence, Innovation Hub Blvd, Sector 4",
     "inventory_deducted": true,
-    "last_updated_at": "2026-09-03T22:14:08.743729+00:00"
+    "last_updated_at": "2026-09-03T22:17:57.433790+00:00",
+    "status_notes": "Auto-advanced doorstep delivery lifecycle (2m)"
   },
   {
     "order_id": "ORD-1426-DF6C",
     "user_id": "buyer_david",
     "customer_name": "David Patel",
     "created_at": "2026-09-03T22:14:26.810342+00:00",
-    "status": "Dispatched",
+    "status": "Delivered",
     "delivery_estimate": "2-3 Business Days",
     "tracking_number": "TRK-8118D8",
     "items": [
@@ -14460,14 +14516,15 @@
     },
     "shipping_address": "David Patel Residence, Innovation Hub Blvd, Sector 4",
     "inventory_deducted": true,
-    "last_updated_at": "2026-09-03T22:14:32.742622+00:00"
+    "last_updated_at": "2026-09-03T22:17:57.287133+00:00",
+    "status_notes": "Auto-advanced doorstep delivery lifecycle (2m)"
   },
   {
     "order_id": "ORD-1444-51F3",
     "user_id": "buyer_marcus",
     "customer_name": "Marcus Kim",
     "created_at": "2026-09-03T22:14:44.003823+00:00",
-    "status": "Dispatched",
+    "status": "Delivered",
     "delivery_estimate": "2-3 Business Days",
     "tracking_number": "TRK-6FD4B9",
     "items": [
@@ -14524,6 +14581,2865 @@
     },
     "shipping_address": "Marcus Kim Residence, Innovation Hub Blvd, Sector 4",
     "inventory_deducted": true,
-    "last_updated_at": "2026-09-03T22:14:49.673466+00:00"
+    "last_updated_at": "2026-09-03T22:18:25.749857+00:00",
+    "status_notes": "Auto-advanced doorstep delivery lifecycle (2m)"
+  },
+  {
+    "order_id": "ORD-1519-9429",
+    "user_id": "buyer_elena",
+    "customer_name": "Elena Rostova",
+    "created_at": "2026-09-03T22:15:19.712381+00:00",
+    "status": "Delivered",
+    "delivery_estimate": "2-3 Business Days",
+    "tracking_number": "TRK-D3A97F",
+    "items": [
+      {
+        "id": "prod_005",
+        "PRODUCT_NAME": "NOVA BladeForge RTX 4080 Gaming Laptop",
+        "PRODUCT_TYPE": "Laptops",
+        "PRODUCT_SIZE": "32GB RAM / 1TB NVMe SSD",
+        "quantity": 1,
+        "price": 100.0,
+        "item_total": 100.0,
+        "IMAGE": "/static/images/laptop_gaming.svg"
+      }
+    ],
+    "currency": "INR",
+    "subtotal": 100.0,
+    "tax": 0.0,
+    "total": 100.0,
+    "payment_method": "Razorpay Gateway (Online)",
+    "razorpay_order_id": "order_TXj1gNi8nam781",
+    "razorpay_payment_id": "pay_TXj1nooHSJuUSN",
+    "payment_details": {
+      "gateway": "Razorpay Gateway (Online)",
+      "razorpay_order_id": "order_TXj1gNi8nam781",
+      "razorpay_payment_id": "pay_TXj1nooHSJuUSN",
+      "razorpay_signature": "0effcd1c8605c0fe108773f35e16705a9003beca8a2afa4b9d2e03497fe26df8",
+      "verified": true,
+      "ap2_mandate_id": "mandate_ap2_fa7dfdfdca8a",
+      "ap2_proof": {
+        "protocol": "AP2 (Google Agent Payments Protocol) + ACP + Razorpay Rail",
+        "authorization_layer": {
+          "mandate_id": "mandate_ap2_fa7dfdfdca8a",
+          "authorized_agent": "nova_commerce_agent",
+          "spending_mandate_signature": "864f77f15164c78c60cf9ed8bff4f8e5c0dd079d2aa20a5e2974d8b18cfecbf8",
+          "status": "VERIFIED_AND_ACTIVE"
+        },
+        "checkout_layer_acp": {
+          "acp_token": "acp_tok_229a4d451e43",
+          "cart_digest": "fff5a8357fe0e150a9e208be575af0455479e24c96a9bfe9828fa70dca21e273",
+          "currency": "INR",
+          "tax": 0.0
+        },
+        "settlement_layer": {
+          "gateway": "Razorpay Gateway (Online)",
+          "gateway_mode": "Test Mode",
+          "razorpay_order_id": "order_TXj1gNi8nam781",
+          "razorpay_payment_id": "pay_TXj1nooHSJuUSN",
+          "razorpay_signature": "0effcd1c8605c0fe108773f35e16705a9003beca8a2afa4b9d2e03497fe26df8",
+          "settlement_rail": "razorpay_upi_fiat",
+          "status": "CAPTURED",
+          "captured_amount_inr": 100.0
+        }
+      }
+    },
+    "shipping_address": "Elena Rostova Residence, Innovation Hub Blvd, Sector 4",
+    "inventory_deducted": true,
+    "last_updated_at": "2026-09-03T22:19:02.671876+00:00",
+    "status_notes": "Auto-advanced doorstep delivery lifecycle (2m)"
+  },
+  {
+    "order_id": "ORD-1537-76CE",
+    "user_id": "buyer_alex",
+    "customer_name": "Alex Chen",
+    "created_at": "2026-09-03T22:15:37.909022+00:00",
+    "status": "Delivered",
+    "delivery_estimate": "2-3 Business Days",
+    "tracking_number": "TRK-102BE7",
+    "items": [
+      {
+        "id": "prod_004",
+        "PRODUCT_NAME": "NOVA ZenBook Ultra 14 M3 Laptop",
+        "PRODUCT_TYPE": "Laptops",
+        "PRODUCT_SIZE": "16GB RAM / 512GB SSD",
+        "quantity": 1,
+        "price": 85.0,
+        "item_total": 85.0,
+        "IMAGE": "/static/images/laptop_pro.svg"
+      }
+    ],
+    "currency": "INR",
+    "subtotal": 85.0,
+    "tax": 0.0,
+    "total": 85.0,
+    "payment_method": "Razorpay Gateway (Online)",
+    "razorpay_order_id": "order_TXj26Iq6xedkKx",
+    "razorpay_payment_id": "pay_TXj2Dnqm7PM08z",
+    "payment_details": {
+      "gateway": "Razorpay Gateway (Online)",
+      "razorpay_order_id": "order_TXj26Iq6xedkKx",
+      "razorpay_payment_id": "pay_TXj2Dnqm7PM08z",
+      "razorpay_signature": "66f55c0bcef549d584e25f6051157687ecad5a954bcf839789b6cd354f665bbb",
+      "verified": true,
+      "ap2_mandate_id": "mandate_ap2_f94fd292d100",
+      "ap2_proof": {
+        "protocol": "AP2 (Google Agent Payments Protocol) + ACP + Razorpay Rail",
+        "authorization_layer": {
+          "mandate_id": "mandate_ap2_f94fd292d100",
+          "authorized_agent": "nova_commerce_agent",
+          "spending_mandate_signature": "abb26df3f946077971f641fd38d8ce4d12f2e359de279625504b7e634848308e",
+          "status": "VERIFIED_AND_ACTIVE"
+        },
+        "checkout_layer_acp": {
+          "acp_token": "acp_tok_5fc15bfa56d7",
+          "cart_digest": "af7eefa539225a67a06c0952753ecef75d6024567d081268eeec6c07378df5c7",
+          "currency": "INR",
+          "tax": 0.0
+        },
+        "settlement_layer": {
+          "gateway": "Razorpay Gateway (Online)",
+          "gateway_mode": "Test Mode",
+          "razorpay_order_id": "order_TXj26Iq6xedkKx",
+          "razorpay_payment_id": "pay_TXj2Dnqm7PM08z",
+          "razorpay_signature": "66f55c0bcef549d584e25f6051157687ecad5a954bcf839789b6cd354f665bbb",
+          "settlement_rail": "razorpay_upi_fiat",
+          "status": "CAPTURED",
+          "captured_amount_inr": 85.0
+        }
+      }
+    },
+    "shipping_address": "Alex Chen Residence, Innovation Hub Blvd, Sector 4",
+    "inventory_deducted": true,
+    "last_updated_at": "2026-09-03T22:19:02.500012+00:00",
+    "status_notes": "Auto-advanced doorstep delivery lifecycle (2m)"
+  },
+  {
+    "order_id": "ORD-1646-411E",
+    "user_id": "buyer_sophia",
+    "customer_name": "Sophia Miller",
+    "created_at": "2026-09-03T22:16:46.636414+00:00",
+    "status": "Delivered",
+    "delivery_estimate": "2-3 Business Days",
+    "tracking_number": "TRK-86306D",
+    "items": [
+      {
+        "id": "prod_018",
+        "PRODUCT_NAME": "NOVA ErgoMaster Silent Wireless Mouse",
+        "PRODUCT_TYPE": "Accessories",
+        "PRODUCT_SIZE": "Ergonomic Right-Hand",
+        "quantity": 1,
+        "price": 24.33,
+        "item_total": 24.33,
+        "IMAGE": "/static/images/mouse_wireless.svg"
+      }
+    ],
+    "currency": "INR",
+    "subtotal": 24.33,
+    "tax": 0.0,
+    "total": 24.33,
+    "payment_method": "Razorpay Gateway (Online)",
+    "razorpay_order_id": "order_TXj3Cx34oxkrYd",
+    "razorpay_payment_id": "pay_TXj3KIl1Rh3wuI",
+    "payment_details": {
+      "gateway": "Razorpay Gateway (Online)",
+      "razorpay_order_id": "order_TXj3Cx34oxkrYd",
+      "razorpay_payment_id": "pay_TXj3KIl1Rh3wuI",
+      "razorpay_signature": "b98bb19e4467d19a37c9efffc880883b8f6f2ed8a2b14773f3104ad9902bd407",
+      "verified": true,
+      "ap2_mandate_id": "mandate_ap2_c52dd77e4f64",
+      "ap2_proof": {
+        "protocol": "AP2 (Google Agent Payments Protocol) + ACP + Razorpay Rail",
+        "authorization_layer": {
+          "mandate_id": "mandate_ap2_c52dd77e4f64",
+          "authorized_agent": "nova_commerce_agent",
+          "spending_mandate_signature": "0dd60da1396067e5a87a3f13225437ae0325c94dfb319e7384046bfcaeeb8824",
+          "status": "VERIFIED_AND_ACTIVE"
+        },
+        "checkout_layer_acp": {
+          "acp_token": "acp_tok_1e737d11cfd4",
+          "cart_digest": "44fecec8c15a59dea10093ab2d5747189f78029bd6c69477c9b0d1b49650d1e2",
+          "currency": "INR",
+          "tax": 0.0
+        },
+        "settlement_layer": {
+          "gateway": "Razorpay Gateway (Online)",
+          "gateway_mode": "Test Mode",
+          "razorpay_order_id": "order_TXj3Cx34oxkrYd",
+          "razorpay_payment_id": "pay_TXj3KIl1Rh3wuI",
+          "razorpay_signature": "b98bb19e4467d19a37c9efffc880883b8f6f2ed8a2b14773f3104ad9902bd407",
+          "settlement_rail": "razorpay_upi_fiat",
+          "status": "CAPTURED",
+          "captured_amount_inr": 24.33
+        }
+      }
+    },
+    "shipping_address": "Sophia Miller Residence, Innovation Hub Blvd, Sector 4",
+    "inventory_deducted": true,
+    "last_updated_at": "2026-09-03T22:20:14.642254+00:00",
+    "status_notes": "Auto-advanced doorstep delivery lifecycle (2m)"
+  },
+  {
+    "order_id": "ORD-1708-EB32",
+    "user_id": "buyer_david",
+    "customer_name": "David Patel",
+    "created_at": "2026-09-03T22:17:08.996647+00:00",
+    "status": "Delivered",
+    "delivery_estimate": "2-3 Business Days",
+    "tracking_number": "TRK-F32902",
+    "items": [
+      {
+        "id": "prod_018",
+        "PRODUCT_NAME": "NOVA ErgoMaster Silent Wireless Mouse",
+        "PRODUCT_TYPE": "Accessories",
+        "PRODUCT_SIZE": "Ergonomic Right-Hand",
+        "quantity": 1,
+        "price": 24.33,
+        "item_total": 24.33,
+        "IMAGE": "/static/images/mouse_wireless.svg"
+      }
+    ],
+    "currency": "INR",
+    "subtotal": 24.33,
+    "tax": 0.0,
+    "total": 24.33,
+    "payment_method": "Razorpay Gateway (Online)",
+    "razorpay_order_id": "order_TXj3cKtAOxkFmv",
+    "razorpay_payment_id": "pay_TXj3jYFjum6kog",
+    "payment_details": {
+      "gateway": "Razorpay Gateway (Online)",
+      "razorpay_order_id": "order_TXj3cKtAOxkFmv",
+      "razorpay_payment_id": "pay_TXj3jYFjum6kog",
+      "razorpay_signature": "300483d748b2b111c3ed52431cf5d98363af77338d57523c4088d16388c46fff",
+      "verified": true,
+      "ap2_mandate_id": "mandate_ap2_c5328d88301c",
+      "ap2_proof": {
+        "protocol": "AP2 (Google Agent Payments Protocol) + ACP + Razorpay Rail",
+        "authorization_layer": {
+          "mandate_id": "mandate_ap2_c5328d88301c",
+          "authorized_agent": "nova_commerce_agent",
+          "spending_mandate_signature": "7ba51727eb21dd994f3406488baea357d1f1a5a262ed3220ad7dc936e0a702aa",
+          "status": "VERIFIED_AND_ACTIVE"
+        },
+        "checkout_layer_acp": {
+          "acp_token": "acp_tok_aa5753ae9bf4",
+          "cart_digest": "44fecec8c15a59dea10093ab2d5747189f78029bd6c69477c9b0d1b49650d1e2",
+          "currency": "INR",
+          "tax": 0.0
+        },
+        "settlement_layer": {
+          "gateway": "Razorpay Gateway (Online)",
+          "gateway_mode": "Test Mode",
+          "razorpay_order_id": "order_TXj3cKtAOxkFmv",
+          "razorpay_payment_id": "pay_TXj3jYFjum6kog",
+          "razorpay_signature": "300483d748b2b111c3ed52431cf5d98363af77338d57523c4088d16388c46fff",
+          "settlement_rail": "razorpay_upi_fiat",
+          "status": "CAPTURED",
+          "captured_amount_inr": 24.33
+        }
+      }
+    },
+    "shipping_address": "David Patel Residence, Innovation Hub Blvd, Sector 4",
+    "inventory_deducted": true,
+    "last_updated_at": "2026-09-03T22:20:39.296556+00:00",
+    "status_notes": "Auto-advanced doorstep delivery lifecycle (2m)"
+  },
+  {
+    "order_id": "ORD-1750-50B9",
+    "user_id": "buyer_marcus",
+    "customer_name": "Marcus Kim",
+    "created_at": "2026-09-03T22:17:50.348446+00:00",
+    "status": "Delivered",
+    "delivery_estimate": "2-3 Business Days",
+    "tracking_number": "TRK-534E5A",
+    "items": [
+      {
+        "id": "prod_022",
+        "PRODUCT_NAME": "NOVA Stealth Commuter Smart Backpack",
+        "PRODUCT_TYPE": "Accessories",
+        "PRODUCT_SIZE": "Medium (22 Liters)",
+        "quantity": 1,
+        "price": 36.5,
+        "item_total": 36.5,
+        "IMAGE": "/static/images/backpack.svg"
+      }
+    ],
+    "currency": "INR",
+    "subtotal": 36.5,
+    "tax": 0.0,
+    "total": 36.5,
+    "payment_method": "Razorpay Gateway (Online)",
+    "razorpay_order_id": "order_TXj4LN801uDHLN",
+    "razorpay_payment_id": "pay_TXj4SgXOxFJOX4",
+    "payment_details": {
+      "gateway": "Razorpay Gateway (Online)",
+      "razorpay_order_id": "order_TXj4LN801uDHLN",
+      "razorpay_payment_id": "pay_TXj4SgXOxFJOX4",
+      "razorpay_signature": "b702e4a0a9de0316af3f25efa3163e1f6318d5548fc704c91623a27a1340e41d",
+      "verified": true,
+      "ap2_mandate_id": "mandate_ap2_cb4f7fb79e5f",
+      "ap2_proof": {
+        "protocol": "AP2 (Google Agent Payments Protocol) + ACP + Razorpay Rail",
+        "authorization_layer": {
+          "mandate_id": "mandate_ap2_cb4f7fb79e5f",
+          "authorized_agent": "nova_commerce_agent",
+          "spending_mandate_signature": "c0f599cfc3ac014ebb8759b32a49df610380c6f4621d4fae19b6a466fc4dbd92",
+          "status": "VERIFIED_AND_ACTIVE"
+        },
+        "checkout_layer_acp": {
+          "acp_token": "acp_tok_693942a82047",
+          "cart_digest": "c0de5e0aa887c91cac99585c3c084da6029b90f645994c8b1a3b453496a5c98a",
+          "currency": "INR",
+          "tax": 0.0
+        },
+        "settlement_layer": {
+          "gateway": "Razorpay Gateway (Online)",
+          "gateway_mode": "Test Mode",
+          "razorpay_order_id": "order_TXj4LN801uDHLN",
+          "razorpay_payment_id": "pay_TXj4SgXOxFJOX4",
+          "razorpay_signature": "b702e4a0a9de0316af3f25efa3163e1f6318d5548fc704c91623a27a1340e41d",
+          "settlement_rail": "razorpay_upi_fiat",
+          "status": "CAPTURED",
+          "captured_amount_inr": 36.5
+        }
+      }
+    },
+    "shipping_address": "Marcus Kim Residence, Innovation Hub Blvd, Sector 4",
+    "inventory_deducted": true,
+    "last_updated_at": "2026-09-03T22:21:24.661506+00:00",
+    "status_notes": "Auto-advanced doorstep delivery lifecycle (2m)"
+  },
+  {
+    "order_id": "ORD-1818-B9AD",
+    "user_id": "buyer_sophia",
+    "customer_name": "Sophia Miller",
+    "created_at": "2026-09-03T22:18:18.986722+00:00",
+    "status": "Delivered",
+    "delivery_estimate": "2-3 Business Days",
+    "tracking_number": "TRK-E880D9",
+    "items": [
+      {
+        "id": "prod_021",
+        "PRODUCT_NAME": "NOVA TitanVolt HyperCharge PowerBank 20k",
+        "PRODUCT_TYPE": "Accessories",
+        "PRODUCT_SIZE": "20,000mAh / 65W PD",
+        "quantity": 1,
+        "price": 42.59,
+        "item_total": 42.59,
+        "IMAGE": "/static/images/powerbank.svg"
+      }
+    ],
+    "currency": "INR",
+    "subtotal": 42.59,
+    "tax": 0.0,
+    "total": 42.59,
+    "payment_method": "Razorpay Gateway (Online)",
+    "razorpay_order_id": "order_TXj4qhaIwgt6F2",
+    "razorpay_payment_id": "pay_TXj4y5quWVdtKF",
+    "payment_details": {
+      "gateway": "Razorpay Gateway (Online)",
+      "razorpay_order_id": "order_TXj4qhaIwgt6F2",
+      "razorpay_payment_id": "pay_TXj4y5quWVdtKF",
+      "razorpay_signature": "3ec1a9aae2666181484e277bd74e23135de2d6c523bc889b44dd6b3c5058bbb1",
+      "verified": true,
+      "ap2_mandate_id": "mandate_ap2_c52dd77e4f64",
+      "ap2_proof": {
+        "protocol": "AP2 (Google Agent Payments Protocol) + ACP + Razorpay Rail",
+        "authorization_layer": {
+          "mandate_id": "mandate_ap2_c52dd77e4f64",
+          "authorized_agent": "nova_commerce_agent",
+          "spending_mandate_signature": "0dd60da1396067e5a87a3f13225437ae0325c94dfb319e7384046bfcaeeb8824",
+          "status": "VERIFIED_AND_ACTIVE"
+        },
+        "checkout_layer_acp": {
+          "acp_token": "acp_tok_65f8d51e229c",
+          "cart_digest": "fdf81fce62cf2f2d2285d596988066b90b80caa94d72376509ee396a25478781",
+          "currency": "INR",
+          "tax": 0.0
+        },
+        "settlement_layer": {
+          "gateway": "Razorpay Gateway (Online)",
+          "gateway_mode": "Test Mode",
+          "razorpay_order_id": "order_TXj4qhaIwgt6F2",
+          "razorpay_payment_id": "pay_TXj4y5quWVdtKF",
+          "razorpay_signature": "3ec1a9aae2666181484e277bd74e23135de2d6c523bc889b44dd6b3c5058bbb1",
+          "settlement_rail": "razorpay_upi_fiat",
+          "status": "CAPTURED",
+          "captured_amount_inr": 42.59
+        }
+      }
+    },
+    "shipping_address": "Sophia Miller Residence, Innovation Hub Blvd, Sector 4",
+    "inventory_deducted": true,
+    "last_updated_at": "2026-09-03T22:21:54.685932+00:00",
+    "status_notes": "Auto-advanced doorstep delivery lifecycle (2m)"
+  },
+  {
+    "order_id": "ORD-1950-EF2A",
+    "user_id": "buyer_alex",
+    "customer_name": "Alex Chen",
+    "created_at": "2026-09-03T22:19:50.262922+00:00",
+    "status": "Delivered",
+    "delivery_estimate": "2-3 Business Days",
+    "tracking_number": "TRK-F314D6",
+    "items": [
+      {
+        "id": "prod_006",
+        "PRODUCT_NAME": "NOVA AeroBook Slim i7 Ultrabook",
+        "PRODUCT_TYPE": "Laptops",
+        "PRODUCT_SIZE": "16GB RAM / 512GB SSD",
+        "quantity": 1,
+        "price": 75.0,
+        "item_total": 75.0,
+        "IMAGE": "/static/images/laptop_pro.svg"
+      }
+    ],
+    "currency": "INR",
+    "subtotal": 75.0,
+    "tax": 0.0,
+    "total": 75.0,
+    "payment_method": "Razorpay Gateway (Online)",
+    "razorpay_order_id": "order_TXj6QEV0yqtzLt",
+    "razorpay_payment_id": "pay_TXj6YegTLcJZRU",
+    "payment_details": {
+      "gateway": "Razorpay Gateway (Online)",
+      "razorpay_order_id": "order_TXj6QEV0yqtzLt",
+      "razorpay_payment_id": "pay_TXj6YegTLcJZRU",
+      "razorpay_signature": "204060990abad1f007fbc81d5c05e64e2635dad6b743a0d21e0e234f22ffb390",
+      "verified": true,
+      "ap2_mandate_id": "mandate_ap2_f94fd292d100",
+      "ap2_proof": {
+        "protocol": "AP2 (Google Agent Payments Protocol) + ACP + Razorpay Rail",
+        "authorization_layer": {
+          "mandate_id": "mandate_ap2_f94fd292d100",
+          "authorized_agent": "nova_commerce_agent",
+          "spending_mandate_signature": "abb26df3f946077971f641fd38d8ce4d12f2e359de279625504b7e634848308e",
+          "status": "VERIFIED_AND_ACTIVE"
+        },
+        "checkout_layer_acp": {
+          "acp_token": "acp_tok_87356e337492",
+          "cart_digest": "728d9fbeec65989de13886858b1d650e14df8dc6c73fdfa972adcc2e08ac8912",
+          "currency": "INR",
+          "tax": 0.0
+        },
+        "settlement_layer": {
+          "gateway": "Razorpay Gateway (Online)",
+          "gateway_mode": "Test Mode",
+          "razorpay_order_id": "order_TXj6QEV0yqtzLt",
+          "razorpay_payment_id": "pay_TXj6YegTLcJZRU",
+          "razorpay_signature": "204060990abad1f007fbc81d5c05e64e2635dad6b743a0d21e0e234f22ffb390",
+          "settlement_rail": "razorpay_upi_fiat",
+          "status": "CAPTURED",
+          "captured_amount_inr": 75.0
+        }
+      }
+    },
+    "shipping_address": "Alex Chen Residence, Innovation Hub Blvd, Sector 4",
+    "inventory_deducted": true,
+    "last_updated_at": "2026-09-03T22:23:02.772310+00:00",
+    "status_notes": "Auto-advanced doorstep delivery lifecycle (2m)"
+  },
+  {
+    "order_id": "ORD-2007-338F",
+    "user_id": "buyer_elena",
+    "customer_name": "Elena Rostova",
+    "created_at": "2026-09-03T22:20:07.009907+00:00",
+    "status": "Delivered",
+    "delivery_estimate": "2-3 Business Days",
+    "tracking_number": "TRK-CC6BBF",
+    "items": [
+      {
+        "id": "prod_001",
+        "PRODUCT_NAME": "NOVA Apex Pro 5G Smartphone",
+        "PRODUCT_TYPE": "Mobiles",
+        "PRODUCT_SIZE": "12GB RAM / 256GB",
+        "quantity": 1,
+        "price": 120.46,
+        "item_total": 120.46,
+        "IMAGE": "/static/images/phone_flagship.svg"
+      }
+    ],
+    "currency": "INR",
+    "subtotal": 120.46,
+    "tax": 0.0,
+    "total": 120.46,
+    "payment_method": "Razorpay Gateway (Online)",
+    "razorpay_order_id": "order_TXj6qE2avUOAwn",
+    "razorpay_payment_id": "pay_TXj6xfu2EpEzFH",
+    "payment_details": {
+      "gateway": "Razorpay Gateway (Online)",
+      "razorpay_order_id": "order_TXj6qE2avUOAwn",
+      "razorpay_payment_id": "pay_TXj6xfu2EpEzFH",
+      "razorpay_signature": "6874503fad770066b59c222c60bcee10af43799a735f186d5c085c1f95e50687",
+      "verified": true,
+      "ap2_mandate_id": "mandate_ap2_fa7dfdfdca8a",
+      "ap2_proof": {
+        "protocol": "AP2 (Google Agent Payments Protocol) + ACP + Razorpay Rail",
+        "authorization_layer": {
+          "mandate_id": "mandate_ap2_fa7dfdfdca8a",
+          "authorized_agent": "nova_commerce_agent",
+          "spending_mandate_signature": "864f77f15164c78c60cf9ed8bff4f8e5c0dd079d2aa20a5e2974d8b18cfecbf8",
+          "status": "VERIFIED_AND_ACTIVE"
+        },
+        "checkout_layer_acp": {
+          "acp_token": "acp_tok_3643ba4277d1",
+          "cart_digest": "926825d8fa9da6ba739d1e1d49b5123fd17822267f93fde3b2cc7688c7aa7ffc",
+          "currency": "INR",
+          "tax": 0.0
+        },
+        "settlement_layer": {
+          "gateway": "Razorpay Gateway (Online)",
+          "gateway_mode": "Test Mode",
+          "razorpay_order_id": "order_TXj6qE2avUOAwn",
+          "razorpay_payment_id": "pay_TXj6xfu2EpEzFH",
+          "razorpay_signature": "6874503fad770066b59c222c60bcee10af43799a735f186d5c085c1f95e50687",
+          "settlement_rail": "razorpay_upi_fiat",
+          "status": "CAPTURED",
+          "captured_amount_inr": 120.46
+        }
+      }
+    },
+    "shipping_address": "Elena Rostova Residence, Innovation Hub Blvd, Sector 4",
+    "inventory_deducted": true,
+    "last_updated_at": "2026-09-03T22:23:25.306218+00:00",
+    "status_notes": "Auto-advanced doorstep delivery lifecycle (2m)"
+  },
+  {
+    "order_id": "ORD-2031-DEB4",
+    "user_id": "buyer_david",
+    "customer_name": "David Patel",
+    "created_at": "2026-09-03T22:20:31.451029+00:00",
+    "status": "Delivered",
+    "delivery_estimate": "2-3 Business Days",
+    "tracking_number": "TRK-79D566",
+    "items": [
+      {
+        "id": "prod_017",
+        "PRODUCT_NAME": "NOVA AirType Low-Profile Wireless Keyboard",
+        "PRODUCT_TYPE": "Accessories",
+        "PRODUCT_SIZE": "75% Wireless Layout",
+        "quantity": 1,
+        "price": 51.1,
+        "item_total": 51.1,
+        "IMAGE": "/static/images/gaming_keyboard.svg"
+      }
+    ],
+    "currency": "INR",
+    "subtotal": 51.1,
+    "tax": 0.0,
+    "total": 51.1,
+    "payment_method": "Razorpay Gateway (Online)",
+    "razorpay_order_id": "order_TXj7BEKZHLvxv5",
+    "razorpay_payment_id": "pay_TXj7IWudYbrZSu",
+    "payment_details": {
+      "gateway": "Razorpay Gateway (Online)",
+      "razorpay_order_id": "order_TXj7BEKZHLvxv5",
+      "razorpay_payment_id": "pay_TXj7IWudYbrZSu",
+      "razorpay_signature": "e8b15c06a43cc21694871efe5fef5eb5dc3b41cf0153a6836cee40efd6ae79c5",
+      "verified": true,
+      "ap2_mandate_id": "mandate_ap2_c5328d88301c",
+      "ap2_proof": {
+        "protocol": "AP2 (Google Agent Payments Protocol) + ACP + Razorpay Rail",
+        "authorization_layer": {
+          "mandate_id": "mandate_ap2_c5328d88301c",
+          "authorized_agent": "nova_commerce_agent",
+          "spending_mandate_signature": "7ba51727eb21dd994f3406488baea357d1f1a5a262ed3220ad7dc936e0a702aa",
+          "status": "VERIFIED_AND_ACTIVE"
+        },
+        "checkout_layer_acp": {
+          "acp_token": "acp_tok_e2d46b938930",
+          "cart_digest": "071fb1d569a0f4125bbf196f0f33b77a22730694e29f4e3108e87943d1d771a6",
+          "currency": "INR",
+          "tax": 0.0
+        },
+        "settlement_layer": {
+          "gateway": "Razorpay Gateway (Online)",
+          "gateway_mode": "Test Mode",
+          "razorpay_order_id": "order_TXj7BEKZHLvxv5",
+          "razorpay_payment_id": "pay_TXj7IWudYbrZSu",
+          "razorpay_signature": "e8b15c06a43cc21694871efe5fef5eb5dc3b41cf0153a6836cee40efd6ae79c5",
+          "settlement_rail": "razorpay_upi_fiat",
+          "status": "CAPTURED",
+          "captured_amount_inr": 51.1
+        }
+      }
+    },
+    "shipping_address": "David Patel Residence, Innovation Hub Blvd, Sector 4",
+    "inventory_deducted": true,
+    "last_updated_at": "2026-09-03T22:24:10.215915+00:00",
+    "status_notes": "Auto-advanced doorstep delivery lifecycle (2m)"
+  },
+  {
+    "order_id": "ORD-2055-EA7A",
+    "user_id": "buyer_marcus",
+    "customer_name": "Marcus Kim",
+    "created_at": "2026-09-03T22:20:55.582263+00:00",
+    "status": "Delivered",
+    "delivery_estimate": "2-3 Business Days",
+    "tracking_number": "TRK-EAA40E",
+    "items": [
+      {
+        "id": "prod_027",
+        "PRODUCT_NAME": "NOVA HyperGaN 140W Quad-Port Pro Charger",
+        "PRODUCT_TYPE": "Accessories",
+        "PRODUCT_SIZE": "140W (3x Type-C + 1x USB-A)",
+        "quantity": 1,
+        "price": 46.23,
+        "item_total": 46.23,
+        "IMAGE": "/static/images/charger_gan.svg"
+      }
+    ],
+    "currency": "INR",
+    "subtotal": 46.23,
+    "tax": 0.0,
+    "total": 46.23,
+    "payment_method": "Razorpay Gateway (Online)",
+    "razorpay_order_id": "order_TXj7avnF862BpU",
+    "razorpay_payment_id": "pay_TXj7iSTD0b02c9",
+    "payment_details": {
+      "gateway": "Razorpay Gateway (Online)",
+      "razorpay_order_id": "order_TXj7avnF862BpU",
+      "razorpay_payment_id": "pay_TXj7iSTD0b02c9",
+      "razorpay_signature": "47aa3013fca49ccf8b9ee4345c8200c503aaf92d4e54aa253e4439978b53e8bc",
+      "verified": true,
+      "ap2_mandate_id": "mandate_ap2_cb4f7fb79e5f",
+      "ap2_proof": {
+        "protocol": "AP2 (Google Agent Payments Protocol) + ACP + Razorpay Rail",
+        "authorization_layer": {
+          "mandate_id": "mandate_ap2_cb4f7fb79e5f",
+          "authorized_agent": "nova_commerce_agent",
+          "spending_mandate_signature": "c0f599cfc3ac014ebb8759b32a49df610380c6f4621d4fae19b6a466fc4dbd92",
+          "status": "VERIFIED_AND_ACTIVE"
+        },
+        "checkout_layer_acp": {
+          "acp_token": "acp_tok_6e83ab37647e",
+          "cart_digest": "d772c45ca620296b761284350f4ec13399af8c374c2d957a79d047349b3f4677",
+          "currency": "INR",
+          "tax": 0.0
+        },
+        "settlement_layer": {
+          "gateway": "Razorpay Gateway (Online)",
+          "gateway_mode": "Test Mode",
+          "razorpay_order_id": "order_TXj7avnF862BpU",
+          "razorpay_payment_id": "pay_TXj7iSTD0b02c9",
+          "razorpay_signature": "47aa3013fca49ccf8b9ee4345c8200c503aaf92d4e54aa253e4439978b53e8bc",
+          "settlement_rail": "razorpay_upi_fiat",
+          "status": "CAPTURED",
+          "captured_amount_inr": 46.23
+        }
+      }
+    },
+    "shipping_address": "Marcus Kim Residence, Innovation Hub Blvd, Sector 4",
+    "inventory_deducted": true,
+    "last_updated_at": "2026-09-03T22:24:49.086724+00:00",
+    "status_notes": "Auto-advanced doorstep delivery lifecycle (2m)"
+  },
+  {
+    "order_id": "ORD-2117-115A",
+    "user_id": "buyer_alex",
+    "customer_name": "Alex Chen",
+    "created_at": "2026-09-03T22:21:17.340169+00:00",
+    "status": "Delivered",
+    "delivery_estimate": "2-3 Business Days",
+    "tracking_number": "TRK-C378CF",
+    "items": [
+      {
+        "id": "prod_001",
+        "PRODUCT_NAME": "NOVA Apex Pro 5G Smartphone",
+        "PRODUCT_TYPE": "Mobiles",
+        "PRODUCT_SIZE": "12GB RAM / 256GB",
+        "quantity": 1,
+        "price": 120.46,
+        "item_total": 120.46,
+        "IMAGE": "/static/images/phone_flagship.svg"
+      }
+    ],
+    "currency": "INR",
+    "subtotal": 120.46,
+    "tax": 0.0,
+    "total": 120.46,
+    "payment_method": "Razorpay Gateway (Online)",
+    "razorpay_order_id": "order_TXj7yhc83Rw6kn",
+    "razorpay_payment_id": "pay_TXj868BN21vYtz",
+    "payment_details": {
+      "gateway": "Razorpay Gateway (Online)",
+      "razorpay_order_id": "order_TXj7yhc83Rw6kn",
+      "razorpay_payment_id": "pay_TXj868BN21vYtz",
+      "razorpay_signature": "39d2512c035502cb59708d1ba1f7c93029ae9ae7c829aea8d1902d405fb2d913",
+      "verified": true,
+      "ap2_mandate_id": "mandate_ap2_f94fd292d100",
+      "ap2_proof": {
+        "protocol": "AP2 (Google Agent Payments Protocol) + ACP + Razorpay Rail",
+        "authorization_layer": {
+          "mandate_id": "mandate_ap2_f94fd292d100",
+          "authorized_agent": "nova_commerce_agent",
+          "spending_mandate_signature": "abb26df3f946077971f641fd38d8ce4d12f2e359de279625504b7e634848308e",
+          "status": "VERIFIED_AND_ACTIVE"
+        },
+        "checkout_layer_acp": {
+          "acp_token": "acp_tok_3cf50d9fbd65",
+          "cart_digest": "926825d8fa9da6ba739d1e1d49b5123fd17822267f93fde3b2cc7688c7aa7ffc",
+          "currency": "INR",
+          "tax": 0.0
+        },
+        "settlement_layer": {
+          "gateway": "Razorpay Gateway (Online)",
+          "gateway_mode": "Test Mode",
+          "razorpay_order_id": "order_TXj7yhc83Rw6kn",
+          "razorpay_payment_id": "pay_TXj868BN21vYtz",
+          "razorpay_signature": "39d2512c035502cb59708d1ba1f7c93029ae9ae7c829aea8d1902d405fb2d913",
+          "settlement_rail": "razorpay_upi_fiat",
+          "status": "CAPTURED",
+          "captured_amount_inr": 120.46
+        }
+      }
+    },
+    "shipping_address": "Alex Chen Residence, Innovation Hub Blvd, Sector 4",
+    "inventory_deducted": true,
+    "last_updated_at": "2026-09-03T22:24:48.932412+00:00",
+    "status_notes": "Auto-advanced doorstep delivery lifecycle (2m)"
+  },
+  {
+    "order_id": "ORD-2214-244A",
+    "user_id": "buyer_david",
+    "customer_name": "David Patel",
+    "created_at": "2026-09-03T22:22:14.855829+00:00",
+    "status": "Delivered",
+    "delivery_estimate": "2-3 Business Days",
+    "tracking_number": "TRK-0E10F2",
+    "items": [
+      {
+        "id": "prod_025",
+        "PRODUCT_NAME": "NOVA TurboFlash 30W Mobile Fast Charger",
+        "PRODUCT_TYPE": "Accessories",
+        "PRODUCT_SIZE": "30W Nano USB-C",
+        "quantity": 1,
+        "price": 18.25,
+        "item_total": 18.25,
+        "IMAGE": "/static/images/charger_mobile.svg"
+      }
+    ],
+    "currency": "INR",
+    "subtotal": 18.25,
+    "tax": 0.0,
+    "total": 18.25,
+    "payment_method": "Razorpay Gateway (Online)",
+    "razorpay_order_id": "order_TXj8yJ5Y92QG0e",
+    "razorpay_payment_id": "pay_TXj95ZepwdWsrU",
+    "payment_details": {
+      "gateway": "Razorpay Gateway (Online)",
+      "razorpay_order_id": "order_TXj8yJ5Y92QG0e",
+      "razorpay_payment_id": "pay_TXj95ZepwdWsrU",
+      "razorpay_signature": "f7512c56f36abd92dc40932b434cd1069f2a81db5f7173d5f837f1c3a203e502",
+      "verified": true,
+      "ap2_mandate_id": "mandate_ap2_c5328d88301c",
+      "ap2_proof": {
+        "protocol": "AP2 (Google Agent Payments Protocol) + ACP + Razorpay Rail",
+        "authorization_layer": {
+          "mandate_id": "mandate_ap2_c5328d88301c",
+          "authorized_agent": "nova_commerce_agent",
+          "spending_mandate_signature": "7ba51727eb21dd994f3406488baea357d1f1a5a262ed3220ad7dc936e0a702aa",
+          "status": "VERIFIED_AND_ACTIVE"
+        },
+        "checkout_layer_acp": {
+          "acp_token": "acp_tok_643f11db79ed",
+          "cart_digest": "14440652022243dfce851b82fe268c5835488193a1a1a784ddc98eacb3e5a78c",
+          "currency": "INR",
+          "tax": 0.0
+        },
+        "settlement_layer": {
+          "gateway": "Razorpay Gateway (Online)",
+          "gateway_mode": "Test Mode",
+          "razorpay_order_id": "order_TXj8yJ5Y92QG0e",
+          "razorpay_payment_id": "pay_TXj95ZepwdWsrU",
+          "razorpay_signature": "f7512c56f36abd92dc40932b434cd1069f2a81db5f7173d5f837f1c3a203e502",
+          "settlement_rail": "razorpay_upi_fiat",
+          "status": "CAPTURED",
+          "captured_amount_inr": 18.25
+        }
+      }
+    },
+    "shipping_address": "David Patel Residence, Innovation Hub Blvd, Sector 4",
+    "inventory_deducted": true,
+    "last_updated_at": "2026-09-03T22:25:49.140759+00:00",
+    "status_notes": "Auto-advanced doorstep delivery lifecycle (2m)"
+  },
+  {
+    "order_id": "ORD-2256-6F35",
+    "user_id": "buyer_sophia",
+    "customer_name": "Sophia Miller",
+    "created_at": "2026-09-03T22:22:56.161851+00:00",
+    "status": "Delivered",
+    "delivery_estimate": "2-3 Business Days",
+    "tracking_number": "TRK-DD52A2",
+    "items": [
+      {
+        "id": "prod_022",
+        "PRODUCT_NAME": "NOVA Stealth Commuter Smart Backpack",
+        "PRODUCT_TYPE": "Accessories",
+        "PRODUCT_SIZE": "Medium (22 Liters)",
+        "quantity": 1,
+        "price": 36.5,
+        "item_total": 36.5,
+        "IMAGE": "/static/images/backpack.svg"
+      }
+    ],
+    "currency": "INR",
+    "subtotal": 36.5,
+    "tax": 0.0,
+    "total": 36.5,
+    "payment_method": "Razorpay Gateway (Online)",
+    "razorpay_order_id": "order_TXj9oIdBRC8Nhl",
+    "razorpay_payment_id": "pay_TXj9wBLba13SgM",
+    "payment_details": {
+      "gateway": "Razorpay Gateway (Online)",
+      "razorpay_order_id": "order_TXj9oIdBRC8Nhl",
+      "razorpay_payment_id": "pay_TXj9wBLba13SgM",
+      "razorpay_signature": "714ae36ae5904a8ca2539594c3defd58c72882b253aa2a8fb10fc01ec88f98e7",
+      "verified": true,
+      "ap2_mandate_id": "mandate_ap2_c52dd77e4f64",
+      "ap2_proof": {
+        "protocol": "AP2 (Google Agent Payments Protocol) + ACP + Razorpay Rail",
+        "authorization_layer": {
+          "mandate_id": "mandate_ap2_c52dd77e4f64",
+          "authorized_agent": "nova_commerce_agent",
+          "spending_mandate_signature": "0dd60da1396067e5a87a3f13225437ae0325c94dfb319e7384046bfcaeeb8824",
+          "status": "VERIFIED_AND_ACTIVE"
+        },
+        "checkout_layer_acp": {
+          "acp_token": "acp_tok_17248bf09d10",
+          "cart_digest": "c0de5e0aa887c91cac99585c3c084da6029b90f645994c8b1a3b453496a5c98a",
+          "currency": "INR",
+          "tax": 0.0
+        },
+        "settlement_layer": {
+          "gateway": "Razorpay Gateway (Online)",
+          "gateway_mode": "Test Mode",
+          "razorpay_order_id": "order_TXj9oIdBRC8Nhl",
+          "razorpay_payment_id": "pay_TXj9wBLba13SgM",
+          "razorpay_signature": "714ae36ae5904a8ca2539594c3defd58c72882b253aa2a8fb10fc01ec88f98e7",
+          "settlement_rail": "razorpay_upi_fiat",
+          "status": "CAPTURED",
+          "captured_amount_inr": 36.5
+        }
+      }
+    },
+    "shipping_address": "Sophia Miller Residence, Innovation Hub Blvd, Sector 4",
+    "inventory_deducted": true,
+    "last_updated_at": "2026-09-03T22:26:30.955655+00:00",
+    "status_notes": "Auto-advanced doorstep delivery lifecycle (2m)"
+  },
+  {
+    "order_id": "ORD-2318-E2C0",
+    "user_id": "buyer_elena",
+    "customer_name": "Elena Rostova",
+    "created_at": "2026-09-03T22:23:18.294962+00:00",
+    "status": "Delivered",
+    "delivery_estimate": "2-3 Business Days",
+    "tracking_number": "TRK-4E1CF8",
+    "items": [
+      {
+        "id": "prod_004",
+        "PRODUCT_NAME": "NOVA ZenBook Ultra 14 M3 Laptop",
+        "PRODUCT_TYPE": "Laptops",
+        "PRODUCT_SIZE": "16GB RAM / 512GB SSD",
+        "quantity": 1,
+        "price": 85.0,
+        "item_total": 85.0,
+        "IMAGE": "/static/images/laptop_pro.svg"
+      }
+    ],
+    "currency": "INR",
+    "subtotal": 85.0,
+    "tax": 0.0,
+    "total": 85.0,
+    "payment_method": "Razorpay Gateway (Online)",
+    "razorpay_order_id": "order_TXjA7MT9ZJHnFb",
+    "razorpay_payment_id": "pay_TXjAEk7YL8YvDO",
+    "payment_details": {
+      "gateway": "Razorpay Gateway (Online)",
+      "razorpay_order_id": "order_TXjA7MT9ZJHnFb",
+      "razorpay_payment_id": "pay_TXjAEk7YL8YvDO",
+      "razorpay_signature": "b95c116ca995592da2b3f6bfb1ce2c2cebd74381c4d33391f49e0af23b82fc28",
+      "verified": true,
+      "ap2_mandate_id": "mandate_ap2_fa7dfdfdca8a",
+      "ap2_proof": {
+        "protocol": "AP2 (Google Agent Payments Protocol) + ACP + Razorpay Rail",
+        "authorization_layer": {
+          "mandate_id": "mandate_ap2_fa7dfdfdca8a",
+          "authorized_agent": "nova_commerce_agent",
+          "spending_mandate_signature": "864f77f15164c78c60cf9ed8bff4f8e5c0dd079d2aa20a5e2974d8b18cfecbf8",
+          "status": "VERIFIED_AND_ACTIVE"
+        },
+        "checkout_layer_acp": {
+          "acp_token": "acp_tok_d6c93a9c229c",
+          "cart_digest": "af7eefa539225a67a06c0952753ecef75d6024567d081268eeec6c07378df5c7",
+          "currency": "INR",
+          "tax": 0.0
+        },
+        "settlement_layer": {
+          "gateway": "Razorpay Gateway (Online)",
+          "gateway_mode": "Test Mode",
+          "razorpay_order_id": "order_TXjA7MT9ZJHnFb",
+          "razorpay_payment_id": "pay_TXjAEk7YL8YvDO",
+          "razorpay_signature": "b95c116ca995592da2b3f6bfb1ce2c2cebd74381c4d33391f49e0af23b82fc28",
+          "settlement_rail": "razorpay_upi_fiat",
+          "status": "CAPTURED",
+          "captured_amount_inr": 85.0
+        }
+      }
+    },
+    "shipping_address": "Elena Rostova Residence, Innovation Hub Blvd, Sector 4",
+    "inventory_deducted": true,
+    "last_updated_at": "2026-09-03T22:26:55.882202+00:00",
+    "status_notes": "Auto-advanced doorstep delivery lifecycle (2m)"
+  },
+  {
+    "order_id": "ORD-2341-9CA3",
+    "user_id": "buyer_marcus",
+    "customer_name": "Marcus Kim",
+    "created_at": "2026-09-03T22:23:41.030825+00:00",
+    "status": "Delivered",
+    "delivery_estimate": "2-3 Business Days",
+    "tracking_number": "TRK-B93A09",
+    "items": [
+      {
+        "id": "prod_011",
+        "PRODUCT_NAME": "NOVA SonicFlow ANC Pro Wireless Headphones",
+        "PRODUCT_TYPE": "Audio",
+        "PRODUCT_SIZE": "Over-Ear Wireless",
+        "quantity": 1,
+        "price": 66.05,
+        "item_total": 66.05,
+        "IMAGE": "/static/images/sonicflow_headphones.svg"
+      }
+    ],
+    "currency": "INR",
+    "subtotal": 66.05,
+    "tax": 0.0,
+    "total": 66.05,
+    "payment_method": "Razorpay Gateway (Online)",
+    "razorpay_order_id": "order_TXjAW1pPgEXg3t",
+    "razorpay_payment_id": "pay_TXjAdJ9bjaRLW8",
+    "payment_details": {
+      "gateway": "Razorpay Gateway (Online)",
+      "razorpay_order_id": "order_TXjAW1pPgEXg3t",
+      "razorpay_payment_id": "pay_TXjAdJ9bjaRLW8",
+      "razorpay_signature": "e01e14a3737883da00cb63d8cfb66b96bb1669e1e22f8fa45e89e888edbfa375",
+      "verified": true,
+      "ap2_mandate_id": "mandate_ap2_cb4f7fb79e5f",
+      "ap2_proof": {
+        "protocol": "AP2 (Google Agent Payments Protocol) + ACP + Razorpay Rail",
+        "authorization_layer": {
+          "mandate_id": "mandate_ap2_cb4f7fb79e5f",
+          "authorized_agent": "nova_commerce_agent",
+          "spending_mandate_signature": "c0f599cfc3ac014ebb8759b32a49df610380c6f4621d4fae19b6a466fc4dbd92",
+          "status": "VERIFIED_AND_ACTIVE"
+        },
+        "checkout_layer_acp": {
+          "acp_token": "acp_tok_0033844de512",
+          "cart_digest": "a24339f6d7d2f95c2b3c4b8c2505dc6ec175adc455e5370123edcf6648145e2d",
+          "currency": "INR",
+          "tax": 0.0
+        },
+        "settlement_layer": {
+          "gateway": "Razorpay Gateway (Online)",
+          "gateway_mode": "Test Mode",
+          "razorpay_order_id": "order_TXjAW1pPgEXg3t",
+          "razorpay_payment_id": "pay_TXjAdJ9bjaRLW8",
+          "razorpay_signature": "e01e14a3737883da00cb63d8cfb66b96bb1669e1e22f8fa45e89e888edbfa375",
+          "settlement_rail": "razorpay_upi_fiat",
+          "status": "CAPTURED",
+          "captured_amount_inr": 66.05
+        }
+      }
+    },
+    "shipping_address": "Marcus Kim Residence, Innovation Hub Blvd, Sector 4",
+    "inventory_deducted": true,
+    "last_updated_at": "2026-09-03T22:26:55.738043+00:00",
+    "status_notes": "Auto-advanced doorstep delivery lifecycle (2m)"
+  },
+  {
+    "order_id": "ORD-2403-1178",
+    "user_id": "buyer_sophia",
+    "customer_name": "Sophia Miller",
+    "created_at": "2026-09-03T22:24:03.209209+00:00",
+    "status": "Delivered",
+    "delivery_estimate": "2-3 Business Days",
+    "tracking_number": "TRK-664239",
+    "items": [
+      {
+        "id": "prod_003",
+        "PRODUCT_NAME": "NOVA Prime 5G Smartphone",
+        "PRODUCT_TYPE": "Mobiles",
+        "PRODUCT_SIZE": "8GB RAM / 128GB",
+        "quantity": 1,
+        "price": 83.95,
+        "item_total": 83.95,
+        "IMAGE": "/static/images/phone_flagship.svg"
+      }
+    ],
+    "currency": "INR",
+    "subtotal": 83.95,
+    "tax": 0.0,
+    "total": 83.95,
+    "payment_method": "Razorpay Gateway (Online)",
+    "razorpay_order_id": "order_TXjAuExpKyXbgW",
+    "razorpay_payment_id": "pay_TXjB1eLaMzwJv0",
+    "payment_details": {
+      "gateway": "Razorpay Gateway (Online)",
+      "razorpay_order_id": "order_TXjAuExpKyXbgW",
+      "razorpay_payment_id": "pay_TXjB1eLaMzwJv0",
+      "razorpay_signature": "25e018db4860dbec07d62a09e611a5626916bfa00075c96c70782ee2731efd7e",
+      "verified": true,
+      "ap2_mandate_id": "mandate_ap2_c52dd77e4f64",
+      "ap2_proof": {
+        "protocol": "AP2 (Google Agent Payments Protocol) + ACP + Razorpay Rail",
+        "authorization_layer": {
+          "mandate_id": "mandate_ap2_c52dd77e4f64",
+          "authorized_agent": "nova_commerce_agent",
+          "spending_mandate_signature": "0dd60da1396067e5a87a3f13225437ae0325c94dfb319e7384046bfcaeeb8824",
+          "status": "VERIFIED_AND_ACTIVE"
+        },
+        "checkout_layer_acp": {
+          "acp_token": "acp_tok_d9fad57d7322",
+          "cart_digest": "764e3c248c2b95f077141856c033645138e953f278d5268dc36402c542131e40",
+          "currency": "INR",
+          "tax": 0.0
+        },
+        "settlement_layer": {
+          "gateway": "Razorpay Gateway (Online)",
+          "gateway_mode": "Test Mode",
+          "razorpay_order_id": "order_TXjAuExpKyXbgW",
+          "razorpay_payment_id": "pay_TXjB1eLaMzwJv0",
+          "razorpay_signature": "25e018db4860dbec07d62a09e611a5626916bfa00075c96c70782ee2731efd7e",
+          "settlement_rail": "razorpay_upi_fiat",
+          "status": "CAPTURED",
+          "captured_amount_inr": 83.95
+        }
+      }
+    },
+    "shipping_address": "Sophia Miller Residence, Innovation Hub Blvd, Sector 4",
+    "inventory_deducted": true,
+    "last_updated_at": "2026-09-03T22:27:34.614202+00:00",
+    "status_notes": "Auto-advanced doorstep delivery lifecycle (2m)"
+  },
+  {
+    "order_id": "ORD-2442-601D",
+    "user_id": "buyer_elena",
+    "customer_name": "Elena Rostova",
+    "created_at": "2026-09-03T22:24:42.223692+00:00",
+    "status": "Delivered",
+    "delivery_estimate": "2-3 Business Days",
+    "tracking_number": "TRK-23AFBB",
+    "items": [
+      {
+        "id": "prod_012",
+        "PRODUCT_NAME": "NOVA VoiceCraft XLR Studio Condenser Wired Mic",
+        "PRODUCT_TYPE": "Audio",
+        "PRODUCT_SIZE": "XLR / 34mm Gold Capsule",
+        "quantity": 1,
+        "price": 54.85,
+        "item_total": 54.85,
+        "IMAGE": "/static/images/mic_wired.svg"
+      }
+    ],
+    "currency": "INR",
+    "subtotal": 54.85,
+    "tax": 0.0,
+    "total": 54.85,
+    "payment_method": "Razorpay Gateway (Online)",
+    "razorpay_order_id": "order_TXjBahcpDZzw7G",
+    "razorpay_payment_id": "pay_TXjBhyOK1zBJJQ",
+    "payment_details": {
+      "gateway": "Razorpay Gateway (Online)",
+      "razorpay_order_id": "order_TXjBahcpDZzw7G",
+      "razorpay_payment_id": "pay_TXjBhyOK1zBJJQ",
+      "razorpay_signature": "6d6a008dcffa5fd2bd7c1dcd17b8963417268cc062307e24506acdc9c93e25e4",
+      "verified": true,
+      "ap2_mandate_id": "mandate_ap2_fa7dfdfdca8a",
+      "ap2_proof": {
+        "protocol": "AP2 (Google Agent Payments Protocol) + ACP + Razorpay Rail",
+        "authorization_layer": {
+          "mandate_id": "mandate_ap2_fa7dfdfdca8a",
+          "authorized_agent": "nova_commerce_agent",
+          "spending_mandate_signature": "864f77f15164c78c60cf9ed8bff4f8e5c0dd079d2aa20a5e2974d8b18cfecbf8",
+          "status": "VERIFIED_AND_ACTIVE"
+        },
+        "checkout_layer_acp": {
+          "acp_token": "acp_tok_e743fca651bb",
+          "cart_digest": "1fe404e2654812a83c8e477467866950982f358ee95abbaf7e7a30dce964368f",
+          "currency": "INR",
+          "tax": 0.0
+        },
+        "settlement_layer": {
+          "gateway": "Razorpay Gateway (Online)",
+          "gateway_mode": "Test Mode",
+          "razorpay_order_id": "order_TXjBahcpDZzw7G",
+          "razorpay_payment_id": "pay_TXjBhyOK1zBJJQ",
+          "razorpay_signature": "6d6a008dcffa5fd2bd7c1dcd17b8963417268cc062307e24506acdc9c93e25e4",
+          "settlement_rail": "razorpay_upi_fiat",
+          "status": "CAPTURED",
+          "captured_amount_inr": 54.85
+        }
+      }
+    },
+    "shipping_address": "Elena Rostova Residence, Innovation Hub Blvd, Sector 4",
+    "inventory_deducted": true,
+    "last_updated_at": "2026-09-03T22:28:05.070742+00:00",
+    "status_notes": "Auto-advanced doorstep delivery lifecycle (2m)"
+  },
+  {
+    "order_id": "ORD-2541-A680",
+    "user_id": "buyer_alex",
+    "customer_name": "Alex Chen",
+    "created_at": "2026-09-03T22:25:41.904150+00:00",
+    "status": "Delivered",
+    "delivery_estimate": "2-3 Business Days",
+    "tracking_number": "TRK-4026D7",
+    "items": [
+      {
+        "id": "prod_003",
+        "PRODUCT_NAME": "NOVA Prime 5G Smartphone",
+        "PRODUCT_TYPE": "Mobiles",
+        "PRODUCT_SIZE": "8GB RAM / 128GB",
+        "quantity": 1,
+        "price": 83.95,
+        "item_total": 83.95,
+        "IMAGE": "/static/images/phone_flagship.svg"
+      }
+    ],
+    "currency": "INR",
+    "subtotal": 83.95,
+    "tax": 0.0,
+    "total": 83.95,
+    "payment_method": "Razorpay Gateway (Online)",
+    "razorpay_order_id": "order_TXjCdytAO8dMq0",
+    "razorpay_payment_id": "pay_TXjClQEguWyp4c",
+    "payment_details": {
+      "gateway": "Razorpay Gateway (Online)",
+      "razorpay_order_id": "order_TXjCdytAO8dMq0",
+      "razorpay_payment_id": "pay_TXjClQEguWyp4c",
+      "razorpay_signature": "894b890a2ad45a9995848ca7b61f06f7a6b3629652d9023eca65c3b3c885df7e",
+      "verified": true,
+      "ap2_mandate_id": "mandate_ap2_f94fd292d100",
+      "ap2_proof": {
+        "protocol": "AP2 (Google Agent Payments Protocol) + ACP + Razorpay Rail",
+        "authorization_layer": {
+          "mandate_id": "mandate_ap2_f94fd292d100",
+          "authorized_agent": "nova_commerce_agent",
+          "spending_mandate_signature": "abb26df3f946077971f641fd38d8ce4d12f2e359de279625504b7e634848308e",
+          "status": "VERIFIED_AND_ACTIVE"
+        },
+        "checkout_layer_acp": {
+          "acp_token": "acp_tok_413404c87f3f",
+          "cart_digest": "764e3c248c2b95f077141856c033645138e953f278d5268dc36402c542131e40",
+          "currency": "INR",
+          "tax": 0.0
+        },
+        "settlement_layer": {
+          "gateway": "Razorpay Gateway (Online)",
+          "gateway_mode": "Test Mode",
+          "razorpay_order_id": "order_TXjCdytAO8dMq0",
+          "razorpay_payment_id": "pay_TXjClQEguWyp4c",
+          "razorpay_signature": "894b890a2ad45a9995848ca7b61f06f7a6b3629652d9023eca65c3b3c885df7e",
+          "settlement_rail": "razorpay_upi_fiat",
+          "status": "CAPTURED",
+          "captured_amount_inr": 83.95
+        }
+      }
+    },
+    "shipping_address": "Alex Chen Residence, Innovation Hub Blvd, Sector 4",
+    "inventory_deducted": true,
+    "last_updated_at": "2026-09-03T22:29:09.954441+00:00",
+    "status_notes": "Auto-advanced doorstep delivery lifecycle (2m)"
+  },
+  {
+    "order_id": "ORD-2600-DEA0",
+    "user_id": "buyer_marcus",
+    "customer_name": "Marcus Kim",
+    "created_at": "2026-09-03T22:26:00.086245+00:00",
+    "status": "Delivered",
+    "delivery_estimate": "2-3 Business Days",
+    "tracking_number": "TRK-CEFA09",
+    "items": [
+      {
+        "id": "prod_003",
+        "PRODUCT_NAME": "NOVA Prime 5G Smartphone",
+        "PRODUCT_TYPE": "Mobiles",
+        "PRODUCT_SIZE": "8GB RAM / 128GB",
+        "quantity": 1,
+        "price": 83.95,
+        "item_total": 83.95,
+        "IMAGE": "/static/images/phone_flagship.svg"
+      }
+    ],
+    "currency": "INR",
+    "subtotal": 83.95,
+    "tax": 0.0,
+    "total": 83.95,
+    "payment_method": "Razorpay Gateway (Online)",
+    "razorpay_order_id": "order_TXjD34z23n538l",
+    "razorpay_payment_id": "pay_TXjDATZmn8LFNf",
+    "payment_details": {
+      "gateway": "Razorpay Gateway (Online)",
+      "razorpay_order_id": "order_TXjD34z23n538l",
+      "razorpay_payment_id": "pay_TXjDATZmn8LFNf",
+      "razorpay_signature": "5e24c5a9fb6c490a72087f05eb77649b995b1d30982fedf2b2fee0fc3b96d0bc",
+      "verified": true,
+      "ap2_mandate_id": "mandate_ap2_cb4f7fb79e5f",
+      "ap2_proof": {
+        "protocol": "AP2 (Google Agent Payments Protocol) + ACP + Razorpay Rail",
+        "authorization_layer": {
+          "mandate_id": "mandate_ap2_cb4f7fb79e5f",
+          "authorized_agent": "nova_commerce_agent",
+          "spending_mandate_signature": "c0f599cfc3ac014ebb8759b32a49df610380c6f4621d4fae19b6a466fc4dbd92",
+          "status": "VERIFIED_AND_ACTIVE"
+        },
+        "checkout_layer_acp": {
+          "acp_token": "acp_tok_3a9244aba57f",
+          "cart_digest": "764e3c248c2b95f077141856c033645138e953f278d5268dc36402c542131e40",
+          "currency": "INR",
+          "tax": 0.0
+        },
+        "settlement_layer": {
+          "gateway": "Razorpay Gateway (Online)",
+          "gateway_mode": "Test Mode",
+          "razorpay_order_id": "order_TXjD34z23n538l",
+          "razorpay_payment_id": "pay_TXjDATZmn8LFNf",
+          "razorpay_signature": "5e24c5a9fb6c490a72087f05eb77649b995b1d30982fedf2b2fee0fc3b96d0bc",
+          "settlement_rail": "razorpay_upi_fiat",
+          "status": "CAPTURED",
+          "captured_amount_inr": 83.95
+        }
+      }
+    },
+    "shipping_address": "Marcus Kim Residence, Innovation Hub Blvd, Sector 4",
+    "inventory_deducted": true,
+    "last_updated_at": "2026-09-03T22:30:03.618559+00:00",
+    "status_notes": "Auto-advanced doorstep delivery lifecycle (2m)"
+  },
+  {
+    "order_id": "ORD-2650-33EF",
+    "user_id": "buyer_sophia",
+    "customer_name": "Sophia Miller",
+    "created_at": "2026-09-03T22:26:50.156367+00:00",
+    "status": "Delivered",
+    "delivery_estimate": "2-3 Business Days",
+    "tracking_number": "TRK-12A4EA",
+    "items": [
+      {
+        "id": "prod_003",
+        "PRODUCT_NAME": "NOVA Prime 5G Smartphone",
+        "PRODUCT_TYPE": "Mobiles",
+        "PRODUCT_SIZE": "8GB RAM / 128GB",
+        "quantity": 1,
+        "price": 83.95,
+        "item_total": 83.95,
+        "IMAGE": "/static/images/phone_flagship.svg"
+      }
+    ],
+    "currency": "INR",
+    "subtotal": 83.95,
+    "tax": 0.0,
+    "total": 83.95,
+    "payment_method": "Razorpay Gateway (Online)",
+    "razorpay_order_id": "order_TXjDwCk55A6nQL",
+    "razorpay_payment_id": "pay_TXjE3c5FSfTAr6",
+    "payment_details": {
+      "gateway": "Razorpay Gateway (Online)",
+      "razorpay_order_id": "order_TXjDwCk55A6nQL",
+      "razorpay_payment_id": "pay_TXjE3c5FSfTAr6",
+      "razorpay_signature": "9b71be13643c1021e3c839b72066c84e4860b5492c8377961e0d96a2b072752c",
+      "verified": true,
+      "ap2_mandate_id": "mandate_ap2_c52dd77e4f64",
+      "ap2_proof": {
+        "protocol": "AP2 (Google Agent Payments Protocol) + ACP + Razorpay Rail",
+        "authorization_layer": {
+          "mandate_id": "mandate_ap2_c52dd77e4f64",
+          "authorized_agent": "nova_commerce_agent",
+          "spending_mandate_signature": "0dd60da1396067e5a87a3f13225437ae0325c94dfb319e7384046bfcaeeb8824",
+          "status": "VERIFIED_AND_ACTIVE"
+        },
+        "checkout_layer_acp": {
+          "acp_token": "acp_tok_ff522d9b93f1",
+          "cart_digest": "764e3c248c2b95f077141856c033645138e953f278d5268dc36402c542131e40",
+          "currency": "INR",
+          "tax": 0.0
+        },
+        "settlement_layer": {
+          "gateway": "Razorpay Gateway (Online)",
+          "gateway_mode": "Test Mode",
+          "razorpay_order_id": "order_TXjDwCk55A6nQL",
+          "razorpay_payment_id": "pay_TXjE3c5FSfTAr6",
+          "razorpay_signature": "9b71be13643c1021e3c839b72066c84e4860b5492c8377961e0d96a2b072752c",
+          "settlement_rail": "razorpay_upi_fiat",
+          "status": "CAPTURED",
+          "captured_amount_inr": 83.95
+        }
+      }
+    },
+    "shipping_address": "Sophia Miller Residence, Innovation Hub Blvd, Sector 4",
+    "inventory_deducted": true,
+    "last_updated_at": "2026-09-03T22:30:30.717543+00:00",
+    "status_notes": "Auto-advanced doorstep delivery lifecycle (2m)"
+  },
+  {
+    "order_id": "ORD-2706-9F38",
+    "user_id": "buyer_david",
+    "customer_name": "David Patel",
+    "created_at": "2026-09-03T22:27:06.731038+00:00",
+    "status": "Delivered",
+    "delivery_estimate": "2-3 Business Days",
+    "tracking_number": "TRK-D4C102",
+    "items": [
+      {
+        "id": "prod_017",
+        "PRODUCT_NAME": "NOVA AirType Low-Profile Wireless Keyboard",
+        "PRODUCT_TYPE": "Accessories",
+        "PRODUCT_SIZE": "75% Wireless Layout",
+        "quantity": 1,
+        "price": 51.1,
+        "item_total": 51.1,
+        "IMAGE": "/static/images/gaming_keyboard.svg"
+      }
+    ],
+    "currency": "INR",
+    "subtotal": 51.1,
+    "tax": 0.0,
+    "total": 51.1,
+    "payment_method": "Razorpay Gateway (Online)",
+    "razorpay_order_id": "order_TXjEDojQ4BIPUy",
+    "razorpay_payment_id": "pay_TXjELW2X99Dx5j",
+    "payment_details": {
+      "gateway": "Razorpay Gateway (Online)",
+      "razorpay_order_id": "order_TXjEDojQ4BIPUy",
+      "razorpay_payment_id": "pay_TXjELW2X99Dx5j",
+      "razorpay_signature": "0f328b8621331126725fcf887e29bb33a2c98f1a3e0bdf177a091da967d9081a",
+      "verified": true,
+      "ap2_mandate_id": "mandate_ap2_c5328d88301c",
+      "ap2_proof": {
+        "protocol": "AP2 (Google Agent Payments Protocol) + ACP + Razorpay Rail",
+        "authorization_layer": {
+          "mandate_id": "mandate_ap2_c5328d88301c",
+          "authorized_agent": "nova_commerce_agent",
+          "spending_mandate_signature": "7ba51727eb21dd994f3406488baea357d1f1a5a262ed3220ad7dc936e0a702aa",
+          "status": "VERIFIED_AND_ACTIVE"
+        },
+        "checkout_layer_acp": {
+          "acp_token": "acp_tok_e733807e46fc",
+          "cart_digest": "071fb1d569a0f4125bbf196f0f33b77a22730694e29f4e3108e87943d1d771a6",
+          "currency": "INR",
+          "tax": 0.0
+        },
+        "settlement_layer": {
+          "gateway": "Razorpay Gateway (Online)",
+          "gateway_mode": "Test Mode",
+          "razorpay_order_id": "order_TXjEDojQ4BIPUy",
+          "razorpay_payment_id": "pay_TXjELW2X99Dx5j",
+          "razorpay_signature": "0f328b8621331126725fcf887e29bb33a2c98f1a3e0bdf177a091da967d9081a",
+          "settlement_rail": "razorpay_upi_fiat",
+          "status": "CAPTURED",
+          "captured_amount_inr": 51.1
+        }
+      }
+    },
+    "shipping_address": "David Patel Residence, Innovation Hub Blvd, Sector 4",
+    "inventory_deducted": true,
+    "last_updated_at": "2026-09-03T22:30:54.447187+00:00",
+    "status_notes": "Auto-advanced doorstep delivery lifecycle (2m)"
+  },
+  {
+    "order_id": "ORD-2729-90F7",
+    "user_id": "buyer_marcus",
+    "customer_name": "Marcus Kim",
+    "created_at": "2026-09-03T22:27:29.166895+00:00",
+    "status": "Refunded",
+    "delivery_estimate": "2-3 Business Days",
+    "tracking_number": "TRK-832F28",
+    "items": [
+      {
+        "id": "prod_020",
+        "PRODUCT_NAME": "NOVA TitanVolt MagSafe PowerBank 10k",
+        "PRODUCT_TYPE": "Accessories",
+        "PRODUCT_SIZE": "10,000mAh / 15W Qi2",
+        "quantity": 1,
+        "price": 30.42,
+        "item_total": 30.42,
+        "IMAGE": "/static/images/powerbank.svg"
+      }
+    ],
+    "currency": "INR",
+    "subtotal": 30.42,
+    "tax": 0.0,
+    "total": 30.42,
+    "payment_method": "Razorpay Gateway (Online)",
+    "razorpay_order_id": "order_TXjEX3pqK3FPuV",
+    "razorpay_payment_id": "pay_TXjEeGpsH0NpTO",
+    "payment_details": {
+      "gateway": "Razorpay Gateway (Online)",
+      "razorpay_order_id": "order_TXjEX3pqK3FPuV",
+      "razorpay_payment_id": "pay_TXjEeGpsH0NpTO",
+      "razorpay_signature": "bb4dd204a40873aaf7b5479cd81ad5beed9b1ad804a936b98cc5e52d8e43fc05",
+      "verified": true,
+      "ap2_mandate_id": "mandate_ap2_cb4f7fb79e5f",
+      "ap2_proof": {
+        "protocol": "AP2 (Google Agent Payments Protocol) + ACP + Razorpay Rail",
+        "authorization_layer": {
+          "mandate_id": "mandate_ap2_cb4f7fb79e5f",
+          "authorized_agent": "nova_commerce_agent",
+          "spending_mandate_signature": "c0f599cfc3ac014ebb8759b32a49df610380c6f4621d4fae19b6a466fc4dbd92",
+          "status": "VERIFIED_AND_ACTIVE"
+        },
+        "checkout_layer_acp": {
+          "acp_token": "acp_tok_3f2c95bcc1db",
+          "cart_digest": "5cc96424f29a71979eea707f7867227e60d49ef101d2c294456b8cba423540e8",
+          "currency": "INR",
+          "tax": 0.0
+        },
+        "settlement_layer": {
+          "gateway": "Razorpay Gateway (Online)",
+          "gateway_mode": "Test Mode",
+          "razorpay_order_id": "order_TXjEX3pqK3FPuV",
+          "razorpay_payment_id": "pay_TXjEeGpsH0NpTO",
+          "razorpay_signature": "bb4dd204a40873aaf7b5479cd81ad5beed9b1ad804a936b98cc5e52d8e43fc05",
+          "settlement_rail": "razorpay_upi_fiat",
+          "status": "CAPTURED",
+          "captured_amount_inr": 30.42
+        }
+      }
+    },
+    "shipping_address": "Marcus Kim Residence, Innovation Hub Blvd, Sector 4",
+    "inventory_deducted": true,
+    "last_updated_at": "2026-09-03T22:28:08.656646+00:00",
+    "status_notes": "Refund of \u20b930.42 processed by Finance Manager."
+  },
+  {
+    "order_id": "ORD-2825-BEAF",
+    "user_id": "buyer_marcus",
+    "customer_name": "Marcus Kim",
+    "created_at": "2026-09-03T22:28:25.407166+00:00",
+    "status": "Delivered",
+    "delivery_estimate": "2-3 Business Days",
+    "tracking_number": "TRK-636D5C",
+    "items": [
+      {
+        "id": "prod_010",
+        "PRODUCT_NAME": "NOVA StudioMaster Pro Hi-Fi Wired Headphones",
+        "PRODUCT_TYPE": "Audio",
+        "PRODUCT_SIZE": "Over-Ear Open-Back",
+        "quantity": 1,
+        "price": 61.57,
+        "item_total": 61.57,
+        "IMAGE": "/static/images/headphones_wired.svg"
+      }
+    ],
+    "currency": "INR",
+    "subtotal": 61.57,
+    "tax": 0.0,
+    "total": 61.57,
+    "payment_method": "Razorpay Gateway (Online)",
+    "razorpay_order_id": "order_TXjFW6k2hs7vh8",
+    "razorpay_payment_id": "pay_TXjFdPglA2DR7a",
+    "payment_details": {
+      "gateway": "Razorpay Gateway (Online)",
+      "razorpay_order_id": "order_TXjFW6k2hs7vh8",
+      "razorpay_payment_id": "pay_TXjFdPglA2DR7a",
+      "razorpay_signature": "77f1cebeecd40c138a31edc530d4e8dc3828d22d160a7a938e0b76d3aa7576a5",
+      "verified": true,
+      "ap2_mandate_id": "mandate_ap2_cb4f7fb79e5f",
+      "ap2_proof": {
+        "protocol": "AP2 (Google Agent Payments Protocol) + ACP + Razorpay Rail",
+        "authorization_layer": {
+          "mandate_id": "mandate_ap2_cb4f7fb79e5f",
+          "authorized_agent": "nova_commerce_agent",
+          "spending_mandate_signature": "c0f599cfc3ac014ebb8759b32a49df610380c6f4621d4fae19b6a466fc4dbd92",
+          "status": "VERIFIED_AND_ACTIVE"
+        },
+        "checkout_layer_acp": {
+          "acp_token": "acp_tok_d29186ba3a18",
+          "cart_digest": "29f335efc711aa82b26062f8b00b2b506c47607ae2c243a546f4466879b9ada6",
+          "currency": "INR",
+          "tax": 0.0
+        },
+        "settlement_layer": {
+          "gateway": "Razorpay Gateway (Online)",
+          "gateway_mode": "Test Mode",
+          "razorpay_order_id": "order_TXjFW6k2hs7vh8",
+          "razorpay_payment_id": "pay_TXjFdPglA2DR7a",
+          "razorpay_signature": "77f1cebeecd40c138a31edc530d4e8dc3828d22d160a7a938e0b76d3aa7576a5",
+          "settlement_rail": "razorpay_upi_fiat",
+          "status": "CAPTURED",
+          "captured_amount_inr": 61.57
+        }
+      }
+    },
+    "shipping_address": "Marcus Kim Residence, Innovation Hub Blvd, Sector 4",
+    "inventory_deducted": true,
+    "last_updated_at": "2026-09-03T22:32:07.197825+00:00",
+    "status_notes": "Auto-advanced doorstep delivery lifecycle (2m)"
+  },
+  {
+    "order_id": "ORD-2903-14DE",
+    "user_id": "buyer_elena",
+    "customer_name": "Elena Rostova",
+    "created_at": "2026-09-03T22:29:03.204882+00:00",
+    "status": "Delivered",
+    "delivery_estimate": "2-3 Business Days",
+    "tracking_number": "TRK-9E0438",
+    "items": [
+      {
+        "id": "prod_009",
+        "PRODUCT_NAME": "NOVA BoomPulse 360 Bluetooth Speaker",
+        "PRODUCT_TYPE": "Audio",
+        "PRODUCT_SIZE": "Portable 40W RMS",
+        "quantity": 1,
+        "price": 43.65,
+        "item_total": 43.65,
+        "IMAGE": "/static/images/speaker_bluetooth.svg"
+      }
+    ],
+    "currency": "INR",
+    "subtotal": 43.65,
+    "tax": 0.0,
+    "total": 43.65,
+    "payment_method": "Razorpay Gateway (Online)",
+    "razorpay_order_id": "order_TXjGBZJG5ehxbP",
+    "razorpay_payment_id": "pay_TXjGIwwWAEaQJK",
+    "payment_details": {
+      "gateway": "Razorpay Gateway (Online)",
+      "razorpay_order_id": "order_TXjGBZJG5ehxbP",
+      "razorpay_payment_id": "pay_TXjGIwwWAEaQJK",
+      "razorpay_signature": "6268a21318fb26fea29e65f5cc6067c5c5bd7d3267c31d0afa35892b7c026b87",
+      "verified": true,
+      "ap2_mandate_id": "mandate_ap2_fa7dfdfdca8a",
+      "ap2_proof": {
+        "protocol": "AP2 (Google Agent Payments Protocol) + ACP + Razorpay Rail",
+        "authorization_layer": {
+          "mandate_id": "mandate_ap2_fa7dfdfdca8a",
+          "authorized_agent": "nova_commerce_agent",
+          "spending_mandate_signature": "864f77f15164c78c60cf9ed8bff4f8e5c0dd079d2aa20a5e2974d8b18cfecbf8",
+          "status": "VERIFIED_AND_ACTIVE"
+        },
+        "checkout_layer_acp": {
+          "acp_token": "acp_tok_724e52c95b94",
+          "cart_digest": "adf7380bd2e49e7763ba02f72423eeed4d7bfe33f8cb2fa555a58f6721f3aa21",
+          "currency": "INR",
+          "tax": 0.0
+        },
+        "settlement_layer": {
+          "gateway": "Razorpay Gateway (Online)",
+          "gateway_mode": "Test Mode",
+          "razorpay_order_id": "order_TXjGBZJG5ehxbP",
+          "razorpay_payment_id": "pay_TXjGIwwWAEaQJK",
+          "razorpay_signature": "6268a21318fb26fea29e65f5cc6067c5c5bd7d3267c31d0afa35892b7c026b87",
+          "settlement_rail": "razorpay_upi_fiat",
+          "status": "CAPTURED",
+          "captured_amount_inr": 43.65
+        }
+      }
+    },
+    "shipping_address": "Elena Rostova Residence, Innovation Hub Blvd, Sector 4",
+    "inventory_deducted": true,
+    "last_updated_at": "2026-09-03T22:32:47.796885+00:00",
+    "status_notes": "Auto-advanced doorstep delivery lifecycle (2m)"
+  },
+  {
+    "order_id": "ORD-2925-546E",
+    "user_id": "buyer_alex",
+    "customer_name": "Alex Chen",
+    "created_at": "2026-09-03T22:29:25.793646+00:00",
+    "status": "Delivered",
+    "delivery_estimate": "2-3 Business Days",
+    "tracking_number": "TRK-17A5FD",
+    "items": [
+      {
+        "id": "prod_002",
+        "PRODUCT_NAME": "NOVA Apex Ultra Fold 5G",
+        "PRODUCT_TYPE": "Mobiles",
+        "PRODUCT_SIZE": "16GB RAM / 512GB",
+        "quantity": 1,
+        "price": 120.46,
+        "item_total": 120.46,
+        "IMAGE": "/static/images/phone_fold.svg"
+      }
+    ],
+    "currency": "INR",
+    "subtotal": 120.46,
+    "tax": 0.0,
+    "total": 120.46,
+    "payment_method": "Razorpay Gateway (Online)",
+    "razorpay_order_id": "order_TXjGaCyvnBbkG9",
+    "razorpay_payment_id": "pay_TXjGhiOuVxD2IN",
+    "payment_details": {
+      "gateway": "Razorpay Gateway (Online)",
+      "razorpay_order_id": "order_TXjGaCyvnBbkG9",
+      "razorpay_payment_id": "pay_TXjGhiOuVxD2IN",
+      "razorpay_signature": "d08150d2d6a0ec1adcabd8a87dca55c3fad2f217d819ac4021ebd52051508358",
+      "verified": true,
+      "ap2_mandate_id": "mandate_ap2_f94fd292d100",
+      "ap2_proof": {
+        "protocol": "AP2 (Google Agent Payments Protocol) + ACP + Razorpay Rail",
+        "authorization_layer": {
+          "mandate_id": "mandate_ap2_f94fd292d100",
+          "authorized_agent": "nova_commerce_agent",
+          "spending_mandate_signature": "abb26df3f946077971f641fd38d8ce4d12f2e359de279625504b7e634848308e",
+          "status": "VERIFIED_AND_ACTIVE"
+        },
+        "checkout_layer_acp": {
+          "acp_token": "acp_tok_42a13f5d58f0",
+          "cart_digest": "a68de41aea2255e99bcdbd4004bc693eb85f609240f1e72faa3c291f218f7bd6",
+          "currency": "INR",
+          "tax": 0.0
+        },
+        "settlement_layer": {
+          "gateway": "Razorpay Gateway (Online)",
+          "gateway_mode": "Test Mode",
+          "razorpay_order_id": "order_TXjGaCyvnBbkG9",
+          "razorpay_payment_id": "pay_TXjGhiOuVxD2IN",
+          "razorpay_signature": "d08150d2d6a0ec1adcabd8a87dca55c3fad2f217d819ac4021ebd52051508358",
+          "settlement_rail": "razorpay_upi_fiat",
+          "status": "CAPTURED",
+          "captured_amount_inr": 120.46
+        }
+      }
+    },
+    "shipping_address": "Alex Chen Residence, Innovation Hub Blvd, Sector 4",
+    "inventory_deducted": true,
+    "last_updated_at": "2026-09-03T22:33:15.198798+00:00",
+    "status_notes": "Auto-advanced doorstep delivery lifecycle (2m)"
+  },
+  {
+    "order_id": "ORD-3015-36B3",
+    "user_id": "buyer_alex",
+    "customer_name": "Alex Chen",
+    "created_at": "2026-09-03T22:30:15.240976+00:00",
+    "status": "Delivered",
+    "delivery_estimate": "2-3 Business Days",
+    "tracking_number": "TRK-C66AD0",
+    "items": [
+      {
+        "id": "prod_002",
+        "PRODUCT_NAME": "NOVA Apex Ultra Fold 5G",
+        "PRODUCT_TYPE": "Mobiles",
+        "PRODUCT_SIZE": "16GB RAM / 512GB",
+        "quantity": 1,
+        "price": 120.46,
+        "item_total": 120.46,
+        "IMAGE": "/static/images/phone_fold.svg"
+      }
+    ],
+    "currency": "INR",
+    "subtotal": 120.46,
+    "tax": 0.0,
+    "total": 120.46,
+    "payment_method": "Razorpay Gateway (Online)",
+    "razorpay_order_id": "order_TXjHXAEsNsyX17",
+    "razorpay_payment_id": "pay_TXjHfJH2zn4QzP",
+    "payment_details": {
+      "gateway": "Razorpay Gateway (Online)",
+      "razorpay_order_id": "order_TXjHXAEsNsyX17",
+      "razorpay_payment_id": "pay_TXjHfJH2zn4QzP",
+      "razorpay_signature": "6021849c37f0250c016dcddf65723292a43e70b735c16d5990a76ad811e8e3e6",
+      "verified": true,
+      "ap2_mandate_id": "mandate_ap2_f94fd292d100",
+      "ap2_proof": {
+        "protocol": "AP2 (Google Agent Payments Protocol) + ACP + Razorpay Rail",
+        "authorization_layer": {
+          "mandate_id": "mandate_ap2_f94fd292d100",
+          "authorized_agent": "nova_commerce_agent",
+          "spending_mandate_signature": "abb26df3f946077971f641fd38d8ce4d12f2e359de279625504b7e634848308e",
+          "status": "VERIFIED_AND_ACTIVE"
+        },
+        "checkout_layer_acp": {
+          "acp_token": "acp_tok_ba4898725f3d",
+          "cart_digest": "a68de41aea2255e99bcdbd4004bc693eb85f609240f1e72faa3c291f218f7bd6",
+          "currency": "INR",
+          "tax": 0.0
+        },
+        "settlement_layer": {
+          "gateway": "Razorpay Gateway (Online)",
+          "gateway_mode": "Test Mode",
+          "razorpay_order_id": "order_TXjHXAEsNsyX17",
+          "razorpay_payment_id": "pay_TXjHfJH2zn4QzP",
+          "razorpay_signature": "6021849c37f0250c016dcddf65723292a43e70b735c16d5990a76ad811e8e3e6",
+          "settlement_rail": "razorpay_upi_fiat",
+          "status": "CAPTURED",
+          "captured_amount_inr": 120.46
+        }
+      }
+    },
+    "shipping_address": "Alex Chen Residence, Innovation Hub Blvd, Sector 4",
+    "inventory_deducted": true,
+    "last_updated_at": "2026-09-03T22:33:59.165557+00:00",
+    "status_notes": "Auto-advanced doorstep delivery lifecycle (2m)"
+  },
+  {
+    "order_id": "ORD-3047-4E13",
+    "user_id": "buyer_david",
+    "customer_name": "David Patel",
+    "created_at": "2026-09-03T22:30:47.063897+00:00",
+    "status": "Delivered",
+    "delivery_estimate": "2-3 Business Days",
+    "tracking_number": "TRK-1E8545",
+    "items": [
+      {
+        "id": "prod_026",
+        "PRODUCT_NAME": "NOVA HyperGaN 65W 3-Port Fast Charger",
+        "PRODUCT_TYPE": "Accessories",
+        "PRODUCT_SIZE": "65W (2x Type-C + 1x USB-A)",
+        "quantity": 1,
+        "price": 26.76,
+        "item_total": 26.76,
+        "IMAGE": "/static/images/charger_gan.svg"
+      }
+    ],
+    "currency": "INR",
+    "subtotal": 26.76,
+    "tax": 0.0,
+    "total": 26.76,
+    "payment_method": "Razorpay Gateway (Online)",
+    "razorpay_order_id": "order_TXjI0XqHWYnERT",
+    "razorpay_payment_id": "pay_TXjI8PuMJ5199Y",
+    "payment_details": {
+      "gateway": "Razorpay Gateway (Online)",
+      "razorpay_order_id": "order_TXjI0XqHWYnERT",
+      "razorpay_payment_id": "pay_TXjI8PuMJ5199Y",
+      "razorpay_signature": "b96ab470d02324521ba6c525fa8c84fcf03e20bfe8c997b8ac1bbff647795914",
+      "verified": true,
+      "ap2_mandate_id": "mandate_ap2_c5328d88301c",
+      "ap2_proof": {
+        "protocol": "AP2 (Google Agent Payments Protocol) + ACP + Razorpay Rail",
+        "authorization_layer": {
+          "mandate_id": "mandate_ap2_c5328d88301c",
+          "authorized_agent": "nova_commerce_agent",
+          "spending_mandate_signature": "7ba51727eb21dd994f3406488baea357d1f1a5a262ed3220ad7dc936e0a702aa",
+          "status": "VERIFIED_AND_ACTIVE"
+        },
+        "checkout_layer_acp": {
+          "acp_token": "acp_tok_cab7c02e1f78",
+          "cart_digest": "2eba7c51f49e60233c870b989e7872db6971f6754522f3f96d436b39fba0d296",
+          "currency": "INR",
+          "tax": 0.0
+        },
+        "settlement_layer": {
+          "gateway": "Razorpay Gateway (Online)",
+          "gateway_mode": "Test Mode",
+          "razorpay_order_id": "order_TXjI0XqHWYnERT",
+          "razorpay_payment_id": "pay_TXjI8PuMJ5199Y",
+          "razorpay_signature": "b96ab470d02324521ba6c525fa8c84fcf03e20bfe8c997b8ac1bbff647795914",
+          "settlement_rail": "razorpay_upi_fiat",
+          "status": "CAPTURED",
+          "captured_amount_inr": 26.76
+        }
+      }
+    },
+    "shipping_address": "David Patel Residence, Innovation Hub Blvd, Sector 4",
+    "inventory_deducted": true,
+    "last_updated_at": "2026-09-03T22:34:39.817720+00:00",
+    "status_notes": "Auto-advanced doorstep delivery lifecycle (2m)"
+  },
+  {
+    "order_id": "ORD-3139-8BFE",
+    "user_id": "buyer_marcus",
+    "customer_name": "Marcus Kim",
+    "created_at": "2026-09-03T22:31:39.067725+00:00",
+    "status": "Delivered",
+    "delivery_estimate": "2-3 Business Days",
+    "tracking_number": "TRK-0EC245",
+    "items": [
+      {
+        "id": "prod_025",
+        "PRODUCT_NAME": "NOVA TurboFlash 30W Mobile Fast Charger",
+        "PRODUCT_TYPE": "Accessories",
+        "PRODUCT_SIZE": "30W Nano USB-C",
+        "quantity": 1,
+        "price": 18.25,
+        "item_total": 18.25,
+        "IMAGE": "/static/images/charger_mobile.svg"
+      }
+    ],
+    "currency": "INR",
+    "subtotal": 18.25,
+    "tax": 0.0,
+    "total": 18.25,
+    "payment_method": "Razorpay Gateway (Online)",
+    "razorpay_order_id": "order_TXjIud3zp2HU2S",
+    "razorpay_payment_id": "pay_TXjJ1yuoycYqqa",
+    "payment_details": {
+      "gateway": "Razorpay Gateway (Online)",
+      "razorpay_order_id": "order_TXjIud3zp2HU2S",
+      "razorpay_payment_id": "pay_TXjJ1yuoycYqqa",
+      "razorpay_signature": "0df8a3041e9a087fc55d978bc3bf3d2ed66415adc1d5bc986f40c188ca53cd66",
+      "verified": true,
+      "ap2_mandate_id": "mandate_ap2_cb4f7fb79e5f",
+      "ap2_proof": {
+        "protocol": "AP2 (Google Agent Payments Protocol) + ACP + Razorpay Rail",
+        "authorization_layer": {
+          "mandate_id": "mandate_ap2_cb4f7fb79e5f",
+          "authorized_agent": "nova_commerce_agent",
+          "spending_mandate_signature": "c0f599cfc3ac014ebb8759b32a49df610380c6f4621d4fae19b6a466fc4dbd92",
+          "status": "VERIFIED_AND_ACTIVE"
+        },
+        "checkout_layer_acp": {
+          "acp_token": "acp_tok_34d5e01a71b6",
+          "cart_digest": "14440652022243dfce851b82fe268c5835488193a1a1a784ddc98eacb3e5a78c",
+          "currency": "INR",
+          "tax": 0.0
+        },
+        "settlement_layer": {
+          "gateway": "Razorpay Gateway (Online)",
+          "gateway_mode": "Test Mode",
+          "razorpay_order_id": "order_TXjIud3zp2HU2S",
+          "razorpay_payment_id": "pay_TXjJ1yuoycYqqa",
+          "razorpay_signature": "0df8a3041e9a087fc55d978bc3bf3d2ed66415adc1d5bc986f40c188ca53cd66",
+          "settlement_rail": "razorpay_upi_fiat",
+          "status": "CAPTURED",
+          "captured_amount_inr": 18.25
+        }
+      }
+    },
+    "shipping_address": "Marcus Kim Residence, Innovation Hub Blvd, Sector 4",
+    "inventory_deducted": true,
+    "last_updated_at": "2026-09-03T22:35:09.562467+00:00",
+    "status_notes": "Auto-advanced doorstep delivery lifecycle (2m)"
+  },
+  {
+    "order_id": "ORD-3201-5EED",
+    "user_id": "buyer_sophia",
+    "customer_name": "Sophia Miller",
+    "created_at": "2026-09-03T22:32:01.277370+00:00",
+    "status": "Delivered",
+    "delivery_estimate": "2-3 Business Days",
+    "tracking_number": "TRK-6772E6",
+    "items": [
+      {
+        "id": "prod_018",
+        "PRODUCT_NAME": "NOVA ErgoMaster Silent Wireless Mouse",
+        "PRODUCT_TYPE": "Accessories",
+        "PRODUCT_SIZE": "Ergonomic Right-Hand",
+        "quantity": 1,
+        "price": 24.33,
+        "item_total": 24.33,
+        "IMAGE": "/static/images/mouse_wireless.svg"
+      }
+    ],
+    "currency": "INR",
+    "subtotal": 24.33,
+    "tax": 0.0,
+    "total": 24.33,
+    "payment_method": "Razorpay Gateway (Online)",
+    "razorpay_order_id": "order_TXjJJFkWu6qOxu",
+    "razorpay_payment_id": "pay_TXjJQFutaJ0U1L",
+    "payment_details": {
+      "gateway": "Razorpay Gateway (Online)",
+      "razorpay_order_id": "order_TXjJJFkWu6qOxu",
+      "razorpay_payment_id": "pay_TXjJQFutaJ0U1L",
+      "razorpay_signature": "4e89a0cfca311c6817a4e30c0d70a92b19d4cd4fb03924d218fdebc26e67e113",
+      "verified": true,
+      "ap2_mandate_id": "mandate_ap2_c52dd77e4f64",
+      "ap2_proof": {
+        "protocol": "AP2 (Google Agent Payments Protocol) + ACP + Razorpay Rail",
+        "authorization_layer": {
+          "mandate_id": "mandate_ap2_c52dd77e4f64",
+          "authorized_agent": "nova_commerce_agent",
+          "spending_mandate_signature": "0dd60da1396067e5a87a3f13225437ae0325c94dfb319e7384046bfcaeeb8824",
+          "status": "VERIFIED_AND_ACTIVE"
+        },
+        "checkout_layer_acp": {
+          "acp_token": "acp_tok_ce56a00873c9",
+          "cart_digest": "44fecec8c15a59dea10093ab2d5747189f78029bd6c69477c9b0d1b49650d1e2",
+          "currency": "INR",
+          "tax": 0.0
+        },
+        "settlement_layer": {
+          "gateway": "Razorpay Gateway (Online)",
+          "gateway_mode": "Test Mode",
+          "razorpay_order_id": "order_TXjJJFkWu6qOxu",
+          "razorpay_payment_id": "pay_TXjJQFutaJ0U1L",
+          "razorpay_signature": "4e89a0cfca311c6817a4e30c0d70a92b19d4cd4fb03924d218fdebc26e67e113",
+          "settlement_rail": "razorpay_upi_fiat",
+          "status": "CAPTURED",
+          "captured_amount_inr": 24.33
+        }
+      }
+    },
+    "shipping_address": "Sophia Miller Residence, Innovation Hub Blvd, Sector 4",
+    "inventory_deducted": true,
+    "last_updated_at": "2026-09-03T22:35:33.500144+00:00",
+    "status_notes": "Auto-advanced doorstep delivery lifecycle (2m)"
+  },
+  {
+    "order_id": "ORD-3223-278E",
+    "user_id": "buyer_elena",
+    "customer_name": "Elena Rostova",
+    "created_at": "2026-09-03T22:32:23.213142+00:00",
+    "status": "Delivered",
+    "delivery_estimate": "2-3 Business Days",
+    "tracking_number": "TRK-48842B",
+    "items": [
+      {
+        "id": "prod_012",
+        "PRODUCT_NAME": "NOVA VoiceCraft XLR Studio Condenser Wired Mic",
+        "PRODUCT_TYPE": "Audio",
+        "PRODUCT_SIZE": "XLR / 34mm Gold Capsule",
+        "quantity": 1,
+        "price": 54.85,
+        "item_total": 54.85,
+        "IMAGE": "/static/images/mic_wired.svg"
+      }
+    ],
+    "currency": "INR",
+    "subtotal": 54.85,
+    "tax": 0.0,
+    "total": 54.85,
+    "payment_method": "Razorpay Gateway (Online)",
+    "razorpay_order_id": "order_TXjJhek3DyPs2y",
+    "razorpay_payment_id": "pay_TXjJooWv8XrfRu",
+    "payment_details": {
+      "gateway": "Razorpay Gateway (Online)",
+      "razorpay_order_id": "order_TXjJhek3DyPs2y",
+      "razorpay_payment_id": "pay_TXjJooWv8XrfRu",
+      "razorpay_signature": "113a34a7769ce571521ba6e4cee246e49777bc522db15be36b03218e2221afd0",
+      "verified": true,
+      "ap2_mandate_id": "mandate_ap2_fa7dfdfdca8a",
+      "ap2_proof": {
+        "protocol": "AP2 (Google Agent Payments Protocol) + ACP + Razorpay Rail",
+        "authorization_layer": {
+          "mandate_id": "mandate_ap2_fa7dfdfdca8a",
+          "authorized_agent": "nova_commerce_agent",
+          "spending_mandate_signature": "864f77f15164c78c60cf9ed8bff4f8e5c0dd079d2aa20a5e2974d8b18cfecbf8",
+          "status": "VERIFIED_AND_ACTIVE"
+        },
+        "checkout_layer_acp": {
+          "acp_token": "acp_tok_f3cc387e4687",
+          "cart_digest": "1fe404e2654812a83c8e477467866950982f358ee95abbaf7e7a30dce964368f",
+          "currency": "INR",
+          "tax": 0.0
+        },
+        "settlement_layer": {
+          "gateway": "Razorpay Gateway (Online)",
+          "gateway_mode": "Test Mode",
+          "razorpay_order_id": "order_TXjJhek3DyPs2y",
+          "razorpay_payment_id": "pay_TXjJooWv8XrfRu",
+          "razorpay_signature": "113a34a7769ce571521ba6e4cee246e49777bc522db15be36b03218e2221afd0",
+          "settlement_rail": "razorpay_upi_fiat",
+          "status": "CAPTURED",
+          "captured_amount_inr": 54.85
+        }
+      }
+    },
+    "shipping_address": "Elena Rostova Residence, Innovation Hub Blvd, Sector 4",
+    "inventory_deducted": true,
+    "last_updated_at": "2026-09-03T22:35:55.580283+00:00",
+    "status_notes": "Auto-advanced doorstep delivery lifecycle (2m)"
+  },
+  {
+    "order_id": "ORD-3331-8B33",
+    "user_id": "buyer_david",
+    "customer_name": "David Patel",
+    "created_at": "2026-09-03T22:33:31.627031+00:00",
+    "status": "Delivered",
+    "delivery_estimate": "2-3 Business Days",
+    "tracking_number": "TRK-548FC3",
+    "items": [
+      {
+        "id": "prod_021",
+        "PRODUCT_NAME": "NOVA TitanVolt HyperCharge PowerBank 20k",
+        "PRODUCT_TYPE": "Accessories",
+        "PRODUCT_SIZE": "20,000mAh / 65W PD",
+        "quantity": 1,
+        "price": 42.59,
+        "item_total": 42.59,
+        "IMAGE": "/static/images/powerbank.svg"
+      }
+    ],
+    "currency": "INR",
+    "subtotal": 42.59,
+    "tax": 0.0,
+    "total": 42.59,
+    "payment_method": "Razorpay Gateway (Online)",
+    "razorpay_order_id": "order_TXjKuEs7Zyvmzz",
+    "razorpay_payment_id": "pay_TXjL1mebcZNhjo",
+    "payment_details": {
+      "gateway": "Razorpay Gateway (Online)",
+      "razorpay_order_id": "order_TXjKuEs7Zyvmzz",
+      "razorpay_payment_id": "pay_TXjL1mebcZNhjo",
+      "razorpay_signature": "feb96deab42e2a578bf685b9f9d94b44697fa6bd4239d3188366c9577e5f9aa3",
+      "verified": true,
+      "ap2_mandate_id": "mandate_ap2_c5328d88301c",
+      "ap2_proof": {
+        "protocol": "AP2 (Google Agent Payments Protocol) + ACP + Razorpay Rail",
+        "authorization_layer": {
+          "mandate_id": "mandate_ap2_c5328d88301c",
+          "authorized_agent": "nova_commerce_agent",
+          "spending_mandate_signature": "7ba51727eb21dd994f3406488baea357d1f1a5a262ed3220ad7dc936e0a702aa",
+          "status": "VERIFIED_AND_ACTIVE"
+        },
+        "checkout_layer_acp": {
+          "acp_token": "acp_tok_a9f46328b373",
+          "cart_digest": "fdf81fce62cf2f2d2285d596988066b90b80caa94d72376509ee396a25478781",
+          "currency": "INR",
+          "tax": 0.0
+        },
+        "settlement_layer": {
+          "gateway": "Razorpay Gateway (Online)",
+          "gateway_mode": "Test Mode",
+          "razorpay_order_id": "order_TXjKuEs7Zyvmzz",
+          "razorpay_payment_id": "pay_TXjL1mebcZNhjo",
+          "razorpay_signature": "feb96deab42e2a578bf685b9f9d94b44697fa6bd4239d3188366c9577e5f9aa3",
+          "settlement_rail": "razorpay_upi_fiat",
+          "status": "CAPTURED",
+          "captured_amount_inr": 42.59
+        }
+      }
+    },
+    "shipping_address": "David Patel Residence, Innovation Hub Blvd, Sector 4",
+    "inventory_deducted": true,
+    "last_updated_at": "2026-09-03T22:36:41.126533+00:00",
+    "status_notes": "Auto-advanced doorstep delivery lifecycle (2m)"
+  },
+  {
+    "order_id": "ORD-3456-A559",
+    "user_id": "buyer_alex",
+    "customer_name": "Alex Chen",
+    "created_at": "2026-09-03T22:34:56.003648+00:00",
+    "status": "Delivered",
+    "delivery_estimate": "2-3 Business Days",
+    "tracking_number": "TRK-C887C7",
+    "items": [
+      {
+        "id": "prod_006",
+        "PRODUCT_NAME": "NOVA AeroBook Slim i7 Ultrabook",
+        "PRODUCT_TYPE": "Laptops",
+        "PRODUCT_SIZE": "16GB RAM / 512GB SSD",
+        "quantity": 1,
+        "price": 75.0,
+        "item_total": 75.0,
+        "IMAGE": "/static/images/laptop_pro.svg"
+      }
+    ],
+    "currency": "INR",
+    "subtotal": 75.0,
+    "tax": 0.0,
+    "total": 75.0,
+    "payment_method": "Razorpay Gateway (Online)",
+    "razorpay_order_id": "order_TXjMOf0KzIav39",
+    "razorpay_payment_id": "pay_TXjMWCU6i3BlnU",
+    "payment_details": {
+      "gateway": "Razorpay Gateway (Online)",
+      "razorpay_order_id": "order_TXjMOf0KzIav39",
+      "razorpay_payment_id": "pay_TXjMWCU6i3BlnU",
+      "razorpay_signature": "dbcadebf8347ae4987c9ace6c8ec7c99c0f8dd20d5ab42001b2b7f5c180b8862",
+      "verified": true,
+      "ap2_mandate_id": "mandate_ap2_f94fd292d100",
+      "ap2_proof": {
+        "protocol": "AP2 (Google Agent Payments Protocol) + ACP + Razorpay Rail",
+        "authorization_layer": {
+          "mandate_id": "mandate_ap2_f94fd292d100",
+          "authorized_agent": "nova_commerce_agent",
+          "spending_mandate_signature": "abb26df3f946077971f641fd38d8ce4d12f2e359de279625504b7e634848308e",
+          "status": "VERIFIED_AND_ACTIVE"
+        },
+        "checkout_layer_acp": {
+          "acp_token": "acp_tok_2999e0e0894a",
+          "cart_digest": "728d9fbeec65989de13886858b1d650e14df8dc6c73fdfa972adcc2e08ac8912",
+          "currency": "INR",
+          "tax": 0.0
+        },
+        "settlement_layer": {
+          "gateway": "Razorpay Gateway (Online)",
+          "gateway_mode": "Test Mode",
+          "razorpay_order_id": "order_TXjMOf0KzIav39",
+          "razorpay_payment_id": "pay_TXjMWCU6i3BlnU",
+          "razorpay_signature": "dbcadebf8347ae4987c9ace6c8ec7c99c0f8dd20d5ab42001b2b7f5c180b8862",
+          "settlement_rail": "razorpay_upi_fiat",
+          "status": "CAPTURED",
+          "captured_amount_inr": 75.0
+        }
+      }
+    },
+    "shipping_address": "Alex Chen Residence, Innovation Hub Blvd, Sector 4",
+    "inventory_deducted": true,
+    "last_updated_at": "2026-09-03T22:38:33.988608+00:00",
+    "status_notes": "Auto-advanced doorstep delivery lifecycle (2m)"
+  },
+  {
+    "order_id": "ORD-3526-B33A",
+    "user_id": "buyer_alex",
+    "customer_name": "Alex Chen",
+    "created_at": "2026-09-03T22:35:26.158921+00:00",
+    "status": "Delivered",
+    "delivery_estimate": "2-3 Business Days",
+    "tracking_number": "TRK-E95814",
+    "items": [
+      {
+        "id": "prod_002",
+        "PRODUCT_NAME": "NOVA Apex Ultra Fold 5G",
+        "PRODUCT_TYPE": "Mobiles",
+        "PRODUCT_SIZE": "16GB RAM / 512GB",
+        "quantity": 1,
+        "price": 120.46,
+        "item_total": 120.46,
+        "IMAGE": "/static/images/phone_fold.svg"
+      }
+    ],
+    "currency": "INR",
+    "subtotal": 120.46,
+    "tax": 0.0,
+    "total": 120.46,
+    "payment_method": "Razorpay Gateway (Online)",
+    "razorpay_order_id": "order_TXjMukt9lms7pB",
+    "razorpay_payment_id": "pay_TXjN2TdL2qiMGJ",
+    "payment_details": {
+      "gateway": "Razorpay Gateway (Online)",
+      "razorpay_order_id": "order_TXjMukt9lms7pB",
+      "razorpay_payment_id": "pay_TXjN2TdL2qiMGJ",
+      "razorpay_signature": "a98680c560bf9371cb1cc201fa401c52904c5230c8dfddbf704425afc7737366",
+      "verified": true,
+      "ap2_mandate_id": "mandate_ap2_f94fd292d100",
+      "ap2_proof": {
+        "protocol": "AP2 (Google Agent Payments Protocol) + ACP + Razorpay Rail",
+        "authorization_layer": {
+          "mandate_id": "mandate_ap2_f94fd292d100",
+          "authorized_agent": "nova_commerce_agent",
+          "spending_mandate_signature": "abb26df3f946077971f641fd38d8ce4d12f2e359de279625504b7e634848308e",
+          "status": "VERIFIED_AND_ACTIVE"
+        },
+        "checkout_layer_acp": {
+          "acp_token": "acp_tok_32c1b2f4d9c9",
+          "cart_digest": "a68de41aea2255e99bcdbd4004bc693eb85f609240f1e72faa3c291f218f7bd6",
+          "currency": "INR",
+          "tax": 0.0
+        },
+        "settlement_layer": {
+          "gateway": "Razorpay Gateway (Online)",
+          "gateway_mode": "Test Mode",
+          "razorpay_order_id": "order_TXjMukt9lms7pB",
+          "razorpay_payment_id": "pay_TXjN2TdL2qiMGJ",
+          "razorpay_signature": "a98680c560bf9371cb1cc201fa401c52904c5230c8dfddbf704425afc7737366",
+          "settlement_rail": "razorpay_upi_fiat",
+          "status": "CAPTURED",
+          "captured_amount_inr": 120.46
+        }
+      }
+    },
+    "shipping_address": "Alex Chen Residence, Innovation Hub Blvd, Sector 4",
+    "inventory_deducted": true,
+    "last_updated_at": "2026-09-03T22:38:57.132657+00:00",
+    "status_notes": "Auto-advanced doorstep delivery lifecycle (2m)"
+  },
+  {
+    "order_id": "ORD-3542-407C",
+    "user_id": "buyer_alex",
+    "customer_name": "Alex Chen",
+    "created_at": "2026-09-03T22:35:42.102531+00:00",
+    "status": "Delivered",
+    "delivery_estimate": "2-3 Business Days",
+    "tracking_number": "TRK-4B5938",
+    "items": [
+      {
+        "id": "prod_005",
+        "PRODUCT_NAME": "NOVA BladeForge RTX 4080 Gaming Laptop",
+        "PRODUCT_TYPE": "Laptops",
+        "PRODUCT_SIZE": "32GB RAM / 1TB NVMe SSD",
+        "quantity": 1,
+        "price": 100.0,
+        "item_total": 100.0,
+        "IMAGE": "/static/images/laptop_gaming.svg"
+      }
+    ],
+    "currency": "INR",
+    "subtotal": 100.0,
+    "tax": 0.0,
+    "total": 100.0,
+    "payment_method": "Razorpay Gateway (Online)",
+    "razorpay_order_id": "order_TXjNKpBvHG3sCI",
+    "razorpay_payment_id": "pay_214652048d3b4e",
+    "payment_details": {
+      "gateway": "Razorpay Gateway (Online)",
+      "razorpay_order_id": "order_TXjNKpBvHG3sCI",
+      "razorpay_payment_id": "pay_214652048d3b4e",
+      "razorpay_signature": "fd0ef511c16551cc502740cb3e98ebb48ce719f9c3ce5d0d2356d8eba92f87ca",
+      "verified": true,
+      "ap2_mandate_id": "mandate_ap2_f94fd292d100",
+      "ap2_proof": {
+        "protocol": "AP2 (Google Agent Payments Protocol) + ACP + Razorpay Rail",
+        "authorization_layer": {
+          "mandate_id": "mandate_ap2_f94fd292d100",
+          "authorized_agent": "nova_commerce_agent",
+          "spending_mandate_signature": "abb26df3f946077971f641fd38d8ce4d12f2e359de279625504b7e634848308e",
+          "status": "VERIFIED_AND_ACTIVE"
+        },
+        "checkout_layer_acp": {
+          "acp_token": "acp_tok_afb7ebcc8ce8",
+          "cart_digest": "fff5a8357fe0e150a9e208be575af0455479e24c96a9bfe9828fa70dca21e273",
+          "currency": "INR",
+          "tax": 0.0
+        },
+        "settlement_layer": {
+          "gateway": "Razorpay Gateway (Online)",
+          "gateway_mode": "Test Mode",
+          "razorpay_order_id": "order_TXjNKpBvHG3sCI",
+          "razorpay_payment_id": "pay_214652048d3b4e",
+          "razorpay_signature": "fd0ef511c16551cc502740cb3e98ebb48ce719f9c3ce5d0d2356d8eba92f87ca",
+          "settlement_rail": "razorpay_upi_fiat",
+          "status": "CAPTURED",
+          "captured_amount_inr": 100.0
+        }
+      }
+    },
+    "shipping_address": "Alex Chen Residence, Innovation Hub Blvd, Sector 4",
+    "inventory_deducted": true,
+    "last_updated_at": "2026-09-03T22:39:04.117436+00:00",
+    "status_notes": "Auto-advanced doorstep delivery lifecycle (2m)"
+  },
+  {
+    "order_id": "ORD-3612-153C",
+    "user_id": "buyer_alex",
+    "customer_name": "Alex Chen",
+    "created_at": "2026-09-03T22:36:12.742814+00:00",
+    "status": "Delivered",
+    "delivery_estimate": "2-3 Business Days",
+    "tracking_number": "TRK-358EF9",
+    "items": [
+      {
+        "id": "prod_001",
+        "PRODUCT_NAME": "NOVA Apex Pro 5G Smartphone",
+        "PRODUCT_TYPE": "Mobiles",
+        "PRODUCT_SIZE": "12GB RAM / 256GB",
+        "quantity": 1,
+        "price": 120.48,
+        "item_total": 120.48,
+        "IMAGE": "/static/images/phone_flagship.svg"
+      }
+    ],
+    "currency": "INR",
+    "subtotal": 120.48,
+    "tax": 0.0,
+    "total": 120.48,
+    "payment_method": "Razorpay Gateway (Online)",
+    "razorpay_order_id": "order_TXjNjQxXxeex5i",
+    "razorpay_payment_id": "pay_TXjNrACsZYoZks",
+    "payment_details": {
+      "gateway": "Razorpay Gateway (Online)",
+      "razorpay_order_id": "order_TXjNjQxXxeex5i",
+      "razorpay_payment_id": "pay_TXjNrACsZYoZks",
+      "razorpay_signature": "6dd818b21ef54d781410e0fe6c665c1bb919f6787521a12ab88ef280e335ee90",
+      "verified": true,
+      "ap2_mandate_id": "mandate_ap2_f94fd292d100",
+      "ap2_proof": {
+        "protocol": "AP2 (Google Agent Payments Protocol) + ACP + Razorpay Rail",
+        "authorization_layer": {
+          "mandate_id": "mandate_ap2_f94fd292d100",
+          "authorized_agent": "nova_commerce_agent",
+          "spending_mandate_signature": "abb26df3f946077971f641fd38d8ce4d12f2e359de279625504b7e634848308e",
+          "status": "VERIFIED_AND_ACTIVE"
+        },
+        "checkout_layer_acp": {
+          "acp_token": "acp_tok_9a8c5def010d",
+          "cart_digest": "ac88d9dec1c8e13e4308095252b2a38c90daa5775b01d2a003cb6a569472d44a",
+          "currency": "INR",
+          "tax": 0.0
+        },
+        "settlement_layer": {
+          "gateway": "Razorpay Gateway (Online)",
+          "gateway_mode": "Test Mode",
+          "razorpay_order_id": "order_TXjNjQxXxeex5i",
+          "razorpay_payment_id": "pay_TXjNrACsZYoZks",
+          "razorpay_signature": "6dd818b21ef54d781410e0fe6c665c1bb919f6787521a12ab88ef280e335ee90",
+          "settlement_rail": "razorpay_upi_fiat",
+          "status": "CAPTURED",
+          "captured_amount_inr": 120.48
+        }
+      }
+    },
+    "shipping_address": "Alex Chen Residence, Innovation Hub Blvd, Sector 4",
+    "inventory_deducted": true,
+    "last_updated_at": "2026-09-03T22:39:38.095363+00:00",
+    "status_notes": "Auto-advanced doorstep delivery lifecycle (2m)"
+  },
+  {
+    "order_id": "ORD-3633-F0C1",
+    "user_id": "buyer_alex",
+    "customer_name": "Alex Chen",
+    "created_at": "2026-09-03T22:36:33.402850+00:00",
+    "status": "Delivered",
+    "delivery_estimate": "2-3 Business Days",
+    "tracking_number": "TRK-36657D",
+    "items": [
+      {
+        "id": "prod_006",
+        "PRODUCT_NAME": "NOVA AeroBook Slim i7 Ultrabook",
+        "PRODUCT_TYPE": "Laptops",
+        "PRODUCT_SIZE": "16GB RAM / 512GB SSD",
+        "quantity": 1,
+        "price": 75.0,
+        "item_total": 75.0,
+        "IMAGE": "/static/images/laptop_pro.svg"
+      }
+    ],
+    "currency": "INR",
+    "subtotal": 75.0,
+    "tax": 0.0,
+    "total": 75.0,
+    "payment_method": "Razorpay Gateway (Online)",
+    "razorpay_order_id": "order_TXjOBUAOtSqOYF",
+    "razorpay_payment_id": "pay_TXjOJ4NN1Rp3ou",
+    "payment_details": {
+      "gateway": "Razorpay Gateway (Online)",
+      "razorpay_order_id": "order_TXjOBUAOtSqOYF",
+      "razorpay_payment_id": "pay_TXjOJ4NN1Rp3ou",
+      "razorpay_signature": "c1553b2a0bc8b6bad41b47673250d899f912381c61a6123c0f34607c44404263",
+      "verified": true,
+      "ap2_mandate_id": "mandate_ap2_f94fd292d100",
+      "ap2_proof": {
+        "protocol": "AP2 (Google Agent Payments Protocol) + ACP + Razorpay Rail",
+        "authorization_layer": {
+          "mandate_id": "mandate_ap2_f94fd292d100",
+          "authorized_agent": "nova_commerce_agent",
+          "spending_mandate_signature": "abb26df3f946077971f641fd38d8ce4d12f2e359de279625504b7e634848308e",
+          "status": "VERIFIED_AND_ACTIVE"
+        },
+        "checkout_layer_acp": {
+          "acp_token": "acp_tok_1d8438944071",
+          "cart_digest": "728d9fbeec65989de13886858b1d650e14df8dc6c73fdfa972adcc2e08ac8912",
+          "currency": "INR",
+          "tax": 0.0
+        },
+        "settlement_layer": {
+          "gateway": "Razorpay Gateway (Online)",
+          "gateway_mode": "Test Mode",
+          "razorpay_order_id": "order_TXjOBUAOtSqOYF",
+          "razorpay_payment_id": "pay_TXjOJ4NN1Rp3ou",
+          "razorpay_signature": "c1553b2a0bc8b6bad41b47673250d899f912381c61a6123c0f34607c44404263",
+          "settlement_rail": "razorpay_upi_fiat",
+          "status": "CAPTURED",
+          "captured_amount_inr": 75.0
+        }
+      }
+    },
+    "shipping_address": "Alex Chen Residence, Innovation Hub Blvd, Sector 4",
+    "inventory_deducted": true,
+    "last_updated_at": "2026-09-03T22:40:03.005847+00:00",
+    "status_notes": "Auto-advanced doorstep delivery lifecycle (2m)"
+  },
+  {
+    "order_id": "ORD-3653-D631",
+    "user_id": "buyer_sophia",
+    "customer_name": "Sophia Miller",
+    "created_at": "2026-09-03T22:36:53.382357+00:00",
+    "status": "Shipped",
+    "delivery_estimate": "2-3 Business Days",
+    "tracking_number": "TRK-24BFE0",
+    "items": [
+      {
+        "id": "prod_003",
+        "PRODUCT_NAME": "NOVA Prime 5G Smartphone",
+        "PRODUCT_TYPE": "Mobiles",
+        "PRODUCT_SIZE": "8GB RAM / 128GB",
+        "quantity": 1,
+        "price": 77.25,
+        "item_total": 77.25,
+        "IMAGE": "/static/images/phone_flagship.svg"
+      }
+    ],
+    "currency": "INR",
+    "subtotal": 77.25,
+    "tax": 0.0,
+    "total": 77.25,
+    "payment_method": "Razorpay Gateway (Online)",
+    "razorpay_order_id": "order_TXjOWkkAkMTsoR",
+    "razorpay_payment_id": "pay_TXjOePOCCkWCJb",
+    "payment_details": {
+      "gateway": "Razorpay Gateway (Online)",
+      "razorpay_order_id": "order_TXjOWkkAkMTsoR",
+      "razorpay_payment_id": "pay_TXjOePOCCkWCJb",
+      "razorpay_signature": "29e0269513157091078f244d009e576433d7847ff7a4ec51e18108feffaede29",
+      "verified": true,
+      "ap2_mandate_id": "mandate_ap2_c52dd77e4f64",
+      "ap2_proof": {
+        "protocol": "AP2 (Google Agent Payments Protocol) + ACP + Razorpay Rail",
+        "authorization_layer": {
+          "mandate_id": "mandate_ap2_c52dd77e4f64",
+          "authorized_agent": "nova_commerce_agent",
+          "spending_mandate_signature": "0dd60da1396067e5a87a3f13225437ae0325c94dfb319e7384046bfcaeeb8824",
+          "status": "VERIFIED_AND_ACTIVE"
+        },
+        "checkout_layer_acp": {
+          "acp_token": "acp_tok_4e7d492ddfe0",
+          "cart_digest": "acbbe67826bd83be31ebe41743db7695d3b702c25d1a7c64ad682f73ac49724d",
+          "currency": "INR",
+          "tax": 0.0
+        },
+        "settlement_layer": {
+          "gateway": "Razorpay Gateway (Online)",
+          "gateway_mode": "Test Mode",
+          "razorpay_order_id": "order_TXjOWkkAkMTsoR",
+          "razorpay_payment_id": "pay_TXjOePOCCkWCJb",
+          "razorpay_signature": "29e0269513157091078f244d009e576433d7847ff7a4ec51e18108feffaede29",
+          "settlement_rail": "razorpay_upi_fiat",
+          "status": "CAPTURED",
+          "captured_amount_inr": 77.25
+        }
+      }
+    },
+    "shipping_address": "Sophia Miller Residence, Innovation Hub Blvd, Sector 4",
+    "inventory_deducted": true,
+    "last_updated_at": "2026-09-03T22:38:10.255005+00:00",
+    "status_notes": "Auto-advanced carrier transit lifecycle (1m)"
+  },
+  {
+    "order_id": "ORD-3715-BB85",
+    "user_id": "buyer_sophia",
+    "customer_name": "Sophia Miller",
+    "created_at": "2026-09-03T22:37:15.479147+00:00",
+    "status": "Shipped",
+    "delivery_estimate": "2-3 Business Days",
+    "tracking_number": "TRK-D2BAD4",
+    "items": [
+      {
+        "id": "prod_027",
+        "PRODUCT_NAME": "NOVA HyperGaN 140W Quad-Port Pro Charger",
+        "PRODUCT_TYPE": "Accessories",
+        "PRODUCT_SIZE": "140W (3x Type-C + 1x USB-A)",
+        "quantity": 1,
+        "price": 46.23,
+        "item_total": 46.23,
+        "IMAGE": "/static/images/charger_gan.svg"
+      }
+    ],
+    "currency": "INR",
+    "subtotal": 46.23,
+    "tax": 0.0,
+    "total": 46.23,
+    "payment_method": "Razorpay Gateway (Online)",
+    "razorpay_order_id": "order_TXjOq9j9IcxSH1",
+    "razorpay_payment_id": "pay_TXjOxmrlk7DUNs",
+    "payment_details": {
+      "gateway": "Razorpay Gateway (Online)",
+      "razorpay_order_id": "order_TXjOq9j9IcxSH1",
+      "razorpay_payment_id": "pay_TXjOxmrlk7DUNs",
+      "razorpay_signature": "99fe51ef72158e28e5db5995557b5d26c257b0ec3e8048fe0790be08c99412fb",
+      "verified": true,
+      "ap2_mandate_id": "mandate_ap2_c52dd77e4f64",
+      "ap2_proof": {
+        "protocol": "AP2 (Google Agent Payments Protocol) + ACP + Razorpay Rail",
+        "authorization_layer": {
+          "mandate_id": "mandate_ap2_c52dd77e4f64",
+          "authorized_agent": "nova_commerce_agent",
+          "spending_mandate_signature": "0dd60da1396067e5a87a3f13225437ae0325c94dfb319e7384046bfcaeeb8824",
+          "status": "VERIFIED_AND_ACTIVE"
+        },
+        "checkout_layer_acp": {
+          "acp_token": "acp_tok_81826ee5639b",
+          "cart_digest": "d772c45ca620296b761284350f4ec13399af8c374c2d957a79d047349b3f4677",
+          "currency": "INR",
+          "tax": 0.0
+        },
+        "settlement_layer": {
+          "gateway": "Razorpay Gateway (Online)",
+          "gateway_mode": "Test Mode",
+          "razorpay_order_id": "order_TXjOq9j9IcxSH1",
+          "razorpay_payment_id": "pay_TXjOxmrlk7DUNs",
+          "razorpay_signature": "99fe51ef72158e28e5db5995557b5d26c257b0ec3e8048fe0790be08c99412fb",
+          "settlement_rail": "razorpay_upi_fiat",
+          "status": "CAPTURED",
+          "captured_amount_inr": 46.23
+        }
+      }
+    },
+    "shipping_address": "Sophia Miller Residence, Innovation Hub Blvd, Sector 4",
+    "inventory_deducted": true,
+    "last_updated_at": "2026-09-03T22:38:33.829195+00:00",
+    "status_notes": "Auto-advanced carrier transit lifecycle (1m)"
+  },
+  {
+    "order_id": "ORD-3739-8080",
+    "user_id": "buyer_elena",
+    "customer_name": "Elena Rostova",
+    "created_at": "2026-09-03T22:37:39.303183+00:00",
+    "status": "Shipped",
+    "delivery_estimate": "2-3 Business Days",
+    "tracking_number": "TRK-17E298",
+    "items": [
+      {
+        "id": "prod_004",
+        "PRODUCT_NAME": "NOVA ZenBook Ultra 14 M3 Laptop",
+        "PRODUCT_TYPE": "Laptops",
+        "PRODUCT_SIZE": "16GB RAM / 512GB SSD",
+        "quantity": 1,
+        "price": 85.0,
+        "item_total": 85.0,
+        "IMAGE": "/static/images/laptop_pro.svg"
+      }
+    ],
+    "currency": "INR",
+    "subtotal": 85.0,
+    "tax": 0.0,
+    "total": 85.0,
+    "payment_method": "Razorpay Gateway (Online)",
+    "razorpay_order_id": "order_TXjPGHlXWRRdmz",
+    "razorpay_payment_id": "pay_TXjPNrMpNu6KDN",
+    "payment_details": {
+      "gateway": "Razorpay Gateway (Online)",
+      "razorpay_order_id": "order_TXjPGHlXWRRdmz",
+      "razorpay_payment_id": "pay_TXjPNrMpNu6KDN",
+      "razorpay_signature": "9ce21127ccae54ed7d3fe73fb310d56d9e4c943d100e22710aed44461ed29ba7",
+      "verified": true,
+      "ap2_mandate_id": "mandate_ap2_fa7dfdfdca8a",
+      "ap2_proof": {
+        "protocol": "AP2 (Google Agent Payments Protocol) + ACP + Razorpay Rail",
+        "authorization_layer": {
+          "mandate_id": "mandate_ap2_fa7dfdfdca8a",
+          "authorized_agent": "nova_commerce_agent",
+          "spending_mandate_signature": "864f77f15164c78c60cf9ed8bff4f8e5c0dd079d2aa20a5e2974d8b18cfecbf8",
+          "status": "VERIFIED_AND_ACTIVE"
+        },
+        "checkout_layer_acp": {
+          "acp_token": "acp_tok_170d7b773d0d",
+          "cart_digest": "af7eefa539225a67a06c0952753ecef75d6024567d081268eeec6c07378df5c7",
+          "currency": "INR",
+          "tax": 0.0
+        },
+        "settlement_layer": {
+          "gateway": "Razorpay Gateway (Online)",
+          "gateway_mode": "Test Mode",
+          "razorpay_order_id": "order_TXjPGHlXWRRdmz",
+          "razorpay_payment_id": "pay_TXjPNrMpNu6KDN",
+          "razorpay_signature": "9ce21127ccae54ed7d3fe73fb310d56d9e4c943d100e22710aed44461ed29ba7",
+          "settlement_rail": "razorpay_upi_fiat",
+          "status": "CAPTURED",
+          "captured_amount_inr": 85.0
+        }
+      }
+    },
+    "shipping_address": "Elena Rostova Residence, Innovation Hub Blvd, Sector 4",
+    "inventory_deducted": true,
+    "last_updated_at": "2026-09-03T22:38:56.971090+00:00",
+    "status_notes": "Auto-advanced carrier transit lifecycle (1m)"
+  },
+  {
+    "order_id": "ORD-3803-1C04",
+    "user_id": "buyer_elena",
+    "customer_name": "Elena Rostova",
+    "created_at": "2026-09-03T22:38:03.208927+00:00",
+    "status": "Shipped",
+    "delivery_estimate": "2-3 Business Days",
+    "tracking_number": "TRK-515F5E",
+    "items": [
+      {
+        "id": "prod_009",
+        "PRODUCT_NAME": "NOVA BoomPulse 360 Bluetooth Speaker",
+        "PRODUCT_TYPE": "Audio",
+        "PRODUCT_SIZE": "Portable 40W RMS",
+        "quantity": 1,
+        "price": 43.65,
+        "item_total": 43.65,
+        "IMAGE": "/static/images/speaker_bluetooth.svg"
+      }
+    ],
+    "currency": "INR",
+    "subtotal": 43.65,
+    "tax": 0.0,
+    "total": 43.65,
+    "payment_method": "Razorpay Gateway (Online)",
+    "razorpay_order_id": "order_TXjPgQPvC7nHMl",
+    "razorpay_payment_id": "pay_TXjPnpU0AcXR7R",
+    "payment_details": {
+      "gateway": "Razorpay Gateway (Online)",
+      "razorpay_order_id": "order_TXjPgQPvC7nHMl",
+      "razorpay_payment_id": "pay_TXjPnpU0AcXR7R",
+      "razorpay_signature": "4eaf07e6ba6f2360295e265ad20bce8c3c7867605b972803a1b4e3505cdcb0cb",
+      "verified": true,
+      "ap2_mandate_id": "mandate_ap2_fa7dfdfdca8a",
+      "ap2_proof": {
+        "protocol": "AP2 (Google Agent Payments Protocol) + ACP + Razorpay Rail",
+        "authorization_layer": {
+          "mandate_id": "mandate_ap2_fa7dfdfdca8a",
+          "authorized_agent": "nova_commerce_agent",
+          "spending_mandate_signature": "864f77f15164c78c60cf9ed8bff4f8e5c0dd079d2aa20a5e2974d8b18cfecbf8",
+          "status": "VERIFIED_AND_ACTIVE"
+        },
+        "checkout_layer_acp": {
+          "acp_token": "acp_tok_c115e1203145",
+          "cart_digest": "adf7380bd2e49e7763ba02f72423eeed4d7bfe33f8cb2fa555a58f6721f3aa21",
+          "currency": "INR",
+          "tax": 0.0
+        },
+        "settlement_layer": {
+          "gateway": "Razorpay Gateway (Online)",
+          "gateway_mode": "Test Mode",
+          "razorpay_order_id": "order_TXjPgQPvC7nHMl",
+          "razorpay_payment_id": "pay_TXjPnpU0AcXR7R",
+          "razorpay_signature": "4eaf07e6ba6f2360295e265ad20bce8c3c7867605b972803a1b4e3505cdcb0cb",
+          "settlement_rail": "razorpay_upi_fiat",
+          "status": "CAPTURED",
+          "captured_amount_inr": 43.65
+        }
+      }
+    },
+    "shipping_address": "Elena Rostova Residence, Innovation Hub Blvd, Sector 4",
+    "inventory_deducted": true,
+    "last_updated_at": "2026-09-03T22:39:37.937089+00:00",
+    "status_notes": "Auto-advanced carrier transit lifecycle (1m)"
+  },
+  {
+    "order_id": "ORD-3826-0E1E",
+    "user_id": "buyer_marcus",
+    "customer_name": "Marcus Kim",
+    "created_at": "2026-09-03T22:38:26.704867+00:00",
+    "status": "Shipped",
+    "delivery_estimate": "2-3 Business Days",
+    "tracking_number": "TRK-071249",
+    "items": [
+      {
+        "id": "prod_027",
+        "PRODUCT_NAME": "NOVA HyperGaN 140W Quad-Port Pro Charger",
+        "PRODUCT_TYPE": "Accessories",
+        "PRODUCT_SIZE": "140W (3x Type-C + 1x USB-A)",
+        "quantity": 1,
+        "price": 46.23,
+        "item_total": 46.23,
+        "IMAGE": "/static/images/charger_gan.svg"
+      }
+    ],
+    "currency": "INR",
+    "subtotal": 46.23,
+    "tax": 0.0,
+    "total": 46.23,
+    "payment_method": "Razorpay Gateway (Online)",
+    "razorpay_order_id": "order_TXjQ5z6cv1xB0n",
+    "razorpay_payment_id": "pay_TXjQDZsKIKBaYw",
+    "payment_details": {
+      "gateway": "Razorpay Gateway (Online)",
+      "razorpay_order_id": "order_TXjQ5z6cv1xB0n",
+      "razorpay_payment_id": "pay_TXjQDZsKIKBaYw",
+      "razorpay_signature": "6e489392233178210d0c78a8a5dd03650d3a4a77dfad28cac51fc6701feb7944",
+      "verified": true,
+      "ap2_mandate_id": "mandate_ap2_cb4f7fb79e5f",
+      "ap2_proof": {
+        "protocol": "AP2 (Google Agent Payments Protocol) + ACP + Razorpay Rail",
+        "authorization_layer": {
+          "mandate_id": "mandate_ap2_cb4f7fb79e5f",
+          "authorized_agent": "nova_commerce_agent",
+          "spending_mandate_signature": "c0f599cfc3ac014ebb8759b32a49df610380c6f4621d4fae19b6a466fc4dbd92",
+          "status": "VERIFIED_AND_ACTIVE"
+        },
+        "checkout_layer_acp": {
+          "acp_token": "acp_tok_41cf20833157",
+          "cart_digest": "d772c45ca620296b761284350f4ec13399af8c374c2d957a79d047349b3f4677",
+          "currency": "INR",
+          "tax": 0.0
+        },
+        "settlement_layer": {
+          "gateway": "Razorpay Gateway (Online)",
+          "gateway_mode": "Test Mode",
+          "razorpay_order_id": "order_TXjQ5z6cv1xB0n",
+          "razorpay_payment_id": "pay_TXjQDZsKIKBaYw",
+          "razorpay_signature": "6e489392233178210d0c78a8a5dd03650d3a4a77dfad28cac51fc6701feb7944",
+          "settlement_rail": "razorpay_upi_fiat",
+          "status": "CAPTURED",
+          "captured_amount_inr": 46.23
+        }
+      }
+    },
+    "shipping_address": "Marcus Kim Residence, Innovation Hub Blvd, Sector 4",
+    "inventory_deducted": true,
+    "last_updated_at": "2026-09-03T22:39:37.768007+00:00",
+    "status_notes": "Auto-advanced carrier transit lifecycle (1m)"
+  },
+  {
+    "order_id": "ORD-3850-BEE8",
+    "user_id": "buyer_david",
+    "customer_name": "David Patel",
+    "created_at": "2026-09-03T22:38:50.358781+00:00",
+    "status": "Shipped",
+    "delivery_estimate": "2-3 Business Days",
+    "tracking_number": "TRK-226A40",
+    "items": [
+      {
+        "id": "prod_012",
+        "PRODUCT_NAME": "NOVA VoiceCraft XLR Studio Condenser Wired Mic",
+        "PRODUCT_TYPE": "Audio",
+        "PRODUCT_SIZE": "XLR / 34mm Gold Capsule",
+        "quantity": 1,
+        "price": 54.85,
+        "item_total": 54.85,
+        "IMAGE": "/static/images/mic_wired.svg"
+      }
+    ],
+    "currency": "INR",
+    "subtotal": 54.85,
+    "tax": 0.0,
+    "total": 54.85,
+    "payment_method": "Razorpay Gateway (Online)",
+    "razorpay_order_id": "order_TXjQVpgB7rGPIK",
+    "razorpay_payment_id": "pay_TXjQdCzTgDwBMi",
+    "payment_details": {
+      "gateway": "Razorpay Gateway (Online)",
+      "razorpay_order_id": "order_TXjQVpgB7rGPIK",
+      "razorpay_payment_id": "pay_TXjQdCzTgDwBMi",
+      "razorpay_signature": "b43cf9fb13c01e5ee7ec97384ccb3a2111f6303ea9fd124503505ad4cf1510aa",
+      "verified": true,
+      "ap2_mandate_id": "mandate_ap2_c5328d88301c",
+      "ap2_proof": {
+        "protocol": "AP2 (Google Agent Payments Protocol) + ACP + Razorpay Rail",
+        "authorization_layer": {
+          "mandate_id": "mandate_ap2_c5328d88301c",
+          "authorized_agent": "nova_commerce_agent",
+          "spending_mandate_signature": "7ba51727eb21dd994f3406488baea357d1f1a5a262ed3220ad7dc936e0a702aa",
+          "status": "VERIFIED_AND_ACTIVE"
+        },
+        "checkout_layer_acp": {
+          "acp_token": "acp_tok_31ffb7db5042",
+          "cart_digest": "1fe404e2654812a83c8e477467866950982f358ee95abbaf7e7a30dce964368f",
+          "currency": "INR",
+          "tax": 0.0
+        },
+        "settlement_layer": {
+          "gateway": "Razorpay Gateway (Online)",
+          "gateway_mode": "Test Mode",
+          "razorpay_order_id": "order_TXjQVpgB7rGPIK",
+          "razorpay_payment_id": "pay_TXjQdCzTgDwBMi",
+          "razorpay_signature": "b43cf9fb13c01e5ee7ec97384ccb3a2111f6303ea9fd124503505ad4cf1510aa",
+          "settlement_rail": "razorpay_upi_fiat",
+          "status": "CAPTURED",
+          "captured_amount_inr": 54.85
+        }
+      }
+    },
+    "shipping_address": "David Patel Residence, Innovation Hub Blvd, Sector 4",
+    "inventory_deducted": true,
+    "last_updated_at": "2026-09-03T22:40:02.849118+00:00",
+    "status_notes": "Auto-advanced carrier transit lifecycle (1m)"
+  },
+  {
+    "order_id": "ORD-3920-C86C",
+    "user_id": "buyer_sophia",
+    "customer_name": "Sophia Miller",
+    "created_at": "2026-09-03T22:39:20.779366+00:00",
+    "status": "Dispatched",
+    "delivery_estimate": "2-3 Business Days",
+    "tracking_number": "TRK-5FC7FC",
+    "items": [
+      {
+        "id": "prod_025",
+        "PRODUCT_NAME": "NOVA TurboFlash 30W Mobile Fast Charger",
+        "PRODUCT_TYPE": "Accessories",
+        "PRODUCT_SIZE": "30W Nano USB-C",
+        "quantity": 1,
+        "price": 18.25,
+        "item_total": 18.25,
+        "IMAGE": "/static/images/charger_mobile.svg"
+      }
+    ],
+    "currency": "INR",
+    "subtotal": 18.25,
+    "tax": 0.0,
+    "total": 18.25,
+    "payment_method": "Razorpay Gateway (Online)",
+    "razorpay_order_id": "order_TXjR2kxBmG6Wdb",
+    "razorpay_payment_id": "pay_TXjR9x62IjGjqW",
+    "payment_details": {
+      "gateway": "Razorpay Gateway (Online)",
+      "razorpay_order_id": "order_TXjR2kxBmG6Wdb",
+      "razorpay_payment_id": "pay_TXjR9x62IjGjqW",
+      "razorpay_signature": "2ed5031b2e572378e0c2edc5053eec12a2051eb3fab7d47bdab53d2eef0e9513",
+      "verified": true,
+      "ap2_mandate_id": "mandate_ap2_c52dd77e4f64",
+      "ap2_proof": {
+        "protocol": "AP2 (Google Agent Payments Protocol) + ACP + Razorpay Rail",
+        "authorization_layer": {
+          "mandate_id": "mandate_ap2_c52dd77e4f64",
+          "authorized_agent": "nova_commerce_agent",
+          "spending_mandate_signature": "0dd60da1396067e5a87a3f13225437ae0325c94dfb319e7384046bfcaeeb8824",
+          "status": "VERIFIED_AND_ACTIVE"
+        },
+        "checkout_layer_acp": {
+          "acp_token": "acp_tok_33aba357c4d9",
+          "cart_digest": "14440652022243dfce851b82fe268c5835488193a1a1a784ddc98eacb3e5a78c",
+          "currency": "INR",
+          "tax": 0.0
+        },
+        "settlement_layer": {
+          "gateway": "Razorpay Gateway (Online)",
+          "gateway_mode": "Test Mode",
+          "razorpay_order_id": "order_TXjR2kxBmG6Wdb",
+          "razorpay_payment_id": "pay_TXjR9x62IjGjqW",
+          "razorpay_signature": "2ed5031b2e572378e0c2edc5053eec12a2051eb3fab7d47bdab53d2eef0e9513",
+          "settlement_rail": "razorpay_upi_fiat",
+          "status": "CAPTURED",
+          "captured_amount_inr": 18.25
+        }
+      }
+    },
+    "shipping_address": "Sophia Miller Residence, Innovation Hub Blvd, Sector 4",
+    "inventory_deducted": true,
+    "last_updated_at": "2026-09-03T22:39:36.087652+00:00"
+  },
+  {
+    "order_id": "ORD-3955-0011",
+    "user_id": "buyer_sophia",
+    "customer_name": "Sophia Miller",
+    "created_at": "2026-09-03T22:39:55.290264+00:00",
+    "status": "Dispatched",
+    "delivery_estimate": "2-3 Business Days",
+    "tracking_number": "TRK-57B935",
+    "items": [
+      {
+        "id": "prod_014",
+        "PRODUCT_NAME": "NOVA Pulse Ultra Smartwatch",
+        "PRODUCT_TYPE": "Accessories",
+        "PRODUCT_SIZE": "45mm Titanium",
+        "quantity": 1,
+        "price": 79.08,
+        "item_total": 79.08,
+        "IMAGE": "/static/images/smartwatch.svg"
+      }
+    ],
+    "currency": "INR",
+    "subtotal": 79.08,
+    "tax": 0.0,
+    "total": 79.08,
+    "payment_method": "Razorpay Gateway (Online)",
+    "razorpay_order_id": "order_TXjReMrUspx4Nv",
+    "razorpay_payment_id": "pay_TXjRlvMaUkGh8c",
+    "payment_details": {
+      "gateway": "Razorpay Gateway (Online)",
+      "razorpay_order_id": "order_TXjReMrUspx4Nv",
+      "razorpay_payment_id": "pay_TXjRlvMaUkGh8c",
+      "razorpay_signature": "159aba03f62e9b19e511e13685077bda1a3f8d7aa98ba269b9960d52a0b1b341",
+      "verified": true,
+      "ap2_mandate_id": "mandate_ap2_c52dd77e4f64",
+      "ap2_proof": {
+        "protocol": "AP2 (Google Agent Payments Protocol) + ACP + Razorpay Rail",
+        "authorization_layer": {
+          "mandate_id": "mandate_ap2_c52dd77e4f64",
+          "authorized_agent": "nova_commerce_agent",
+          "spending_mandate_signature": "0dd60da1396067e5a87a3f13225437ae0325c94dfb319e7384046bfcaeeb8824",
+          "status": "VERIFIED_AND_ACTIVE"
+        },
+        "checkout_layer_acp": {
+          "acp_token": "acp_tok_e2fa2270abd4",
+          "cart_digest": "362158d3348b3bbf2c2516b83e2400d67f35305ce3d082acab3d36f8e95779a5",
+          "currency": "INR",
+          "tax": 0.0
+        },
+        "settlement_layer": {
+          "gateway": "Razorpay Gateway (Online)",
+          "gateway_mode": "Test Mode",
+          "razorpay_order_id": "order_TXjReMrUspx4Nv",
+          "razorpay_payment_id": "pay_TXjRlvMaUkGh8c",
+          "razorpay_signature": "159aba03f62e9b19e511e13685077bda1a3f8d7aa98ba269b9960d52a0b1b341",
+          "settlement_rail": "razorpay_upi_fiat",
+          "status": "CAPTURED",
+          "captured_amount_inr": 79.08
+        }
+      }
+    },
+    "shipping_address": "Sophia Miller Residence, Innovation Hub Blvd, Sector 4",
+    "inventory_deducted": true,
+    "last_updated_at": "2026-09-03T22:40:01.138294+00:00"
   }
 ]

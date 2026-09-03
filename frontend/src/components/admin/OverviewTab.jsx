@@ -7,10 +7,10 @@ import {
   PackageCheck, 
   AlertTriangle, 
   Bot, 
-  Radio, 
   Terminal, 
   ArrowRight,
-  Play 
+  Play,
+  RotateCcw
 } from 'lucide-react';
 import { useAdmin } from '../../context/AdminContext';
 
@@ -20,10 +20,11 @@ export default function OverviewTab() {
     agentsStatus, 
     treasury, 
     agentLogs, 
-    agentMessages, 
     setActiveTab, 
-    triggerAgent 
+    triggerAgent,
+    setIsResetConfirmModalOpen
   } = useAdmin();
+
 
   const kpis = overview?.kpis || {};
   const bankBalance = treasury?.bank_balance ?? 500000;
@@ -113,7 +114,7 @@ export default function OverviewTab() {
         </div>
       </div>
 
-      {/* 2-Column: 7 Agents Grid & Live Message Bus */}
+      {/* 2-Column: 7 Agents Grid & Store Activity */}
       <div className="dashboard-2col">
         {/* Agents Quick List */}
         <div className="glass-panel">
@@ -122,10 +123,20 @@ export default function OverviewTab() {
               <Bot size={18} style={{ color: '#06b6d4' }} />
               <span>Autonomous Agent Fleet (7 Agents)</span>
             </h4>
-            <button className="action-btn" onClick={() => setActiveTab('agents')}>
-              <span>View Hub</span>
-              <ArrowRight size={13} />
-            </button>
+            <div style={{ display: 'flex', gap: '0.5rem' }}>
+              <button 
+                className="action-btn danger" 
+                style={{ fontSize: '0.72rem', color: '#fb7185', background: 'rgba(244, 63, 94, 0.12)', borderColor: 'rgba(244, 63, 94, 0.3)' }}
+                onClick={() => setIsResetConfirmModalOpen(true)}
+              >
+                <RotateCcw size={12} />
+                <span>Reset to Base</span>
+              </button>
+              <button className="action-btn" onClick={() => setActiveTab('agents')}>
+                <span>View Hub</span>
+                <ArrowRight size={13} />
+              </button>
+            </div>
           </div>
 
           <div style={{ padding: '1rem', display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
@@ -182,32 +193,32 @@ export default function OverviewTab() {
           </div>
         </div>
 
-        {/* Live Inter-Agent Message Bus */}
+        {/* Live Autonomous Agent Activity Ledger */}
         <div className="glass-panel">
           <div className="panel-header-bar">
             <h4>
-              <Radio size={18} style={{ color: '#a855f7' }} />
-              <span>⚡ Inter-Agent Real-Time Message Bus</span>
+              <Terminal size={18} style={{ color: '#06b6d4' }} />
+              <span>⚡ Recent Autonomous Agent Activity</span>
             </h4>
-            <span style={{ fontSize: '0.68rem', background: 'rgba(168, 85, 247, 0.2)', color: '#c084fc', padding: '0.15rem 0.5rem', borderRadius: '4px', fontWeight: 700 }}>
-              COLLABORATING
+            <span style={{ fontSize: '0.68rem', background: 'rgba(6, 182, 212, 0.15)', color: '#38bdf8', padding: '0.15rem 0.5rem', borderRadius: '4px', fontWeight: 700 }}>
+              LIVE ACTIVITY
             </span>
           </div>
 
-          <div className="terminal-feed-box" style={{ height: '340px' }}>
-            {agentMessages.length === 0 ? (
+          <div className="terminal-feed-box" style={{ height: '370px' }}>
+            {agentLogs.length === 0 ? (
               <div style={{ textAlign: 'center', padding: '2rem', color: '#64748b' }}>
-                Connecting to message bus stream...
+                No recent agent actions recorded.
               </div>
             ) : (
-              agentMessages.slice(0, 20).map((msg, idx) => {
-                const time = msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString() : 'NOW';
+              agentLogs.slice(0, 20).map((log, idx) => {
+                const time = log.timestamp ? new Date(log.timestamp).toLocaleTimeString() : 'NOW';
                 return (
                   <div key={idx} className="terminal-entry">
                     <span className="term-time">{time}</span>
-                    <span className="term-tag purple">{msg.from_agent || 'Agent'} ➔ {msg.to_agent || 'All'}</span>
+                    <span className="term-tag cyan">{log.agent_name || 'Agent'}</span>
                     <span style={{ color: '#e2e8f0', wordBreak: 'break-word' }}>
-                      <strong>[{msg.subject || 'DIRECTIVE'}]</strong> {typeof msg.content === 'object' ? JSON.stringify(msg.content) : String(msg.content || '')}
+                      <strong>[{log.action_type || 'DECISION'}]</strong> {log.details || ''}
                     </span>
                   </div>
                 );
@@ -216,6 +227,7 @@ export default function OverviewTab() {
           </div>
         </div>
       </div>
+
 
       {/* 24/7 Agent Decision & Audit Activity Stream */}
       <div className="glass-panel">

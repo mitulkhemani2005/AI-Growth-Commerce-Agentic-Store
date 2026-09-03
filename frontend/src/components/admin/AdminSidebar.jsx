@@ -18,7 +18,7 @@ import {
 import { useAdmin } from '../../context/AdminContext';
 
 export default function AdminSidebar({ onOpenStorefront }) {
-  const { activeTab, setActiveTab, overview, treasury } = useAdmin();
+  const { activeTab, setActiveTab, overview, treasury, setIsResetConfirmModalOpen } = useAdmin();
 
   const bankBalance = treasury?.bank_balance ?? overview?.kpis?.total_revenue ?? 500000;
   const formattedBalance = bankBalance >= 100000 
@@ -38,7 +38,6 @@ export default function AdminSidebar({ onOpenStorefront }) {
     { id: 'reviews', label: 'AI Reviews & Feedback', icon: Star },
     { id: 'chat', label: 'CEO Command Chat', icon: Sparkles }
   ];
-
 
   return (
     <aside className="admin-sidebar">
@@ -94,8 +93,24 @@ export default function AdminSidebar({ onOpenStorefront }) {
         })}
       </nav>
 
-      {/* Footer Links */}
+      {/* Footer Links & Reset */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', paddingTop: '0.75rem', borderTop: '1px solid rgba(255, 255, 255, 0.06)' }}>
+        <button 
+          className="action-btn danger"
+          style={{ 
+            background: 'rgba(244, 63, 94, 0.12)', 
+            borderColor: 'rgba(244, 63, 94, 0.35)', 
+            color: '#fb7185', 
+            justifyContent: 'center',
+            fontSize: '0.75rem'
+          }}
+          onClick={() => setIsResetConfirmModalOpen(true)}
+          title="Reset inventory to 0 stock, clear orders, reset bank balance"
+        >
+          <RotateCcw size={14} />
+          <span>Reset to Base Condition</span>
+        </button>
+
         <a 
           href="/office" 
           target="_blank" 
@@ -125,3 +140,4 @@ export default function AdminSidebar({ onOpenStorefront }) {
     </aside>
   );
 }
+

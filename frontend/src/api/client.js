@@ -169,6 +169,12 @@ export const api = {
       method: 'POST',
       body: { enabled }
     }),
+  updateBuyerInterval: (buyerId = 'all', intervalSeconds = 60) =>
+    apiRequest('/api/admin/buyers/interval', {
+      method: 'POST',
+      body: { buyer_id: buyerId, interval_seconds: intervalSeconds }
+    }),
+
 
   // CEO Roundtable Discussion
   startCEODiscussion: (topic, participants = 'ALL_AGENTS') => 
@@ -200,6 +206,11 @@ export const api = {
     apiRequest(`/api/admin/orders/${orderId}/status`, {
       method: 'POST',
       body: { status, tracking_number: trackingNumber, notes }
+    }),
+  // Refunds
+  refundOrder: (orderId, reason = 'Customer Request') => 
+    apiRequest(`/api/orders/${encodeURIComponent(orderId)}/refund?reason=${encodeURIComponent(reason)}`, {
+      method: 'POST'
     }),
   adminCancelOrder: (orderId, reason = 'Customer Request', forceOverride = false) => 
     apiRequest(`/api/admin/orders/${orderId}/cancel`, {
@@ -248,6 +259,19 @@ export const api = {
       method: 'POST',
       body: payload
     }),
+  activateAdminCampaign: (campaignId) =>
+    apiRequest(`/api/admin/campaigns/${encodeURIComponent(campaignId)}/activate`, {
+      method: 'POST'
+    }),
+  stopAdminCampaign: (campaignId) =>
+    apiRequest(`/api/admin/campaigns/${encodeURIComponent(campaignId)}/stop`, {
+      method: 'POST'
+    }),
+  deleteAdminCampaign: (campaignId) =>
+    apiRequest(`/api/admin/campaigns/${encodeURIComponent(campaignId)}`, {
+      method: 'DELETE'
+    }),
+
 
   // Conversational In-App Checkout
   conversationalCheckout: (payload) => 
