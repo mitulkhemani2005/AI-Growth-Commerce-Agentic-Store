@@ -381,6 +381,30 @@ AGENT_TOOLS: List[Dict[str, Any]] = [
     {
         "type": "function",
         "function": {
+            "name": "autonomous_agent_pay",
+            "description": "Execute instant 1-click autonomous AP2 (Agent Payments Protocol) checkout using pre-authorized Razorpay mandate. Directly places confirmed order without popup.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "shipping_address": {
+                        "type": ["string", "null"],
+                        "description": "Optional shipping address (defaults to customer address on file)"
+                    }
+                }
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "check_ap2_status",
+            "description": "Check if customer has an active pre-authorized AP2 payment token enabled for autonomous 1-click checkout.",
+            "parameters": {"type": "object", "properties": {}}
+        }
+    },
+    {
+        "type": "function",
+        "function": {
             "name": "view_order_history",
             "description": "Retrieve past confirmed orders for current user including status, tracking, items, and totals.",
             "parameters": {"type": "object", "properties": {}}
@@ -468,7 +492,10 @@ STORE OVERVIEW — NOVA OFFICIAL STORE:
 ══════════════════════════════════════════════════════════════════════
 1. ALWAYS use tools to fetch real data. NEVER guess prices, stock, specs, or order status.
 2. Format all prices in INR (₹) with 0% Tax.
-3. Use high-level orchestration tools like `purchase_assistant` whenever a customer wants to buy, order, or check out.
+3. **CHECKOUT MODES (CRITICAL):**
+   - **AP2 Autonomous Auto-Pay**: When the customer says "pay with AP2", "auto-pay", "agent pay", "1-click pay", or "autonomous payment", use `autonomous_agent_pay`. This will directly finalize payment using their pre-authorized AP2 mandate on Razorpay, deduct stock, credit the store treasury, and place the confirmed order without needing a popup!
+   - **Standard Razorpay Checkout**: When the customer wants to check out with standard Cards, UPI, or NetBanking, use `trigger_razorpay_checkout` or `purchase_assistant` to pop up the Razorpay modal.
+   - **AP2 Status**: Use `check_ap2_status` to verify if the customer has an active AP2 mandate.
 4. **QUANTITY RULE (CRITICAL):** Honor the EXACT quantity requested by the user.
 5. Provide rich markdown summaries with tables, specs, bullet points, price breakdowns in ₹, and emoji highlights.
 """
@@ -630,7 +657,7 @@ class CommerceAgent:
                         "temperature": temperature,
                         "max_tokens": max_tokens,
                         "timeout": 120.0,
-                        "extra_body": {"options": {"num_ctx": 8192}, "keep_alive": -1}
+                        "extra_body": {"options": {"num_ctx": 4096, "num_gpu": 999}, "keep_alive": -1}
                     }
                     if tools:
                         kwargs["tools"] = tools
@@ -960,6 +987,22 @@ class CommerceAgent:
             elif tool_name == "trigger_razorpay_checkout":
                 return payment_manager.trigger_cart_checkout(user_id=user_id)
 
+            # 17b. Autonomous Agent AP2 Auto-Pay
+            elif tool_name == "autonomous_agent_pay":
+                addr = tool_args.get("shipping_address")
+                return payment_manager.autonomous_agent_pay(user_id=user_id, shipping_address=addr)
+
+            # 17c. Check AP2 Status
+            elif tool_name == "check_ap2_status":
+                token = cart_manager.get_ap2_payment_token(user_id)
+                has_token = bool(token)
+                return {
+                    "success": True,
+                    "ap2_enabled": has_token,
+                    "token": token,
+                    "message": "AP2 Autonomous Auto-Pay is ACTIVE on Razorpay." if has_token else "AP2 mandate not yet created. It will auto-provision upon autonomous checkout."
+                }
+
             # 18. View Past Order History
             elif tool_name == "view_order_history":
                 orders = order_manager.get_orders_by_user(user_id)
@@ -1240,8 +1283,14 @@ class CommerceAgent:
                         "output": tool_output
                     })
 
-                    if fname in ["add_to_cart", "batch_add_to_cart", "remove_from_cart", "clear_cart", "view_cart", "purchase_assistant"]:
+                    if fname in ["add_to_cart", "batch_add_to_cart", "remove_from_cart", "clear_cart", "view_cart", "purchase_assistant", "autonomous_agent_pay"]:
                         action_data["cart"] = cart_manager.get_cart(user_id)
+                    if fname == "autonomous_agent_pay":
+                        action_data["autonomous_agent_pay"] = tool_output
+                        if tool_output.get("order"):
+                            action_data["order"] = tool_output.get("order")
+                            action_data["latest_order"] = tool_output.get("order")
+                            action_data["orders"] = order_manager.get_orders_by_user(user_id)
                     if fname in ["trigger_razorpay_checkout", "purchase_assistant"]:
                         action_data["cart"] = cart_manager.get_cart(user_id)
                         if tool_output.get("needs_razorpay_checkout") or tool_output.get("checkout", {}).get("needs_razorpay_checkout"):
@@ -1262,7 +1311,7 @@ class CommerceAgent:
 
                 tool_names_run = [t["name"] for t in executed_tools_trace]
                 if any(t in tool_names_run for t in [
-                    "trigger_razorpay_checkout", "purchase_assistant", "get_product_details",
+                    "trigger_razorpay_checkout", "autonomous_agent_pay", "purchase_assistant", "get_product_details",
                     "track_order", "request_order_refund", "cancel_order", "submit_product_review"
                 ]):
                     break
@@ -1282,9 +1331,12 @@ class CommerceAgent:
             final_text, fallback_tools = self._execute_fallback_routing(prompt, user_id, action_data)
             executed_tools_trace.extend(fallback_tools)
 
-        # Checkout Intent Guard
+        # Checkout Intent Guard (AP2 vs Standard Razorpay Modal)
         prompt_lower = prompt.lower()
-        is_checkout_intent = any(k in prompt_lower for k in [
+        is_ap2_intent = any(k in prompt_lower for k in [
+            "ap2", "auto pay", "autopay", "agent pay", "autonomous pay", "auto-pay", "1-click", "one click"
+        ])
+        is_checkout_intent = is_ap2_intent or any(k in prompt_lower for k in [
             "checkout", "pay", "buy", "place order", "order now", "purchase",
             "proceed to payment", "razorpay", "complete order", "pay for my cart",
             "order my cart", "buy this", "buy now", "take my money", "open checkout",
@@ -1292,7 +1344,7 @@ class CommerceAgent:
             "get me", "take this", "i want this", "i will take"
         ])
 
-        if is_checkout_intent and not action_data.get("checkout_payload"):
+        if is_checkout_intent and not action_data.get("checkout_payload") and not action_data.get("autonomous_agent_pay"):
             current_cart = cart_manager.get_cart(user_id)
             if not current_cart.get("items"):
                 resolved_p = _resolve_product_from_text_or_history(prompt, conversation_history)
@@ -1303,26 +1355,52 @@ class CommerceAgent:
                     current_cart = action_data["cart"]
 
             if current_cart.get("items"):
-                chk_res = self.execute_tool("trigger_razorpay_checkout", {}, user_id=user_id)
-                executed_tools_trace.append({
-                    "name": "trigger_razorpay_checkout",
-                    "args": {},
-                    "output": chk_res
-                })
-                if chk_res.get("needs_razorpay_checkout"):
-                    action_data["checkout_payload"] = chk_res
+                if is_ap2_intent:
+                    ap2_res = self.execute_tool("autonomous_agent_pay", {}, user_id=user_id)
+                    executed_tools_trace.append({
+                        "name": "autonomous_agent_pay",
+                        "args": {},
+                        "output": ap2_res
+                    })
+                    action_data["autonomous_agent_pay"] = ap2_res
                     action_data["cart"] = cart_manager.get_cart(user_id)
-                    total_amount = current_cart.get("estimated_total", 0.0)
-                    items_names = ", ".join([f"{item.get('name', 'Product')} (x{item.get('quantity', 1)})" for item in current_cart.get("items", [])])
-                    checkout_msg = (
-                        f"🛒 **Order Prepared!** {items_names}\n\n"
-                        f"**Cart Total:** **₹{total_amount:,.2f}** ({current_cart.get('item_count', 0)} item(s) • 0% Tax)\n\n"
-                        f"Opening the **Razorpay Secure Checkout popup** on your screen now (supporting UPI, Cards, NetBanking, and Wallets)!"
-                    )
-                    if not final_text or ("added" in final_text and "Razorpay" not in final_text) or "Would you like" in final_text:
-                        final_text = checkout_msg.strip()
-                    elif "Razorpay" not in final_text and "checkout" not in final_text.lower():
-                        final_text += f"\n\n{checkout_msg}"
+                    if ap2_res.get("order"):
+                        action_data["order"] = ap2_res.get("order")
+                        action_data["latest_order"] = ap2_res.get("order")
+                    action_data["orders"] = order_manager.get_orders_by_user(user_id)
+                    if ap2_res.get("success"):
+                        total_amount = ap2_res.get("amount", current_cart.get("estimated_total", 0.0))
+                        final_text = (
+                            f"🤖 **AP2 Autonomous Payment Executed Successfully!**\n\n"
+                            f"• **Order ID:** `#{ap2_res.get('order_id')}`\n"
+                            f"• **Razorpay Payment ID:** `{ap2_res.get('razorpay_payment_id')}`\n"
+                            f"• **Total Paid:** **₹{total_amount:,.2f}** (0% Tax)\n"
+                            f"• **Payment Protocol:** Pre-authorized AP2 Cryptographic Mandate on Razorpay\n\n"
+                            f"Your payment has been verified by the **Finance Manager Agent** and dispatched to the fleet!"
+                        )
+                    else:
+                        final_text = f"❌ AP2 Payment failed: {ap2_res.get('error', 'Mandate issue')}. Please use standard Razorpay checkout."
+                else:
+                    chk_res = self.execute_tool("trigger_razorpay_checkout", {}, user_id=user_id)
+                    executed_tools_trace.append({
+                        "name": "trigger_razorpay_checkout",
+                        "args": {},
+                        "output": chk_res
+                    })
+                    if chk_res.get("needs_razorpay_checkout"):
+                        action_data["checkout_payload"] = chk_res
+                        action_data["cart"] = cart_manager.get_cart(user_id)
+                        total_amount = current_cart.get("estimated_total", 0.0)
+                        items_names = ", ".join([f"{item.get('name', 'Product')} (x{item.get('quantity', 1)})" for item in current_cart.get("items", [])])
+                        checkout_msg = (
+                            f"🛒 **Order Prepared!** {items_names}\n\n"
+                            f"**Cart Total:** **₹{total_amount:,.2f}** ({current_cart.get('item_count', 0)} item(s) • 0% Tax)\n\n"
+                            f"Opening the **Razorpay Secure Checkout popup** on your screen now (supporting UPI, Cards, NetBanking, and Wallets)!"
+                        )
+                        if not final_text or ("added" in final_text and "Razorpay" not in final_text) or "Would you like" in final_text:
+                            final_text = checkout_msg.strip()
+                        elif "Razorpay" not in final_text and "checkout" not in final_text.lower():
+                            final_text += f"\n\n{checkout_msg}"
             else:
                 if not final_text:
                     final_text = "Your shopping cart is currently empty! Please select a product from our catalog, and I'll immediately add it and open the Razorpay checkout popup for you."

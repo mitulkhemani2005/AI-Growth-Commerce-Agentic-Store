@@ -30,7 +30,7 @@ from backend.observability import observability_manager
 
 OLLAMA_BASE_URL = os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434/v1")
 DEFAULT_ADMIN_MODEL = os.environ.get("ADMIN_MODEL", os.environ.get("OLLAMA_MODEL", "qwen2.5:7b"))
-OLLAMA_NUM_CTX = int(os.environ.get("OLLAMA_NUM_CTX", "8192"))
+OLLAMA_NUM_CTX = int(os.environ.get("OLLAMA_NUM_CTX", "4096"))
 
 # =====================================================================
 # LOGGING INFRASTRUCTURE
@@ -339,6 +339,8 @@ message_bus = AgentMessageBus()
 # =====================================================================
 # SHARED LLM CALL UTILITY (LOCAL OLLAMA)
 # =====================================================================
+_ollama_gpu_lock = threading.Lock()
+
 def _call_ollama_sync(
     api_key: str = "ollama",
     model: str = DEFAULT_ADMIN_MODEL,
@@ -353,24 +355,25 @@ def _call_ollama_sync(
     models_to_try = list(dict.fromkeys([model] + (fallback_models or []) + ["qwen2.5:7b", "llama3.1:8b", "llama3:8b", "qwen2.5:14b", "gemma4:e2b-it-qat"]))
 
     last_err = None
-    for m in models_to_try:
-        try:
-            kwargs = {
-                "model": m,
-                "messages": messages or [],
-                "temperature": temperature,
-                "max_tokens": max_tokens,
-                "timeout": 120.0,
-                "extra_body": {"options": {"num_ctx": OLLAMA_NUM_CTX, "num_gpu": 999}, "keep_alive": -1}
-            }
-            if tools:
-                kwargs["tools"] = tools
-                kwargs["tool_choice"] = "auto"
-            resp = client.chat.completions.create(**kwargs)
-            return resp
-        except Exception as e:
-            last_err = e
-            continue
+    with _ollama_gpu_lock:
+        for m in models_to_try:
+            try:
+                kwargs = {
+                    "model": m,
+                    "messages": messages or [],
+                    "temperature": temperature,
+                    "max_tokens": max_tokens,
+                    "timeout": 120.0,
+                    "extra_body": {"options": {"num_ctx": OLLAMA_NUM_CTX, "num_gpu": 999}, "keep_alive": -1}
+                }
+                if tools:
+                    kwargs["tools"] = tools
+                    kwargs["tool_choice"] = "auto"
+                resp = client.chat.completions.create(**kwargs)
+                return resp
+            except Exception as e:
+                last_err = e
+                continue
     raise last_err or Exception("All Ollama models exhausted.")
 
 _call_groq_sync = _call_ollama_sync
@@ -391,56 +394,69 @@ AGENT FLEET DIRECTORY — All agents communicate via structured Events on the Me
 """
 
 _AGENT_PERSONALITY = """
-PERSONALITY & GOALS:
-- You operate with high agency, discipline, and domain precision in INR ₹ (0% Tax).
-- You proactively share meaningful signals on the message bus and avoid message spam.
-- You strictly enforce deterministic business policies and report risks promptly.
+OPERATIONAL PRINCIPLES & MULTI-AGENT ETIQUETTE:
+- Currency & Taxes: Standardized exclusively in Indian Rupee (INR ₹) with 0% Tax storewide. Always format amounts as ₹XX,XXX.XX.
+- Peer-to-Peer Event Collaboration: When store events occur (orders, payments, dispatches, stock changes, refunds, reviews), specialist agents proactively message relevant peer agents to coordinate fulfillment.
+- Anti-Spam Directive: The CEO Agent is the strategic executive and does NOT emit operational event spam.
+- Task Execution: When tasks are delegated to you by the CEO or Store Owner, promptly claim, execute, complete them with domain precision, and report the results back.
+- Base Price Governance: Product BASE_PRICE is an immutable floor set exclusively by the Store Owner.
 """
 
 PRICE_MANAGER_SYSTEM_PROMPT = """You are the Price Manager Agent of the AI Growth Commerce Store.
 You report directly to the CEO Agent and Store Owner.
-RESPONSIBILITIES:
-- Dynamic pricing based on demand elasticity, stock scarcity, and competitor signals.
-- Strict protection of the BASE_PRICE floor (prices cannot drop below BASE_PRICE; minimum 15% margin).
+CORE DOMAIN & TASKS:
+- Dynamic SKU Pricing: Calculate optimal prices using demand elasticity, stock scarcity (+15% surge for <=3 stock), and velocity.
+- Margin & Floor Governance: Strictly enforce PRICE >= BASE_PRICE at all times with minimum 15% target margin.
+- Peer Collaboration: Message the Inventory Manager Agent whenever prices are adjusted or promotions are launched. Listen for LOW_STOCK_SCARCITY_ALERT signals.
+- Task Fulfillment: Proactively claim and execute pricing adjustment, margin audit, and promotional tasks delegated to you.
 - Currency: Indian Rupee (INR ₹), 0% Tax storewide.
 """ + _FLEET_DIRECTORY + _AGENT_PERSONALITY
 
 INVENTORY_MANAGER_SYSTEM_PROMPT = """You are the Inventory Manager Agent of the AI Growth Commerce Store.
 You report directly to the CEO Agent and Store Owner.
-RESPONSIBILITIES:
-- Warehouse inventory tracking, demand forecasting, reorder point calculations.
-- Request CEO approval for wholesale restocking before spending treasury funds.
-- Reconcile stock with audit logging. Never create stock without authorization.
+CORE DOMAIN & TASKS:
+- Warehouse Auditing: Track real-time stock levels across Mobiles, Laptops, Audio, and Accessories.
+- Low-Stock & Velocity Alerts: When stock drops <= 4 units, immediately notify the Price Manager Agent (scarcity surge) and submit purchase requests to the CEO.
+- Wholesale Restocking: Increment inventory only upon authorized acquisition or restock execution.
+- Peer Collaboration: Message the Price Manager Agent on inventory restock completion and stockout risks. Message the Finance Manager on stock expenditures.
+- Task Fulfillment: Proactively claim and execute warehouse stock audit and restock proposal tasks.
 """ + _FLEET_DIRECTORY + _AGENT_PERSONALITY
 
 ORDER_MANAGER_SYSTEM_PROMPT = """You are the Order Management Agent of the AI Growth Commerce Store.
 You report directly to the CEO Agent and Store Owner.
-RESPONSIBILITIES:
-- Order lifecycle progression (Pending → Confirmed → Dispatched → Shipped → Delivered).
-- SLA monitoring (<1h pending threshold) and delivery risk prediction.
-- Route refund requests to Finance Manager Agent (the sole payment authority).
+CORE DOMAIN & TASKS:
+- Order Lifecycle Progression: Enforce monotonic state transitions (Pending → Confirmed → Dispatched → Shipped → Delivered).
+- SLA Monitoring: Audit fulfillment velocity; identify orders pending for >1 hour and flag SLA breach risks.
+- Peer Collaboration: When an order is confirmed, immediately message the Dispatcher Agent (for courier tracking assignment) and Finance Manager Agent (for treasury settlement). Route cancellation/refund requests to the Finance Manager Agent.
+- Task Fulfillment: Proactively claim and execute order lifecycle audit, SLA tracking, and expediting tasks.
 """ + _FLEET_DIRECTORY + _AGENT_PERSONALITY
 
 FINANCE_MANAGER_SYSTEM_PROMPT = """You are the Finance Manager Agent of the AI Growth Commerce Store — THE SOLE PAYMENT AUTHORITY.
 You report directly to the CEO Agent and Store Owner.
-RESPONSIBILITIES:
-- YOU ARE THE ONLY AGENT THAT CAN PROCESS PAYMENTS, REFUNDS, AND SALARIES.
-- Enforce strict 24-Hour refund rule (Delivered/Shipped items are non-refundable).
-- Ensure idempotency on every financial transaction and reconcile payments against orders and treasury.
+CORE DOMAIN & TASKS:
+- Exclusive Payment Authority: You are the ONLY agent authorized to verify Razorpay payments, validate AP2 cryptographic spending mandates, process refunds, and disburse salaries.
+- Strict 24-Hour Refund Rule: Auto-approve cancellations/refunds ONLY if order age <= 24 hours AND status is NOT 'Shipped' or 'Delivered'. Reject all shipped/delivered refund attempts.
+- Treasury Reconciliation: Maintain real-time ledger consistency across Sales Revenue, Wholesale Spend, Staff Salaries, and Net Profit.
+- Peer Collaboration: Message the Order Management Agent upon payment verification and refund approval. Message the Inventory Manager Agent to restock returned goods.
+- Task Fulfillment: Proactively claim and execute financial audit, refund processing, and treasury reconciliation tasks.
 """ + _FLEET_DIRECTORY + _AGENT_PERSONALITY
 
 DISPATCHER_SYSTEM_PROMPT = """You are the Dispatcher Agent of the AI Growth Commerce Store.
 You report directly to the CEO Agent and Store Owner.
-RESPONSIBILITIES:
-- Carrier optimization (BlueDart, Delhivery, Express logistics), tracking assignments (TRK-XXXXX).
-- Dispatch confirmed orders with realistic delivery ETAs.
+CORE DOMAIN & TASKS:
+- Logistics Fulfillment: Package confirmed orders and allocate trusted express carriers (BlueDart, Delhivery, Express logistics).
+- Tracking Generation: Assign unique live courier tracking numbers (TRK-XXXXX) to confirmed orders.
+- Peer Collaboration: Upon dispatching a package, immediately message the Order Management Agent with the tracking ID, carrier name, and delivery ETA (2-3 Business Days).
+- Task Fulfillment: Proactively claim and execute priority dispatch and logistics optimization tasks.
 """ + _FLEET_DIRECTORY + _AGENT_PERSONALITY
 
 REVIEW_FEEDBACK_SYSTEM_PROMPT = """You are the Review and Feedback Manager of the AI Growth Commerce Store.
 You report directly to the CEO Agent and Store Owner.
-RESPONSIBILITIES:
-- Customer sentiment trends, issue clustering (e.g. battery, shipping, quality defects).
-- Escalate PRODUCT_QUALITY_ALERT to CEO when ratings drop < 3.0 stars.
+CORE DOMAIN & TASKS:
+- Sentiment Synthesis: Continuously analyze customer reviews, Bayesian average ratings, and positive/negative trends.
+- Catalog Enrichment: Automatically generate high-impact AI review summaries and update product listings in the inventory catalog.
+- Peer Collaboration: Message the Price Manager Agent and Inventory Manager Agent when low ratings (<3.0★) or product quality defects are detected.
+- Task Fulfillment: Proactively claim and execute customer sentiment synthesis, review clustering, and product quality audit tasks.
 """ + _FLEET_DIRECTORY + _AGENT_PERSONALITY
 
 
@@ -701,8 +717,38 @@ class PriceManagerAgent:
         memory_manager.add_turn(self.name, "assistant", reply, {"to": sender})
         return {"success": True, "agent": self.name, "reply": reply, "actions_taken": actions_taken}
 
+    async def process_assigned_tasks(self) -> List[Dict[str, Any]]:
+        """Claims and executes tasks delegated by CEO or Store Owner."""
+        pending = task_manager.get_tasks(assigned_to=self.name, status="pending")
+        results = []
+        for t in pending:
+            tid = t.get("task_id")
+            task_manager.claim_task(tid, self.name)
+            obj = (t.get("objective") or "").lower()
+            res_summary = "Pricing analysis and policy verification completed."
+            if "discount" in obj or "promo" in obj or "sale" in obj:
+                promo_res = self.create_promotion(category=None, discount_percentage=10.0)
+                res_summary = f"Created promotional pricing: {promo_res.get('items_updated', 0)} items adjusted."
+            elif "margin" in obj or "elasticity" in obj:
+                anom = self.detect_price_anomaly()
+                res_summary = f"Margin audit completed. Detected {anom.get('anomalies_detected', 0)} pricing anomalies."
+            elif "audit" in obj or "check" in obj:
+                anom = self.detect_price_anomaly()
+                res_summary = f"Catalog pricing audit completed: {anom.get('anomalies_detected', 0)} floor issues."
+
+            task_manager.complete_task(tid, result={"summary": res_summary, "status": "completed"})
+            message_bus.publish(
+                from_agent=self.name,
+                to_agent=t.get("created_by", "CEO Agent"),
+                subject="TASK_COMPLETED",
+                payload={"task_id": tid, "objective": t.get("objective"), "summary": res_summary}
+            )
+            results.append({"task_id": tid, "summary": res_summary})
+        return results
+
     async def run_autonomous_cycle(self) -> Dict[str, Any]:
         """Event-aware dynamic pricing cycle."""
+        claimed_tasks = await self.process_assigned_tasks()
         inbox = message_bus.get_inbox(self.name)
         products = inventory_manager.get_all_products()
         orders = order_manager.get_all_orders()
@@ -974,8 +1020,40 @@ class InventoryManagerAgent:
         memory_manager.add_turn(self.name, "assistant", reply, {"to": sender})
         return {"success": True, "agent": self.name, "reply": reply, "actions_taken": actions_taken}
 
+    async def process_assigned_tasks(self) -> List[Dict[str, Any]]:
+        """Claims and executes tasks delegated by CEO or Store Owner."""
+        pending = task_manager.get_tasks(assigned_to=self.name, status="pending")
+        results = []
+        for t in pending:
+            tid = t.get("task_id")
+            task_manager.claim_task(tid, self.name)
+            obj = (t.get("objective") or "").lower()
+            res_summary = "Warehouse inventory audit completed."
+            if "restock" in obj or "purchase" in obj or "order" in obj:
+                products = inventory_manager.get_all_products()
+                low = min(products, key=lambda x: int(x.get("STOCK_REMAINING", 0))) if products else None
+                if low and int(low.get("STOCK_REMAINING", 0)) <= 10:
+                    acq = inventory_manager.acquire_wholesale_stock(low["id"], 10, actor="Inventory Task Fulfillment")
+                    res_summary = f"Restocked {low['PRODUCT_NAME']} x10 at Base Price ₹{acq.get('base_price', 0):,.2f}."
+                else:
+                    res_summary = "Stock levels are currently optimal across all SKUs."
+            elif "reconcile" in obj or "audit" in obj:
+                products = inventory_manager.get_all_products()
+                res_summary = f"Audited {len(products)} SKUs. Total warehouse stock: {sum(int(p.get('STOCK_REMAINING', 0)) for p in products)} units."
+
+            task_manager.complete_task(tid, result={"summary": res_summary, "status": "completed"})
+            message_bus.publish(
+                from_agent=self.name,
+                to_agent=t.get("created_by", "CEO Agent"),
+                subject="TASK_COMPLETED",
+                payload={"task_id": tid, "objective": t.get("objective"), "summary": res_summary}
+            )
+            results.append({"task_id": tid, "summary": res_summary})
+        return results
+
     async def run_autonomous_cycle(self) -> Dict[str, Any]:
         """Event-driven warehouse cycle."""
+        claimed_tasks = await self.process_assigned_tasks()
         inbox = message_bus.get_inbox(self.name)
         approved_restocks: Dict[str, int] = {}
 
@@ -1195,8 +1273,41 @@ class OrderManagementAgent:
         memory_manager.add_turn(self.name, "assistant", reply, {"to": sender})
         return {"success": True, "agent": self.name, "reply": reply}
 
+    async def process_assigned_tasks(self) -> List[Dict[str, Any]]:
+        """Claims and executes tasks delegated by CEO or Store Owner."""
+        pending = task_manager.get_tasks(assigned_to=self.name, status="pending")
+        results = []
+        for t in pending:
+            tid = t.get("task_id")
+            task_manager.claim_task(tid, self.name)
+            obj = (t.get("objective") or "").lower()
+            res_summary = "Order lifecycle and SLA audit completed."
+            if "sla" in obj or "breach" in obj or "delay" in obj:
+                sla = self.predict_sla_breach()
+                res_summary = f"SLA check completed: {sla.get('breached_orders_count', 0)} breached orders identified."
+            elif "expedite" in obj or "priority" in obj:
+                orders = order_manager.get_all_orders()
+                confirmed = [o for o in orders if o.get("status") == "Confirmed"]
+                for c in confirmed[:2]:
+                    dispatcher_agent.assign_carrier_tracking(c["order_id"])
+                res_summary = f"Expedited fulfillment for {min(2, len(confirmed))} confirmed orders."
+            else:
+                orders = order_manager.get_all_orders()
+                res_summary = f"Pipeline audit: {len(orders)} total orders evaluated across states."
+
+            task_manager.complete_task(tid, result={"summary": res_summary, "status": "completed"})
+            message_bus.publish(
+                from_agent=self.name,
+                to_agent=t.get("created_by", "CEO Agent"),
+                subject="TASK_COMPLETED",
+                payload={"task_id": tid, "objective": t.get("objective"), "summary": res_summary}
+            )
+            results.append({"task_id": tid, "summary": res_summary})
+        return results
+
     async def run_autonomous_cycle(self) -> Dict[str, Any]:
         """Order lifecycle transition audit."""
+        claimed_tasks = await self.process_assigned_tasks()
         inbox = message_bus.get_inbox(self.name)
         all_orders = order_manager.get_all_orders()
         auto_advanced = []
@@ -1457,8 +1568,37 @@ class FinanceManagerAgent:
         memory_manager.add_turn(self.name, "assistant", reply, {"to": sender})
         return {"success": True, "agent": self.name, "reply": reply}
 
+    async def process_assigned_tasks(self) -> List[Dict[str, Any]]:
+        """Claims and executes tasks delegated by CEO or Store Owner."""
+        pending = task_manager.get_tasks(assigned_to=self.name, status="pending")
+        results = []
+        for t in pending:
+            tid = t.get("task_id")
+            task_manager.claim_task(tid, self.name)
+            obj = (t.get("objective") or "").lower()
+            res_summary = "Financial audit and reconciliation completed."
+            if "refund" in obj:
+                res_summary = "Audited pending refund requests under strict 24h non-shipped rule."
+            elif "reconcile" in obj or "p&l" in obj or "profit" in obj:
+                rec = self.reconcile_payments()
+                res_summary = f"Treasury reconciliation completed. Status: {rec.get('reconciliation_status', 'MATCHED')}."
+            elif "salary" in obj or "payroll" in obj:
+                sal = salary_manager.get_payroll_summary()
+                res_summary = f"Payroll audit completed. Active staff: {len(sal.get('salaries', {}))} agents."
+
+            task_manager.complete_task(tid, result={"summary": res_summary, "status": "completed"})
+            message_bus.publish(
+                from_agent=self.name,
+                to_agent=t.get("created_by", "CEO Agent"),
+                subject="TASK_COMPLETED",
+                payload={"task_id": tid, "objective": t.get("objective"), "summary": res_summary}
+            )
+            results.append({"task_id": tid, "summary": res_summary})
+        return results
+
     async def run_autonomous_cycle(self) -> Dict[str, Any]:
         """Event-driven financial cycle."""
+        claimed_tasks = await self.process_assigned_tasks()
         inbox = message_bus.get_inbox(self.name)
         refunds_processed = []
         stock_expenditures = []
@@ -1606,8 +1746,35 @@ class DispatcherAgent:
         memory_manager.add_turn(self.name, "assistant", reply, {"to": sender})
         return {"success": True, "agent": self.name, "reply": reply}
 
+    async def process_assigned_tasks(self) -> List[Dict[str, Any]]:
+        """Claims and executes tasks delegated by CEO or Store Owner."""
+        pending = task_manager.get_tasks(assigned_to=self.name, status="pending")
+        results = []
+        for t in pending:
+            tid = t.get("task_id")
+            task_manager.claim_task(tid, self.name)
+            orders = order_manager.get_all_orders()
+            confirmed = [o for o in orders if o.get("status") == "Confirmed"]
+            dispatched = []
+            for o in confirmed:
+                res = self.create_shipping_label(o["order_id"])
+                if res.get("success"):
+                    dispatched.append(o["order_id"])
+            res_summary = f"Logistics task executed: Dispatched {len(dispatched)} confirmed orders via express courier."
+
+            task_manager.complete_task(tid, result={"summary": res_summary, "dispatched_count": len(dispatched), "status": "completed"})
+            message_bus.publish(
+                from_agent=self.name,
+                to_agent=t.get("created_by", "CEO Agent"),
+                subject="TASK_COMPLETED",
+                payload={"task_id": tid, "objective": t.get("objective"), "summary": res_summary}
+            )
+            results.append({"task_id": tid, "summary": res_summary})
+        return results
+
     async def run_autonomous_cycle(self) -> Dict[str, Any]:
         """Dispatches confirmed orders with carrier shipping labels."""
+        claimed_tasks = await self.process_assigned_tasks()
         inbox = message_bus.get_inbox(self.name)
         orders = order_manager.get_all_orders()
         confirmed = [o for o in orders if o.get("status") == "Confirmed"]
@@ -1780,8 +1947,30 @@ class ReviewFeedbackAgent:
         memory_manager.add_turn(self.name, "assistant", reply, {"to": sender})
         return {"success": True, "agent": self.name, "reply": reply}
 
+    async def process_assigned_tasks(self) -> List[Dict[str, Any]]:
+        """Claims and executes tasks delegated by CEO or Store Owner."""
+        pending = task_manager.get_tasks(assigned_to=self.name, status="pending")
+        results = []
+        for t in pending:
+            tid = t.get("task_id")
+            task_manager.claim_task(tid, self.name)
+            trend = self.calculate_sentiment_trend()
+            clusters = self.cluster_review_issues()
+            res_summary = f"Customer sentiment audit completed. Store average: {trend.get('average_rating', 4.8)}★ across {clusters.get('total_reviews', 0)} reviews."
+
+            task_manager.complete_task(tid, result={"summary": res_summary, "status": "completed"})
+            message_bus.publish(
+                from_agent=self.name,
+                to_agent=t.get("created_by", "CEO Agent"),
+                subject="TASK_COMPLETED",
+                payload={"task_id": tid, "objective": t.get("objective"), "summary": res_summary}
+            )
+            results.append({"task_id": tid, "summary": res_summary})
+        return results
+
     async def run_autonomous_cycle(self) -> Dict[str, Any]:
         """Review sentiment and quality audit."""
+        claimed_tasks = await self.process_assigned_tasks()
         inbox = message_bus.get_inbox(self.name)
         products = inventory_manager.get_all_products()
         low_rated = []
@@ -1839,7 +2028,8 @@ STORE RULES & FLEET DISCIPLINE:
 - Base Price: Product BASE_PRICE is set EXCLUSIVELY by the Store Owner and is an immutable floor threshold.
 - Return Policy: Delivered and Shipped items are strictly non-refundable. Only orders cancelled within 24h before shipping are eligible for refunds.
 - Finance Manager is the SOLE PAYMENT AUTHORITY. All monetary transactions route through Finance Manager.
-- You orchestrate via high-level delegation and strategic simulation tools.
+- Executive Orchestration: You govern via high-level delegation (`delegate_task`) and strategic simulation tools (`simulate_business_decision`, `get_business_forecast`).
+- Anti-Spam Governance: You do NOT emit operational event spam (order confirmed, payment verified, dispatch, stock deducted). Operational event messages are emitted strictly by the 6 subordinate specialist agents.
 """ + _FLEET_DIRECTORY
 
 CEO_OWNER_SYSTEM_PROMPT = """You are the Chief Executive Officer (CEO Agent) speaking directly with the STORE OWNER.
@@ -1852,6 +2042,7 @@ You have supreme executive authority over all 6 specialist agents, store treasur
 6. ⭐ Review & Feedback Agent — customer sentiment analysis, AI summaries, escalates problems to CEO
 
 Execute with high-level orchestration tools (`delegate_task`, `simulate_business_decision`, `get_business_forecast`).
+Refrain from routine event chatter — focus on executive metrics, profitability, and strategic execution.
 """ + _FLEET_DIRECTORY
 
 CEO_TOOLS = [

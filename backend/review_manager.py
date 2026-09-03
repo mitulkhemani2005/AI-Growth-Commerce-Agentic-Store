@@ -95,6 +95,22 @@ class ReviewManager:
                 rating=avg_rating
             )
 
+        # Emit review event to notify Price Manager & Fleet
+        try:
+            from backend.events import emit_store_event, EventType
+            emit_store_event(
+                event_type=EventType.REVIEW_SUBMITTED,
+                source_agent="Review and Feedback Manager",
+                payload={
+                    "product_id": product_id,
+                    "product_name": p_name,
+                    "rating": new_rev["rating"],
+                    "review_text": new_rev["review_text"]
+                }
+            )
+        except Exception as e:
+            print(f"[Review Event Error]: {e}", flush=True)
+
         return {
             "success": True,
             "message": f"Review added for '{p_name}'.",
@@ -168,7 +184,7 @@ Format with clear bullet points and bold highlights. Keep it under 150 words."""
                         ],
                         temperature=0.3,
                         max_tokens=1000,
-                        extra_body={"keep_alive": -1}
+                        extra_body={"options": {"num_ctx": 4096, "num_gpu": 999}, "keep_alive": -1}
                     )
                     raw_text = chat_resp.choices[0].message.content or ""
                     import re

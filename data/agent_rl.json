@@ -1141,19 +1141,20 @@
     "alpha": 0.15,
     "gamma": 0.85,
     "epsilon": 0.1,
-    "total_rewards": 22.0,
-    "episode_count": 20,
+    "total_rewards": 26.0,
+    "episode_count": 24,
     "action_counts": {
-      "purchase_assistant": 12,
+      "purchase_assistant": 13,
       "add_to_cart": 1,
       "trigger_razorpay_checkout": 1,
       "recommend_products": 2,
       "compare_products": 2,
-      "apply_coupon": 2
+      "apply_coupon": 2,
+      "autonomous_agent_pay": 3
     },
     "q_table": {
       "tool=purchase_assist|user_id=user_test": {
-        "purchase_assistant": 0.7685
+        "purchase_assistant": 0.8032
       },
       "tool=add_to_cart|user_id=user_alex": {
         "add_to_cart": 0.45
@@ -1175,6 +1176,9 @@
       },
       "tool=purchase_assist|user_id=user_alex": {
         "purchase_assistant": 0.15
+      },
+      "tool=autonomous_agen|user_id=test_chat_user_": {
+        "autonomous_agent_pay": 0.3859
       }
     },
     "history": [
@@ -1337,6 +1341,38 @@
         "next_state": "success=1",
         "q_after": 0.15,
         "timestamp": "2026-08-30T21:40:57.026276"
+      },
+      {
+        "state": "tool=purchase_assist|user_id=user_test",
+        "action": "purchase_assistant",
+        "reward": 1.0,
+        "next_state": "success=1",
+        "q_after": 0.8032,
+        "timestamp": "2026-09-03T17:48:05.512328"
+      },
+      {
+        "state": "tool=autonomous_agen|user_id=test_chat_user_",
+        "action": "autonomous_agent_pay",
+        "reward": 1.0,
+        "next_state": "success=1",
+        "q_after": 0.15,
+        "timestamp": "2026-09-03T18:00:14.764572"
+      },
+      {
+        "state": "tool=autonomous_agen|user_id=test_chat_user_",
+        "action": "autonomous_agent_pay",
+        "reward": 1.0,
+        "next_state": "success=1",
+        "q_after": 0.2775,
+        "timestamp": "2026-09-03T18:01:10.503870"
+      },
+      {
+        "state": "tool=autonomous_agen|user_id=test_chat_user_",
+        "action": "autonomous_agent_pay",
+        "reward": 1.0,
+        "next_state": "success=1",
+        "q_after": 0.3859,
+        "timestamp": "2026-09-03T18:27:29.022672"
       }
     ]
   }

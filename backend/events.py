@@ -195,6 +195,210 @@ class EventRouter:
 event_router = EventRouter()
 
 
+def dispatch_agent_event_message(event: Event):
+    """
+    Translates store lifecycle events into rich inter-agent messages between specialist agents.
+    RULE: The CEO Agent is EXPLICITLY EXCLUDED from sending event-level messages.
+    """
+    from backend.admin_agents import message_bus
+
+    # If the source is CEO Agent, do not broadcast event-level messaging spam
+    if event.source_agent and "ceo" in event.source_agent.lower():
+        return
+
+    etype = event.event_type
+    p = event.payload or {}
+
+    if etype == EventType.ORDER_CONFIRMED:
+        oid = p.get("order_id", "Unknown")
+        total = float(p.get("total", 0.0))
+        items_summary = p.get("items_summary") or f"{len(p.get('items', []))} item(s)"
+        # 1. Order Manager notifies Dispatcher Agent
+        message_bus.publish(
+            from_agent="Order Management Agent",
+            to_agent="Dispatcher Agent",
+            subject="ORDER_CONFIRMED",
+            payload={
+                "order_id": oid,
+                "total": total,
+                "items_summary": items_summary,
+                "shipping_address": p.get("shipping_address", ""),
+                "action_required": "Assign express courier tracking (TRK-XXXXX) and prepare package dispatch."
+            },
+            priority="high",
+            correlation_id=event.correlation_id
+        )
+        # 2. Order Manager notifies Finance Manager Agent
+        message_bus.publish(
+            from_agent="Order Management Agent",
+            to_agent="Finance Manager Agent",
+            subject="ORDER_PAYMENT_CAPTURED",
+            payload={
+                "order_id": oid,
+                "total": total,
+                "payment_method": p.get("payment_method", "Razorpay Gateway"),
+                "action_required": "Verify settlement and reconcile treasury ledger."
+            },
+            priority="normal",
+            correlation_id=event.correlation_id
+        )
+
+    elif etype == EventType.ORDER_DISPATCHED:
+        oid = p.get("order_id", "Unknown")
+        trk = p.get("tracking_number", "TRK-Pending")
+        carrier = p.get("carrier", "BlueDart Express")
+        # Dispatcher notifies Order Manager
+        message_bus.publish(
+            from_agent="Dispatcher Agent",
+            to_agent="Order Management Agent",
+            subject="ORDER_DISPATCHED",
+            payload={
+                "order_id": oid,
+                "tracking_number": trk,
+                "carrier": carrier,
+                "eta": p.get("eta", "2-3 Business Days"),
+                "details": f"Parcel handed to {carrier} under tracking #{trk}."
+            },
+            priority="high",
+            correlation_id=event.correlation_id
+        )
+
+    elif etype == EventType.ORDER_SHIPPED:
+        oid = p.get("order_id", "Unknown")
+        message_bus.publish(
+            from_agent="Order Management Agent",
+            to_agent="Dispatcher Agent",
+            subject="ORDER_SHIPPED",
+            payload={"order_id": oid, "status": "Shipped", "tracking_number": p.get("tracking_number")},
+            priority="normal",
+            correlation_id=event.correlation_id
+        )
+
+    elif etype == EventType.ORDER_DELIVERED:
+        oid = p.get("order_id", "Unknown")
+        message_bus.publish(
+            from_agent="Order Management Agent",
+            to_agent="Review and Feedback Manager",
+            subject="ORDER_DELIVERED",
+            payload={"order_id": oid, "customer": p.get("customer", ""), "action_required": "Track customer satisfaction and solicit verified review."},
+            priority="normal",
+            correlation_id=event.correlation_id
+        )
+
+    elif etype in [EventType.ORDER_CANCELLED, EventType.REFUND_REQUESTED]:
+        oid = p.get("order_id", "Unknown")
+        message_bus.publish(
+            from_agent="Order Management Agent",
+            to_agent="Finance Manager Agent",
+            subject="REFUND_REQUEST",
+            payload={"order_id": oid, "reason": p.get("reason", "Customer cancellation"), "total": float(p.get("total", 0.0)), "action_required": "Evaluate 24h non-shipped refund policy and disburse funds."},
+            priority="high",
+            correlation_id=event.correlation_id
+        )
+
+    elif etype in [EventType.REFUND_COMPLETED, EventType.REFUND_APPROVED]:
+        oid = p.get("order_id", "Unknown")
+        amt = float(p.get("amount") or p.get("total", 0.0))
+        # Finance notifies Order Manager
+        message_bus.publish(
+            from_agent="Finance Manager Agent",
+            to_agent="Order Management Agent",
+            subject="REFUND_COMPLETED",
+            payload={"order_id": oid, "amount": amt, "status": "Refunded", "details": f"Refund of ₹{amt:,.2f} disbursed to customer."},
+            priority="high",
+            correlation_id=event.correlation_id
+        )
+        # Finance notifies Inventory Manager to restock
+        message_bus.publish(
+            from_agent="Finance Manager Agent",
+            to_agent="Inventory Manager Agent",
+            subject="RESTOCK_CANCELLED_ITEMS",
+            payload={"order_id": oid, "items": p.get("items", []), "action_required": "Restock returned items into warehouse inventory."},
+            priority="normal",
+            correlation_id=event.correlation_id
+        )
+
+    elif etype == EventType.PAYMENT_RECEIVED:
+        oid = p.get("order_id", "Unknown")
+        amt = float(p.get("amount", 0.0))
+        pid = p.get("payment_id", "")
+        # Finance notifies Order Manager
+        message_bus.publish(
+            from_agent="Finance Manager Agent",
+            to_agent="Order Management Agent",
+            subject="PAYMENT_RECEIVED",
+            payload={"order_id": oid, "payment_id": pid, "amount": amt, "method": p.get("payment_method", "Razorpay Gateway")},
+            priority="normal",
+            correlation_id=event.correlation_id
+        )
+
+    elif etype == EventType.PRODUCT_LOW_STOCK:
+        pname = p.get("product_name") or p.get("PRODUCT_NAME") or p.get("sku", "Item")
+        stock = p.get("stock_remaining", 0)
+        pid = p.get("product_id") or p.get("id", "")
+        # Inventory Manager notifies Price Manager
+        message_bus.publish(
+            from_agent="Inventory Manager Agent",
+            to_agent="Price Manager Agent",
+            subject="LOW_STOCK_SCARCITY_ALERT",
+            payload={"product_id": pid, "product_name": pname, "stock_remaining": stock, "action_required": "Evaluate margin surge for remaining stock."},
+            priority="high",
+            correlation_id=event.correlation_id
+        )
+
+    elif etype in [EventType.INVENTORY_RESTOCKED, EventType.RESTOCK_APPROVED]:
+        pname = p.get("product_name") or p.get("sku", "Item")
+        qty = p.get("quantity", 0)
+        pid = p.get("product_id", "")
+        cost = float(p.get("total_cost", 0.0))
+        # Inventory Manager notifies Price Manager
+        message_bus.publish(
+            from_agent="Inventory Manager Agent",
+            to_agent="Price Manager Agent",
+            subject="INVENTORY_RESTOCKED",
+            payload={"product_id": pid, "product_name": pname, "quantity_added": qty, "action_required": "Normalize selling price following stock replenishment."},
+            priority="normal",
+            correlation_id=event.correlation_id
+        )
+        if cost > 0:
+            # Inventory Manager notifies Finance Manager
+            message_bus.publish(
+                from_agent="Inventory Manager Agent",
+                to_agent="Finance Manager Agent",
+                subject="STOCK_PURCHASE_COMPLETED",
+                payload={"product_id": pid, "product_name": pname, "quantity": qty, "cost": cost},
+                priority="normal",
+                correlation_id=event.correlation_id
+            )
+
+    elif etype == EventType.PRICE_CHANGED:
+        pname = p.get("product_name", "Item")
+        new_p = float(p.get("new_price", 0.0))
+        old_p = float(p.get("old_price", 0.0))
+        # Price Manager notifies Inventory Manager
+        message_bus.publish(
+            from_agent="Price Manager Agent",
+            to_agent="Inventory Manager Agent",
+            subject="PRICE_ADJUSTED",
+            payload={"product_id": p.get("product_id", ""), "product_name": pname, "old_price": old_p, "new_price": new_p, "reason": p.get("reason", "Dynamic pricing recalibration")},
+            priority="normal",
+            correlation_id=event.correlation_id
+        )
+
+    elif etype == EventType.REVIEW_SUBMITTED:
+        pname = p.get("product_name", "Product")
+        rating = p.get("rating", 5)
+        # Review Manager notifies Price Manager
+        message_bus.publish(
+            from_agent="Review and Feedback Manager",
+            to_agent="Price Manager Agent",
+            subject="REVIEW_SUBMITTED",
+            payload={"product_id": p.get("product_id", ""), "product_name": pname, "rating": rating, "review": str(p.get("review_text", ""))[:100]},
+            priority="normal",
+            correlation_id=event.correlation_id
+        )
+
+
 def create_event(
     event_type: str,
     source_agent: str,
@@ -216,3 +420,35 @@ def create_event(
         operation_id=operation_id,
         requires_ack=requires_ack
     )
+
+
+def emit_store_event(
+    event_type: str,
+    source_agent: str,
+    payload: Optional[Dict[str, Any]] = None,
+    priority: str = "normal"
+) -> Event:
+    """
+    Synchronous and asynchronous safe dispatcher:
+    1. Creates a structured event.
+    2. Immediately dispatches the inter-agent peer message (excluding CEO).
+    3. Emits on the async event router if an event loop is active.
+    """
+    evt = create_event(
+        event_type=event_type,
+        source_agent=source_agent,
+        target_agent="ALL_AGENTS",
+        payload=payload or {},
+        priority=priority
+    )
+    try:
+        dispatch_agent_event_message(evt)
+    except Exception as e:
+        print(f"[Event Message Dispatch Warning] {e}", flush=True)
+
+    try:
+        loop = asyncio.get_running_loop()
+        loop.create_task(event_router.emit_event(evt))
+    except RuntimeError:
+        pass
+    return evt

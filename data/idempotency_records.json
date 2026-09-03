@@ -1,21 +1,49 @@
 {
-  "refund:ORD-5620-89FA": {
-    "operation_id": "refund:ORD-5620-89FA",
+  "refund:ORD-2302-D6AF": {
+    "operation_id": "refund:ORD-2302-D6AF",
     "operation_type": "REFUND",
     "actor": "Finance Manager Agent",
     "status": "SUCCESS",
-    "started_at": "2026-08-30T21:57:09.673476+00:00",
-    "started_at_ts": 1788127029.6734903,
-    "completed_at": "2026-08-30T21:57:09.791895+00:00",
+    "started_at": "2026-09-03T18:23:13.942814+00:00",
+    "started_at_ts": 1788459793.942827,
+    "completed_at": "2026-09-03T18:23:14.073602+00:00",
     "result": {
       "success": true,
-      "order_id": "ORD-5620-89FA",
-      "refund_amount": 50.31,
+      "order_id": "ORD-2302-D6AF",
+      "refund_amount": 50.25,
       "status": "Refunded",
-      "message": "Successfully refunded \u20b950.31 for Order #ORD-5620-89FA via Razorpay Gateway. Inventory restocked."
+      "message": "Successfully refunded \u20b950.25 for Order #ORD-2302-D6AF via Razorpay Gateway. Inventory restocked."
     },
     "error": null,
     "retry_count": 0,
     "metadata": {}
+  },
+  "refund:ORD-4926-7916": {
+    "operation_id": "refund:ORD-4926-7916",
+    "operation_type": "REFUND",
+    "actor": "Finance Manager Agent",
+    "status": "FAILED",
+    "started_at": "2026-09-03T21:00:19.285297+00:00",
+    "started_at_ts": 1788469219.2853136,
+    "completed_at": "2026-09-03T21:00:19.321035+00:00",
+    "result": null,
+    "error": "Order #ORD-4926-7916 has already been refunded.",
+    "retry_count": 0,
+    "metadata": {},
+    "allow_retry": true
+  },
+  "refund:ORD-5945-6F37": {
+    "operation_id": "refund:ORD-5945-6F37",
+    "operation_type": "REFUND",
+    "actor": "Finance Manager Agent",
+    "status": "FAILED",
+    "started_at": "2026-09-03T21:00:19.325083+00:00",
+    "started_at_ts": 1788469219.325114,
+    "completed_at": "2026-09-03T21:00:19.336701+00:00",
+    "result": null,
+    "error": "Order #ORD-5945-6F37 has already been refunded.",
+    "retry_count": 0,
+    "metadata": {},
+    "allow_retry": true
   }
 }

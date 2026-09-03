@@ -42,7 +42,13 @@
     "email": "buyer_alex@growthcommerce.ai",
     "shipping_address": "Alex Chen Residence, Innovation Hub Blvd, Sector 4",
     "auto_pay_enabled": true,
-    "cart": [],
+    "cart": [
+      {
+        "id": "prod_002",
+        "quantity": 1,
+        "size": "16GB RAM / 512GB"
+      }
+    ],
     "payment_details": {
       "card_holder_name": "Alex Chen",
       "card_number_masked": "4242 \u2022\u2022\u2022\u2022 \u2022\u2022\u2022\u2022 4242",
@@ -218,5 +224,53 @@
     "shipping_address": "100 Tech Blvd, San Francisco, CA",
     "auto_pay_enabled": true,
     "cart": []
+  },
+  {
+    "user_id": "test_user_ap2_verification",
+    "name": "Guest User",
+    "email": "test_user_ap2_verification@example.com",
+    "shipping_address": "100 Tech Blvd, San Francisco, CA",
+    "auto_pay_enabled": true,
+    "cart": [],
+    "ap2_payment_token": {
+      "mandate_id": "mandate_ap2_955ff0e71b88",
+      "user_id": "test_user_ap2_verification",
+      "authorized_agent": "nova_commerce_agent",
+      "spending_limit_per_tx": 1000000.0,
+      "currency": "INR",
+      "valid_from": "2026-09-03T17:58:41.897351+00:00",
+      "valid_until": "2027-09-03T17:58:41.897351+00:00",
+      "signature": "5307c88145bf34c1be65cae42f4b231aa6cd7a84296c7c18da177b29d508f0f6",
+      "status": "ACTIVE_AND_VERIFIED",
+      "protocol": "Google Agent Payments Protocol (AP2) v1.0",
+      "settlement_rail": "razorpay_upi_fiat"
+    }
+  },
+  {
+    "user_id": "test_chat_user_ap2",
+    "name": "Guest User",
+    "email": "test_chat_user_ap2@example.com",
+    "shipping_address": "100 Tech Blvd, San Francisco, CA",
+    "auto_pay_enabled": true,
+    "cart": [
+      {
+        "id": "prod_002",
+        "quantity": 1,
+        "size": "16GB RAM / 512GB"
+      }
+    ],
+    "ap2_payment_token": {
+      "mandate_id": "mandate_ap2_9732e4f7de7a",
+      "user_id": "test_chat_user_ap2",
+      "authorized_agent": "nova_commerce_agent",
+      "spending_limit_per_tx": 1000000.0,
+      "currency": "INR",
+      "valid_from": "2026-09-03T18:00:14.430642+00:00",
+      "valid_until": "2027-09-03T18:00:14.430642+00:00",
+      "signature": "d466a1c41d01acc4c1299a75b8099af7d908d9b4f9fb54156e9b6f979a386f0c",
+      "status": "ACTIVE_AND_VERIFIED",
+      "protocol": "Google Agent Payments Protocol (AP2) v1.0",
+      "settlement_rail": "razorpay_upi_fiat"
+    }
   }
 ]

@@ -10,16 +10,16 @@
       "Laptops"
     ],
     "price_sensitivity": "Low (Unlimited Budget)",
-    "return_probability": 0.05,
+    "return_probability": 0.0,
     "review_sentiment": "Positive & Technical",
-    "total_spent": 2179.23,
-    "orders_count": 17,
+    "total_spent": 1273.68,
+    "orders_count": 10,
     "returns_count": 0,
-    "reviews_written": 17,
-    "status": "Browsing catalog (Next order in ~265s)",
-    "next_purchase_ts": 1788128252.338304,
-    "next_delay_seconds": 265,
-    "last_action_ts": 1788127987.338303
+    "reviews_written": 10,
+    "status": "Browsing catalog (Next order in ~134s)",
+    "next_purchase_ts": 1788469348.301928,
+    "next_delay_seconds": 134,
+    "last_action_ts": 1788469214.3019254
   },
   {
     "id": "buyer_sophia",
@@ -34,14 +34,14 @@
     "price_sensitivity": "High (Values Good Deals)",
     "return_probability": 0.2,
     "review_sentiment": "Value & Quality Focused",
-    "total_spent": 720.17,
-    "orders_count": 11,
-    "returns_count": 0,
-    "reviews_written": 11,
-    "status": "Browsing catalog (Next order in ~225s)",
-    "next_purchase_ts": 1788128125.493181,
-    "next_delay_seconds": 225,
-    "last_action_ts": 1788127900.4931796
+    "total_spent": 327.73,
+    "orders_count": 6,
+    "returns_count": 1,
+    "reviews_written": 6,
+    "status": "Refunded #ORD-2302-D6AF (\u20b950.25)",
+    "next_purchase_ts": 1788469403.0095096,
+    "next_delay_seconds": 41,
+    "last_action_ts": 1788459562.897085
   },
   {
     "id": "buyer_david",
@@ -56,14 +56,14 @@
     "price_sensitivity": "Medium",
     "return_probability": 0.15,
     "review_sentiment": "Acoustic & Feature Detailed",
-    "total_spent": 758.98,
-    "orders_count": 14,
+    "total_spent": 188.31,
+    "orders_count": 4,
     "returns_count": 0,
-    "reviews_written": 14,
-    "status": "Browsing catalog (Next order in ~282s)",
-    "next_purchase_ts": 1788128188.1881833,
-    "next_delay_seconds": 282,
-    "last_action_ts": 1788127906.1881828
+    "reviews_written": 4,
+    "status": "Browsing catalog (Next order in ~157s)",
+    "next_purchase_ts": 1788469396.0095096,
+    "next_delay_seconds": 34,
+    "last_action_ts": 1788459663.3869443
   },
   {
     "id": "buyer_elena",
@@ -79,14 +79,14 @@
     "price_sensitivity": "Zero (Unlimited Budget)",
     "return_probability": 0.08,
     "review_sentiment": "Sophisticated & Enthusiastic",
-    "total_spent": 1577.69,
-    "orders_count": 16,
+    "total_spent": 521.81,
+    "orders_count": 5,
     "returns_count": 0,
-    "reviews_written": 16,
-    "status": "Browsing catalog (Next order in ~108s)",
-    "next_purchase_ts": 1788128030.0025723,
-    "next_delay_seconds": 108,
-    "last_action_ts": 1788127922.002571
+    "reviews_written": 5,
+    "status": "Browsing catalog (Next order in ~271s)",
+    "next_purchase_ts": 1788469412.7073271,
+    "next_delay_seconds": 28,
+    "last_action_ts": 1788459699.6654863
   },
   {
     "id": "buyer_marcus",
@@ -102,13 +102,13 @@
     "price_sensitivity": "Low",
     "return_probability": 0.3,
     "review_sentiment": "Expressive with Emojis",
-    "total_spent": 779.11,
-    "orders_count": 12,
+    "total_spent": 175.38,
+    "orders_count": 3,
     "returns_count": 0,
-    "reviews_written": 12,
-    "status": "Browsing catalog (Next order in ~264s)",
-    "next_purchase_ts": 1788128272.2389781,
-    "next_delay_seconds": 264,
-    "last_action_ts": 1788128008.2389772
+    "reviews_written": 3,
+    "status": "Browsing catalog (Next order in ~271s)",
+    "next_purchase_ts": 1788469394.0095096,
+    "next_delay_seconds": 32,
+    "last_action_ts": 1788459492.5206468
   }
 ]

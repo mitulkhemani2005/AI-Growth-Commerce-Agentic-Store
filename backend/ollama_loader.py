@@ -129,10 +129,14 @@ def preload_model_in_vram(model_name: str, host: Optional[str] = None) -> bool:
     Sends a warm-up/preload request to Ollama with keep_alive=-1 to load the model
     into GPU VRAM immediately and pin it permanently.
     """
-    host = host or get_base_host()
+    ctx_len = int(os.environ.get("OLLAMA_NUM_CTX", "4096"))
     payload = {
         "model": model_name,
-        "keep_alive": -1  # Keeps model indefinitely resident in GPU VRAM
+        "keep_alive": -1,  # Keeps model indefinitely resident in GPU VRAM
+        "options": {
+            "num_gpu": 999,
+            "num_ctx": ctx_len
+        }
     }
     try:
         print(f"[Ollama Loader] Preloading '{model_name}' into GPU VRAM (keep_alive: Forever)...", flush=True)

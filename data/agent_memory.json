@@ -356,6 +356,26 @@
         "metadata": {
           "to": "CEO Agent"
         }
+      },
+      {
+        "id": "turn_cca53dac",
+        "role": "user",
+        "content": "Executive Meeting Agenda: 'Wholesale stock restock budget and Q1 margin strategy'. Provide your domain telemetry and strategic assessment.",
+        "ts": "2026-09-03 17:48:48 UTC",
+        "turn_idx": 9,
+        "metadata": {
+          "sender": "CEO Agent"
+        }
+      },
+      {
+        "id": "turn_e1a63f5a",
+        "role": "assistant",
+        "content": "```markdown\n# Executive Meeting Agenda: Wholesale Stock Restock Budget and Q1 Margin Strategy\n\n## Warehouse Logistics Telemetry and Stock Velocity Analysis\n\n### Current Warehouse State:\n- **Total SKUs:** 27\n- **Total In-Stock Units:** 240\n- **Low Stock SKUs (<=5):** 4 (NOVA Prime 5G Smartphone, NOVA ZenBook Ultra 14 M3 Laptop, NOVA BladeForge RTX 4080 Gaming Laptop, NOVA AeroBook Slim i7 Ultrabook)\n\n### Sample Inventory Levels:\n- **NOVA Apex Pro 5G Smartphone:** 25 units\n- **NOVA Apex Ultra Fold 5G:** 15 units\n- **NOVA Prime 5G Smartphone:** 6 units\n- **NOVA ZenBook Ultra 14 M3 Laptop:** 9 units\n- **NOVA BladeForge RTX 4080 Gaming Laptop:** 5 units\n- **NOVA AeroBook Slim i7 Ultrabook:** 8 units\n\n### Recent Actions:\n- **Requested NOVA BladeForge RTX 4080 Gaming Laptop:** 5 units\n- **Requested NOVA SonicFlow ANC Pro Wireless Headphones:** 5 units\n- **Requested NOVA ErgoMaster Silent Wireless Mouse:** 5 units\n\n### Stock Velocity Analysis:\n- **NOVA Apex Pro 5G Smartphone:** Moderate velocity (25 units in stock, recent sales data shows moderate demand)\n- **NOVA Apex Ultra Fold 5G:** Low velocity (15 units in stock, recent sales data shows low demand)\n- **NOVA Prime 5G Smartphone:** Low velocity (6 units in stock, recent sales data shows high demand)\n- **NOVA ZenBook Ultra 14 M3 Laptop:** Low velocity (9 units in stock, recent sales data shows high demand)\n- **NOVA BladeForge RTX 4080 Gaming Laptop:** Low velocity (5 units in stock, recent sales data shows high demand)\n- **NOVA AeroBook Slim i7 Ultrabook:** Low velocity (8 units in stock, recent sales data shows high demand)\n\n## Strategic Assessment and Recommendations\n\n### Restock Recommendations:\n1. **NOVA Prime 5G Smartphone:**\n   - **Current Stock:** 6 units\n   - **Demand:** High\n   - **Action:** Request 5",
+        "ts": "2026-09-03 17:48:48 UTC",
+        "turn_idx": 10,
+        "metadata": {
+          "to": "CEO Agent"
+        }
       }
     ],
     "rolling_summary": "",
@@ -535,7 +555,7 @@
         "ts": "2026-08-29 08:21:17 UTC"
       }
     ],
-    "total_turns": 9,
+    "total_turns": 11,
     "last_summarized_turn": 0
   },
   "Finance Manager Agent": {
@@ -609,6 +629,16 @@
         "turn_idx": 6,
         "metadata": {
           "to": "CEO Agent"
+        }
+      },
+      {
+        "id": "turn_a4d4a26c",
+        "role": "user",
+        "content": "Executive Meeting Agenda: 'Wholesale stock restock budget and Q1 margin strategy'. Provide your domain telemetry and strategic assessment.",
+        "ts": "2026-09-03 17:49:02 UTC",
+        "turn_idx": 7,
+        "metadata": {
+          "sender": "CEO Agent"
         }
       }
     ],
@@ -748,7 +778,7 @@
         "alerts": 0
       }
     ],
-    "total_turns": 7,
+    "total_turns": 8,
     "last_summarized_turn": 0
   },
   "Price Manager Agent": {
@@ -841,6 +871,26 @@
         "content": "```markdown\n# Executive Meeting on: 'Wholesale Stock Restock Budget and Q1 Margin Strategy'\n\n## Current Store Telemetry and Strategic Assessment\n\n### Current Store State:\n- **Total Products:** 27 SKUs\n- **Sample Catalog:**\n  - NOVA Apex Pro 5G Smartphone (Stock: 31, Price: ₹1,500.00, Base: ₹99.00)\n  - NOVA Apex Ultra Fold 5G (Stock: 17, Price: ₹163.66, Base: ₹99.00)\n  - NOVA Prime 5G Smartphone (Stock: 13, Price: ₹5,711.20, Base: ₹69.00)\n  - NOVA ZenBook Ultra 14 M3 Laptop (Stock: 13, Price: ₹10,700.24, Base: ₹85.00)\n  - NOVA BladeForge RTX 4080 Gaming Laptop (Stock: 8, Price: ₹14,475.36, Base: ₹100.00)\n  - NOVA AeroBook Slim i7 Ultrabook (Stock: 5, Price: ₹10,857.21, Base: ₹75.00)\n\n### Dynamic Pricing Summary:\n- **Last Pricing Adjustments:** 0 times (no recent actions executed)\n- **Current Adjustments:** No recent actions executed\n\n### Wholesale Stock Restock Budget:\n- **High Demand Products:** NOVA Apex Pro 5G Smartphone (Stock: 31), NOVA Apex Ultra Fold 5G (Stock: 17)\n- **Low Demand Products:** NOVA Prime 5G Smartphone (Stock: 13), NOVA ZenBook Ultra 14 M3 Laptop (Stock: 13), NOVA BladeForge RTX 4080 Gaming Laptop (Stock: 8), NOVA AeroBook Slim i7 Ultrabook (Stock: 5)\n\n### Q1 Margin Strategy:\n- **Base Price Floor Enforcement:** Ensured all prices are above the BASE_PRICE floor.\n- **Price Increases:** For high-demand products, consider small price increases to capitalize on demand.\n- **Price Decreases:** For low-demand products, consider price reductions to clear inventory and stimulate sales",
         "ts": "2026-08-30 20:49:57 UTC",
         "turn_idx": 8,
+        "metadata": {
+          "to": "CEO Agent"
+        }
+      },
+      {
+        "id": "turn_c7f861d0",
+        "role": "user",
+        "content": "Executive Meeting Agenda: 'Wholesale stock restock budget and Q1 margin strategy'. Provide your domain telemetry and strategic assessment.",
+        "ts": "2026-09-03 17:48:34 UTC",
+        "turn_idx": 9,
+        "metadata": {
+          "sender": "CEO Agent"
+        }
+      },
+      {
+        "id": "turn_6397d79a",
+        "role": "assistant",
+        "content": "```markdown\n# Executive Meeting on: 'Wholesale Stock Restock Budget and Q1 Margin Strategy'\n\n## Current Store Telemetry and Strategic Assessment\n\n### Current Store State:\n- **Total Products:** 27 SKUs\n- **Sample Catalog:**\n  - NOVA Apex Pro 5G Smartphone (Stock: 25, Price: ₹1,500.00, Base: ₹1,000.00)\n  - NOVA Apex Ultra Fold 5G (Stock: 15, Price: ₹142.31, Base: ₹99.00)\n  - NOVA Prime 5G Smartphone (Stock: 6, Price: ₹4,318.49, Base: ₹69.00)\n  - NOVA ZenBook Ultra 14 M3 Laptop (Stock: 9, Price: ₹122.19, Base: ₹85.00)\n  - NOVA BladeForge RTX 4080 Gaming Laptop (Stock: 5, Price: ₹143.75, Base: ₹100.00)\n  - NOVA AeroBook Slim i7 Ultrabook (Stock: 8, Price: ₹107.81, Base: ₹75.00)\n\n### Dynamic Pricing Summary:\n- **Last Pricing Adjustments:** 0 times (no recent actions executed)\n- **Current Adjustments:** No recent actions executed\n\n### Wholesale Stock Restock Budget:\n- **High Demand Products:** NOVA Apex Pro 5G Smartphone (Stock: 25), NOVA Apex Ultra Fold 5G (Stock: 15)\n- **Low Demand Products:** NOVA Prime 5G Smartphone (Stock: 6), NOVA ZenBook Ultra 14 M3 Laptop (Stock: 9), NOVA BladeForge RTX 4080 Gaming Laptop (Stock: 5), NOVA AeroBook Slim i7 Ultrabook (Stock: 8)\n\n### Q1 Margin Strategy:\n- **Base Price Floor Enforcement:** Ensured all prices are above the BASE_PRICE floor.\n- **Price Increases:** For high-demand products, consider small price increases to capitalize on demand.\n- **Price Decreases:** For low-demand products, consider price reductions to clear inventory and stimulate sales.\n\n### Strategic Assessment:\n- **High-Demand",
+        "ts": "2026-09-03 17:48:34 UTC",
+        "turn_idx": 10,
         "metadata": {
           "to": "CEO Agent"
         }
@@ -1014,7 +1064,7 @@
         "ts": "2026-08-29 08:21:04 UTC"
       }
     ],
-    "total_turns": 9,
+    "total_turns": 11,
     "last_summarized_turn": 0
   },
   "Order Management Agent": {
@@ -1652,16 +1702,6 @@
     "agent_name": "Customer AI (Nova)",
     "recent_context": [
       {
-        "id": "turn_12aee508",
-        "role": "user",
-        "content": "checkout",
-        "ts": "2026-08-29 08:40:02 UTC",
-        "turn_idx": 8,
-        "metadata": {
-          "user_id": "user_alex"
-        }
-      },
-      {
         "id": "turn_504479fa",
         "role": "user",
         "content": "i need laptop",
@@ -1859,9 +1899,19 @@
         "metadata": {
           "user_id": "user_alex"
         }
+      },
+      {
+        "id": "turn_2ea29fa1",
+        "role": "user",
+        "content": "Please auto pay for my cart using AP2 autonomous payment",
+        "ts": "2026-09-03 18:00:05 UTC",
+        "turn_idx": 28,
+        "metadata": {
+          "user_id": "test_chat_user_ap2"
+        }
       }
     ],
-    "rolling_summary": "Owner: order mobile -> Agent: Sure! To help you order a mobile, I'll first recommend some top models based on your preferences. Would you like to spec -> Owner: no -> Agent: Great! Let's start by recommending some popular mobiles from NOVA. Here are three top models:\n\n| Product Name            -> Owner: NOVA Apex Pro 5G Smartphone -> Agent: Great! I've added the **NOVA Apex Pro 5G Smartphone** (12GB RAM / 256GB) to your cart. Here's a summary of your order:\n\n -> Owner: cgeckout -> Agent: It seems like there was a typo. Did you mean to say \"checkout\"? Let's proceed with the checkout process.\n\nBefore we do t",
+    "rolling_summary": "Owner: order mobile -> Agent: Sure! To help you order a mobile, I'll first recommend some top models based on your preferences. Would you like to spec -> Owner: no -> Agent: Great! Let's start by recommending some popular mobiles from NOVA. Here are three top models:\n\n| Product Name            -> Owner: NOVA Apex Pro 5G Smartphone -> Agent: Great! I've added the **NOVA Apex Pro 5G Smartphone** (12GB RAM / 256GB) to your cart. Here's a summary of your order:\n\n -> Owner: cgeckout -> Agent: It seems like there was a typo. Did you mean to say \"checkout\"? Let's proceed with the checkout process.\n\nBefore we do t -> Owner: checkout",
     "structured": {},
     "episodes": [
       {
@@ -2095,9 +2145,49 @@
         "reward": 1.0,
         "ts": "2026-08-30 21:40:57 UTC",
         "user_id": "user_alex"
+      },
+      {
+        "id": "ep_6fdaf25e",
+        "action": "tool:purchase_assistant",
+        "outcome": "{'success': True, 'action': 'PURCHASE_ASSISTANT_COMPLETED', 'added_items': [{'product': 'NOVA Apex Pro 5G Smartphone', 'quantity': 1, 'price': 1500.0}], 'out_of_stock': [], 'coupon_applied': 'None', '",
+        "reward": 1.0,
+        "ts": "2026-09-03 17:48:05 UTC",
+        "user_id": "user_test"
+      },
+      {
+        "id": "ep_5fc91885",
+        "action": "tool:recommend_products",
+        "outcome": "{'success': True, 'count': 3, 'recommendations': [{'id': 'prod_001', 'PRODUCT_NAME': 'NOVA Apex Pro 5G Smartphone', 'PRODUCT_TYPE': 'Mobiles', 'PRODUCT_SIZE': '12GB RAM / 256GB', 'STOCK_REMAINING': 10",
+        "reward": 1.0,
+        "ts": "2026-09-03 17:48:05 UTC",
+        "user_id": "user_test"
+      },
+      {
+        "id": "ep_c8b037dc",
+        "action": "tool:compare_products",
+        "outcome": "{'success': True, 'comparison': [{'id': 'prod_001', 'name': 'NOVA Apex Pro 5G Smartphone', 'price': 1500.0, 'stock': 10, 'rating': 5.0, 'description': 'Flagship NOVA 5G smartphone featuring Snapdragon",
+        "reward": 1.0,
+        "ts": "2026-09-03 17:48:05 UTC",
+        "user_id": "user_test"
+      },
+      {
+        "id": "ep_901a7133",
+        "action": "tool:apply_coupon",
+        "outcome": "{'success': True, 'coupon': 'GROWTH10', 'discount_percentage': 10.0, 'message': \"Coupon 'GROWTH10' applied! You get 10.0% off your order total at checkout.\"}",
+        "reward": 1.0,
+        "ts": "2026-09-03 17:48:05 UTC",
+        "user_id": "user_test"
+      },
+      {
+        "id": "ep_21e389c9",
+        "action": "tool:autonomous_agent_pay",
+        "outcome": "{'success': True, 'order_id': 'ORD-2728-4D0C', 'amount': 120.46, 'razorpay_payment_id': 'pay_TXf97nEdbogczW', 'razorpay_order_id': 'order_TXf90ZrDEBuMHm', 'ap2_proof': {'protocol': 'AP2 (Google Agent ",
+        "reward": 1.0,
+        "ts": "2026-09-03 18:27:29 UTC",
+        "user_id": "test_chat_user_ap2"
       }
     ],
-    "total_turns": 28,
-    "last_summarized_turn": 28
+    "total_turns": 29,
+    "last_summarized_turn": 29
   }
 }

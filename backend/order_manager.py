@@ -158,6 +158,8 @@ class OrderManager:
             "tax": 0.0,
             "total": total,
             "payment_method": payment_method,
+            "razorpay_order_id": (payment_details or {}).get("razorpay_order_id"),
+            "razorpay_payment_id": (payment_details or {}).get("razorpay_payment_id"),
             "payment_details": payment_details or {},
             "shipping_address": address,
             "inventory_deducted": (initial_status.capitalize() == "Confirmed")
@@ -170,6 +172,28 @@ class OrderManager:
 
         # Clear cart
         cart_manager.clear_cart(user_id)
+
+        # Emit event and message fleet (specialist agents, excluding CEO)
+        if new_order['status'] == "Confirmed":
+            try:
+                from backend.events import emit_store_event, EventType
+                item_names = ", ".join([f"{it['PRODUCT_NAME']} (x{it['quantity']})" for it in order_items])
+                emit_store_event(
+                    event_type=EventType.ORDER_CONFIRMED,
+                    source_agent="Order Management Agent",
+                    payload={
+                        "order_id": order_id,
+                        "total": total,
+                        "items_summary": item_names,
+                        "items": order_items,
+                        "customer": customer_name,
+                        "shipping_address": address,
+                        "payment_method": payment_method
+                    },
+                    priority="high"
+                )
+            except Exception as e:
+                print(f"[Order Event Error]: {e}", flush=True)
 
         return {
             "success": True,
@@ -240,6 +264,43 @@ class OrderManager:
             order["status_notes"] = notes
 
         self._write_orders(orders)
+
+        # Emit event and notify specialist agents (excluding CEO)
+        if status_clean != old_status:
+            try:
+                from backend.events import emit_store_event, EventType
+                if status_clean == "Dispatched":
+                    emit_store_event(
+                        event_type=EventType.ORDER_DISPATCHED,
+                        source_agent="Dispatcher Agent",
+                        payload={
+                            "order_id": order_id,
+                            "tracking_number": order.get("tracking_number"),
+                            "carrier": "BlueDart Express Logistics",
+                            "eta": "2-3 Business Days"
+                        }
+                    )
+                elif status_clean == "Shipped":
+                    emit_store_event(
+                        event_type=EventType.ORDER_SHIPPED,
+                        source_agent="Order Management Agent",
+                        payload={"order_id": order_id, "tracking_number": order.get("tracking_number")}
+                    )
+                elif status_clean == "Delivered":
+                    emit_store_event(
+                        event_type=EventType.ORDER_DELIVERED,
+                        source_agent="Order Management Agent",
+                        payload={"order_id": order_id, "customer": order.get("customer_name")}
+                    )
+                elif status_clean in ["Cancelled", "Refunded"]:
+                    emit_store_event(
+                        event_type=EventType.ORDER_CANCELLED,
+                        source_agent="Order Management Agent",
+                        payload={"order_id": order_id, "reason": notes or "Customer cancellation", "total": order.get("total", 0.0)}
+                    )
+            except Exception as e:
+                print(f"[Order Status Event Error]: {e}", flush=True)
+
         return {
             "success": True,
             "message": f"Order #{order_id} status updated from '{old_status}' to '{status_clean}'.",

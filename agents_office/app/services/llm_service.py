@@ -121,6 +121,8 @@ def chat_completion(
         kwargs["api_base"] = api_base
     if api_key:
         kwargs["api_key"] = api_key
+    if "ollama" in model:
+        kwargs["extra_body"] = {"options": {"num_ctx": 4096, "num_gpu": 999}, "keep_alive": -1}
 
     response = litellm.completion(**kwargs)
     return _parse_response(response, model)
@@ -151,6 +153,8 @@ async def async_chat_completion(
         kwargs["api_base"] = api_base
     if api_key:
         kwargs["api_key"] = api_key
+    if "ollama" in model:
+        kwargs["extra_body"] = {"options": {"num_ctx": 4096, "num_gpu": 999}, "keep_alive": -1}
 
     response = await litellm.acompletion(**kwargs)
     return _parse_response(response, model)

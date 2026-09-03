@@ -318,6 +318,22 @@ async def verify_razorpay_payment(req: RazorpayVerifyPaymentRequest):
         customer=order.get("customer_name", req.user_id)
     )
 
+    # Emit payment event to notify fleet (Finance Manager -> Order Manager)
+    try:
+        from backend.events import emit_store_event, EventType
+        emit_store_event(
+            event_type=EventType.PAYMENT_RECEIVED,
+            source_agent="Finance Manager Agent",
+            payload={
+                "order_id": order.get("order_id"),
+                "payment_id": req.razorpay_payment_id,
+                "amount": order.get("total", 0.0),
+                "payment_method": "Razorpay Gateway (Online)"
+            }
+        )
+    except Exception as e:
+        print(f"[Payment Event Error]: {e}", flush=True)
+
     # AP2 Protocol: Save payment token for future autonomous agent payments
     saved_card = cart_manager.get_customer_payment_details(req.user_id) or {}
     payment_manager.save_ap2_token_from_payment(

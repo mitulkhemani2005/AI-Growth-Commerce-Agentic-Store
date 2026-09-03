@@ -435,7 +435,7 @@ class BuyerAgentsFleet:
             shipping_address=f"{buyer['name']} Residence, Innovation Hub Blvd, Sector 4",
             customer_name=buyer["name"],
             customer_email=f"{buyer_id}@growthcommerce.ai",
-            customer_phone="9876543210",
+            customer_phone="9823012345",
             notes=f"Autonomous AI Buyer AP2 Checkout ({buyer['persona_title']})"
         )
 

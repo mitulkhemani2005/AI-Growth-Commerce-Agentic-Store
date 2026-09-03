@@ -1,1284 +1,1252 @@
 {
-  "bank_balance": 595.42,
+  "bank_balance": 8231.2,
   "initial_bank_balance": 10000.0,
-  "total_sales_revenue": 7025.73,
-  "total_inventory_spend": 14780.0,
-  "total_salaries_paid": 1600.0,
-  "total_refunds_deducted": 50.31,
-  "created_at": "2026-08-30T20:59:25.760123+00:00",
+  "total_sales_revenue": 10106.45,
+  "total_inventory_spend": 11825.0,
+  "total_salaries_paid": 0.0,
+  "total_refunds_deducted": 50.25,
+  "created_at": "2026-09-03T18:04:47.563860+00:00",
   "transactions": [
     {
-      "id": "tx_c3561bbe",
+      "id": "tx_cd25e08e",
       "type": "SALES_REVENUE",
-      "amount": 79.06,
-      "balance_after": 595.42,
-      "order_id": "ORD-1351-DE82",
-      "customer": "Elena Rostova",
-      "description": "Received payment of \u20b979.06 for Order #ORD-1351-DE82 (Elena Rostova). 1x NOVA StudioMaster Pro Hi-Fi Wired Headphones",
-      "actor": "Payment Gateway / AP2",
-      "timestamp": "2026-08-30T22:13:51.079498+00:00"
-    },
-    {
-      "id": "tx_cbc3d182",
-      "type": "SALES_REVENUE",
-      "amount": 43.12,
-      "balance_after": 516.36,
-      "order_id": "ORD-1324-55B7",
-      "customer": "Marcus Kim",
-      "description": "Received payment of \u20b943.12 for Order #ORD-1324-55B7 (Marcus Kim). 1x NOVA Stealth Commuter Smart Backpack",
-      "actor": "Payment Gateway / AP2",
-      "timestamp": "2026-08-30T22:13:24.126447+00:00"
-    },
-    {
-      "id": "tx_c2551d08",
-      "type": "SALES_REVENUE",
-      "amount": 107.81,
-      "balance_after": 473.24,
-      "order_id": "ORD-1303-77ED",
+      "amount": 91.25,
+      "balance_after": 8231.2,
+      "order_id": "ORD-0320-E465",
       "customer": "Alex Chen",
-      "description": "Received payment of \u20b9107.81 for Order #ORD-1303-77ED (Alex Chen). 1x NOVA AeroBook Slim i7 Ultrabook",
+      "description": "Received payment of \u20b991.25 for Order #ORD-0320-E465 (Alex Chen). 1x NOVA AeroBook Slim i7 Ultrabook",
       "actor": "Payment Gateway / AP2",
-      "timestamp": "2026-08-30T22:13:03.647058+00:00"
+      "timestamp": "2026-09-03T21:03:20.306204+00:00"
     },
     {
-      "id": "tx_87825761",
-      "type": "STOCK_PURCHASE",
-      "amount": 325.0,
-      "balance_after": 365.43,
-      "product_id": "prod_014",
-      "product_name": "NOVA Pulse Ultra Smartwatch",
-      "quantity": 5,
-      "unit_cost": 65.0,
-      "description": "Acquired 5 units of 'NOVA Pulse Ultra Smartwatch' at wholesale Base Price \u20b965.00/unit.",
-      "actor": "Inventory Manager Agent",
-      "timestamp": "2026-08-30T22:12:07.835846+00:00"
-    },
-    {
-      "id": "tx_105d2efa",
+      "id": "tx_89fbb81b",
       "type": "SALES_REVENUE",
-      "amount": 122.19,
-      "balance_after": 690.43,
-      "order_id": "ORD-1158-402C",
-      "customer": "Elena Rostova",
-      "description": "Received payment of \u20b9122.19 for Order #ORD-1158-402C (Elena Rostova). 1x NOVA ZenBook Ultra 14 M3 Laptop",
+      "amount": 120.46,
+      "balance_after": 8139.95,
+      "order_id": "ORD-0257-DB22",
+      "customer": "Alex Chen",
+      "description": "Received payment of \u20b9120.46 for Order #ORD-0257-DB22 (Alex Chen). 1x NOVA Apex Pro 5G Smartphone",
       "actor": "Payment Gateway / AP2",
-      "timestamp": "2026-08-30T22:11:58.311104+00:00"
+      "timestamp": "2026-09-03T21:02:57.817409+00:00"
     },
     {
-      "id": "tx_5ad22942",
+      "id": "tx_42268f86",
       "type": "SALES_REVENUE",
-      "amount": 40.25,
-      "balance_after": 568.24,
-      "order_id": "ORD-1141-84B3",
+      "amount": 51.1,
+      "balance_after": 8019.49,
+      "order_id": "ORD-0236-DC78",
+      "customer": "Sophia Miller",
+      "description": "Received payment of \u20b951.10 for Order #ORD-0236-DC78 (Sophia Miller). 1x NOVA AirType Low-Profile Wireless Keyboard",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T21:02:36.526789+00:00"
+    },
+    {
+      "id": "tx_e75be22a",
+      "type": "SALES_REVENUE",
+      "amount": 59.62,
+      "balance_after": 7968.39,
+      "order_id": "ORD-0208-BEED",
+      "customer": "Sophia Miller",
+      "description": "Received payment of \u20b959.62 for Order #ORD-0208-BEED (Sophia Miller). 1x NOVA Pulse Slim Smartwatch",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T21:02:08.655646+00:00"
+    },
+    {
+      "id": "tx_638661fc",
+      "type": "SALES_REVENUE",
+      "amount": 26.76,
+      "balance_after": 7908.77,
+      "order_id": "ORD-0137-47D2",
+      "customer": "Sophia Miller",
+      "description": "Received payment of \u20b926.76 for Order #ORD-0137-47D2 (Sophia Miller). 1x NOVA HyperGaN 65W 3-Port Fast Charger",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T21:01:37.529472+00:00"
+    },
+    {
+      "id": "tx_19309e50",
+      "type": "SALES_REVENUE",
+      "amount": 18.25,
+      "balance_after": 7882.01,
+      "order_id": "ORD-0107-3F1D",
+      "customer": "Sophia Miller",
+      "description": "Received payment of \u20b918.25 for Order #ORD-0107-3F1D (Sophia Miller). 1x NOVA TurboFlash 30W Mobile Fast Charger",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T21:01:08.028964+00:00"
+    },
+    {
+      "id": "tx_53ea6107",
+      "type": "SALES_REVENUE",
+      "amount": 51.1,
+      "balance_after": 7863.76,
+      "order_id": "ORD-0038-5CBF",
+      "customer": "Sophia Miller",
+      "description": "Received payment of \u20b951.10 for Order #ORD-0038-5CBF (Sophia Miller). 1x NOVA AirType Low-Profile Wireless Keyboard",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T21:00:39.311207+00:00"
+    },
+    {
+      "id": "tx_383540ea",
+      "type": "SALES_REVENUE",
+      "amount": 83.95,
+      "balance_after": 7812.66,
+      "order_id": "ORD-0008-CC34",
+      "customer": "Alex Chen",
+      "description": "Received payment of \u20b983.95 for Order #ORD-0008-CC34 (Alex Chen). 1x NOVA Prime 5G Smartphone",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T21:00:09.203949+00:00"
+    },
+    {
+      "id": "tx_e067136a",
+      "type": "SALES_REVENUE",
+      "amount": 120.46,
+      "balance_after": 7728.71,
+      "order_id": "ORD-5945-6F37",
+      "customer": "Alex Chen",
+      "description": "Received payment of \u20b9120.46 for Order #ORD-5945-6F37 (Alex Chen). 1x NOVA Apex Pro 5G Smartphone",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T20:59:45.540644+00:00"
+    },
+    {
+      "id": "tx_29a8a5ff",
+      "type": "SALES_REVENUE",
+      "amount": 121.67,
+      "balance_after": 7608.25,
+      "order_id": "ORD-4926-7916",
+      "customer": "Alex Chen",
+      "description": "Received payment of \u20b9121.67 for Order #ORD-4926-7916 (Alex Chen). 1x NOVA BladeForge RTX 4080 Gaming Laptop",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T18:49:26.762883+00:00"
+    },
+    {
+      "id": "tx_aede3120",
+      "type": "SALES_REVENUE",
+      "amount": 120.46,
+      "balance_after": 7486.58,
+      "order_id": "ORD-4855-41D8",
+      "customer": "Alex Chen",
+      "description": "Received payment of \u20b9120.46 for Order #ORD-4855-41D8 (Alex Chen). 1x NOVA Apex Ultra Fold 5G",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T18:48:56.035971+00:00"
+    },
+    {
+      "id": "tx_43bb7ec3",
+      "type": "SALES_REVENUE",
+      "amount": 120.46,
+      "balance_after": 7366.12,
+      "order_id": "ORD-4825-DB75",
+      "customer": "Alex Chen",
+      "description": "Received payment of \u20b9120.46 for Order #ORD-4825-DB75 (Alex Chen). 1x NOVA Apex Pro 5G Smartphone",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T18:48:25.765271+00:00"
+    },
+    {
+      "id": "tx_2d9d5c17",
+      "type": "SALES_REVENUE",
+      "amount": 120.46,
+      "balance_after": 7245.66,
+      "order_id": "ORD-4754-C5E8",
+      "customer": "Alex Chen",
+      "description": "Received payment of \u20b9120.46 for Order #ORD-4754-C5E8 (Alex Chen). 1x NOVA Apex Pro 5G Smartphone",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T18:47:55.300694+00:00"
+    },
+    {
+      "id": "tx_b0a875fe",
+      "type": "SALES_REVENUE",
+      "amount": 83.95,
+      "balance_after": 7125.2,
+      "order_id": "ORD-4724-5FD7",
+      "customer": "Alex Chen",
+      "description": "Received payment of \u20b983.95 for Order #ORD-4724-5FD7 (Alex Chen). 1x NOVA Prime 5G Smartphone",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T18:47:24.732788+00:00"
+    },
+    {
+      "id": "tx_15d7cd70",
+      "type": "SALES_REVENUE",
+      "amount": 120.46,
+      "balance_after": 7041.25,
+      "order_id": "ORD-4653-3A98",
+      "customer": "Alex Chen",
+      "description": "Received payment of \u20b9120.46 for Order #ORD-4653-3A98 (Alex Chen). 1x NOVA Apex Ultra Fold 5G",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T18:46:53.448200+00:00"
+    },
+    {
+      "id": "tx_d11e9262",
+      "type": "SALES_REVENUE",
+      "amount": 91.25,
+      "balance_after": 6920.79,
+      "order_id": "ORD-4623-AFD2",
+      "customer": "Alex Chen",
+      "description": "Received payment of \u20b991.25 for Order #ORD-4623-AFD2 (Alex Chen). 1x NOVA AeroBook Slim i7 Ultrabook",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T18:46:23.642076+00:00"
+    },
+    {
+      "id": "tx_aec7caf0",
+      "type": "SALES_REVENUE",
+      "amount": 103.42,
+      "balance_after": 6829.54,
+      "order_id": "ORD-4552-2BA0",
+      "customer": "Alex Chen",
+      "description": "Received payment of \u20b9103.42 for Order #ORD-4552-2BA0 (Alex Chen). 1x NOVA ZenBook Ultra 14 M3 Laptop",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T18:45:52.779875+00:00"
+    },
+    {
+      "id": "tx_d710a0ad",
+      "type": "SALES_REVENUE",
+      "amount": 83.95,
+      "balance_after": 6726.12,
+      "order_id": "ORD-4522-202F",
+      "customer": "Alex Chen",
+      "description": "Received payment of \u20b983.95 for Order #ORD-4522-202F (Alex Chen). 1x NOVA Prime 5G Smartphone",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T18:45:22.541810+00:00"
+    },
+    {
+      "id": "tx_35aa017f",
+      "type": "SALES_REVENUE",
+      "amount": 103.42,
+      "balance_after": 6642.17,
+      "order_id": "ORD-4452-75D2",
+      "customer": "Alex Chen",
+      "description": "Received payment of \u20b9103.42 for Order #ORD-4452-75D2 (Alex Chen). 1x NOVA ZenBook Ultra 14 M3 Laptop",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T18:44:52.472264+00:00"
+    },
+    {
+      "id": "tx_a6671a71",
+      "type": "SALES_REVENUE",
+      "amount": 103.42,
+      "balance_after": 6538.75,
+      "order_id": "ORD-4421-69A4",
+      "customer": "Alex Chen",
+      "description": "Received payment of \u20b9103.42 for Order #ORD-4421-69A4 (Alex Chen). 1x NOVA ZenBook Ultra 14 M3 Laptop",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T18:44:21.952216+00:00"
+    },
+    {
+      "id": "tx_3234ec0b",
+      "type": "SALES_REVENUE",
+      "amount": 120.46,
+      "balance_after": 6435.33,
+      "order_id": "ORD-4351-3671",
+      "customer": "Alex Chen",
+      "description": "Received payment of \u20b9120.46 for Order #ORD-4351-3671 (Alex Chen). 1x NOVA Apex Ultra Fold 5G",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T18:43:51.403316+00:00"
+    },
+    {
+      "id": "tx_4832fb41",
+      "type": "SALES_REVENUE",
+      "amount": 91.25,
+      "balance_after": 6314.87,
+      "order_id": "ORD-4320-48B6",
+      "customer": "Alex Chen",
+      "description": "Received payment of \u20b991.25 for Order #ORD-4320-48B6 (Alex Chen). 1x NOVA AeroBook Slim i7 Ultrabook",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T18:43:21.065597+00:00"
+    },
+    {
+      "id": "tx_db3cf1cd",
+      "type": "SALES_REVENUE",
+      "amount": 91.25,
+      "balance_after": 6223.62,
+      "order_id": "ORD-4250-2C5F",
+      "customer": "Alex Chen",
+      "description": "Received payment of \u20b991.25 for Order #ORD-4250-2C5F (Alex Chen). 1x NOVA AeroBook Slim i7 Ultrabook",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T18:42:50.795346+00:00"
+    },
+    {
+      "id": "tx_a554b395",
+      "type": "SALES_REVENUE",
+      "amount": 120.46,
+      "balance_after": 6132.37,
+      "order_id": "ORD-4219-DA87",
+      "customer": "Alex Chen",
+      "description": "Received payment of \u20b9120.46 for Order #ORD-4219-DA87 (Alex Chen). 1x NOVA Apex Ultra Fold 5G",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T18:42:20.175209+00:00"
+    },
+    {
+      "id": "tx_5890fd78",
+      "type": "SALES_REVENUE",
+      "amount": 103.42,
+      "balance_after": 6011.91,
+      "order_id": "ORD-4148-803A",
+      "customer": "Alex Chen",
+      "description": "Received payment of \u20b9103.42 for Order #ORD-4148-803A (Alex Chen). 1x NOVA ZenBook Ultra 14 M3 Laptop",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T18:41:48.739848+00:00"
+    },
+    {
+      "id": "tx_028efd96",
+      "type": "SALES_REVENUE",
+      "amount": 91.25,
+      "balance_after": 5908.49,
+      "order_id": "ORD-4118-D6D6",
+      "customer": "Alex Chen",
+      "description": "Received payment of \u20b991.25 for Order #ORD-4118-D6D6 (Alex Chen). 1x NOVA AeroBook Slim i7 Ultrabook",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T18:41:18.617669+00:00"
+    },
+    {
+      "id": "tx_18ff25b6",
+      "type": "SALES_REVENUE",
+      "amount": 83.95,
+      "balance_after": 5817.24,
+      "order_id": "ORD-4047-88FA",
+      "customer": "Alex Chen",
+      "description": "Received payment of \u20b983.95 for Order #ORD-4047-88FA (Alex Chen). 1x NOVA Prime 5G Smartphone",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T18:40:47.592455+00:00"
+    },
+    {
+      "id": "tx_331057c2",
+      "type": "SALES_REVENUE",
+      "amount": 91.25,
+      "balance_after": 5733.29,
+      "order_id": "ORD-4016-CC22",
+      "customer": "Alex Chen",
+      "description": "Received payment of \u20b991.25 for Order #ORD-4016-CC22 (Alex Chen). 1x NOVA AeroBook Slim i7 Ultrabook",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T18:40:16.774549+00:00"
+    },
+    {
+      "id": "tx_6b747c7a",
+      "type": "SALES_REVENUE",
+      "amount": 120.46,
+      "balance_after": 5642.04,
+      "order_id": "ORD-3946-7C8C",
+      "customer": "Alex Chen",
+      "description": "Received payment of \u20b9120.46 for Order #ORD-3946-7C8C (Alex Chen). 1x NOVA Apex Pro 5G Smartphone",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T18:39:46.374025+00:00"
+    },
+    {
+      "id": "tx_bf09b213",
+      "type": "SALES_REVENUE",
+      "amount": 91.25,
+      "balance_after": 5521.58,
+      "order_id": "ORD-3915-3B34",
+      "customer": "Alex Chen",
+      "description": "Received payment of \u20b991.25 for Order #ORD-3915-3B34 (Alex Chen). 1x NOVA AeroBook Slim i7 Ultrabook",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T18:39:15.429166+00:00"
+    },
+    {
+      "id": "tx_95b8d046",
+      "type": "SALES_REVENUE",
+      "amount": 103.42,
+      "balance_after": 5430.33,
+      "order_id": "ORD-3844-2050",
+      "customer": "Alex Chen",
+      "description": "Received payment of \u20b9103.42 for Order #ORD-3844-2050 (Alex Chen). 1x NOVA ZenBook Ultra 14 M3 Laptop",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T18:38:44.868086+00:00"
+    },
+    {
+      "id": "tx_123aa199",
+      "type": "SALES_REVENUE",
+      "amount": 120.46,
+      "balance_after": 5326.91,
+      "order_id": "ORD-3812-A013",
+      "customer": "Alex Chen",
+      "description": "Received payment of \u20b9120.46 for Order #ORD-3812-A013 (Alex Chen). 1x NOVA Apex Ultra Fold 5G",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T18:38:13.205905+00:00"
+    },
+    {
+      "id": "tx_aec82d7c",
+      "type": "SALES_REVENUE",
+      "amount": 121.67,
+      "balance_after": 5206.45,
+      "order_id": "ORD-3742-6FE2",
+      "customer": "Alex Chen",
+      "description": "Received payment of \u20b9121.67 for Order #ORD-3742-6FE2 (Alex Chen). 1x NOVA BladeForge RTX 4080 Gaming Laptop",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T18:37:42.633829+00:00"
+    },
+    {
+      "id": "tx_bf6baeec",
+      "type": "SALES_REVENUE",
+      "amount": 120.46,
+      "balance_after": 5084.78,
+      "order_id": "ORD-3711-60C3",
+      "customer": "Alex Chen",
+      "description": "Received payment of \u20b9120.46 for Order #ORD-3711-60C3 (Alex Chen). 1x NOVA Apex Ultra Fold 5G",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T18:37:12.051545+00:00"
+    },
+    {
+      "id": "tx_242a4879",
+      "type": "SALES_REVENUE",
+      "amount": 103.42,
+      "balance_after": 4964.32,
+      "order_id": "ORD-3640-379D",
+      "customer": "Alex Chen",
+      "description": "Received payment of \u20b9103.42 for Order #ORD-3640-379D (Alex Chen). 1x NOVA ZenBook Ultra 14 M3 Laptop",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T18:36:40.870274+00:00"
+    },
+    {
+      "id": "tx_bcdaac72",
+      "type": "SALES_REVENUE",
+      "amount": 120.46,
+      "balance_after": 4860.9,
+      "order_id": "ORD-3609-0CB7",
+      "customer": "Alex Chen",
+      "description": "Received payment of \u20b9120.46 for Order #ORD-3609-0CB7 (Alex Chen). 1x NOVA Apex Ultra Fold 5G",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T18:36:09.369321+00:00"
+    },
+    {
+      "id": "tx_aa8ee713",
+      "type": "SALES_REVENUE",
+      "amount": 103.42,
+      "balance_after": 4740.44,
+      "order_id": "ORD-3538-656D",
+      "customer": "Alex Chen",
+      "description": "Received payment of \u20b9103.42 for Order #ORD-3538-656D (Alex Chen). 1x NOVA ZenBook Ultra 14 M3 Laptop",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T18:35:38.607398+00:00"
+    },
+    {
+      "id": "tx_f318e0d0",
+      "type": "SALES_REVENUE",
+      "amount": 121.67,
+      "balance_after": 4637.02,
+      "order_id": "ORD-3507-AA72",
+      "customer": "Alex Chen",
+      "description": "Received payment of \u20b9121.67 for Order #ORD-3507-AA72 (Alex Chen). 1x NOVA BladeForge RTX 4080 Gaming Laptop",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T18:35:07.379387+00:00"
+    },
+    {
+      "id": "tx_8c49b597",
+      "type": "SALES_REVENUE",
+      "amount": 121.67,
+      "balance_after": 4515.35,
+      "order_id": "ORD-3436-8F63",
+      "customer": "Alex Chen",
+      "description": "Received payment of \u20b9121.67 for Order #ORD-3436-8F63 (Alex Chen). 1x NOVA BladeForge RTX 4080 Gaming Laptop",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T18:34:36.503854+00:00"
+    },
+    {
+      "id": "tx_7349e4cc",
+      "type": "SALES_REVENUE",
+      "amount": 121.67,
+      "balance_after": 4393.68,
+      "order_id": "ORD-3404-58EA",
+      "customer": "Alex Chen",
+      "description": "Received payment of \u20b9121.67 for Order #ORD-3404-58EA (Alex Chen). 1x NOVA BladeForge RTX 4080 Gaming Laptop",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T18:34:05.098310+00:00"
+    },
+    {
+      "id": "tx_5fb2e127",
+      "type": "SALES_REVENUE",
+      "amount": 121.67,
+      "balance_after": 4272.01,
+      "order_id": "ORD-3332-7F2D",
+      "customer": "Alex Chen",
+      "description": "Received payment of \u20b9121.67 for Order #ORD-3332-7F2D (Alex Chen). 1x NOVA BladeForge RTX 4080 Gaming Laptop",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T18:33:33.279102+00:00"
+    },
+    {
+      "id": "tx_14553b36",
+      "type": "SALES_REVENUE",
+      "amount": 121.67,
+      "balance_after": 4150.34,
+      "order_id": "ORD-3303-429F",
+      "customer": "Alex Chen",
+      "description": "Received payment of \u20b9121.67 for Order #ORD-3303-429F (Alex Chen). 1x NOVA BladeForge RTX 4080 Gaming Laptop",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T18:33:03.415260+00:00"
+    },
+    {
+      "id": "tx_ef9b209d",
+      "type": "SALES_REVENUE",
+      "amount": 120.46,
+      "balance_after": 4028.67,
+      "order_id": "ORD-3232-9DD1",
+      "customer": "Alex Chen",
+      "description": "Received payment of \u20b9120.46 for Order #ORD-3232-9DD1 (Alex Chen). 1x NOVA Apex Ultra Fold 5G",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T18:32:32.822499+00:00"
+    },
+    {
+      "id": "tx_daaeeadb",
+      "type": "SALES_REVENUE",
+      "amount": 121.67,
+      "balance_after": 3908.21,
+      "order_id": "ORD-3200-2347",
+      "customer": "Alex Chen",
+      "description": "Received payment of \u20b9121.67 for Order #ORD-3200-2347 (Alex Chen). 1x NOVA BladeForge RTX 4080 Gaming Laptop",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T18:32:01.198716+00:00"
+    },
+    {
+      "id": "tx_1c783e44",
+      "type": "SALES_REVENUE",
+      "amount": 91.25,
+      "balance_after": 3786.54,
+      "order_id": "ORD-3129-AC41",
+      "customer": "Alex Chen",
+      "description": "Received payment of \u20b991.25 for Order #ORD-3129-AC41 (Alex Chen). 1x NOVA AeroBook Slim i7 Ultrabook",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T18:31:29.791416+00:00"
+    },
+    {
+      "id": "tx_b76b5e7a",
+      "type": "SALES_REVENUE",
+      "amount": 120.46,
+      "balance_after": 3695.29,
+      "order_id": "ORD-3103-E6E7",
+      "customer": "Alex Chen",
+      "description": "Received payment of \u20b9120.46 for Order #ORD-3103-E6E7 (Alex Chen). 1x NOVA Apex Ultra Fold 5G",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T18:31:03.667448+00:00"
+    },
+    {
+      "id": "tx_b6220ad3",
+      "type": "SALES_REVENUE",
+      "amount": 103.42,
+      "balance_after": 3574.83,
+      "order_id": "ORD-3030-799D",
+      "customer": "Alex Chen",
+      "description": "Received payment of \u20b9103.42 for Order #ORD-3030-799D (Alex Chen). 1x NOVA ZenBook Ultra 14 M3 Laptop",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T18:30:31.259498+00:00"
+    },
+    {
+      "id": "tx_7d0e6a2a",
+      "type": "SALES_REVENUE",
+      "amount": 103.42,
+      "balance_after": 3471.41,
+      "order_id": "ORD-3005-7E7D",
+      "customer": "Alex Chen",
+      "description": "Received payment of \u20b9103.42 for Order #ORD-3005-7E7D (Alex Chen). 1x NOVA ZenBook Ultra 14 M3 Laptop",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T18:30:05.817250+00:00"
+    },
+    {
+      "id": "tx_60868467",
+      "type": "SALES_REVENUE",
+      "amount": 120.46,
+      "balance_after": 3367.99,
+      "order_id": "ORD-2946-BBC1",
+      "customer": "Alex Chen",
+      "description": "Received payment of \u20b9120.46 for Order #ORD-2946-BBC1 (Alex Chen). 1x NOVA Apex Pro 5G Smartphone",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T18:29:46.518014+00:00"
+    },
+    {
+      "id": "tx_834fc6e4",
+      "type": "SALES_REVENUE",
+      "amount": 120.46,
+      "balance_after": 3247.53,
+      "order_id": "ORD-2921-728E",
+      "customer": "Sophia Miller",
+      "description": "Received payment of \u20b9120.46 for Order #ORD-2921-728E (Sophia Miller). 1x NOVA Apex Pro 5G Smartphone",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T18:29:21.936662+00:00"
+    },
+    {
+      "id": "tx_7a684309",
+      "type": "SALES_REVENUE",
+      "amount": 79.08,
+      "balance_after": 3127.07,
+      "order_id": "ORD-2858-75A8",
       "customer": "David Patel",
-      "description": "Received payment of \u20b940.25 for Order #ORD-1141-84B3 (David Patel). 1x NOVA ViperBlade 26K DPI Gaming Mouse",
+      "description": "Received payment of \u20b979.08 for Order #ORD-2858-75A8 (David Patel). 1x NOVA Pulse Ultra Smartwatch",
       "actor": "Payment Gateway / AP2",
-      "timestamp": "2026-08-30T22:11:41.880172+00:00"
+      "timestamp": "2026-09-03T18:28:58.780176+00:00"
     },
     {
-      "id": "tx_c29f552c",
+      "id": "tx_864810f7",
       "type": "SALES_REVENUE",
-      "amount": 93.44,
-      "balance_after": 527.99,
-      "order_id": "ORD-1136-0AB2",
+      "amount": 121.67,
+      "balance_after": 3047.99,
+      "order_id": "ORD-2835-6082",
+      "customer": "Alex Chen",
+      "description": "Received payment of \u20b9121.67 for Order #ORD-2835-6082 (Alex Chen). 1x NOVA BladeForge RTX 4080 Gaming Laptop",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T18:28:35.907657+00:00"
+    },
+    {
+      "id": "tx_967da845",
+      "type": "SALES_REVENUE",
+      "amount": 103.42,
+      "balance_after": 2926.32,
+      "order_id": "ORD-2814-470C",
+      "customer": "Alex Chen",
+      "description": "Received payment of \u20b9103.42 for Order #ORD-2814-470C (Alex Chen). 1x NOVA ZenBook Ultra 14 M3 Laptop",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T18:28:14.343070+00:00"
+    },
+    {
+      "id": "tx_07a4d539",
+      "type": "SALES_REVENUE",
+      "amount": 120.46,
+      "balance_after": 2822.9,
+      "order_id": "ORD-2752-B188",
+      "customer": "Alex Chen",
+      "description": "Received payment of \u20b9120.46 for Order #ORD-2752-B188 (Alex Chen). 1x NOVA Apex Ultra Fold 5G",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T18:27:52.217681+00:00"
+    },
+    {
+      "id": "tx_30e3fd16",
+      "type": "SALES_REVENUE",
+      "amount": 103.42,
+      "balance_after": 2702.44,
+      "order_id": "ORD-2751-C0A0",
+      "customer": "Alex Chen",
+      "description": "Received payment of \u20b9103.42 for Order #ORD-2751-C0A0 (Alex Chen). 1x NOVA ZenBook Ultra 14 M3 Laptop",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T18:27:51.347712+00:00"
+    },
+    {
+      "id": "tx_e262b132",
+      "type": "SALES_REVENUE",
+      "amount": 120.46,
+      "balance_after": 2599.02,
+      "order_id": "ORD-2728-4D0C",
+      "customer": "Guest User",
+      "description": "Received payment of \u20b9120.46 for Order #ORD-2728-4D0C (Guest User). 1x NOVA Apex Pro 5G Smartphone",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T18:27:28.957307+00:00"
+    },
+    {
+      "id": "tx_ec56849a",
+      "type": "SALES_REVENUE",
+      "amount": 120.46,
+      "balance_after": 2478.56,
+      "order_id": "ORD-2728-FFFE",
+      "customer": "Alex Chen",
+      "description": "Received payment of \u20b9120.46 for Order #ORD-2728-FFFE (Alex Chen). 1x NOVA Apex Pro 5G Smartphone",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T18:27:28.662648+00:00"
+    },
+    {
+      "id": "tx_80924109",
+      "type": "SALES_REVENUE",
+      "amount": 91.25,
+      "balance_after": 2358.1,
+      "order_id": "ORD-2705-9688",
+      "customer": "Alex Chen",
+      "description": "Received payment of \u20b991.25 for Order #ORD-2705-9688 (Alex Chen). 1x NOVA AeroBook Slim i7 Ultrabook",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T18:27:05.464176+00:00"
+    },
+    {
+      "id": "tx_e5713d26",
+      "type": "SALES_REVENUE",
+      "amount": 120.46,
+      "balance_after": 2266.85,
+      "order_id": "ORD-2704-8CD6",
+      "customer": "Guest User",
+      "description": "Received payment of \u20b9120.46 for Order #ORD-2704-8CD6 (Guest User). 1x NOVA Apex Pro 5G Smartphone",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T18:27:04.603532+00:00"
+    },
+    {
+      "id": "tx_087cf3e6",
+      "type": "SALES_REVENUE",
+      "amount": 120.46,
+      "balance_after": 2146.39,
+      "order_id": "ORD-2644-35CC",
+      "customer": "Alex Chen",
+      "description": "Received payment of \u20b9120.46 for Order #ORD-2644-35CC (Alex Chen). 1x NOVA Apex Ultra Fold 5G",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T18:26:44.524045+00:00"
+    },
+    {
+      "id": "tx_1dd47f61",
+      "type": "SALES_REVENUE",
+      "amount": 120.46,
+      "balance_after": 2025.93,
+      "order_id": "ORD-2620-0BC2",
+      "customer": "Alex Chen",
+      "description": "Received payment of \u20b9120.46 for Order #ORD-2620-0BC2 (Alex Chen). 1x NOVA Apex Ultra Fold 5G",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T18:26:20.657985+00:00"
+    },
+    {
+      "id": "tx_5c910701",
+      "type": "SALES_REVENUE",
+      "amount": 103.42,
+      "balance_after": 1905.47,
+      "order_id": "ORD-2616-FB32",
+      "customer": "Alex Chen",
+      "description": "Received payment of \u20b9103.42 for Order #ORD-2616-FB32 (Alex Chen). 1x NOVA ZenBook Ultra 14 M3 Laptop",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T18:26:16.209086+00:00"
+    },
+    {
+      "id": "tx_96b8e995",
+      "type": "SALES_REVENUE",
+      "amount": 103.42,
+      "balance_after": 1802.05,
+      "order_id": "ORD-2550-B60A",
+      "customer": "Alex Chen",
+      "description": "Received payment of \u20b9103.42 for Order #ORD-2550-B60A (Alex Chen). 1x NOVA ZenBook Ultra 14 M3 Laptop",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T18:25:50.296804+00:00"
+    },
+    {
+      "id": "tx_4c62330f",
+      "type": "SALES_REVENUE",
+      "amount": 120.46,
+      "balance_after": 1698.63,
+      "order_id": "ORD-2530-748A",
+      "customer": "Alex Chen",
+      "description": "Received payment of \u20b9120.46 for Order #ORD-2530-748A (Alex Chen). 1x NOVA Apex Pro 5G Smartphone",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T18:25:30.759281+00:00"
+    },
+    {
+      "id": "tx_17b4cf38",
+      "type": "SALES_REVENUE",
+      "amount": 103.42,
+      "balance_after": 1578.17,
+      "order_id": "ORD-2527-B183",
+      "customer": "Alex Chen",
+      "description": "Received payment of \u20b9103.42 for Order #ORD-2527-B183 (Alex Chen). 1x NOVA ZenBook Ultra 14 M3 Laptop",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T18:25:27.728785+00:00"
+    },
+    {
+      "id": "tx_4d5e57ab",
+      "type": "SALES_REVENUE",
+      "amount": 120.46,
+      "balance_after": 1474.75,
+      "order_id": "ORD-2445-14DB",
+      "customer": "Alex Chen",
+      "description": "Received payment of \u20b9120.46 for Order #ORD-2445-14DB (Alex Chen). 1x NOVA Apex Ultra Fold 5G",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T18:24:46.100083+00:00"
+    },
+    {
+      "id": "tx_aa7248ed",
+      "type": "SALES_REVENUE",
+      "amount": 121.67,
+      "balance_after": 1354.29,
+      "order_id": "ORD-2435-3A25",
+      "customer": "Alex Chen",
+      "description": "Received payment of \u20b9121.67 for Order #ORD-2435-3A25 (Alex Chen). 1x NOVA BladeForge RTX 4080 Gaming Laptop",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T18:24:35.861901+00:00"
+    },
+    {
+      "id": "tx_9ec9da78",
+      "type": "SALES_REVENUE",
+      "amount": 120.46,
+      "balance_after": 1232.62,
+      "order_id": "ORD-2411-81F6",
+      "customer": "Alex Chen",
+      "description": "Received payment of \u20b9120.46 for Order #ORD-2411-81F6 (Alex Chen). 1x NOVA Apex Ultra Fold 5G",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T18:24:11.276078+00:00"
+    },
+    {
+      "id": "tx_b9f19fc5",
+      "type": "SALES_REVENUE",
+      "amount": 112.41,
+      "balance_after": 1112.16,
+      "order_id": "ORD-2410-FF14",
+      "customer": "Alex Chen",
+      "description": "Received payment of \u20b9112.41 for Order #ORD-2410-FF14 (Alex Chen). 1x NOVA ZenBook Ultra 14 M3 Laptop",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T18:24:10.235197+00:00"
+    },
+    {
+      "id": "tx_96f953ee",
+      "type": "SALES_REVENUE",
+      "amount": 48.67,
+      "balance_after": 999.75,
+      "order_id": "ORD-2346-3FEF",
       "customer": "Sophia Miller",
-      "description": "Received payment of \u20b993.44 for Order #ORD-1136-0AB2 (Sophia Miller). 1x NOVA Pulse Ultra Smartwatch",
+      "description": "Received payment of \u20b948.67 for Order #ORD-2346-3FEF (Sophia Miller). 1x NOVA Stealth Travel Expandable Smart Backpack",
       "actor": "Payment Gateway / AP2",
-      "timestamp": "2026-08-30T22:11:36.244779+00:00"
+      "timestamp": "2026-09-03T18:23:47.122822+00:00"
     },
     {
-      "id": "tx_5f0119b7",
+      "id": "tx_37c1ace6",
       "type": "SALES_REVENUE",
-      "amount": 122.19,
-      "balance_after": 434.55,
-      "order_id": "ORD-1100-30F8",
-      "customer": "Alex Chen",
-      "description": "Received payment of \u20b9122.19 for Order #ORD-1100-30F8 (Alex Chen). 1x NOVA ZenBook Ultra 14 M3 Laptop",
-      "actor": "Payment Gateway / AP2",
-      "timestamp": "2026-08-30T22:11:00.510815+00:00"
-    },
-    {
-      "id": "tx_92698adc",
-      "type": "SALES_REVENUE",
-      "amount": 84.81,
-      "balance_after": 312.36,
-      "order_id": "ORD-1050-5092",
-      "customer": "Marcus Kim",
-      "description": "Received payment of \u20b984.81 for Order #ORD-1050-5092 (Marcus Kim). 1x NOVA SonicFlow ANC Pro Wireless Headphones",
-      "actor": "Payment Gateway / AP2",
-      "timestamp": "2026-08-30T22:10:50.472427+00:00"
-    },
-    {
-      "id": "tx_d55104a6",
-      "type": "SALES_REVENUE",
-      "amount": 107.81,
-      "balance_after": 227.55,
-      "order_id": "ORD-1019-9DAF",
-      "customer": "Alex Chen",
-      "description": "Received payment of \u20b9107.81 for Order #ORD-1019-9DAF (Alex Chen). 1x NOVA AeroBook Slim i7 Ultrabook",
-      "actor": "Payment Gateway / AP2",
-      "timestamp": "2026-08-30T22:10:19.642889+00:00"
-    },
-    {
-      "id": "tx_c3459c6d",
-      "type": "SALES_REVENUE",
-      "amount": 74.75,
-      "balance_after": 119.74,
-      "order_id": "ORD-0915-A36D",
-      "customer": "Elena Rostova",
-      "description": "Received payment of \u20b974.75 for Order #ORD-0915-A36D (Elena Rostova). 1x NOVA StreamAir Dual Wireless Lavalier Mic System",
-      "actor": "Payment Gateway / AP2",
-      "timestamp": "2026-08-30T22:09:15.184627+00:00"
-    },
-    {
-      "id": "tx_3a7dc26f",
-      "type": "SALARY_PAYOUT",
-      "amount": 50.0,
-      "balance_after": 44.99,
-      "agent_name": "Review and Feedback Manager",
-      "description": "Paid salary of \u20b950.00 to Review and Feedback Manager (Per 100 Cycles (Min \u20b950)).",
-      "actor": "CEO Agent (Milestone Payroll)",
-      "timestamp": "2026-08-30T22:07:04.765477+00:00"
-    },
-    {
-      "id": "tx_62d4efd6",
-      "type": "SALARY_PAYOUT",
-      "amount": 50.0,
-      "balance_after": 94.99,
-      "agent_name": "Dispatcher Agent",
-      "description": "Paid salary of \u20b950.00 to Dispatcher Agent (Per 100 Cycles (Min \u20b950)).",
-      "actor": "CEO Agent (Milestone Payroll)",
-      "timestamp": "2026-08-30T22:07:04.727987+00:00"
-    },
-    {
-      "id": "tx_0d4c2509",
-      "type": "SALARY_PAYOUT",
-      "amount": 50.0,
-      "balance_after": 144.99,
-      "agent_name": "Finance Manager Agent",
-      "description": "Paid salary of \u20b950.00 to Finance Manager Agent (Per 100 Cycles (Min \u20b950)).",
-      "actor": "CEO Agent (Milestone Payroll)",
-      "timestamp": "2026-08-30T22:07:04.685818+00:00"
-    },
-    {
-      "id": "tx_5ca665a3",
-      "type": "SALARY_PAYOUT",
-      "amount": 50.0,
-      "balance_after": 194.99,
-      "agent_name": "Order Management Agent",
-      "description": "Paid salary of \u20b950.00 to Order Management Agent (Per 100 Cycles (Min \u20b950)).",
-      "actor": "CEO Agent (Milestone Payroll)",
-      "timestamp": "2026-08-30T22:07:04.638668+00:00"
-    },
-    {
-      "id": "tx_36cb57a6",
-      "type": "SALARY_PAYOUT",
-      "amount": 50.0,
-      "balance_after": 244.99,
-      "agent_name": "Inventory Manager Agent",
-      "description": "Paid salary of \u20b950.00 to Inventory Manager Agent (Per 100 Cycles (Min \u20b950)).",
-      "actor": "CEO Agent (Milestone Payroll)",
-      "timestamp": "2026-08-30T22:07:04.591179+00:00"
-    },
-    {
-      "id": "tx_e524a80b",
-      "type": "SALARY_PAYOUT",
-      "amount": 50.0,
-      "balance_after": 294.99,
-      "agent_name": "Price Manager Agent",
-      "description": "Paid salary of \u20b950.00 to Price Manager Agent (Per 100 Cycles (Min \u20b950)).",
-      "actor": "CEO Agent (Milestone Payroll)",
-      "timestamp": "2026-08-30T22:07:04.540703+00:00"
-    },
-    {
-      "id": "tx_1b9df1de",
-      "type": "SALARY_PAYOUT",
-      "amount": 500.0,
-      "balance_after": 344.99,
-      "agent_name": "CEO Agent",
-      "description": "Paid salary of \u20b9500.00 to CEO Agent (Per 100 Cycles (Owner-Set Premium)).",
-      "actor": "CEO Agent (Milestone Payroll)",
-      "timestamp": "2026-08-30T22:07:04.492906+00:00"
-    },
-    {
-      "id": "tx_6322125f",
-      "type": "SALES_REVENUE",
-      "amount": 54.62,
-      "balance_after": 844.99,
-      "order_id": "ORD-0653-BA21",
+      "amount": 46.29,
+      "balance_after": 951.08,
+      "order_id": "ORD-2315-106D",
       "customer": "Sophia Miller",
-      "description": "Received payment of \u20b954.62 for Order #ORD-0653-BA21 (Sophia Miller). 1x NOVA HyperGaN 140W Quad-Port Pro Charger",
+      "description": "Received payment of \u20b946.29 for Order #ORD-2315-106D (Sophia Miller). 1x NOVA TitanVolt HyperCharge PowerBank 20k",
       "actor": "Payment Gateway / AP2",
-      "timestamp": "2026-08-30T22:06:53.070685+00:00"
+      "timestamp": "2026-09-03T18:23:15.332333+00:00"
     },
     {
-      "id": "tx_098ba8d5",
-      "type": "SALES_REVENUE",
-      "amount": 57.5,
-      "balance_after": 790.37,
-      "order_id": "ORD-0646-9F73",
-      "customer": "David Patel",
-      "description": "Received payment of \u20b957.50 for Order #ORD-0646-9F73 (David Patel). 1x NOVA Stealth Travel Expandable Smart Backpack",
-      "actor": "Payment Gateway / AP2",
-      "timestamp": "2026-08-30T22:06:46.672430+00:00"
-    },
-    {
-      "id": "tx_9fa72813",
-      "type": "SALES_REVENUE",
-      "amount": 74.75,
-      "balance_after": 732.87,
-      "order_id": "ORD-0639-1FFC",
-      "customer": "Elena Rostova",
-      "description": "Received payment of \u20b974.75 for Order #ORD-0639-1FFC (Elena Rostova). 1x NOVA StreamAir Dual Wireless Lavalier Mic System",
-      "actor": "Payment Gateway / AP2",
-      "timestamp": "2026-08-30T22:06:39.799594+00:00"
-    },
-    {
-      "id": "tx_854ba7d7",
-      "type": "SALES_REVENUE",
-      "amount": 35.94,
-      "balance_after": 658.12,
-      "order_id": "ORD-0614-48E3",
-      "customer": "Marcus Kim",
-      "description": "Received payment of \u20b935.94 for Order #ORD-0614-48E3 (Marcus Kim). 1x NOVA PowerStream 100W USB-C Laptop Charger",
-      "actor": "Payment Gateway / AP2",
-      "timestamp": "2026-08-30T22:06:14.695490+00:00"
-    },
-    {
-      "id": "tx_1df175d9",
-      "type": "SALES_REVENUE",
-      "amount": 143.75,
-      "balance_after": 622.18,
-      "order_id": "ORD-0544-553F",
-      "customer": "Alex Chen",
-      "description": "Received payment of \u20b9143.75 for Order #ORD-0544-553F (Alex Chen). 1x NOVA BladeForge RTX 4080 Gaming Laptop",
-      "actor": "Payment Gateway / AP2",
-      "timestamp": "2026-08-30T22:05:45.020915+00:00"
-    },
-    {
-      "id": "tx_969321a0",
-      "type": "SALES_REVENUE",
-      "amount": 40.25,
-      "balance_after": 478.43,
-      "order_id": "ORD-0233-19E8",
-      "customer": "Marcus Kim",
-      "description": "Received payment of \u20b940.25 for Order #ORD-0233-19E8 (Marcus Kim). 1x NOVA ViperBlade 26K DPI Gaming Mouse",
-      "actor": "Payment Gateway / AP2",
-      "timestamp": "2026-08-30T22:02:33.757349+00:00"
-    },
-    {
-      "id": "tx_828ed9a9",
-      "type": "STOCK_PURCHASE",
-      "amount": 125.0,
-      "balance_after": 438.18,
-      "product_id": "prod_024",
-      "product_name": "NOVA PowerStream 100W USB-C Laptop Charger",
-      "quantity": 5,
-      "unit_cost": 25.0,
-      "description": "Acquired 5 units of 'NOVA PowerStream 100W USB-C Laptop Charger' at wholesale Base Price \u20b925.00/unit.",
-      "actor": "Inventory Manager Agent",
-      "timestamp": "2026-08-30T22:02:20.034013+00:00"
-    },
-    {
-      "id": "tx_f0e20ff0",
-      "type": "STOCK_PURCHASE",
-      "amount": 125.0,
-      "balance_after": 563.18,
-      "product_id": "prod_024",
-      "product_name": "NOVA PowerStream 100W USB-C Laptop Charger",
-      "quantity": 5,
-      "unit_cost": 25.0,
-      "description": "Acquired 5 units of 'NOVA PowerStream 100W USB-C Laptop Charger' at wholesale Base Price \u20b925.00/unit.",
-      "actor": "Inventory Manager Agent",
-      "timestamp": "2026-08-30T22:02:14.484129+00:00"
-    },
-    {
-      "id": "tx_7ffb9234",
-      "type": "SALES_REVENUE",
-      "amount": 50.31,
-      "balance_after": 688.18,
-      "order_id": "ORD-0208-6E9A",
-      "customer": "David Patel",
-      "description": "Received payment of \u20b950.31 for Order #ORD-0208-6E9A (David Patel). 1x NOVA Vortex Pro RGB Wired Mechanical Keyboard",
-      "actor": "Payment Gateway / AP2",
-      "timestamp": "2026-08-30T22:02:08.089274+00:00"
-    },
-    {
-      "id": "tx_fe29fbef",
-      "type": "SALES_REVENUE",
-      "amount": 143.75,
-      "balance_after": 637.87,
-      "order_id": "ORD-0201-F799",
-      "customer": "Elena Rostova",
-      "description": "Received payment of \u20b9143.75 for Order #ORD-0201-F799 (Elena Rostova). 1x NOVA BladeForge RTX 4080 Gaming Laptop",
-      "actor": "Payment Gateway / AP2",
-      "timestamp": "2026-08-30T22:02:01.281272+00:00"
-    },
-    {
-      "id": "tx_508f29e5",
-      "type": "SALES_REVENUE",
-      "amount": 35.94,
-      "balance_after": 494.12,
-      "order_id": "ORD-0147-B18A",
-      "customer": "Sophia Miller",
-      "description": "Received payment of \u20b935.94 for Order #ORD-0147-B18A (Sophia Miller). 1x NOVA PowerStream 100W USB-C Laptop Charger",
-      "actor": "Payment Gateway / AP2",
-      "timestamp": "2026-08-30T22:01:47.717753+00:00"
-    },
-    {
-      "id": "tx_dfdc144c",
-      "type": "SALES_REVENUE",
-      "amount": 142.31,
-      "balance_after": 458.18,
-      "order_id": "ORD-0139-73D7",
-      "customer": "Alex Chen",
-      "description": "Received payment of \u20b9142.31 for Order #ORD-0139-73D7 (Alex Chen). 1x NOVA Apex Pro 5G Smartphone",
-      "actor": "Payment Gateway / AP2",
-      "timestamp": "2026-08-30T22:01:39.810987+00:00"
-    },
-    {
-      "id": "tx_4a97af0d",
-      "type": "SALARY_PAYOUT",
-      "amount": 50.0,
-      "balance_after": 315.87,
-      "agent_name": "Review and Feedback Manager",
-      "description": "Paid salary of \u20b950.00 to Review and Feedback Manager (Per 100 Cycles (Min \u20b950)).",
-      "actor": "CEO Agent (Milestone Payroll)",
-      "timestamp": "2026-08-30T22:01:05.180578+00:00"
-    },
-    {
-      "id": "tx_e5669ffd",
-      "type": "SALARY_PAYOUT",
-      "amount": 50.0,
-      "balance_after": 365.87,
-      "agent_name": "Dispatcher Agent",
-      "description": "Paid salary of \u20b950.00 to Dispatcher Agent (Per 100 Cycles (Min \u20b950)).",
-      "actor": "CEO Agent (Milestone Payroll)",
-      "timestamp": "2026-08-30T22:01:05.142601+00:00"
-    },
-    {
-      "id": "tx_30d95298",
-      "type": "SALARY_PAYOUT",
-      "amount": 50.0,
-      "balance_after": 415.87,
-      "agent_name": "Finance Manager Agent",
-      "description": "Paid salary of \u20b950.00 to Finance Manager Agent (Per 100 Cycles (Min \u20b950)).",
-      "actor": "CEO Agent (Milestone Payroll)",
-      "timestamp": "2026-08-30T22:01:05.112099+00:00"
-    },
-    {
-      "id": "tx_ce7aeb25",
-      "type": "SALARY_PAYOUT",
-      "amount": 50.0,
-      "balance_after": 465.87,
-      "agent_name": "Order Management Agent",
-      "description": "Paid salary of \u20b950.00 to Order Management Agent (Per 100 Cycles (Min \u20b950)).",
-      "actor": "CEO Agent (Milestone Payroll)",
-      "timestamp": "2026-08-30T22:01:05.073760+00:00"
-    },
-    {
-      "id": "tx_00a0cad6",
-      "type": "SALARY_PAYOUT",
-      "amount": 50.0,
-      "balance_after": 515.87,
-      "agent_name": "Inventory Manager Agent",
-      "description": "Paid salary of \u20b950.00 to Inventory Manager Agent (Per 100 Cycles (Min \u20b950)).",
-      "actor": "CEO Agent (Milestone Payroll)",
-      "timestamp": "2026-08-30T22:01:05.029236+00:00"
-    },
-    {
-      "id": "tx_cf763d69",
-      "type": "SALARY_PAYOUT",
-      "amount": 50.0,
-      "balance_after": 565.87,
-      "agent_name": "Price Manager Agent",
-      "description": "Paid salary of \u20b950.00 to Price Manager Agent (Per 100 Cycles (Min \u20b950)).",
-      "actor": "CEO Agent (Milestone Payroll)",
-      "timestamp": "2026-08-30T22:01:04.987760+00:00"
-    },
-    {
-      "id": "tx_da0ce2f6",
-      "type": "SALARY_PAYOUT",
-      "amount": 500.0,
-      "balance_after": 615.87,
-      "agent_name": "CEO Agent",
-      "description": "Paid salary of \u20b9500.00 to CEO Agent (Per 100 Cycles (Owner-Set Premium)).",
-      "actor": "CEO Agent (Milestone Payroll)",
-      "timestamp": "2026-08-30T22:01:04.940874+00:00"
-    },
-    {
-      "id": "tx_3ff0555c",
-      "type": "SALES_REVENUE",
-      "amount": 122.19,
-      "balance_after": 1115.87,
-      "order_id": "ORD-0014-E284",
-      "customer": "Alex Chen",
-      "description": "Received payment of \u20b9122.19 for Order #ORD-0014-E284 (Alex Chen). 1x NOVA ZenBook Ultra 14 M3 Laptop",
-      "actor": "Payment Gateway / AP2",
-      "timestamp": "2026-08-30T22:00:14.347956+00:00"
-    },
-    {
-      "id": "tx_8e69f5fd",
-      "type": "SALES_REVENUE",
-      "amount": 54.62,
-      "balance_after": 993.68,
-      "order_id": "ORD-5937-4D48",
-      "customer": "Marcus Kim",
-      "description": "Received payment of \u20b954.62 for Order #ORD-5937-4D48 (Marcus Kim). 1x NOVA HyperGaN 140W Quad-Port Pro Charger",
-      "actor": "Payment Gateway / AP2",
-      "timestamp": "2026-08-30T21:59:37.391536+00:00"
-    },
-    {
-      "id": "tx_f349b0a3",
-      "type": "SALES_REVENUE",
-      "amount": 107.13,
-      "balance_after": 939.06,
-      "order_id": "ORD-5744-4734",
-      "customer": "Elena Rostova",
-      "description": "Received payment of \u20b9107.13 for Order #ORD-5744-4734 (Elena Rostova). 1x NOVA VoiceCraft XLR Studio Condenser Wired Mic",
-      "actor": "Payment Gateway / AP2",
-      "timestamp": "2026-08-30T21:57:44.110676+00:00"
-    },
-    {
-      "id": "tx_0c775ce3",
-      "type": "STOCK_PURCHASE",
-      "amount": 150.0,
-      "balance_after": 831.93,
-      "product_id": "prod_022",
-      "product_name": "NOVA Stealth Commuter Smart Backpack",
-      "quantity": 5,
-      "unit_cost": 30.0,
-      "description": "Acquired 5 units of 'NOVA Stealth Commuter Smart Backpack' at wholesale Base Price \u20b930.00/unit.",
-      "actor": "Inventory Manager Agent",
-      "timestamp": "2026-08-30T21:57:17.706633+00:00"
-    },
-    {
-      "id": "tx_ff531f8d",
-      "type": "SALES_REVENUE",
-      "amount": 99.19,
-      "balance_after": 981.93,
-      "order_id": "ORD-5711-6D88",
-      "customer": "Sophia Miller",
-      "description": "Received payment of \u20b999.19 for Order #ORD-5711-6D88 (Sophia Miller). 1x NOVA Prime 5G Smartphone",
-      "actor": "Payment Gateway / AP2",
-      "timestamp": "2026-08-30T21:57:11.565808+00:00"
-    },
-    {
-      "id": "tx_ee26a7c2",
-      "type": "STOCK_PURCHASE",
-      "amount": 150.0,
-      "balance_after": 882.74,
-      "product_id": "prod_022",
-      "product_name": "NOVA Stealth Commuter Smart Backpack",
-      "quantity": 5,
-      "unit_cost": 30.0,
-      "description": "Acquired 5 units of 'NOVA Stealth Commuter Smart Backpack' at wholesale Base Price \u20b930.00/unit.",
-      "actor": "Inventory Manager Agent",
-      "timestamp": "2026-08-30T21:57:10.836083+00:00"
-    },
-    {
-      "id": "tx_5a2aef52",
+      "id": "tx_7cef15e9",
       "type": "REFUND_EXPENSE",
-      "amount": 50.31,
-      "balance_after": 1032.74,
-      "order_id": "ORD-5620-89FA",
-      "description": "Refund of \u20b950.31 issued for Order #ORD-5620-89FA (Buyer Sophia Miller testing 24-hour return policy (Smart Bargain Hunter)).",
+      "amount": 50.25,
+      "balance_after": 904.79,
+      "order_id": "ORD-2302-D6AF",
+      "description": "Refund of \u20b950.25 issued for Order #ORD-2302-D6AF (Buyer Sophia Miller testing 24-hour return policy (Smart Bargain Hunter)).",
       "actor": "Finance Manager Agent",
-      "timestamp": "2026-08-30T21:57:09.677441+00:00"
+      "timestamp": "2026-09-03T18:23:13.945718+00:00"
     },
     {
-      "id": "tx_8668c5a2",
+      "id": "tx_aa281383",
       "type": "SALES_REVENUE",
-      "amount": 43.12,
-      "balance_after": 1083.05,
-      "order_id": "ORD-5658-A613",
-      "customer": "David Patel",
-      "description": "Received payment of \u20b943.12 for Order #ORD-5658-A613 (David Patel). 1x NOVA Stealth Commuter Smart Backpack",
-      "actor": "Payment Gateway / AP2",
-      "timestamp": "2026-08-30T21:56:58.922412+00:00"
-    },
-    {
-      "id": "tx_4cebb0b0",
-      "type": "STOCK_PURCHASE",
-      "amount": 375.0,
-      "balance_after": 1039.93,
-      "product_id": "prod_006",
-      "product_name": "NOVA AeroBook Slim i7 Ultrabook",
-      "quantity": 5,
-      "unit_cost": 75.0,
-      "description": "Acquired 5 units of 'NOVA AeroBook Slim i7 Ultrabook' at wholesale Base Price \u20b975.00/unit.",
-      "actor": "Inventory Manager Agent",
-      "timestamp": "2026-08-30T21:56:47.957142+00:00"
-    },
-    {
-      "id": "tx_35325a23",
-      "type": "STOCK_PURCHASE",
-      "amount": 375.0,
-      "balance_after": 1414.93,
-      "product_id": "prod_006",
-      "product_name": "NOVA AeroBook Slim i7 Ultrabook",
-      "quantity": 5,
-      "unit_cost": 75.0,
-      "description": "Acquired 5 units of 'NOVA AeroBook Slim i7 Ultrabook' at wholesale Base Price \u20b975.00/unit.",
-      "actor": "Inventory Manager Agent",
-      "timestamp": "2026-08-30T21:56:43.402733+00:00"
-    },
-    {
-      "id": "tx_0ea96161",
-      "type": "SALES_REVENUE",
-      "amount": 107.81,
-      "balance_after": 1789.93,
-      "order_id": "ORD-5631-0B2F",
-      "customer": "Alex Chen",
-      "description": "Received payment of \u20b9107.81 for Order #ORD-5631-0B2F (Alex Chen). 1x NOVA AeroBook Slim i7 Ultrabook",
-      "actor": "Payment Gateway / AP2",
-      "timestamp": "2026-08-30T21:56:31.505254+00:00"
-    },
-    {
-      "id": "tx_740d5e48",
-      "type": "SALES_REVENUE",
-      "amount": 142.31,
-      "balance_after": 1682.12,
-      "order_id": "ORD-5625-694C",
-      "customer": "Alex Chen",
-      "description": "Received payment of \u20b9142.31 for Order #ORD-5625-694C (Alex Chen). 1x NOVA Apex Pro 5G Smartphone",
-      "actor": "Payment Gateway / AP2",
-      "timestamp": "2026-08-30T21:56:25.763690+00:00"
-    },
-    {
-      "id": "tx_e2794a66",
-      "type": "SALES_REVENUE",
-      "amount": 50.31,
-      "balance_after": 1539.81,
-      "order_id": "ORD-5620-89FA",
+      "amount": 50.25,
+      "balance_after": 955.04,
+      "order_id": "ORD-2302-D6AF",
       "customer": "Sophia Miller",
-      "description": "Received payment of \u20b950.31 for Order #ORD-5620-89FA (Sophia Miller). 1x NOVA TitanVolt HyperCharge PowerBank 20k",
+      "description": "Received payment of \u20b950.25 for Order #ORD-2302-D6AF (Sophia Miller). 1x NOVA HyperGaN 140W Quad-Port Pro Charger",
       "actor": "Payment Gateway / AP2",
-      "timestamp": "2026-08-30T21:56:20.676755+00:00"
+      "timestamp": "2026-09-03T18:23:02.415449+00:00"
     },
     {
-      "id": "tx_13d39be5",
-      "type": "SALES_REVENUE",
-      "amount": 99.19,
-      "balance_after": 1489.5,
-      "order_id": "ORD-5615-657E",
-      "customer": "Marcus Kim",
-      "description": "Received payment of \u20b999.19 for Order #ORD-5615-657E (Marcus Kim). 1x NOVA Prime 5G Smartphone",
-      "actor": "Payment Gateway / AP2",
-      "timestamp": "2026-08-30T21:56:15.013802+00:00"
-    },
-    {
-      "id": "tx_9b337533",
+      "id": "tx_a8b63c07",
       "type": "SALES_REVENUE",
       "amount": 107.81,
-      "balance_after": 1390.31,
-      "order_id": "ORD-5542-284F",
+      "balance_after": 904.79,
+      "order_id": "ORD-2223-1BB6",
       "customer": "Alex Chen",
-      "description": "Received payment of \u20b9107.81 for Order #ORD-5542-284F (Alex Chen). 1x NOVA AeroBook Slim i7 Ultrabook",
+      "description": "Received payment of \u20b9107.81 for Order #ORD-2223-1BB6 (Alex Chen). 1x NOVA AeroBook Slim i7 Ultrabook",
       "actor": "Payment Gateway / AP2",
-      "timestamp": "2026-08-30T21:55:42.635064+00:00"
+      "timestamp": "2026-09-03T18:22:23.675928+00:00"
     },
     {
-      "id": "tx_a7e60930",
-      "type": "SALES_REVENUE",
-      "amount": 107.81,
-      "balance_after": 1282.5,
-      "order_id": "ORD-5535-4CD0",
-      "customer": "Alex Chen",
-      "description": "Received payment of \u20b9107.81 for Order #ORD-5535-4CD0 (Alex Chen). 1x NOVA AeroBook Slim i7 Ultrabook",
-      "actor": "Payment Gateway / AP2",
-      "timestamp": "2026-08-30T21:55:35.912918+00:00"
-    },
-    {
-      "id": "tx_787747b3",
-      "type": "SALES_REVENUE",
-      "amount": 56.06,
-      "balance_after": 1174.69,
-      "order_id": "ORD-5212-4792",
-      "customer": "Elena Rostova",
-      "description": "Received payment of \u20b956.06 for Order #ORD-5212-4792 (Elena Rostova). 1x NOVA BoomPulse 360 Bluetooth Speaker",
-      "actor": "Payment Gateway / AP2",
-      "timestamp": "2026-08-30T21:52:12.580578+00:00"
-    },
-    {
-      "id": "tx_56e5c055",
-      "type": "STOCK_PURCHASE",
-      "amount": 125.0,
-      "balance_after": 1118.63,
-      "product_id": "prod_020",
-      "product_name": "NOVA TitanVolt MagSafe PowerBank 10k",
-      "quantity": 5,
-      "unit_cost": 25.0,
-      "description": "Acquired 5 units of 'NOVA TitanVolt MagSafe PowerBank 10k' at wholesale Base Price \u20b925.00/unit.",
-      "actor": "Inventory Manager Agent",
-      "timestamp": "2026-08-30T21:50:57.884126+00:00"
-    },
-    {
-      "id": "tx_bcfe8523",
-      "type": "STOCK_PURCHASE",
-      "amount": 125.0,
-      "balance_after": 1243.63,
-      "product_id": "prod_020",
-      "product_name": "NOVA TitanVolt MagSafe PowerBank 10k",
-      "quantity": 5,
-      "unit_cost": 25.0,
-      "description": "Acquired 5 units of 'NOVA TitanVolt MagSafe PowerBank 10k' at wholesale Base Price \u20b925.00/unit.",
-      "actor": "Inventory Manager Agent",
-      "timestamp": "2026-08-30T21:50:53.264113+00:00"
-    },
-    {
-      "id": "tx_43e0c8f5",
-      "type": "SALES_REVENUE",
-      "amount": 35.94,
-      "balance_after": 1368.63,
-      "order_id": "ORD-5043-5078",
-      "customer": "Marcus Kim",
-      "description": "Received payment of \u20b935.94 for Order #ORD-5043-5078 (Marcus Kim). 1x NOVA TitanVolt MagSafe PowerBank 10k",
-      "actor": "Payment Gateway / AP2",
-      "timestamp": "2026-08-30T21:50:43.277265+00:00"
-    },
-    {
-      "id": "tx_6432524b",
-      "type": "SALES_REVENUE",
-      "amount": 64.69,
-      "balance_after": 1332.69,
-      "order_id": "ORD-5037-B9D1",
-      "customer": "Elena Rostova",
-      "description": "Received payment of \u20b964.69 for Order #ORD-5037-B9D1 (Elena Rostova). 1x NOVA AeroPods Pro ANC Wireless Earbuds",
-      "actor": "Payment Gateway / AP2",
-      "timestamp": "2026-08-30T21:50:37.476717+00:00"
-    },
-    {
-      "id": "tx_33d4fc0f",
-      "type": "SALES_REVENUE",
-      "amount": 21.56,
-      "balance_after": 1268.0,
-      "order_id": "ORD-5003-706F",
-      "customer": "Sophia Miller",
-      "description": "Received payment of \u20b921.56 for Order #ORD-5003-706F (Sophia Miller). 1x NOVA TurboFlash 30W Mobile Fast Charger",
-      "actor": "Payment Gateway / AP2",
-      "timestamp": "2026-08-30T21:50:03.768628+00:00"
-    },
-    {
-      "id": "tx_706b9d49",
+      "id": "tx_9868ff2d",
       "type": "SALES_REVENUE",
       "amount": 142.31,
-      "balance_after": 1246.44,
-      "order_id": "ORD-4958-E037",
+      "balance_after": 796.98,
+      "order_id": "ORD-2135-4D0A",
       "customer": "Elena Rostova",
-      "description": "Received payment of \u20b9142.31 for Order #ORD-4958-E037 (Elena Rostova). 1x NOVA Apex Pro 5G Smartphone",
+      "description": "Received payment of \u20b9142.31 for Order #ORD-2135-4D0A (Elena Rostova). 1x NOVA Apex Ultra Fold 5G",
       "actor": "Payment Gateway / AP2",
-      "timestamp": "2026-08-30T21:49:58.519994+00:00"
+      "timestamp": "2026-09-03T18:21:35.976789+00:00"
     },
     {
-      "id": "tx_d27fd345",
-      "type": "SALES_REVENUE",
-      "amount": 84.81,
-      "balance_after": 1104.13,
-      "order_id": "ORD-4933-E5F7",
-      "customer": "Marcus Kim",
-      "description": "Received payment of \u20b984.81 for Order #ORD-4933-E5F7 (Marcus Kim). 1x NOVA SonicFlow ANC Pro Wireless Headphones",
-      "actor": "Payment Gateway / AP2",
-      "timestamp": "2026-08-30T21:49:33.514606+00:00"
-    },
-    {
-      "id": "tx_da44517f",
-      "type": "SALES_REVENUE",
-      "amount": 60.37,
-      "balance_after": 1019.32,
-      "order_id": "ORD-4928-7F20",
-      "customer": "David Patel",
-      "description": "Received payment of \u20b960.37 for Order #ORD-4928-7F20 (David Patel). 1x NOVA AirType Low-Profile Wireless Keyboard",
-      "actor": "Payment Gateway / AP2",
-      "timestamp": "2026-08-30T21:49:28.198023+00:00"
-    },
-    {
-      "id": "tx_accdddea",
-      "type": "SALES_REVENUE",
-      "amount": 143.75,
-      "balance_after": 958.95,
-      "order_id": "ORD-4920-123E",
-      "customer": "Alex Chen",
-      "description": "Received payment of \u20b9143.75 for Order #ORD-4920-123E (Alex Chen). 1x NOVA BladeForge RTX 4080 Gaming Laptop",
-      "actor": "Payment Gateway / AP2",
-      "timestamp": "2026-08-30T21:49:20.250691+00:00"
-    },
-    {
-      "id": "tx_3d312746",
-      "type": "SALES_REVENUE",
-      "amount": 143.75,
-      "balance_after": 815.2,
-      "order_id": "ORD-4914-85B3",
-      "customer": "Alex Chen",
-      "description": "Received payment of \u20b9143.75 for Order #ORD-4914-85B3 (Alex Chen). 1x NOVA BladeForge RTX 4080 Gaming Laptop",
-      "actor": "Payment Gateway / AP2",
-      "timestamp": "2026-08-30T21:49:14.659656+00:00"
-    },
-    {
-      "id": "tx_12136346",
-      "type": "SALES_REVENUE",
-      "amount": 142.31,
-      "balance_after": 671.45,
-      "order_id": "ORD-4907-E90B",
-      "customer": "Alex Chen",
-      "description": "Received payment of \u20b9142.31 for Order #ORD-4907-E90B (Alex Chen). 1x NOVA Apex Ultra Fold 5G",
-      "actor": "Payment Gateway / AP2",
-      "timestamp": "2026-08-30T21:49:07.717605+00:00"
-    },
-    {
-      "id": "tx_04394172",
-      "type": "SALES_REVENUE",
-      "amount": 142.31,
-      "balance_after": 529.14,
-      "order_id": "ORD-4706-5BD5",
-      "customer": "Marcus Kim",
-      "description": "Received payment of \u20b9142.31 for Order #ORD-4706-5BD5 (Marcus Kim). 1x NOVA Apex Pro 5G Smartphone",
-      "actor": "Payment Gateway / AP2",
-      "timestamp": "2026-08-30T21:47:06.045861+00:00"
-    },
-    {
-      "id": "tx_81da6aa5",
-      "type": "STOCK_PURCHASE",
-      "amount": 500.0,
-      "balance_after": 386.83,
-      "product_id": "prod_005",
-      "product_name": "NOVA BladeForge RTX 4080 Gaming Laptop",
-      "quantity": 5,
-      "unit_cost": 100.0,
-      "description": "Acquired 5 units of 'NOVA BladeForge RTX 4080 Gaming Laptop' at wholesale Base Price \u20b9100.00/unit.",
-      "actor": "Inventory Manager Agent",
-      "timestamp": "2026-08-30T21:46:47.748044+00:00"
-    },
-    {
-      "id": "tx_e9e06e7f",
-      "type": "SALES_REVENUE",
-      "amount": 84.81,
-      "balance_after": 886.83,
-      "order_id": "ORD-4639-ED5A",
-      "customer": "Elena Rostova",
-      "description": "Received payment of \u20b984.81 for Order #ORD-4639-ED5A (Elena Rostova). 1x NOVA SonicFlow ANC Pro Wireless Headphones",
-      "actor": "Payment Gateway / AP2",
-      "timestamp": "2026-08-30T21:46:39.058245+00:00"
-    },
-    {
-      "id": "tx_84b0ab1f",
-      "type": "SALES_REVENUE",
-      "amount": 143.75,
-      "balance_after": 802.02,
-      "order_id": "ORD-4633-3C86",
-      "customer": "Elena Rostova",
-      "description": "Received payment of \u20b9143.75 for Order #ORD-4633-3C86 (Elena Rostova). 1x NOVA BladeForge RTX 4080 Gaming Laptop",
-      "actor": "Payment Gateway / AP2",
-      "timestamp": "2026-08-30T21:46:33.780899+00:00"
-    },
-    {
-      "id": "tx_f5117b63",
-      "type": "SALES_REVENUE",
-      "amount": 64.69,
-      "balance_after": 658.27,
-      "order_id": "ORD-4624-01DE",
-      "customer": "David Patel",
-      "description": "Received payment of \u20b964.69 for Order #ORD-4624-01DE (David Patel). 1x NOVA AeroPods Pro ANC Wireless Earbuds",
-      "actor": "Payment Gateway / AP2",
-      "timestamp": "2026-08-30T21:46:24.907876+00:00"
-    },
-    {
-      "id": "tx_75f887c5",
-      "type": "SALES_REVENUE",
-      "amount": 142.31,
-      "balance_after": 593.58,
-      "order_id": "ORD-4520-C5E1",
-      "customer": "Alex Chen",
-      "description": "Received payment of \u20b9142.31 for Order #ORD-4520-C5E1 (Alex Chen). 1x NOVA Apex Ultra Fold 5G",
-      "actor": "Payment Gateway / AP2",
-      "timestamp": "2026-08-30T21:45:20.370003+00:00"
-    },
-    {
-      "id": "tx_c5090a93",
-      "type": "SALES_REVENUE",
-      "amount": 60.37,
-      "balance_after": 451.27,
-      "order_id": "ORD-4508-50E1",
-      "customer": "David Patel",
-      "description": "Received payment of \u20b960.37 for Order #ORD-4508-50E1 (David Patel). 1x NOVA AirType Low-Profile Wireless Keyboard",
-      "actor": "Payment Gateway / AP2",
-      "timestamp": "2026-08-30T21:45:08.895495+00:00"
-    },
-    {
-      "id": "tx_fc19847d",
-      "type": "STOCK_PURCHASE",
-      "amount": 210.0,
-      "balance_after": 390.9,
-      "product_id": "prod_017",
-      "product_name": "NOVA AirType Low-Profile Wireless Keyboard",
-      "quantity": 5,
-      "unit_cost": 42.0,
-      "description": "Acquired 5 units of 'NOVA AirType Low-Profile Wireless Keyboard' at wholesale Base Price \u20b942.00/unit.",
-      "actor": "Inventory Manager Agent",
-      "timestamp": "2026-08-30T21:45:03.915185+00:00"
-    },
-    {
-      "id": "tx_0c91d0cf",
-      "type": "STOCK_PURCHASE",
-      "amount": 210.0,
-      "balance_after": 600.9,
-      "product_id": "prod_017",
-      "product_name": "NOVA AirType Low-Profile Wireless Keyboard",
-      "quantity": 5,
-      "unit_cost": 42.0,
-      "description": "Acquired 5 units of 'NOVA AirType Low-Profile Wireless Keyboard' at wholesale Base Price \u20b942.00/unit.",
-      "actor": "Inventory Manager Agent",
-      "timestamp": "2026-08-30T21:44:57.910788+00:00"
-    },
-    {
-      "id": "tx_a813a82e",
-      "type": "SALES_REVENUE",
-      "amount": 60.37,
-      "balance_after": 810.9,
-      "order_id": "ORD-4447-0AB0",
-      "customer": "Sophia Miller",
-      "description": "Received payment of \u20b960.37 for Order #ORD-4447-0AB0 (Sophia Miller). 1x NOVA AirType Low-Profile Wireless Keyboard",
-      "actor": "Payment Gateway / AP2",
-      "timestamp": "2026-08-30T21:44:47.691626+00:00"
-    },
-    {
-      "id": "tx_c27e109e",
-      "type": "SALES_REVENUE",
-      "amount": 142.31,
-      "balance_after": 750.53,
-      "order_id": "ORD-4221-DBD9",
-      "customer": "Alex Chen",
-      "description": "Received payment of \u20b9142.31 for Order #ORD-4221-DBD9 (Alex Chen). 1x NOVA Apex Ultra Fold 5G",
-      "actor": "Payment Gateway / AP2",
-      "timestamp": "2026-08-30T21:42:21.049399+00:00"
-    },
-    {
-      "id": "tx_dea22730",
-      "type": "SALES_REVENUE",
-      "amount": 122.19,
-      "balance_after": 608.22,
-      "order_id": "ORD-4154-F0C3",
-      "customer": "Elena Rostova",
-      "description": "Received payment of \u20b9122.19 for Order #ORD-4154-F0C3 (Elena Rostova). 1x NOVA ZenBook Ultra 14 M3 Laptop",
-      "actor": "Payment Gateway / AP2",
-      "timestamp": "2026-08-30T21:41:54.508016+00:00"
-    },
-    {
-      "id": "tx_ba27da2a",
-      "type": "SALES_REVENUE",
-      "amount": 57.5,
-      "balance_after": 486.03,
-      "order_id": "ORD-4135-E2A0",
-      "customer": "Marcus Kim",
-      "description": "Received payment of \u20b957.50 for Order #ORD-4135-E2A0 (Marcus Kim). 1x NOVA Stealth Travel Expandable Smart Backpack",
-      "actor": "Payment Gateway / AP2",
-      "timestamp": "2026-08-30T21:41:35.293820+00:00"
-    },
-    {
-      "id": "tx_b093348a",
-      "type": "SALES_REVENUE",
-      "amount": 107.81,
-      "balance_after": 428.53,
-      "order_id": "ORD-4128-3ECF",
-      "customer": "Alex Rivera",
-      "description": "Received payment of \u20b9107.81 for Order #ORD-4128-3ECF (Alex Rivera). 1 items",
-      "actor": "Payment Gateway / AP2",
-      "timestamp": "2026-08-30T21:41:28.104342+00:00"
-    },
-    {
-      "id": "tx_f0e2427d",
-      "type": "SALES_REVENUE",
-      "amount": 142.31,
-      "balance_after": 320.72,
-      "order_id": "ORD-4050-B8BA",
-      "customer": "Alex Chen",
-      "description": "Received payment of \u20b9142.31 for Order #ORD-4050-B8BA (Alex Chen). 1x NOVA Apex Ultra Fold 5G",
-      "actor": "Payment Gateway / AP2",
-      "timestamp": "2026-08-30T21:40:50.884360+00:00"
-    },
-    {
-      "id": "tx_3ca581b1",
-      "type": "STOCK_PURCHASE",
-      "amount": 175.0,
-      "balance_after": 178.41,
-      "product_id": "prod_016",
-      "product_name": "NOVA Vortex Pro RGB Wired Mechanical Keyboard",
-      "quantity": 5,
-      "unit_cost": 35.0,
-      "description": "Acquired 5 units of 'NOVA Vortex Pro RGB Wired Mechanical Keyboard' at wholesale Base Price \u20b935.00/unit.",
-      "actor": "Inventory Manager Agent",
-      "timestamp": "2026-08-30T21:40:40.084776+00:00"
-    },
-    {
-      "id": "tx_3905cb52",
-      "type": "STOCK_PURCHASE",
-      "amount": 175.0,
-      "balance_after": 353.41,
-      "product_id": "prod_016",
-      "product_name": "NOVA Vortex Pro RGB Wired Mechanical Keyboard",
-      "quantity": 5,
-      "unit_cost": 35.0,
-      "description": "Acquired 5 units of 'NOVA Vortex Pro RGB Wired Mechanical Keyboard' at wholesale Base Price \u20b935.00/unit.",
-      "actor": "Inventory Manager Agent",
-      "timestamp": "2026-08-30T21:40:35.576457+00:00"
-    },
-    {
-      "id": "tx_5e7f1b20",
-      "type": "SALES_REVENUE",
-      "amount": 50.31,
-      "balance_after": 528.41,
-      "order_id": "ORD-4024-3719",
-      "customer": "Sophia Miller",
-      "description": "Received payment of \u20b950.31 for Order #ORD-4024-3719 (Sophia Miller). 1x NOVA Vortex Pro RGB Wired Mechanical Keyboard",
-      "actor": "Payment Gateway / AP2",
-      "timestamp": "2026-08-30T21:40:24.067599+00:00"
-    },
-    {
-      "id": "tx_c9b95019",
-      "type": "SALES_REVENUE",
-      "amount": 54.62,
-      "balance_after": 478.1,
-      "order_id": "ORD-4016-0691",
-      "customer": "David Patel",
-      "description": "Received payment of \u20b954.62 for Order #ORD-4016-0691 (David Patel). 1x NOVA HyperGaN 140W Quad-Port Pro Charger",
-      "actor": "Payment Gateway / AP2",
-      "timestamp": "2026-08-30T21:40:16.837723+00:00"
-    },
-    {
-      "id": "tx_d73205c6",
-      "type": "SALES_REVENUE",
-      "amount": 143.75,
-      "balance_after": 423.48,
-      "order_id": "ORD-3841-606E",
-      "customer": "Alex Chen",
-      "description": "Received payment of \u20b9143.75 for Order #ORD-3841-606E (Alex Chen). 1x NOVA BladeForge RTX 4080 Gaming Laptop",
-      "actor": "Payment Gateway / AP2",
-      "timestamp": "2026-08-30T21:38:41.266776+00:00"
-    },
-    {
-      "id": "tx_e00718da",
-      "type": "SALES_REVENUE",
-      "amount": 79.06,
-      "balance_after": 279.73,
-      "order_id": "ORD-3810-F7D2",
-      "customer": "Elena Rostova",
-      "description": "Received payment of \u20b979.06 for Order #ORD-3810-F7D2 (Elena Rostova). 1x NOVA StudioMaster Pro Hi-Fi Wired Headphones",
-      "actor": "Payment Gateway / AP2",
-      "timestamp": "2026-08-30T21:38:10.725683+00:00"
-    },
-    {
-      "id": "tx_94f0aff1",
-      "type": "STOCK_PURCHASE",
-      "amount": 140.0,
-      "balance_after": 200.67,
-      "product_id": "prod_019",
-      "product_name": "NOVA ViperBlade 26K DPI Gaming Mouse",
-      "quantity": 5,
-      "unit_cost": 28.0,
-      "description": "Acquired 5 units of 'NOVA ViperBlade 26K DPI Gaming Mouse' at wholesale Base Price \u20b928.00/unit.",
-      "actor": "Inventory Manager Agent",
-      "timestamp": "2026-08-30T21:37:50.737961+00:00"
-    },
-    {
-      "id": "tx_70e9cad1",
-      "type": "SALES_REVENUE",
-      "amount": 107.81,
-      "balance_after": 340.67,
-      "order_id": "ORD-3740-1886",
-      "customer": "Alex Chen",
-      "description": "Received payment of \u20b9107.81 for Order #ORD-3740-1886 (Alex Chen). 1x NOVA AeroBook Slim i7 Ultrabook",
-      "actor": "Payment Gateway / AP2",
-      "timestamp": "2026-08-30T21:37:40.782958+00:00"
-    },
-    {
-      "id": "tx_79caec72",
+      "id": "tx_f8297961",
       "type": "SALES_REVENUE",
       "amount": 40.25,
-      "balance_after": 232.86,
-      "order_id": "ORD-3734-E434",
+      "balance_after": 654.67,
+      "order_id": "ORD-2058-3830",
       "customer": "David Patel",
-      "description": "Received payment of \u20b940.25 for Order #ORD-3734-E434 (David Patel). 1x NOVA ViperBlade 26K DPI Gaming Mouse",
+      "description": "Received payment of \u20b940.25 for Order #ORD-2058-3830 (David Patel). 1x NOVA ViperBlade 26K DPI Gaming Mouse",
       "actor": "Payment Gateway / AP2",
-      "timestamp": "2026-08-30T21:37:34.327547+00:00"
+      "timestamp": "2026-09-03T18:20:58.835321+00:00"
     },
     {
-      "id": "tx_b0d623e1",
+      "id": "tx_835da8db",
       "type": "SALES_REVENUE",
-      "amount": 21.56,
-      "balance_after": 192.61,
-      "order_id": "ORD-3707-C215",
-      "customer": "Marcus Kim",
-      "description": "Received payment of \u20b921.56 for Order #ORD-3707-C215 (Marcus Kim). 1x NOVA TurboFlash 30W Mobile Fast Charger",
+      "amount": 142.31,
+      "balance_after": 614.42,
+      "order_id": "ORD-2025-4DF9",
+      "customer": "Alex Chen",
+      "description": "Received payment of \u20b9142.31 for Order #ORD-2025-4DF9 (Alex Chen). 1x NOVA Apex Ultra Fold 5G",
       "actor": "Payment Gateway / AP2",
-      "timestamp": "2026-08-30T21:37:07.800180+00:00"
+      "timestamp": "2026-09-03T18:20:26.068370+00:00"
     },
     {
-      "id": "tx_321a77ae",
+      "id": "tx_2d8168cd",
+      "type": "SALES_REVENUE",
+      "amount": 60.37,
+      "balance_after": 472.11,
+      "order_id": "ORD-1917-F92A",
+      "customer": "Sophia Miller",
+      "description": "Received payment of \u20b960.37 for Order #ORD-1917-F92A (Sophia Miller). 1x NOVA AirType Low-Profile Wireless Keyboard",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T18:19:17.786130+00:00"
+    },
+    {
+      "id": "tx_b82bdbbe",
+      "type": "SALES_REVENUE",
+      "amount": 99.19,
+      "balance_after": 411.74,
+      "order_id": "ORD-1808-FB53",
+      "customer": "Marcus Kim",
+      "description": "Received payment of \u20b999.19 for Order #ORD-1808-FB53 (Marcus Kim). 1x NOVA Prime 5G Smartphone",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T18:18:08.485312+00:00"
+    },
+    {
+      "id": "tx_20686bf2",
+      "type": "SALES_REVENUE",
+      "amount": 107.81,
+      "balance_after": 312.55,
+      "order_id": "ORD-1711-7973",
+      "customer": "Elena Rostova",
+      "description": "Received payment of \u20b9107.81 for Order #ORD-1711-7973 (Elena Rostova). 1x NOVA AeroBook Slim i7 Ultrabook",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T18:17:11.893473+00:00"
+    },
+    {
+      "id": "tx_b3e723f5",
+      "type": "SALES_REVENUE",
+      "amount": 43.12,
+      "balance_after": 204.74,
+      "order_id": "ORD-1644-7FB0",
+      "customer": "Sophia Miller",
+      "description": "Received payment of \u20b943.12 for Order #ORD-1644-7FB0 (Sophia Miller). 1x NOVA Stealth Commuter Smart Backpack",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T18:16:44.562313+00:00"
+    },
+    {
+      "id": "tx_95534f66",
       "type": "STOCK_PURCHASE",
       "amount": 190.0,
-      "balance_after": 171.05,
+      "balance_after": 161.62,
       "product_id": "prod_027",
       "product_name": "NOVA HyperGaN 140W Quad-Port Pro Charger",
       "quantity": 5,
       "unit_cost": 38.0,
       "description": "Acquired 5 units of 'NOVA HyperGaN 140W Quad-Port Pro Charger' at wholesale Base Price \u20b938.00/unit.",
       "actor": "Inventory Manager Agent",
-      "timestamp": "2026-08-30T21:36:41.869822+00:00"
+      "timestamp": "2026-09-03T18:16:33.107363+00:00"
     },
     {
-      "id": "tx_ea7ef51f",
+      "id": "tx_e03b0307",
       "type": "SALES_REVENUE",
       "amount": 54.62,
-      "balance_after": 361.05,
-      "order_id": "ORD-3626-4188",
-      "customer": "Sophia Miller",
-      "description": "Received payment of \u20b954.62 for Order #ORD-3626-4188 (Sophia Miller). 1x NOVA HyperGaN 140W Quad-Port Pro Charger",
-      "actor": "Payment Gateway / AP2",
-      "timestamp": "2026-08-30T21:36:26.582396+00:00"
-    },
-    {
-      "id": "tx_ab423091",
-      "type": "SALES_REVENUE",
-      "amount": 143.75,
-      "balance_after": 306.43,
-      "order_id": "ORD-3553-CCCB",
-      "customer": "Elena Rostova",
-      "description": "Received payment of \u20b9143.75 for Order #ORD-3553-CCCB (Elena Rostova). 1x NOVA BladeForge RTX 4080 Gaming Laptop",
-      "actor": "Payment Gateway / AP2",
-      "timestamp": "2026-08-30T21:35:53.827653+00:00"
-    },
-    {
-      "id": "tx_911007f7",
-      "type": "SALES_REVENUE",
-      "amount": 35.94,
-      "balance_after": 162.68,
-      "order_id": "ORD-3538-A354",
+      "balance_after": 351.62,
+      "order_id": "ORD-1620-6A98",
       "customer": "David Patel",
-      "description": "Received payment of \u20b935.94 for Order #ORD-3538-A354 (David Patel). 1x NOVA ClarityFlow Studio Wired In-Ear Monitors",
+      "description": "Received payment of \u20b954.62 for Order #ORD-1620-6A98 (David Patel). 1x NOVA HyperGaN 140W Quad-Port Pro Charger",
       "actor": "Payment Gateway / AP2",
-      "timestamp": "2026-08-30T21:35:38.770804+00:00"
+      "timestamp": "2026-09-03T18:16:20.798163+00:00"
     },
     {
-      "id": "tx_2b08ecb2",
-      "type": "STOCK_PURCHASE",
-      "amount": 175.0,
-      "balance_after": 126.74,
-      "product_id": "prod_021",
-      "product_name": "NOVA TitanVolt HyperCharge PowerBank 20k",
-      "quantity": 5,
-      "unit_cost": 35.0,
-      "description": "Acquired 5 units of 'NOVA TitanVolt HyperCharge PowerBank 20k' at wholesale Base Price \u20b935.00/unit.",
-      "actor": "Inventory Manager Agent",
-      "timestamp": "2026-08-30T21:35:15.011834+00:00"
-    },
-    {
-      "id": "tx_b9d55570",
-      "type": "SALES_REVENUE",
-      "amount": 107.81,
-      "balance_after": 301.74,
-      "order_id": "ORD-3505-39FA",
-      "customer": "Alex Chen",
-      "description": "Received payment of \u20b9107.81 for Order #ORD-3505-39FA (Alex Chen). 1x NOVA AeroBook Slim i7 Ultrabook",
-      "actor": "Payment Gateway / AP2",
-      "timestamp": "2026-08-30T21:35:05.952537+00:00"
-    },
-    {
-      "id": "tx_1bce544b",
-      "type": "SALES_REVENUE",
-      "amount": 84.81,
-      "balance_after": 193.93,
-      "order_id": "ORD-3454-1AD5",
-      "customer": "Elena Rostova",
-      "description": "Received payment of \u20b984.81 for Order #ORD-3454-1AD5 (Elena Rostova). 1x NOVA SonicFlow ANC Pro Wireless Headphones",
-      "actor": "Payment Gateway / AP2",
-      "timestamp": "2026-08-30T21:34:54.302539+00:00"
-    },
-    {
-      "id": "tx_3027d450",
-      "type": "STOCK_PURCHASE",
-      "amount": 260.0,
-      "balance_after": 109.12,
-      "product_id": "prod_013",
-      "product_name": "NOVA StreamAir Dual Wireless Lavalier Mic System",
-      "quantity": 5,
-      "unit_cost": 52.0,
-      "description": "Acquired 5 units of 'NOVA StreamAir Dual Wireless Lavalier Mic System' at wholesale Base Price \u20b952.00/unit.",
-      "actor": "Inventory Manager Agent",
-      "timestamp": "2026-08-30T21:34:00.154748+00:00"
-    },
-    {
-      "id": "tx_e27989ed",
-      "type": "SALES_REVENUE",
-      "amount": 50.31,
-      "balance_after": 369.12,
-      "order_id": "ORD-3350-CEBA",
-      "customer": "David Patel",
-      "description": "Received payment of \u20b950.31 for Order #ORD-3350-CEBA (David Patel). 1x NOVA TitanVolt HyperCharge PowerBank 20k",
-      "actor": "Payment Gateway / AP2",
-      "timestamp": "2026-08-30T21:33:50.529112+00:00"
-    },
-    {
-      "id": "tx_a3cd740a",
-      "type": "SALES_REVENUE",
-      "amount": 122.19,
-      "balance_after": 318.81,
-      "order_id": "ORD-3228-D268",
-      "customer": "Elena Rostova",
-      "description": "Received payment of \u20b9122.19 for Order #ORD-3228-D268 (Elena Rostova). 1x NOVA ZenBook Ultra 14 M3 Laptop",
-      "actor": "Payment Gateway / AP2",
-      "timestamp": "2026-08-30T21:32:28.059782+00:00"
-    },
-    {
-      "id": "tx_ba175119",
-      "type": "SALES_REVENUE",
-      "amount": 79.06,
-      "balance_after": 196.62,
-      "order_id": "ORD-3219-514C",
-      "customer": "Marcus Kim",
-      "description": "Received payment of \u20b979.06 for Order #ORD-3219-514C (Marcus Kim). 1x NOVA StudioMaster Pro Hi-Fi Wired Headphones",
-      "actor": "Payment Gateway / AP2",
-      "timestamp": "2026-08-30T21:32:19.687660+00:00"
-    },
-    {
-      "id": "tx_5fa473d5",
+      "id": "tx_a2b89f4e",
       "type": "STOCK_PURCHASE",
       "amount": 200.0,
-      "balance_after": 117.56,
+      "balance_after": 297.0,
       "product_id": "prod_023",
       "product_name": "NOVA Stealth Travel Expandable Smart Backpack",
       "quantity": 5,
       "unit_cost": 40.0,
       "description": "Acquired 5 units of 'NOVA Stealth Travel Expandable Smart Backpack' at wholesale Base Price \u20b940.00/unit.",
       "actor": "Inventory Manager Agent",
-      "timestamp": "2026-08-30T21:32:16.409334+00:00"
+      "timestamp": "2026-09-03T18:16:18.100182+00:00"
     },
     {
-      "id": "tx_e9237372",
+      "id": "tx_f00cb4ad",
       "type": "SALES_REVENUE",
-      "amount": 57.5,
-      "balance_after": 317.56,
-      "order_id": "ORD-3206-B917",
-      "customer": "Sophia Miller",
-      "description": "Received payment of \u20b957.50 for Order #ORD-3206-B917 (Sophia Miller). 1x NOVA Stealth Travel Expandable Smart Backpack",
+      "amount": 143.75,
+      "balance_after": 497.0,
+      "order_id": "ORD-1611-51B2",
+      "customer": "Alex Chen",
+      "description": "Received payment of \u20b9143.75 for Order #ORD-1611-51B2 (Alex Chen). 1x NOVA BladeForge RTX 4080 Gaming Laptop",
       "actor": "Payment Gateway / AP2",
-      "timestamp": "2026-08-30T21:32:06.869114+00:00"
+      "timestamp": "2026-09-03T18:16:12.123424+00:00"
     },
     {
-      "id": "tx_0843afb3",
+      "id": "tx_5b502ee1",
+      "type": "SALES_REVENUE",
+      "amount": 99.19,
+      "balance_after": 353.25,
+      "order_id": "ORD-1603-EB16",
+      "customer": "Alex Chen",
+      "description": "Received payment of \u20b999.19 for Order #ORD-1603-EB16 (Alex Chen). 1x NOVA Prime 5G Smartphone",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T18:16:03.576418+00:00"
+    },
+    {
+      "id": "tx_7dc00793",
+      "type": "SALES_REVENUE",
+      "amount": 99.19,
+      "balance_after": 254.06,
+      "order_id": "ORD-1554-85BF",
+      "customer": "Alex Chen",
+      "description": "Received payment of \u20b999.19 for Order #ORD-1554-85BF (Alex Chen). 1x NOVA Prime 5G Smartphone",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T18:15:55.165779+00:00"
+    },
+    {
+      "id": "tx_c65b9be2",
+      "type": "STOCK_PURCHASE",
+      "amount": 175.0,
+      "balance_after": 154.87,
+      "product_id": "prod_021",
+      "product_name": "NOVA TitanVolt HyperCharge PowerBank 20k",
+      "quantity": 5,
+      "unit_cost": 35.0,
+      "description": "Acquired 5 units of 'NOVA TitanVolt HyperCharge PowerBank 20k' at wholesale Base Price \u20b935.00/unit.",
+      "actor": "Inventory Manager Agent",
+      "timestamp": "2026-09-03T18:15:50.231964+00:00"
+    },
+    {
+      "id": "tx_2213459d",
       "type": "SALES_REVENUE",
       "amount": 74.75,
-      "balance_after": 260.06,
-      "order_id": "ORD-3158-8300",
-      "customer": "David Patel",
-      "description": "Received payment of \u20b974.75 for Order #ORD-3158-8300 (David Patel). 1x NOVA StreamAir Dual Wireless Lavalier Mic System",
+      "balance_after": 329.87,
+      "order_id": "ORD-1540-891A",
+      "customer": "Elena Rostova",
+      "description": "Received payment of \u20b974.75 for Order #ORD-1540-891A (Elena Rostova). 1x NOVA StreamAir Dual Wireless Lavalier Mic System",
       "actor": "Payment Gateway / AP2",
-      "timestamp": "2026-08-30T21:31:58.326958+00:00"
+      "timestamp": "2026-09-03T18:15:40.852177+00:00"
     },
     {
-      "id": "tx_efbd0f1e",
+      "id": "tx_532244d3",
+      "type": "SALES_REVENUE",
+      "amount": 107.81,
+      "balance_after": 255.12,
+      "order_id": "ORD-1513-16FB",
+      "customer": "Alex Chen",
+      "description": "Received payment of \u20b9107.81 for Order #ORD-1513-16FB (Alex Chen). 1x NOVA AeroBook Slim i7 Ultrabook",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T18:15:14.099298+00:00"
+    },
+    {
+      "id": "tx_738890cb",
       "type": "STOCK_PURCHASE",
-      "amount": 295.0,
-      "balance_after": 185.31,
-      "product_id": "prod_011",
-      "product_name": "NOVA SonicFlow ANC Pro Wireless Headphones",
+      "amount": 125.0,
+      "balance_after": 147.31,
+      "product_id": "prod_020",
+      "product_name": "NOVA TitanVolt MagSafe PowerBank 10k",
       "quantity": 5,
-      "unit_cost": 59.0,
-      "description": "Acquired 5 units of 'NOVA SonicFlow ANC Pro Wireless Headphones' at wholesale Base Price \u20b959.00/unit.",
+      "unit_cost": 25.0,
+      "description": "Acquired 5 units of 'NOVA TitanVolt MagSafe PowerBank 10k' at wholesale Base Price \u20b925.00/unit.",
       "actor": "Inventory Manager Agent",
-      "timestamp": "2026-08-30T21:31:55.577041+00:00"
+      "timestamp": "2026-09-03T18:14:12.576808+00:00"
     },
     {
-      "id": "tx_c5f534f8",
+      "id": "tx_b9b3b4e5",
+      "type": "SALES_REVENUE",
+      "amount": 35.94,
+      "balance_after": 272.31,
+      "order_id": "ORD-1401-ECC9",
+      "customer": "Marcus Kim",
+      "description": "Received payment of \u20b935.94 for Order #ORD-1401-ECC9 (Marcus Kim). 1x NOVA TitanVolt MagSafe PowerBank 10k",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T18:14:02.098078+00:00"
+    },
+    {
+      "id": "tx_0e63f0fd",
+      "type": "SALES_REVENUE",
+      "amount": 50.31,
+      "balance_after": 236.37,
+      "order_id": "ORD-1334-9D4D",
+      "customer": "Sophia Miller",
+      "description": "Received payment of \u20b950.31 for Order #ORD-1334-9D4D (Sophia Miller). 1x NOVA TitanVolt HyperCharge PowerBank 20k",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T18:13:34.878808+00:00"
+    },
+    {
+      "id": "tx_87b0b3e9",
+      "type": "SALES_REVENUE",
+      "amount": 57.5,
+      "balance_after": 186.06,
+      "order_id": "ORD-1213-3D8D",
+      "customer": "David Patel",
+      "description": "Received payment of \u20b957.50 for Order #ORD-1213-3D8D (David Patel). 1x NOVA Stealth Travel Expandable Smart Backpack",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T18:12:13.744312+00:00"
+    },
+    {
+      "id": "tx_266192b3",
+      "type": "STOCK_PURCHASE",
+      "amount": 260.0,
+      "balance_after": 128.56,
+      "product_id": "prod_013",
+      "product_name": "NOVA StreamAir Dual Wireless Lavalier Mic System",
+      "quantity": 5,
+      "unit_cost": 52.0,
+      "description": "Acquired 5 units of 'NOVA StreamAir Dual Wireless Lavalier Mic System' at wholesale Base Price \u20b952.00/unit.",
+      "actor": "Inventory Manager Agent",
+      "timestamp": "2026-09-03T18:12:03.802199+00:00"
+    },
+    {
+      "id": "tx_931c6465",
+      "type": "SALES_REVENUE",
+      "amount": 122.19,
+      "balance_after": 388.56,
+      "order_id": "ORD-1157-640D",
+      "customer": "Alex Chen",
+      "description": "Received payment of \u20b9122.19 for Order #ORD-1157-640D (Alex Chen). 1x NOVA ZenBook Ultra 14 M3 Laptop",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T18:11:57.201987+00:00"
+    },
+    {
+      "id": "tx_935f55dd",
+      "type": "SALES_REVENUE",
+      "amount": 122.19,
+      "balance_after": 266.37,
+      "order_id": "ORD-1101-78FC",
+      "customer": "Alex Chen",
+      "description": "Received payment of \u20b9122.19 for Order #ORD-1101-78FC (Alex Chen). 1x NOVA ZenBook Ultra 14 M3 Laptop",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T18:11:01.317321+00:00"
+    },
+    {
+      "id": "tx_cf36b6bc",
+      "type": "STOCK_PURCHASE",
+      "amount": 140.0,
+      "balance_after": 144.18,
+      "product_id": "prod_019",
+      "product_name": "NOVA ViperBlade 26K DPI Gaming Mouse",
+      "quantity": 5,
+      "unit_cost": 28.0,
+      "description": "Acquired 5 units of 'NOVA ViperBlade 26K DPI Gaming Mouse' at wholesale Base Price \u20b928.00/unit.",
+      "actor": "Inventory Manager Agent",
+      "timestamp": "2026-09-03T18:10:54.132068+00:00"
+    },
+    {
+      "id": "tx_f51e57b3",
+      "type": "SALES_REVENUE",
+      "amount": 74.75,
+      "balance_after": 284.18,
+      "order_id": "ORD-1042-5A3A",
+      "customer": "Elena Rostova",
+      "description": "Received payment of \u20b974.75 for Order #ORD-1042-5A3A (Elena Rostova). 1x NOVA StreamAir Dual Wireless Lavalier Mic System",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T18:10:42.458700+00:00"
+    },
+    {
+      "id": "tx_ad1c93c7",
+      "type": "STOCK_PURCHASE",
+      "amount": 150.0,
+      "balance_after": 209.43,
+      "product_id": "prod_022",
+      "product_name": "NOVA Stealth Commuter Smart Backpack",
+      "quantity": 5,
+      "unit_cost": 30.0,
+      "description": "Acquired 5 units of 'NOVA Stealth Commuter Smart Backpack' at wholesale Base Price \u20b930.00/unit.",
+      "actor": "Inventory Manager Agent",
+      "timestamp": "2026-09-03T18:09:40.479241+00:00"
+    },
+    {
+      "id": "tx_b2f85747",
+      "type": "SALES_REVENUE",
+      "amount": 40.25,
+      "balance_after": 359.43,
+      "order_id": "ORD-0933-52E8",
+      "customer": "Marcus Kim",
+      "description": "Received payment of \u20b940.25 for Order #ORD-0933-52E8 (Marcus Kim). 1x NOVA ViperBlade 26K DPI Gaming Mouse",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T18:09:33.633132+00:00"
+    },
+    {
+      "id": "tx_9a13a1b3",
+      "type": "SALES_REVENUE",
+      "amount": 43.12,
+      "balance_after": 319.18,
+      "order_id": "ORD-0918-0D3F",
+      "customer": "Sophia Miller",
+      "description": "Received payment of \u20b943.12 for Order #ORD-0918-0D3F (Sophia Miller). 1x NOVA Stealth Commuter Smart Backpack",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T18:09:18.397438+00:00"
+    },
+    {
+      "id": "tx_01ddc6b4",
       "type": "SALES_REVENUE",
       "amount": 143.75,
-      "balance_after": 480.31,
-      "order_id": "ORD-3145-0DC7",
+      "balance_after": 276.06,
+      "order_id": "ORD-0851-7BAF",
       "customer": "Alex Chen",
-      "description": "Received payment of \u20b9143.75 for Order #ORD-3145-0DC7 (Alex Chen). 1x NOVA BladeForge RTX 4080 Gaming Laptop",
+      "description": "Received payment of \u20b9143.75 for Order #ORD-0851-7BAF (Alex Chen). 1x NOVA BladeForge RTX 4080 Gaming Laptop",
       "actor": "Payment Gateway / AP2",
-      "timestamp": "2026-08-30T21:31:45.216040+00:00"
+      "timestamp": "2026-09-03T18:08:51.420519+00:00"
     },
     {
-      "id": "tx_5e8d78e0",
-      "type": "SALES_REVENUE",
-      "amount": 143.75,
-      "balance_after": 336.56,
-      "order_id": "ORD-3138-D98E",
-      "customer": "Alex Chen",
-      "description": "Received payment of \u20b9143.75 for Order #ORD-3138-D98E (Alex Chen). 1x NOVA BladeForge RTX 4080 Gaming Laptop",
-      "actor": "Payment Gateway / AP2",
-      "timestamp": "2026-08-30T21:31:38.244767+00:00"
-    },
-    {
-      "id": "tx_f62cf059",
+      "id": "tx_ddc31cee",
       "type": "STOCK_PURCHASE",
       "amount": 245.0,
-      "balance_after": 192.81,
-      "product_id": "prod_012",
-      "product_name": "NOVA VoiceCraft XLR Studio Condenser Wired Mic",
+      "balance_after": 132.31,
+      "product_id": "prod_015",
+      "product_name": "NOVA Pulse Slim Smartwatch",
       "quantity": 5,
       "unit_cost": 49.0,
-      "description": "Acquired 5 units of 'NOVA VoiceCraft XLR Studio Condenser Wired Mic' at wholesale Base Price \u20b949.00/unit.",
+      "description": "Acquired 5 units of 'NOVA Pulse Slim Smartwatch' at wholesale Base Price \u20b949.00/unit.",
       "actor": "Inventory Manager Agent",
-      "timestamp": "2026-08-30T21:03:42.739109+00:00"
+      "timestamp": "2026-09-03T18:08:38.432305+00:00"
     },
     {
-      "id": "tx_27c72a94",
-      "type": "SALES_REVENUE",
-      "amount": 56.06,
-      "balance_after": 437.81,
-      "order_id": "ORD-0337-9680",
-      "customer": "David Patel",
-      "description": "Received payment of \u20b956.06 for Order #ORD-0337-9680 (David Patel). 1x NOVA BoomPulse 360 Bluetooth Speaker",
-      "actor": "Payment Gateway / AP2",
-      "timestamp": "2026-08-30T21:03:37.611208+00:00"
-    },
-    {
-      "id": "tx_2f140abb",
-      "type": "SALES_REVENUE",
-      "amount": 84.81,
-      "balance_after": 381.75,
-      "order_id": "ORD-0331-733B",
-      "customer": "Elena Rostova",
-      "description": "Received payment of \u20b984.81 for Order #ORD-0331-733B (Elena Rostova). 1x NOVA SonicFlow ANC Pro Wireless Headphones",
-      "actor": "Payment Gateway / AP2",
-      "timestamp": "2026-08-30T21:03:31.849085+00:00"
-    },
-    {
-      "id": "tx_2cde2340",
+      "id": "tx_060f9c80",
       "type": "SALES_REVENUE",
       "amount": 70.44,
-      "balance_after": 296.94,
-      "order_id": "ORD-0251-CB4E",
-      "customer": "Elena Rostova",
-      "description": "Received payment of \u20b970.44 for Order #ORD-0251-CB4E (Elena Rostova). 1x NOVA VoiceCraft XLR Studio Condenser Wired Mic",
+      "balance_after": 377.31,
+      "order_id": "ORD-0818-11AC",
+      "customer": "Sophia Miller",
+      "description": "Received payment of \u20b970.44 for Order #ORD-0818-11AC (Sophia Miller). 1x NOVA Pulse Slim Smartwatch",
       "actor": "Payment Gateway / AP2",
-      "timestamp": "2026-08-30T21:02:51.690035+00:00"
+      "timestamp": "2026-09-03T18:08:19.281740+00:00"
     },
     {
-      "id": "tx_41a2f1ef",
+      "id": "tx_15d71870",
       "type": "SALES_REVENUE",
-      "amount": 70.44,
-      "balance_after": 226.5,
-      "order_id": "ORD-0154-639F",
-      "customer": "David Patel",
-      "description": "Received payment of \u20b970.44 for Order #ORD-0154-639F (David Patel). 1x NOVA VoiceCraft XLR Studio Condenser Wired Mic",
+      "amount": 122.19,
+      "balance_after": 306.87,
+      "order_id": "ORD-0802-A30B",
+      "customer": "Elena Rostova",
+      "description": "Received payment of \u20b9122.19 for Order #ORD-0802-A30B (Elena Rostova). 1x NOVA ZenBook Ultra 14 M3 Laptop",
       "actor": "Payment Gateway / AP2",
-      "timestamp": "2026-08-30T21:01:54.743664+00:00"
+      "timestamp": "2026-09-03T18:08:02.305456+00:00"
     },
     {
-      "id": "tx_57e34078",
+      "id": "tx_fcab6885",
+      "type": "SALES_REVENUE",
+      "amount": 35.94,
+      "balance_after": 184.68,
+      "order_id": "ORD-0732-A6D5",
+      "customer": "David Patel",
+      "description": "Received payment of \u20b935.94 for Order #ORD-0732-A6D5 (David Patel). 1x NOVA ClarityFlow Studio Wired In-Ear Monitors",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T18:07:32.313281+00:00"
+    },
+    {
+      "id": "tx_4eeb5e9e",
+      "type": "STOCK_PURCHASE",
+      "amount": 210.0,
+      "balance_after": 148.74,
+      "product_id": "prod_017",
+      "product_name": "NOVA AirType Low-Profile Wireless Keyboard",
+      "quantity": 5,
+      "unit_cost": 42.0,
+      "description": "Acquired 5 units of 'NOVA AirType Low-Profile Wireless Keyboard' at wholesale Base Price \u20b942.00/unit.",
+      "actor": "Inventory Manager Agent",
+      "timestamp": "2026-09-03T18:07:09.511617+00:00"
+    },
+    {
+      "id": "tx_851a20b6",
+      "type": "SALES_REVENUE",
+      "amount": 60.37,
+      "balance_after": 358.74,
+      "order_id": "ORD-0655-7569",
+      "customer": "Sophia Miller",
+      "description": "Received payment of \u20b960.37 for Order #ORD-0655-7569 (Sophia Miller). 1x NOVA AirType Low-Profile Wireless Keyboard",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T18:06:55.782512+00:00"
+    },
+    {
+      "id": "tx_3b2e18dd",
+      "type": "SALES_REVENUE",
+      "amount": 142.31,
+      "balance_after": 298.37,
+      "order_id": "ORD-0612-048A",
+      "customer": "Alex Chen",
+      "description": "Received payment of \u20b9142.31 for Order #ORD-0612-048A (Alex Chen). 1x NOVA Apex Pro 5G Smartphone",
+      "actor": "Payment Gateway / AP2",
+      "timestamp": "2026-09-03T18:06:12.442828+00:00"
+    },
+    {
+      "id": "tx_94663abb",
       "type": "SALES_REVENUE",
       "amount": 142.31,
       "balance_after": 156.06,
-      "order_id": "ORD-0046-02DD",
-      "customer": "Sophia Miller",
-      "description": "Received payment of \u20b9142.31 for Order #ORD-0046-02DD (Sophia Miller). 1x NOVA Apex Pro 5G Smartphone",
+      "order_id": "ORD-0606-8143",
+      "customer": "Alex Chen",
+      "description": "Received payment of \u20b9142.31 for Order #ORD-0606-8143 (Alex Chen). 1x NOVA Apex Pro 5G Smartphone",
       "actor": "Payment Gateway / AP2",
-      "timestamp": "2026-08-30T21:00:46.976743+00:00"
+      "timestamp": "2026-09-03T18:06:06.795505+00:00"
     },
     {
-      "id": "tx_7242bbbd",
+      "id": "tx_12da5f55",
       "type": "STOCK_PURCHASE",
       "amount": 75.0,
       "balance_after": 13.75,
@@ -1288,10 +1256,10 @@
       "unit_cost": 15.0,
       "description": "Acquired 5 units of 'NOVA TurboFlash 30W Mobile Fast Charger' at wholesale Base Price \u20b915.00/unit.",
       "actor": "Inventory Manager Agent",
-      "timestamp": "2026-08-30T20:59:58.461325+00:00"
+      "timestamp": "2026-09-03T18:05:40.131315+00:00"
     },
     {
-      "id": "tx_19d91305",
+      "id": "tx_1b6f4588",
       "type": "STOCK_PURCHASE",
       "amount": 275.0,
       "balance_after": 88.75,
@@ -1301,10 +1269,10 @@
       "unit_cost": 55.0,
       "description": "Acquired 5 units of 'NOVA StudioMaster Pro Hi-Fi Wired Headphones' at wholesale Base Price \u20b955.00/unit.",
       "actor": "Inventory Manager Agent",
-      "timestamp": "2026-08-30T20:59:58.177441+00:00"
+      "timestamp": "2026-09-03T18:05:39.616315+00:00"
     },
     {
-      "id": "tx_f01c27c4",
+      "id": "tx_d1d29da2",
       "type": "STOCK_PURCHASE",
       "amount": 195.0,
       "balance_after": 363.75,
@@ -1314,10 +1282,10 @@
       "unit_cost": 39.0,
       "description": "Acquired 5 units of 'NOVA BoomPulse 360 Bluetooth Speaker' at wholesale Base Price \u20b939.00/unit.",
       "actor": "Inventory Manager Agent",
-      "timestamp": "2026-08-30T20:59:57.936469+00:00"
+      "timestamp": "2026-09-03T18:05:39.142801+00:00"
     },
     {
-      "id": "tx_8f0c5d9f",
+      "id": "tx_8bbd9f89",
       "type": "STOCK_PURCHASE",
       "amount": 225.0,
       "balance_after": 558.75,
@@ -1327,10 +1295,10 @@
       "unit_cost": 45.0,
       "description": "Acquired 5 units of 'NOVA AeroPods Pro ANC Wireless Earbuds' at wholesale Base Price \u20b945.00/unit.",
       "actor": "Inventory Manager Agent",
-      "timestamp": "2026-08-30T20:59:57.674701+00:00"
+      "timestamp": "2026-09-03T18:05:38.644404+00:00"
     },
     {
-      "id": "tx_4b204698",
+      "id": "tx_ca055695",
       "type": "STOCK_PURCHASE",
       "amount": 125.0,
       "balance_after": 783.75,
@@ -1340,10 +1308,10 @@
       "unit_cost": 25.0,
       "description": "Acquired 5 units of 'NOVA ClarityFlow Studio Wired In-Ear Monitors' at wholesale Base Price \u20b925.00/unit.",
       "actor": "Inventory Manager Agent",
-      "timestamp": "2026-08-30T20:59:57.440796+00:00"
+      "timestamp": "2026-09-03T18:05:38.158059+00:00"
     },
     {
-      "id": "tx_887b39f6",
+      "id": "tx_81d9989d",
       "type": "STOCK_PURCHASE",
       "amount": 375.0,
       "balance_after": 908.75,
@@ -1353,10 +1321,10 @@
       "unit_cost": 75.0,
       "description": "Acquired 5 units of 'NOVA AeroBook Slim i7 Ultrabook' at wholesale Base Price \u20b975.00/unit.",
       "actor": "Inventory Manager Agent",
-      "timestamp": "2026-08-30T20:59:57.191193+00:00"
+      "timestamp": "2026-09-03T18:05:37.660442+00:00"
     },
     {
-      "id": "tx_00bf7e02",
+      "id": "tx_7580424f",
       "type": "STOCK_PURCHASE",
       "amount": 500.0,
       "balance_after": 1283.75,
@@ -1366,10 +1334,10 @@
       "unit_cost": 100.0,
       "description": "Acquired 5 units of 'NOVA BladeForge RTX 4080 Gaming Laptop' at wholesale Base Price \u20b9100.00/unit.",
       "actor": "Inventory Manager Agent",
-      "timestamp": "2026-08-30T20:59:56.938270+00:00"
+      "timestamp": "2026-09-03T18:05:37.162862+00:00"
     },
     {
-      "id": "tx_305208fe",
+      "id": "tx_7b036ca9",
       "type": "STOCK_PURCHASE",
       "amount": 425.0,
       "balance_after": 1783.75,
@@ -1379,10 +1347,10 @@
       "unit_cost": 85.0,
       "description": "Acquired 5 units of 'NOVA ZenBook Ultra 14 M3 Laptop' at wholesale Base Price \u20b985.00/unit.",
       "actor": "Inventory Manager Agent",
-      "timestamp": "2026-08-30T20:59:56.573611+00:00"
+      "timestamp": "2026-09-03T18:05:36.707037+00:00"
     },
     {
-      "id": "tx_d683e7ac",
+      "id": "tx_1df45538",
       "type": "STOCK_PURCHASE",
       "amount": 345.0,
       "balance_after": 2208.75,
@@ -1392,10 +1360,10 @@
       "unit_cost": 69.0,
       "description": "Acquired 5 units of 'NOVA Prime 5G Smartphone' at wholesale Base Price \u20b969.00/unit.",
       "actor": "Inventory Manager Agent",
-      "timestamp": "2026-08-30T20:59:56.324657+00:00"
+      "timestamp": "2026-09-03T18:05:36.239412+00:00"
     },
     {
-      "id": "tx_ea378932",
+      "id": "tx_5607aa51",
       "type": "STOCK_PURCHASE",
       "amount": 495.0,
       "balance_after": 2553.75,
@@ -1405,10 +1373,10 @@
       "unit_cost": 99.0,
       "description": "Acquired 5 units of 'NOVA Apex Ultra Fold 5G' at wholesale Base Price \u20b999.00/unit.",
       "actor": "Inventory Manager Agent",
-      "timestamp": "2026-08-30T20:59:56.075820+00:00"
+      "timestamp": "2026-09-03T18:05:35.723165+00:00"
     },
     {
-      "id": "tx_ea044c49",
+      "id": "tx_30e24c99",
       "type": "STOCK_PURCHASE",
       "amount": 495.0,
       "balance_after": 3048.75,
@@ -1418,21 +1386,21 @@
       "unit_cost": 99.0,
       "description": "Acquired 5 units of 'NOVA Apex Pro 5G Smartphone' at wholesale Base Price \u20b999.00/unit.",
       "actor": "Inventory Manager Agent",
-      "timestamp": "2026-08-30T20:59:55.828353+00:00"
+      "timestamp": "2026-09-03T18:05:35.196767+00:00"
     },
     {
-      "id": "tx_3c8b4f32",
+      "id": "tx_1223fcf0",
       "type": "SALES_REVENUE",
       "amount": 143.75,
       "balance_after": 3543.75,
-      "order_id": "ORD-5945-EC90",
+      "order_id": "ORD-0524-96ED",
       "customer": "Alex Chen",
-      "description": "Received payment of \u20b9143.75 for Order #ORD-5945-EC90 (Alex Chen). 1x NOVA BladeForge RTX 4080 Gaming Laptop",
+      "description": "Received payment of \u20b9143.75 for Order #ORD-0524-96ED (Alex Chen). 1x NOVA BladeForge RTX 4080 Gaming Laptop",
       "actor": "Payment Gateway / AP2",
-      "timestamp": "2026-08-30T20:59:45.706721+00:00"
+      "timestamp": "2026-09-03T18:05:24.361151+00:00"
     },
     {
-      "id": "tx_951c064f",
+      "id": "tx_b9330221",
       "type": "STOCK_PURCHASE",
       "amount": 190.0,
       "balance_after": 3400.0,
@@ -1442,10 +1410,10 @@
       "unit_cost": 38.0,
       "description": "Acquired 5 units of 'NOVA HyperGaN 140W Quad-Port Pro Charger' at wholesale Base Price \u20b938.00/unit.",
       "actor": "Inventory Manager Agent",
-      "timestamp": "2026-08-30T20:59:42.848766+00:00"
+      "timestamp": "2026-09-03T18:05:20.791060+00:00"
     },
     {
-      "id": "tx_6e5a47b2",
+      "id": "tx_5eebd547",
       "type": "STOCK_PURCHASE",
       "amount": 110.0,
       "balance_after": 3590.0,
@@ -1455,10 +1423,10 @@
       "unit_cost": 22.0,
       "description": "Acquired 5 units of 'NOVA HyperGaN 65W 3-Port Fast Charger' at wholesale Base Price \u20b922.00/unit.",
       "actor": "Inventory Manager Agent",
-      "timestamp": "2026-08-30T20:59:42.608972+00:00"
+      "timestamp": "2026-09-03T18:05:20.396188+00:00"
     },
     {
-      "id": "tx_c0ac3b97",
+      "id": "tx_0fa4c87f",
       "type": "STOCK_PURCHASE",
       "amount": 75.0,
       "balance_after": 3700.0,
@@ -1468,10 +1436,10 @@
       "unit_cost": 15.0,
       "description": "Acquired 5 units of 'NOVA TurboFlash 30W Mobile Fast Charger' at wholesale Base Price \u20b915.00/unit.",
       "actor": "Inventory Manager Agent",
-      "timestamp": "2026-08-30T20:59:42.389529+00:00"
+      "timestamp": "2026-09-03T18:05:19.986376+00:00"
     },
     {
-      "id": "tx_8c3c695f",
+      "id": "tx_14fe0e8b",
       "type": "STOCK_PURCHASE",
       "amount": 125.0,
       "balance_after": 3775.0,
@@ -1481,10 +1449,10 @@
       "unit_cost": 25.0,
       "description": "Acquired 5 units of 'NOVA PowerStream 100W USB-C Laptop Charger' at wholesale Base Price \u20b925.00/unit.",
       "actor": "Inventory Manager Agent",
-      "timestamp": "2026-08-30T20:59:42.178737+00:00"
+      "timestamp": "2026-09-03T18:05:19.556484+00:00"
     },
     {
-      "id": "tx_4d7a0ab7",
+      "id": "tx_a8a00c4b",
       "type": "STOCK_PURCHASE",
       "amount": 200.0,
       "balance_after": 3900.0,
@@ -1494,10 +1462,10 @@
       "unit_cost": 40.0,
       "description": "Acquired 5 units of 'NOVA Stealth Travel Expandable Smart Backpack' at wholesale Base Price \u20b940.00/unit.",
       "actor": "Inventory Manager Agent",
-      "timestamp": "2026-08-30T20:59:41.969286+00:00"
+      "timestamp": "2026-09-03T18:05:19.130535+00:00"
     },
     {
-      "id": "tx_1cbbe64e",
+      "id": "tx_e9920bec",
       "type": "STOCK_PURCHASE",
       "amount": 150.0,
       "balance_after": 4100.0,
@@ -1507,10 +1475,10 @@
       "unit_cost": 30.0,
       "description": "Acquired 5 units of 'NOVA Stealth Commuter Smart Backpack' at wholesale Base Price \u20b930.00/unit.",
       "actor": "Inventory Manager Agent",
-      "timestamp": "2026-08-30T20:59:41.756435+00:00"
+      "timestamp": "2026-09-03T18:05:18.727773+00:00"
     },
     {
-      "id": "tx_89a3f286",
+      "id": "tx_72667184",
       "type": "STOCK_PURCHASE",
       "amount": 175.0,
       "balance_after": 4250.0,
@@ -1520,10 +1488,10 @@
       "unit_cost": 35.0,
       "description": "Acquired 5 units of 'NOVA TitanVolt HyperCharge PowerBank 20k' at wholesale Base Price \u20b935.00/unit.",
       "actor": "Inventory Manager Agent",
-      "timestamp": "2026-08-30T20:59:41.545264+00:00"
+      "timestamp": "2026-09-03T18:05:18.321036+00:00"
     },
     {
-      "id": "tx_04e98f1a",
+      "id": "tx_9d136072",
       "type": "STOCK_PURCHASE",
       "amount": 125.0,
       "balance_after": 4425.0,
@@ -1533,10 +1501,10 @@
       "unit_cost": 25.0,
       "description": "Acquired 5 units of 'NOVA TitanVolt MagSafe PowerBank 10k' at wholesale Base Price \u20b925.00/unit.",
       "actor": "Inventory Manager Agent",
-      "timestamp": "2026-08-30T20:59:41.345856+00:00"
+      "timestamp": "2026-09-03T18:05:17.934432+00:00"
     },
     {
-      "id": "tx_dc29c177",
+      "id": "tx_7d62cceb",
       "type": "STOCK_PURCHASE",
       "amount": 140.0,
       "balance_after": 4550.0,
@@ -1546,10 +1514,10 @@
       "unit_cost": 28.0,
       "description": "Acquired 5 units of 'NOVA ViperBlade 26K DPI Gaming Mouse' at wholesale Base Price \u20b928.00/unit.",
       "actor": "Inventory Manager Agent",
-      "timestamp": "2026-08-30T20:59:41.133729+00:00"
+      "timestamp": "2026-09-03T18:05:17.545699+00:00"
     },
     {
-      "id": "tx_7aade0e6",
+      "id": "tx_71e5928d",
       "type": "STOCK_PURCHASE",
       "amount": 100.0,
       "balance_after": 4690.0,
@@ -1559,10 +1527,10 @@
       "unit_cost": 20.0,
       "description": "Acquired 5 units of 'NOVA ErgoMaster Silent Wireless Mouse' at wholesale Base Price \u20b920.00/unit.",
       "actor": "Inventory Manager Agent",
-      "timestamp": "2026-08-30T20:59:40.919934+00:00"
+      "timestamp": "2026-09-03T18:05:17.164190+00:00"
     },
     {
-      "id": "tx_dae4f6e9",
+      "id": "tx_83c77a6a",
       "type": "STOCK_PURCHASE",
       "amount": 210.0,
       "balance_after": 4790.0,
@@ -1572,10 +1540,10 @@
       "unit_cost": 42.0,
       "description": "Acquired 5 units of 'NOVA AirType Low-Profile Wireless Keyboard' at wholesale Base Price \u20b942.00/unit.",
       "actor": "Inventory Manager Agent",
-      "timestamp": "2026-08-30T20:59:40.708451+00:00"
+      "timestamp": "2026-09-03T18:05:16.765200+00:00"
     },
     {
-      "id": "tx_5e2de6ab",
+      "id": "tx_2f9c37fb",
       "type": "STOCK_PURCHASE",
       "amount": 175.0,
       "balance_after": 5000.0,
@@ -1585,10 +1553,10 @@
       "unit_cost": 35.0,
       "description": "Acquired 5 units of 'NOVA Vortex Pro RGB Wired Mechanical Keyboard' at wholesale Base Price \u20b935.00/unit.",
       "actor": "Inventory Manager Agent",
-      "timestamp": "2026-08-30T20:59:40.495765+00:00"
+      "timestamp": "2026-09-03T18:05:16.377931+00:00"
     },
     {
-      "id": "tx_5f465084",
+      "id": "tx_f13816ed",
       "type": "STOCK_PURCHASE",
       "amount": 245.0,
       "balance_after": 5175.0,
@@ -1598,10 +1566,10 @@
       "unit_cost": 49.0,
       "description": "Acquired 5 units of 'NOVA Pulse Slim Smartwatch' at wholesale Base Price \u20b949.00/unit.",
       "actor": "Inventory Manager Agent",
-      "timestamp": "2026-08-30T20:59:40.285861+00:00"
+      "timestamp": "2026-09-03T18:05:15.953234+00:00"
     },
     {
-      "id": "tx_3cc83d3f",
+      "id": "tx_d1b2e1ac",
       "type": "STOCK_PURCHASE",
       "amount": 325.0,
       "balance_after": 5420.0,
@@ -1611,10 +1579,10 @@
       "unit_cost": 65.0,
       "description": "Acquired 5 units of 'NOVA Pulse Ultra Smartwatch' at wholesale Base Price \u20b965.00/unit.",
       "actor": "Inventory Manager Agent",
-      "timestamp": "2026-08-30T20:59:40.096620+00:00"
+      "timestamp": "2026-09-03T18:05:15.514841+00:00"
     },
     {
-      "id": "tx_a654aa9a",
+      "id": "tx_be196714",
       "type": "STOCK_PURCHASE",
       "amount": 260.0,
       "balance_after": 5745.0,
@@ -1624,10 +1592,10 @@
       "unit_cost": 52.0,
       "description": "Acquired 5 units of 'NOVA StreamAir Dual Wireless Lavalier Mic System' at wholesale Base Price \u20b952.00/unit.",
       "actor": "Inventory Manager Agent",
-      "timestamp": "2026-08-30T20:59:39.873560+00:00"
+      "timestamp": "2026-09-03T18:05:15.118509+00:00"
     },
     {
-      "id": "tx_2e158630",
+      "id": "tx_93240265",
       "type": "STOCK_PURCHASE",
       "amount": 245.0,
       "balance_after": 6005.0,
@@ -1637,10 +1605,10 @@
       "unit_cost": 49.0,
       "description": "Acquired 5 units of 'NOVA VoiceCraft XLR Studio Condenser Wired Mic' at wholesale Base Price \u20b949.00/unit.",
       "actor": "Inventory Manager Agent",
-      "timestamp": "2026-08-30T20:59:39.660911+00:00"
+      "timestamp": "2026-09-03T18:05:14.728404+00:00"
     },
     {
-      "id": "tx_6f9a8df1",
+      "id": "tx_276f7285",
       "type": "STOCK_PURCHASE",
       "amount": 295.0,
       "balance_after": 6250.0,
@@ -1650,10 +1618,10 @@
       "unit_cost": 59.0,
       "description": "Acquired 5 units of 'NOVA SonicFlow ANC Pro Wireless Headphones' at wholesale Base Price \u20b959.00/unit.",
       "actor": "Inventory Manager Agent",
-      "timestamp": "2026-08-30T20:59:39.459651+00:00"
+      "timestamp": "2026-09-03T18:05:14.342737+00:00"
     },
     {
-      "id": "tx_7e2cd4ef",
+      "id": "tx_8e25ce0e",
       "type": "STOCK_PURCHASE",
       "amount": 275.0,
       "balance_after": 6545.0,
@@ -1663,10 +1631,10 @@
       "unit_cost": 55.0,
       "description": "Acquired 5 units of 'NOVA StudioMaster Pro Hi-Fi Wired Headphones' at wholesale Base Price \u20b955.00/unit.",
       "actor": "Inventory Manager Agent",
-      "timestamp": "2026-08-30T20:59:39.243697+00:00"
+      "timestamp": "2026-09-03T18:05:13.936623+00:00"
     },
     {
-      "id": "tx_5d7a28a8",
+      "id": "tx_c860273d",
       "type": "STOCK_PURCHASE",
       "amount": 195.0,
       "balance_after": 6820.0,
@@ -1676,10 +1644,10 @@
       "unit_cost": 39.0,
       "description": "Acquired 5 units of 'NOVA BoomPulse 360 Bluetooth Speaker' at wholesale Base Price \u20b939.00/unit.",
       "actor": "Inventory Manager Agent",
-      "timestamp": "2026-08-30T20:59:39.086718+00:00"
+      "timestamp": "2026-09-03T18:05:13.578875+00:00"
     },
     {
-      "id": "tx_9344d9a5",
+      "id": "tx_0f764d67",
       "type": "STOCK_PURCHASE",
       "amount": 225.0,
       "balance_after": 7015.0,
@@ -1689,10 +1657,10 @@
       "unit_cost": 45.0,
       "description": "Acquired 5 units of 'NOVA AeroPods Pro ANC Wireless Earbuds' at wholesale Base Price \u20b945.00/unit.",
       "actor": "Inventory Manager Agent",
-      "timestamp": "2026-08-30T20:59:38.898794+00:00"
+      "timestamp": "2026-09-03T18:05:13.223911+00:00"
     },
     {
-      "id": "tx_40feb913",
+      "id": "tx_d3242e76",
       "type": "STOCK_PURCHASE",
       "amount": 125.0,
       "balance_after": 7240.0,
@@ -1702,10 +1670,10 @@
       "unit_cost": 25.0,
       "description": "Acquired 5 units of 'NOVA ClarityFlow Studio Wired In-Ear Monitors' at wholesale Base Price \u20b925.00/unit.",
       "actor": "Inventory Manager Agent",
-      "timestamp": "2026-08-30T20:59:38.689544+00:00"
+      "timestamp": "2026-09-03T18:05:12.855590+00:00"
     },
     {
-      "id": "tx_d4936405",
+      "id": "tx_3716db36",
       "type": "STOCK_PURCHASE",
       "amount": 375.0,
       "balance_after": 7365.0,
@@ -1715,10 +1683,10 @@
       "unit_cost": 75.0,
       "description": "Acquired 5 units of 'NOVA AeroBook Slim i7 Ultrabook' at wholesale Base Price \u20b975.00/unit.",
       "actor": "Inventory Manager Agent",
-      "timestamp": "2026-08-30T20:59:38.484849+00:00"
+      "timestamp": "2026-09-03T18:05:12.477683+00:00"
     },
     {
-      "id": "tx_3f787df9",
+      "id": "tx_b344bd3c",
       "type": "STOCK_PURCHASE",
       "amount": 500.0,
       "balance_after": 7740.0,
@@ -1728,10 +1696,10 @@
       "unit_cost": 100.0,
       "description": "Acquired 5 units of 'NOVA BladeForge RTX 4080 Gaming Laptop' at wholesale Base Price \u20b9100.00/unit.",
       "actor": "Inventory Manager Agent",
-      "timestamp": "2026-08-30T20:59:38.265691+00:00"
+      "timestamp": "2026-09-03T18:05:12.112746+00:00"
     },
     {
-      "id": "tx_3e204544",
+      "id": "tx_d64d5814",
       "type": "STOCK_PURCHASE",
       "amount": 425.0,
       "balance_after": 8240.0,
@@ -1741,10 +1709,10 @@
       "unit_cost": 85.0,
       "description": "Acquired 5 units of 'NOVA ZenBook Ultra 14 M3 Laptop' at wholesale Base Price \u20b985.00/unit.",
       "actor": "Inventory Manager Agent",
-      "timestamp": "2026-08-30T20:59:38.060456+00:00"
+      "timestamp": "2026-09-03T18:05:11.761758+00:00"
     },
     {
-      "id": "tx_f6b36717",
+      "id": "tx_4cbd4db8",
       "type": "STOCK_PURCHASE",
       "amount": 345.0,
       "balance_after": 8665.0,
@@ -1754,10 +1722,10 @@
       "unit_cost": 69.0,
       "description": "Acquired 5 units of 'NOVA Prime 5G Smartphone' at wholesale Base Price \u20b969.00/unit.",
       "actor": "Inventory Manager Agent",
-      "timestamp": "2026-08-30T20:59:37.867102+00:00"
+      "timestamp": "2026-09-03T18:05:11.371602+00:00"
     },
     {
-      "id": "tx_b8be9a63",
+      "id": "tx_49a62337",
       "type": "STOCK_PURCHASE",
       "amount": 495.0,
       "balance_after": 9010.0,
@@ -1767,10 +1735,10 @@
       "unit_cost": 99.0,
       "description": "Acquired 5 units of 'NOVA Apex Ultra Fold 5G' at wholesale Base Price \u20b999.00/unit.",
       "actor": "Inventory Manager Agent",
-      "timestamp": "2026-08-30T20:59:37.662031+00:00"
+      "timestamp": "2026-09-03T18:05:10.995645+00:00"
     },
     {
-      "id": "tx_d5b65f55",
+      "id": "tx_48d70911",
       "type": "STOCK_PURCHASE",
       "amount": 495.0,
       "balance_after": 9505.0,
@@ -1780,16 +1748,16 @@
       "unit_cost": 99.0,
       "description": "Acquired 5 units of 'NOVA Apex Pro 5G Smartphone' at wholesale Base Price \u20b999.00/unit.",
       "actor": "Inventory Manager Agent",
-      "timestamp": "2026-08-30T20:59:37.443401+00:00"
+      "timestamp": "2026-09-03T18:05:10.567054+00:00"
     },
     {
-      "id": "tx_25510968",
+      "id": "tx_940874c1",
       "type": "INITIAL_CAPITAL",
       "amount": 10000.0,
       "balance_after": 10000.0,
       "description": "Treasury reset to starting capital of \u20b910,000.00.",
       "actor": "Store Owner",
-      "timestamp": "2026-08-30T20:59:25.760235+00:00"
+      "timestamp": "2026-09-03T18:04:47.564128+00:00"
     }
   ]
 }

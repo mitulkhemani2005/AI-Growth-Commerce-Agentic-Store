@@ -194,6 +194,24 @@ class InventoryManager:
             # Save updated inventory atomically
             self._write_inventory(products)
 
+            # Check for low stock items to emit event (Inventory Manager -> Price Manager)
+            for u in updated_items:
+                if u.get("new_stock", 0) <= 4:
+                    try:
+                        from backend.events import emit_store_event, EventType
+                        emit_store_event(
+                            event_type=EventType.PRODUCT_LOW_STOCK,
+                            source_agent="Inventory Manager Agent",
+                            payload={
+                                "product_id": u.get("id"),
+                                "product_name": u.get("PRODUCT_NAME"),
+                                "stock_remaining": u.get("new_stock")
+                            },
+                            priority="high"
+                        )
+                    except Exception as e:
+                        print(f"[Low Stock Event Error]: {e}", flush=True)
+
             return {
                 "success": True,
                 "deducted_items": updated_items
@@ -268,11 +286,13 @@ class InventoryManager:
             products = self._read_inventory()
             found = False
             target = None
+            old_price = 0.0
             for p in products:
                 if p.get("id") == product_id or p.get("PRODUCT_NAME", "").lower() == product_id.lower():
                     if base_price is not None:
                         p["BASE_PRICE"] = round(float(base_price), 2)
                     
+                    old_price = float(p.get("PRICE", 0.0))
                     floor = p.get("BASE_PRICE", 0.0) if enforce_base_price else 0.0
                     p["PRICE"] = round(max(floor, float(new_price)), 2)
                     found = True
@@ -282,6 +302,24 @@ class InventoryManager:
                 return {"success": False, "error": f"Product '{product_id}' not found."}
 
             self._write_inventory(products)
+
+            # Emit price changed event (Price Manager -> Inventory Manager)
+            if target["PRICE"] != old_price:
+                try:
+                    from backend.events import emit_store_event, EventType
+                    emit_store_event(
+                        event_type=EventType.PRICE_CHANGED,
+                        source_agent="Price Manager Agent",
+                        payload={
+                            "product_id": target["id"],
+                            "product_name": target["PRODUCT_NAME"],
+                            "old_price": old_price,
+                            "new_price": target["PRICE"],
+                            "reason": "Dynamic price recalibration"
+                        }
+                    )
+                except Exception as e:
+                    print(f"[Price Event Error]: {e}", flush=True)
 
             return {
                 "success": True,
@@ -350,6 +388,22 @@ class InventoryManager:
             # Increment stock in inventory
             target["STOCK_REMAINING"] = target.get("STOCK_REMAINING", 0) + qty
             self._write_inventory(products)
+
+            # Emit restock event to notify Price Manager and Finance Manager
+            try:
+                from backend.events import emit_store_event, EventType
+                emit_store_event(
+                    event_type=EventType.INVENTORY_RESTOCKED,
+                    source_agent="Inventory Manager Agent",
+                    payload={
+                        "product_id": target["id"],
+                        "product_name": target["PRODUCT_NAME"],
+                        "quantity": qty,
+                        "total_cost": spend_res["total_cost"]
+                    }
+                )
+            except Exception as e:
+                print(f"[Restock Event Error]: {e}", flush=True)
 
             return {
                 "success": True,

@@ -85,3 +85,6 @@ agents_office_data.db
 agents_office/.env
 agents_office/frontend/node_modules/
 agents_office/frontend/dist/
+
+# ---- Temporary Scratch ----
+scratch/
