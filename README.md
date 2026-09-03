@@ -36,9 +36,9 @@ Built with a high-impact, editorial design system, Nava runs a collaborative fle
 - Identifies optimal, high-margin complementary hardware pairings (e.g. Workstation Laptop $\rightarrow$ 100W GaN Fast Charger & Sleeve).
 - Applies an automated 10% bundle saving while strictly verifying that prices never breach wholesale base cost floors.
 
-### 4. Autonomous Campaign Orchestrator Agent
-- Evaluates warehouse stock velocity and launches scheduled or event-driven promotional flash sales.
-- Broadcasts campaign directives across the **Inter-Agent Message Bus**, updates the storefront marquee announcement ticker, and notifies the AI shopper fleet.
+### 4. Interactive Campaign Orchestrator
+- Enables the store owner to create, activate, pause, or terminate promotional flash sales per product category (strictly at most 1 active campaign per category).
+- Synchronizes campaign directives across the store, dynamically updates the storefront marquee announcement ticker, and drives targeted buyer engagement.
 
 ### 5. Dual-Tier Dynamic Pricing Engine
 - **Base Price Floor (🔒 Store Owner Constraint)**: Immutable cost floor beneath which an item can never be sold.
@@ -48,7 +48,6 @@ Built with a high-impact, editorial design system, Nava runs a collaborative fle
 - **Explainable**: Every price shift, AP2 charge, wholesale restock, and refund includes an audited rationale and timestamp.
 - **Bounded**: Hard spending limits (e.g., maximum ₹25,000 per AP2 transaction) prevent unauthorized capital leakage.
 - **Gated**: Strict 24-hour pre-shipment refund policy gate prevents inventory discrepancies after logistics dispatch.
-- **Graceful Failure Recovery**: Intercepts out-of-bounds attempts safely, offering alternative payment paths or Owner Studio overrides.
 
 ---
 
@@ -198,8 +197,8 @@ The application will be live at:
 - `POST /api/admin/campaigns/launch` — Launch bounded promotional campaign.
 
 ### Financial Guardrails & Audit
-- `GET /api/admin/audit-trail` — Chronological explainable money ledger.
-- `POST /api/simulation/failure-test` — Test financial failure interception (AP2 overspend, post-24h refund, base price floor breach).
+- `GET /api/admin/audit-trail` — Chronological explainable money ledger with policy evaluations.
+- `GET /api/admin/treasury` — Real-time bank balance, wholesale spend, sales deposits, and net profit ledger.
 
 ### Payments
 - `GET /api/payment/config` — Public Razorpay Key ID.

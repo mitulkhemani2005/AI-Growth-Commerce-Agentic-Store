@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { api } from '../api/client';
 
 const StoreContext = createContext(null);
@@ -7,6 +7,9 @@ export const USERS = [
   { id: 'user_alex', name: 'Alex Rivera', initials: 'AR', email: 'alex.rivera@growthcommerce.ai', address: '742 Evergreen Terrace, San Francisco, CA' },
   { id: 'user_sarah', name: 'Sarah Chen', initials: 'SC', email: 'sarah.chen@techventures.io', address: '102 Innovation Park, Silicon Hub, Bengaluru' }
 ];
+
+// Polling interval for the storefront (8s is plenty — agent cycles run every 15-30s)
+const STORE_POLL_INTERVAL_MS = 8000;
 
 export function StoreProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(USERS[0]);
@@ -22,62 +25,65 @@ export function StoreProvider({ children }) {
   const [isLoadingCatalog, setIsLoadingCatalog] = useState(false);
   const [toastMessage, setToastMessage] = useState(null);
 
+  // In-flight guard for catalog/cart background polls
+  const catalogInFlight = useRef(false);
+
   const showToast = useCallback((msg, type = 'info') => {
     setToastMessage({ msg, type });
     setTimeout(() => setToastMessage(null), 4000);
   }, []);
 
-  // Fetch catalog
+  // ─── Fetch catalog (with in-flight guard) ────────────────────────────────────────
   const refreshCatalog = useCallback(async () => {
     try {
       const data = await api.getInventory();
       setCatalog(data.products || []);
     } catch (e) {
-      console.error('Failed to load catalog:', e);
+      console.error('[Store] Failed to load catalog:', e.message);
     }
   }, []);
 
-  // Fetch cart
+  // ─── Fetch cart ───────────────────────────────────────────────────────────────────
   const refreshCart = useCallback(async (userId = currentUser.id) => {
     try {
       const cartData = await api.getCart(userId);
       setCart(cartData || { items: [], item_count: 0, subtotal: 0, estimated_tax: 0, estimated_total: 0 });
     } catch (e) {
-      console.error('Failed to load cart:', e);
+      console.error('[Store] Failed to load cart:', e.message);
     }
   }, [currentUser.id]);
 
-  // Fetch orders
+  // ─── Fetch orders ─────────────────────────────────────────────────────────────────
   const refreshOrders = useCallback(async (userId = currentUser.id) => {
     try {
       const data = await api.getOrders(userId);
       setOrders(data.orders || []);
     } catch (e) {
-      console.error('Failed to load orders:', e);
+      console.error('[Store] Failed to load orders:', e.message);
     }
   }, [currentUser.id]);
 
-  // Fetch AP2 status
+  // ─── Fetch AP2 status ─────────────────────────────────────────────────────────────
   const refreshAP2Status = useCallback(async (userId = currentUser.id) => {
     try {
       const data = await api.getAP2Status(userId);
       setAp2Status(data);
     } catch (e) {
-      console.error('Failed to check AP2 status:', e);
+      console.error('[Store] Failed to check AP2 status:', e.message);
     }
   }, [currentUser.id]);
 
-  // Fetch payment config
+  // ─── Fetch payment config ─────────────────────────────────────────────────────────
   const refreshPaymentConfig = useCallback(async () => {
     try {
       const cfg = await api.getPaymentConfig();
       setRazorpayKey(cfg.key_id || '');
     } catch (e) {
-      console.error('Failed to get payment config:', e);
+      console.error('[Store] Failed to get payment config:', e.message);
     }
   }, []);
 
-  // Switch user profile
+  // ─── Switch user profile ──────────────────────────────────────────────────────────
   const switchUser = useCallback((user) => {
     setCurrentUser(user);
     setIsUserModalOpen(false);
@@ -87,7 +93,7 @@ export function StoreProvider({ children }) {
     showToast(`Switched active profile to ${user.name}`, 'success');
   }, [refreshCart, refreshOrders, refreshAP2Status, showToast]);
 
-  // Add to cart
+  // ─── Add to cart ─────────────────────────────────────────────────────────────────
   const addToCart = useCallback(async (productId, size = null) => {
     try {
       const res = await api.addToCart(currentUser.id, productId, 1, size);
@@ -100,7 +106,7 @@ export function StoreProvider({ children }) {
     }
   }, [currentUser.id, showToast]);
 
-  // Remove / decrement from cart
+  // ─── Remove / decrement from cart ────────────────────────────────────────────────
   const removeFromCart = useCallback(async (productId, quantity = 1) => {
     try {
       const res = await api.removeFromCart(currentUser.id, productId, quantity);
@@ -112,7 +118,7 @@ export function StoreProvider({ children }) {
     }
   }, [currentUser.id, showToast]);
 
-  // Initial load and periodic catalog polling
+  // ─── Initial load ─────────────────────────────────────────────────────────────────
   useEffect(() => {
     setIsLoadingCatalog(true);
     Promise.all([
@@ -122,15 +128,24 @@ export function StoreProvider({ children }) {
       refreshAP2Status(),
       refreshPaymentConfig()
     ]).finally(() => setIsLoadingCatalog(false));
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-    // Periodic sync every 4s to catch real-time agent price optimizations & buyer acquisitions
-    const timer = setInterval(() => {
-      refreshCatalog();
-      refreshCart();
-    }, 4000);
+  // ─── Background catalog + cart sync (8s, in-flight safe, visibility-aware) ───────
+  useEffect(() => {
+    const timer = setInterval(async () => {
+      // Skip when tab is hidden or poll already in-flight
+      if (document.visibilityState !== 'visible') return;
+      if (catalogInFlight.current) return;
+      catalogInFlight.current = true;
+      try {
+        await Promise.all([refreshCatalog(), refreshCart()]);
+      } finally {
+        catalogInFlight.current = false;
+      }
+    }, STORE_POLL_INTERVAL_MS);
 
     return () => clearInterval(timer);
-  }, [refreshCatalog, refreshCart, refreshOrders, refreshAP2Status, refreshPaymentConfig]);
+  }, [refreshCatalog, refreshCart]);
 
   return (
     <StoreContext.Provider value={{

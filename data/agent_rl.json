@@ -1141,20 +1141,20 @@
     "alpha": 0.15,
     "gamma": 0.85,
     "epsilon": 0.1,
-    "total_rewards": 26.0,
-    "episode_count": 24,
+    "total_rewards": 37.0,
+    "episode_count": 35,
     "action_counts": {
-      "purchase_assistant": 13,
+      "purchase_assistant": 21,
       "add_to_cart": 1,
       "trigger_razorpay_checkout": 1,
-      "recommend_products": 2,
-      "compare_products": 2,
-      "apply_coupon": 2,
+      "recommend_products": 3,
+      "compare_products": 3,
+      "apply_coupon": 3,
       "autonomous_agent_pay": 3
     },
     "q_table": {
       "tool=purchase_assist|user_id=user_test": {
-        "purchase_assistant": 0.8032
+        "purchase_assistant": 0.8791
       },
       "tool=add_to_cart|user_id=user_alex": {
         "add_to_cart": 0.45
@@ -1163,16 +1163,16 @@
         "trigger_razorpay_checkout": 0.15
       },
       "tool=recommend_produ|user_id=user_test": {
-        "recommend_products": 0.2775
+        "recommend_products": 0.3859
       },
       "tool=compare_product|user_id=user_test": {
-        "compare_products": 0.2775
+        "compare_products": 0.3859
       },
       "tool=apply_coupon|user_id=user_test": {
-        "apply_coupon": 0.2775
+        "apply_coupon": 0.3859
       },
       "tool=purchase_assist|user_id=user_e2e_custom": {
-        "purchase_assistant": 0.2775
+        "purchase_assistant": 0.6795
       },
       "tool=purchase_assist|user_id=user_alex": {
         "purchase_assistant": 0.15
@@ -1182,46 +1182,6 @@
       }
     },
     "history": [
-      {
-        "state": "tool=purchase_assist|user_id=user_test",
-        "action": "purchase_assistant",
-        "reward": 1.0,
-        "next_state": "success=1",
-        "q_after": 0.15,
-        "timestamp": "2026-08-29T08:26:56.039139"
-      },
-      {
-        "state": "tool=purchase_assist|user_id=user_test",
-        "action": "purchase_assistant",
-        "reward": 1.0,
-        "next_state": "success=1",
-        "q_after": 0.2775,
-        "timestamp": "2026-08-29T08:28:36.483796"
-      },
-      {
-        "state": "tool=purchase_assist|user_id=user_test",
-        "action": "purchase_assistant",
-        "reward": 1.0,
-        "next_state": "success=1",
-        "q_after": 0.3859,
-        "timestamp": "2026-08-29T08:29:33.246078"
-      },
-      {
-        "state": "tool=purchase_assist|user_id=user_test",
-        "action": "purchase_assistant",
-        "reward": 1.0,
-        "next_state": "success=1",
-        "q_after": 0.478,
-        "timestamp": "2026-08-29T08:29:52.723024"
-      },
-      {
-        "state": "tool=purchase_assist|user_id=user_test",
-        "action": "purchase_assistant",
-        "reward": 1.0,
-        "next_state": "success=1",
-        "q_after": 0.5563,
-        "timestamp": "2026-08-29T08:32:34.087690"
-      },
       {
         "state": "tool=purchase_assist|user_id=user_test",
         "action": "purchase_assistant",
@@ -1373,6 +1333,94 @@
         "next_state": "success=1",
         "q_after": 0.3859,
         "timestamp": "2026-09-03T18:27:29.022672"
+      },
+      {
+        "state": "tool=purchase_assist|user_id=user_test",
+        "action": "purchase_assistant",
+        "reward": 1.0,
+        "next_state": "success=1",
+        "q_after": 0.8327,
+        "timestamp": "2026-09-03T23:09:29.566227"
+      },
+      {
+        "state": "tool=purchase_assist|user_id=user_test",
+        "action": "purchase_assistant",
+        "reward": 1.0,
+        "next_state": "success=1",
+        "q_after": 0.8578,
+        "timestamp": "2026-09-03T23:11:33.396589"
+      },
+      {
+        "state": "tool=recommend_produ|user_id=user_test",
+        "action": "recommend_products",
+        "reward": 1.0,
+        "next_state": "success=1",
+        "q_after": 0.3859,
+        "timestamp": "2026-09-03T23:11:33.418354"
+      },
+      {
+        "state": "tool=compare_product|user_id=user_test",
+        "action": "compare_products",
+        "reward": 1.0,
+        "next_state": "success=1",
+        "q_after": 0.3859,
+        "timestamp": "2026-09-03T23:11:33.419634"
+      },
+      {
+        "state": "tool=apply_coupon|user_id=user_test",
+        "action": "apply_coupon",
+        "reward": 1.0,
+        "next_state": "success=1",
+        "q_after": 0.3859,
+        "timestamp": "2026-09-03T23:11:33.423205"
+      },
+      {
+        "state": "tool=purchase_assist|user_id=user_e2e_custom",
+        "action": "purchase_assistant",
+        "reward": 1.0,
+        "next_state": "success=1",
+        "q_after": 0.3859,
+        "timestamp": "2026-09-03T23:13:32.110001"
+      },
+      {
+        "state": "tool=purchase_assist|user_id=user_e2e_custom",
+        "action": "purchase_assistant",
+        "reward": 1.0,
+        "next_state": "success=1",
+        "q_after": 0.478,
+        "timestamp": "2026-09-03T23:13:35.520534"
+      },
+      {
+        "state": "tool=purchase_assist|user_id=user_e2e_custom",
+        "action": "purchase_assistant",
+        "reward": 1.0,
+        "next_state": "success=1",
+        "q_after": 0.5563,
+        "timestamp": "2026-09-03T23:13:55.956662"
+      },
+      {
+        "state": "tool=purchase_assist|user_id=user_e2e_custom",
+        "action": "purchase_assistant",
+        "reward": 1.0,
+        "next_state": "success=1",
+        "q_after": 0.6229,
+        "timestamp": "2026-09-03T23:14:06.432044"
+      },
+      {
+        "state": "tool=purchase_assist|user_id=user_test",
+        "action": "purchase_assistant",
+        "reward": 1.0,
+        "next_state": "success=1",
+        "q_after": 0.8791,
+        "timestamp": "2026-09-03T23:16:21.122336"
+      },
+      {
+        "state": "tool=purchase_assist|user_id=user_e2e_custom",
+        "action": "purchase_assistant",
+        "reward": 1.0,
+        "next_state": "success=1",
+        "q_after": 0.6795,
+        "timestamp": "2026-09-03T23:18:16.908970"
       }
     ]
   }

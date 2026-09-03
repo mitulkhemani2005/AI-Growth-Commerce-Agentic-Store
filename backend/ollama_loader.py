@@ -6,6 +6,16 @@ import urllib.request
 import urllib.error
 from typing import Optional, Dict, Any, List
 
+# ── GPU-only loading enforcement ──────────────────────────────────────────────
+# Set these BEFORE any Ollama daemon is spawned so every process inherits them.
+# OLLAMA_NUM_GPU=-1   → offload every single layer to GPU; never spill to RAM
+# OLLAMA_GPU_OVERHEAD=0 → remove the system-RAM safety buffer Ollama reserves
+# OLLAMA_MAX_LOADED_MODELS=1 → only one model in memory at a time (no RAM overflow)
+os.environ.setdefault("OLLAMA_NUM_GPU", "-1")
+os.environ.setdefault("OLLAMA_GPU_OVERHEAD", "0")
+os.environ.setdefault("OLLAMA_MAX_LOADED_MODELS", "1")
+# ─────────────────────────────────────────────────────────────────────────────
+
 def get_ollama_models_dir() -> Optional[str]:
     """Retrieves the configured OLLAMA_MODELS directory, checking process and Windows registry/user env."""
     if os.environ.get("OLLAMA_MODELS"):
@@ -68,6 +78,10 @@ def start_ollama_daemon() -> bool:
     env = os.environ.copy()
     if models_dir:
         env["OLLAMA_MODELS"] = models_dir
+    # Force all model layers onto GPU — prevents Ollama from spilling into system RAM
+    env["OLLAMA_NUM_GPU"] = "-1"
+    env["OLLAMA_GPU_OVERHEAD"] = "0"
+    env["OLLAMA_MAX_LOADED_MODELS"] = "1"
 
     print(f"[Ollama Loader] Ollama daemon not running. Attempting to start background server...", flush=True)
     if models_dir:
@@ -129,12 +143,16 @@ def preload_model_in_vram(model_name: str, host: Optional[str] = None) -> bool:
     Sends a warm-up/preload request to Ollama with keep_alive=-1 to load the model
     into GPU VRAM immediately and pin it permanently.
     """
+    # Resolve host default here so the URL is never built with None
+    host = host or get_base_host()
     ctx_len = int(os.environ.get("OLLAMA_NUM_CTX", "4096"))
     payload = {
         "model": model_name,
         "keep_alive": -1,  # Keeps model indefinitely resident in GPU VRAM
         "options": {
-            "num_gpu": 999,
+            "num_gpu": 999,   # Offload ALL layers to GPU; Ollama caps safely
+            "main_gpu": 0,    # Target primary GPU (index 0)
+            "low_vram": False, # Disable low-VRAM mode that causes RAM spill
             "num_ctx": ctx_len
         }
     }

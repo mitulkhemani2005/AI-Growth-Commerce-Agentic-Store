@@ -1,12 +1,36 @@
 [
   {
-    "id": "camp_1788475201",
+    "id": "camp_1788477428",
+    "title": "Mobiles Mega Sale",
+    "category": "Mobiles",
+    "discount_percent": 10.0,
+    "banner_text": "\ud83d\udd25 MOBILES MEGA SALE: UP TO 10% OFF MOBILES \u2022 0% TAX STOREWIDE",
+    "duration_hours": 24,
+    "status": "COMPLETED",
+    "launched_at": "2026-09-03T23:17:08.209222",
+    "total_revenue_generated": 0.0,
+    "orders_count": 0
+  },
+  {
+    "id": "camp_1788477293",
     "title": "Weekend Titanium Drop",
     "category": "Laptops",
     "discount_percent": 10.0,
     "banner_text": "\ud83d\udd25 WEEKEND TITANIUM DROP: UP TO 10% OFF LAPTOPS \u2022 0% TAX STOREWIDE",
     "duration_hours": 48,
     "status": "ACTIVE",
+    "launched_at": "2026-09-03T23:14:53.860398",
+    "total_revenue_generated": 0.0,
+    "orders_count": 0
+  },
+  {
+    "id": "camp_1788475201",
+    "title": "Weekend Titanium Drop",
+    "category": "Laptops",
+    "discount_percent": 10.0,
+    "banner_text": "\ud83d\udd25 WEEKEND TITANIUM DROP: UP TO 10% OFF LAPTOPS \u2022 0% TAX STOREWIDE",
+    "duration_hours": 48,
+    "status": "COMPLETED",
     "launched_at": "2026-09-03T22:40:01.440537",
     "total_revenue_generated": 0.0,
     "orders_count": 0

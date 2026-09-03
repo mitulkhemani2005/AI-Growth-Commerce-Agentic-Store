@@ -19,6 +19,7 @@ async def test_admin_fleet_inter_agent_collaboration():
     # 1. Reset Treasury and Setup Clean State
     treasury_manager.reset_treasury(10000.0)
     message_bus.clear_history()
+    inventory_manager_agent.pending_restock_requests.clear()
     
     # 2. Test Inventory Manager Low Stock -> Restock Request to CEO
     products = inventory_manager.get_all_products()
@@ -33,7 +34,7 @@ async def test_admin_fleet_inter_agent_collaboration():
     assert inv_res["success"] is True
     
     # Check Message Bus has RESTOCK_REQUEST sent to CEO Agent
-    msgs = message_bus.get_all_messages(limit=10)
+    msgs = message_bus.get_all_messages(limit=100)
     restock_req_msgs = [m for m in msgs if m.get("subject") == "RESTOCK_REQUEST"]
     assert len(restock_req_msgs) > 0
     assert restock_req_msgs[0]["to"] == "CEO Agent"
@@ -43,7 +44,7 @@ async def test_admin_fleet_inter_agent_collaboration():
     assert ceo_res["success"] is True
     
     # Check Message Bus has RESTOCK_APPROVED sent to Inventory Manager Agent
-    msgs = message_bus.get_all_messages(limit=10)
+    msgs = message_bus.get_all_messages(limit=100)
     restock_app_msgs = [m for m in msgs if m.get("subject") == "RESTOCK_APPROVED"]
     assert len(restock_app_msgs) > 0
     assert restock_app_msgs[0]["to"] == "Inventory Manager Agent"
@@ -79,7 +80,7 @@ async def test_admin_fleet_inter_agent_collaboration():
     assert dispatched_order["tracking_number"].startswith("TRK-")
     
     # Check Message Bus has DISPATCH_COMPLETED
-    msgs = message_bus.get_all_messages(limit=15)
+    msgs = message_bus.get_all_messages(limit=100)
     disp_msgs = [m for m in msgs if m.get("subject") == "DISPATCH_COMPLETED"]
     assert len(disp_msgs) > 0
     

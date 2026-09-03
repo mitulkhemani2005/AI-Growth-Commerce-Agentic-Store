@@ -9,6 +9,14 @@ Validates full multi-agent business flows:
 5. Defect Feedback -> Quality Alert -> CEO Escalation
 """
 
+import sys
+if sys.platform == "win32":
+    try:
+        sys.stdout.reconfigure(encoding="utf-8")
+        sys.stderr.reconfigure(encoding="utf-8")
+    except Exception:
+        pass
+
 import pytest
 import asyncio
 from datetime import datetime, timezone
@@ -101,6 +109,7 @@ async def test_end_to_end_restock_and_ceo_approval_flow():
     base_p = float(target_p.get("BASE_PRICE") or 1000.0)
 
     # 1. Inventory Manager creates restock request
+    inventory_manager_agent.pending_restock_requests.clear()
     req_res = await inventory_manager_agent.create_purchase_request(pid, quantity=10, reason="Safety stock low")
     assert req_res.get("success") is True
 

@@ -1,145 +1,18 @@
 {
-  "refund:ORD-2302-D6AF": {
-    "operation_id": "refund:ORD-2302-D6AF",
+  "refund:ORD-1835-9CE2": {
+    "operation_id": "refund:ORD-1835-9CE2",
     "operation_type": "REFUND",
     "actor": "Finance Manager Agent",
     "status": "SUCCESS",
-    "started_at": "2026-09-03T18:23:13.942814+00:00",
-    "started_at_ts": 1788459793.942827,
-    "completed_at": "2026-09-03T18:23:14.073602+00:00",
+    "started_at": "2026-09-03T23:18:35.614026+00:00",
+    "started_at_ts": 1788477515.6140335,
+    "completed_at": "2026-09-03T23:18:35.813916+00:00",
     "result": {
       "success": true,
-      "order_id": "ORD-2302-D6AF",
-      "refund_amount": 50.25,
+      "order_id": "ORD-1835-9CE2",
+      "refund_amount": 2000.0,
       "status": "Refunded",
-      "message": "Successfully refunded \u20b950.25 for Order #ORD-2302-D6AF via Razorpay Gateway. Inventory restocked."
-    },
-    "error": null,
-    "retry_count": 0,
-    "metadata": {}
-  },
-  "refund:ORD-4926-7916": {
-    "operation_id": "refund:ORD-4926-7916",
-    "operation_type": "REFUND",
-    "actor": "Finance Manager Agent",
-    "status": "FAILED",
-    "started_at": "2026-09-03T21:00:19.285297+00:00",
-    "started_at_ts": 1788469219.2853136,
-    "completed_at": "2026-09-03T21:00:19.321035+00:00",
-    "result": null,
-    "error": "Order #ORD-4926-7916 has already been refunded.",
-    "retry_count": 0,
-    "metadata": {},
-    "allow_retry": true
-  },
-  "refund:ORD-5945-6F37": {
-    "operation_id": "refund:ORD-5945-6F37",
-    "operation_type": "REFUND",
-    "actor": "Finance Manager Agent",
-    "status": "FAILED",
-    "started_at": "2026-09-03T21:00:19.325083+00:00",
-    "started_at_ts": 1788469219.325114,
-    "completed_at": "2026-09-03T21:00:19.336701+00:00",
-    "result": null,
-    "error": "Order #ORD-5945-6F37 has already been refunded.",
-    "retry_count": 0,
-    "metadata": {},
-    "allow_retry": true
-  },
-  "refund:ORD-0700-F868": {
-    "operation_id": "refund:ORD-0700-F868",
-    "operation_type": "REFUND",
-    "actor": "Finance Manager Agent",
-    "status": "SUCCESS",
-    "started_at": "2026-09-03T21:08:06.263677+00:00",
-    "started_at_ts": 1788469686.263715,
-    "completed_at": "2026-09-03T21:08:06.424584+00:00",
-    "result": {
-      "success": true,
-      "order_id": "ORD-0700-F868",
-      "refund_amount": 42.59,
-      "status": "Refunded",
-      "message": "Successfully refunded \u20b942.59 for Order #ORD-0700-F868 via Razorpay Gateway. Inventory restocked."
-    },
-    "error": null,
-    "retry_count": 0,
-    "metadata": {}
-  },
-  "refund:ORD-0416-50C0": {
-    "operation_id": "refund:ORD-0416-50C0",
-    "operation_type": "REFUND",
-    "actor": "Finance Manager Agent",
-    "status": "SUCCESS",
-    "started_at": "2026-09-03T22:04:22.453227+00:00",
-    "started_at_ts": 1788473062.4532406,
-    "completed_at": "2026-09-03T22:04:22.624256+00:00",
-    "result": {
-      "success": true,
-      "order_id": "ORD-0416-50C0",
-      "refund_amount": 34.07,
-      "status": "Refunded",
-      "message": "Successfully refunded \u20b934.07 for Order #ORD-0416-50C0 via Razorpay Gateway. Inventory restocked."
-    },
-    "error": null,
-    "retry_count": 0,
-    "metadata": {}
-  },
-  "refund:ORD-1238-24F9": {
-    "operation_id": "refund:ORD-1238-24F9",
-    "operation_type": "REFUND",
-    "actor": "Finance Manager Agent",
-    "status": "SUCCESS",
-    "started_at": "2026-09-03T22:12:58.049544+00:00",
-    "started_at_ts": 1788473578.04956,
-    "completed_at": "2026-09-03T22:12:58.266404+00:00",
-    "result": {
-      "success": true,
-      "order_id": "ORD-1238-24F9",
-      "refund_amount": 30.42,
-      "status": "Refunded",
-      "message": "Successfully refunded \u20b930.42 for Order #ORD-1238-24F9 via Razorpay Gateway. Inventory restocked.",
-      "operation_id": "refund:ORD-1238-24F9",
-      "idempotent": true
-    },
-    "error": null,
-    "retry_count": 0,
-    "metadata": {}
-  },
-  "refund:ORD-1220-923E": {
-    "operation_id": "refund:ORD-1220-923E",
-    "operation_type": "REFUND",
-    "actor": "Finance Manager Agent",
-    "status": "SUCCESS",
-    "started_at": "2026-09-03T22:12:59.497749+00:00",
-    "started_at_ts": 1788473579.4977655,
-    "completed_at": "2026-09-03T22:12:59.716086+00:00",
-    "result": {
-      "success": true,
-      "order_id": "ORD-1220-923E",
-      "refund_amount": 26.76,
-      "status": "Refunded",
-      "message": "Successfully refunded \u20b926.76 for Order #ORD-1220-923E via Razorpay Gateway. Inventory restocked.",
-      "operation_id": "refund:ORD-1220-923E",
-      "idempotent": true
-    },
-    "error": null,
-    "retry_count": 0,
-    "metadata": {}
-  },
-  "refund:ORD-2729-90F7": {
-    "operation_id": "refund:ORD-2729-90F7",
-    "operation_type": "REFUND",
-    "actor": "Finance Manager Agent",
-    "status": "SUCCESS",
-    "started_at": "2026-09-03T22:28:08.640086+00:00",
-    "started_at_ts": 1788474488.6400967,
-    "completed_at": "2026-09-03T22:28:08.803768+00:00",
-    "result": {
-      "success": true,
-      "order_id": "ORD-2729-90F7",
-      "refund_amount": 30.42,
-      "status": "Refunded",
-      "message": "Successfully refunded \u20b930.42 for Order #ORD-2729-90F7 via Razorpay Gateway. Inventory restocked."
+      "message": "Successfully refunded \u20b92,000.00 for Order #ORD-1835-9CE2 via Razorpay Gateway. Inventory restocked."
     },
     "error": null,
     "retry_count": 0,

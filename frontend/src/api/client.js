@@ -14,9 +14,22 @@ const getApiBase = () => {
 
 const API_BASE = getApiBase();
 
+// ─── In-flight request deduplication ─────────────────────────────────────────────
+// If the same GET URL is requested while a previous fetch for it is in-flight,
+// return the same promise instead of spawning a duplicate network request.
+// This prevents React StrictMode, concurrent polls, and component remounts from
+// hammering the backend with duplicate requests.
+const _inFlight = new Map();
 
 async function apiRequest(endpoint, options = {}) {
   const url = `${API_BASE}${endpoint}`;
+  const method = (options.method || 'GET').toUpperCase();
+
+  // Dedup only idempotent GET requests
+  if (method === 'GET' && _inFlight.has(url)) {
+    return _inFlight.get(url);
+  }
+
   const config = {
     headers: {
       'Content-Type': 'application/json',
@@ -29,26 +42,40 @@ async function apiRequest(endpoint, options = {}) {
     config.body = JSON.stringify(config.body);
   }
 
-  try {
-    const res = await fetch(url, config);
-    const contentType = res.headers.get('content-type');
-    let data = null;
-    if (contentType && contentType.includes('application/json')) {
-      data = await res.json();
-    } else {
-      data = await res.text();
-    }
+  const promise = (async () => {
+    try {
+      const res = await fetch(url, config);
+      const contentType = res.headers.get('content-type');
+      let data = null;
+      if (contentType && contentType.includes('application/json')) {
+        data = await res.json();
+      } else {
+        data = await res.text();
+      }
 
-    if (!res.ok) {
-      const errorMsg = (data && data.detail) || (data && data.error) || (data && data.message) || `Request failed (${res.status})`;
-      throw new Error(errorMsg);
+      if (!res.ok) {
+        const errorMsg = (data && data.detail) || (data && data.error) || (data && data.message) || `Request failed (${res.status})`;
+        throw new Error(errorMsg);
+      }
+      return data;
+    } catch (err) {
+      console.error(`[API Error] ${method} ${endpoint}:`, err.message);
+      throw err;
+    } finally {
+      // Clean up dedup cache after request settles
+      if (method === 'GET') {
+        _inFlight.delete(url);
+      }
     }
-    return data;
-  } catch (err) {
-    console.error(`[API Error] ${options.method || 'GET'} ${endpoint}:`, err);
-    throw err;
+  })();
+
+  if (method === 'GET') {
+    _inFlight.set(url, promise);
   }
+
+  return promise;
 }
+
 
 export const api = {
   // --- USER & CATALOG ---

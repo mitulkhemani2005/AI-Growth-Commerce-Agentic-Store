@@ -453,7 +453,7 @@ class BuyerAgentsFleet:
         buyer["status"] = f"Purchased #{order_id} (₹{order_total:,.2f})"
 
         # Write customer review
-        review_text, rating = self._generate_persona_review(buyer, selected_product)
+        review_text, rating = await self._generate_persona_review(buyer, selected_product)
         review_manager.add_review(
             product_id=selected_product["id"],
             customer_name=buyer["name"],
@@ -493,7 +493,7 @@ class BuyerAgentsFleet:
             "details": details
         }
 
-    def _generate_persona_review(self, buyer: Dict[str, Any], product: Dict[str, Any]) -> tuple:
+    async def _generate_persona_review(self, buyer: Dict[str, Any], product: Dict[str, Any]) -> tuple:
         b_name = buyer.get("name", "Customer")
         b_title = buyer.get("persona_title", "Verified Buyer")
         b_desc = buyer.get("description", "A discerning consumer")
@@ -511,9 +511,11 @@ class BuyerAgentsFleet:
 
         try:
             from backend.admin_agents import _call_ollama_sync, clean_think_tags
-            resp = _call_ollama_sync(
-                model=os.environ.get("BUYER_MODEL", "qwen2.5:7b"),
-                messages=[
+            resp = await asyncio.to_thread(
+                _call_ollama_sync,
+                "ollama",
+                os.environ.get("BUYER_MODEL", "qwen2.5:7b"),
+                [
                     {"role": "system", "content": f"You are {b_name} ({b_title}). Write a short 1-2 sentence product review in your distinct voice."},
                     {"role": "user", "content": prompt}
                 ],

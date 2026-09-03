@@ -1,6 +1,7 @@
 from dotenv import load_dotenv
 load_dotenv()
 
+import asyncio
 import os
 from contextlib import asynccontextmanager
 from typing import Optional, List, Dict, Any
@@ -1021,9 +1022,21 @@ async def get_admin_agents_status():
 
 @app.post("/api/admin/agents/trigger")
 async def trigger_admin_agent(req: AdminAgentTriggerRequest):
-    """Manually triggers an instant autonomous execution cycle for an agent."""
-    res = await background_worker.trigger_agent(req.agent_key)
-    return res
+    """Fires an instant autonomous execution cycle for an agent (non-blocking fire-and-forget)."""
+    agent_key = req.agent_key
+    state = background_worker.agent_states.get(agent_key)
+    if not state:
+        raise HTTPException(status_code=404, detail=f"Unknown agent: '{agent_key}'")
+    # Reset last_run_ts so the background loop picks it up on next tick
+    state["last_run_ts"] = 0.0
+    # Fire-and-forget: schedule the cycle as a background task so HTTP returns immediately
+    asyncio.create_task(background_worker.trigger_agent(agent_key))
+    return {
+        "success": True,
+        "agent": agent_key,
+        "message": f"Triggered '{state.get('name', agent_key)}' — executing in background.",
+        "status": "QUEUED"
+    }
 
 @app.post("/api/admin/agents/interval")
 async def update_admin_agent_interval(req: AdminAgentIntervalRequest):
@@ -1274,15 +1287,23 @@ async def get_ai_buyers():
 
 @app.post("/api/admin/buyers/trigger")
 async def trigger_ai_buyer(req: AdminBuyerTriggerRequest):
-    """Manually triggers an autonomous shopping/evaluating cycle for a specific AI buyer or all buyers."""
+    """Fires an autonomous shopping cycle for a buyer (non-blocking fire-and-forget)."""
     b_id = req.buyer_id.lower().strip()
-    if b_id in ["all", "all_buyers", "everyone"]:
-        res = await buyer_agents_fleet.run_all_buyers_step()
-    else:
-        res = await buyer_agents_fleet.execute_buyer_step(b_id)
-    if not res.get("success"):
-        raise HTTPException(status_code=400, detail=res.get("error", "Buyer trigger failed"))
-    return res
+    async def _fire():
+        try:
+            if b_id in ["all", "all_buyers", "everyone"]:
+                await buyer_agents_fleet.run_all_buyers_step()
+            else:
+                await buyer_agents_fleet.execute_buyer_step(b_id)
+        except Exception as e:
+            print(f"[BuyerTrigger] Background error: {e}", flush=True)
+    asyncio.create_task(_fire())
+    return {
+        "success": True,
+        "buyer_id": b_id,
+        "message": f"AI buyer '{b_id}' cycle queued — executing in background.",
+        "status": "QUEUED"
+    }
 
 @app.post("/api/admin/buyers/toggle")
 async def toggle_ai_buyers(req: AdminBuyerToggleRequest):
