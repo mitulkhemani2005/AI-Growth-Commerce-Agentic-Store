@@ -1,3 +1,4 @@
+from backend.config import DATA_DIR, data_file
 """
 Reinforcement Learning (RL) Engine for AI Agents
 =================================================
@@ -23,7 +24,7 @@ import threading
 import datetime
 from typing import Dict, List, Any, Optional, Tuple
 
-DATA_DIR = os.path.join(os.path.dirname(__file__), "..", "data")
+DATA_DIR = str(DATA_DIR)
 RL_DATA_FILE = os.path.join(DATA_DIR, "agent_rl.json")
 
 

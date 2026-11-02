@@ -48,8 +48,9 @@ async def test_all():
     test_ord_id = f"ORD-TEST-{int(time.time())}"
     sample_product = inventory_manager.get_all_products()[0]
     p_id = sample_product["id"]
-    init_stock = sample_product.get("STOCK_REMAINING", 10)
-    print(f"Product {p_id} initial stock: {init_stock}")
+    init_stock = 10
+    inventory_manager.update_stock(p_id, init_stock)
+    print(f"Product {p_id} initial stock set to: {init_stock}")
 
     # Place order
     orders = order_manager._read_orders()

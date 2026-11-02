@@ -1,14 +1,15 @@
-import json
+from backend.transactions import serialized
+from backend.config import DATA_DIR, data_file
 import os
-import threading
 import uuid
 from datetime import datetime, timezone
 from typing import List, Dict, Any, Optional
 from backend.inventory_manager import inventory_manager
 from backend.cart_manager import cart_manager
 
-ORDERS_FILE = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "orders.json"))
-_lock = threading.RLock()
+from backend.async_store import AsyncJSONStore
+
+ORDERS_FILE = data_file("orders.json")
 
 
 VALID_STATUSES = ["Pending", "Confirmed", "Dispatched", "Shipped", "Delivered", "Cancelled", "Refunded"]
@@ -16,25 +17,35 @@ VALID_STATUSES = ["Pending", "Confirmed", "Dispatched", "Shipped", "Delivered", 
 class OrderManager:
     def __init__(self, file_path: str = ORDERS_FILE):
         self.file_path = file_path
+        self._store = AsyncJSONStore(self.file_path, default_factory=list)
 
     def _read_orders(self) -> List[Dict[str, Any]]:
-        with _lock:
-            if not os.path.exists(self.file_path):
-                return []
-            with open(self.file_path, "r", encoding="utf-8") as f:
-                return json.load(f)
+        return self._store.get()
 
     def _write_orders(self, orders: List[Dict[str, Any]]) -> None:
-        with _lock:
-            with open(self.file_path, "w", encoding="utf-8") as f:
-                json.dump(orders, f, indent=2)
+        self._store.set(orders)
+
+    async def _read_orders_async(self) -> List[Dict[str, Any]]:
+        return await self._store.get_async()
+
+    async def _write_orders_async(self, orders: List[Dict[str, Any]]) -> None:
+        await self._store.set_async(orders)
 
     def get_all_orders(self) -> List[Dict[str, Any]]:
         orders = self._read_orders()
         return sorted(orders, key=lambda x: x.get("created_at", ""), reverse=True)
 
+    async def get_all_orders_async(self) -> List[Dict[str, Any]]:
+        orders = await self._read_orders_async()
+        return sorted(orders, key=lambda x: x.get("created_at", ""), reverse=True)
+
     def get_orders_by_user(self, user_id: str) -> List[Dict[str, Any]]:
         orders = self._read_orders()
+        user_orders = [o for o in orders if o.get("user_id") == user_id]
+        return sorted(user_orders, key=lambda x: x.get("created_at", ""), reverse=True)
+
+    async def get_orders_by_user_async(self, user_id: str) -> List[Dict[str, Any]]:
+        orders = await self._read_orders_async()
         user_orders = [o for o in orders if o.get("user_id") == user_id]
         return sorted(user_orders, key=lambda x: x.get("created_at", ""), reverse=True)
 
@@ -46,6 +57,15 @@ class OrderManager:
                 return o
         return None
 
+    async def get_order_by_id_async(self, order_id: str) -> Optional[Dict[str, Any]]:
+        orders = await self._read_orders_async()
+        order_id_clean = order_id.upper().strip()
+        for o in orders:
+            if o.get("order_id", "").upper() == order_id_clean:
+                return o
+        return None
+
+    @serialized
     def create_order(
         self,
         user_id: str,
@@ -62,12 +82,25 @@ class OrderManager:
     ) -> Dict[str, Any]:
         """Creates a confirmed order directly or from cart."""
         if items:
+            for item in items:
+                pid = item.get("id") or item.get("product_id")
+                product = inventory_manager.get_product_by_id(pid or "")
+                qty = item.get("quantity", 1)
+                if not product or isinstance(qty, bool) or not isinstance(qty, int) or qty <= 0:
+                    return {"success": False, "error": "Order contains an invalid product or quantity."}
+            original_user = cart_manager.get_user(user_id)
             cart_manager.clear_cart(user_id)
             for it in items:
                 pid = it.get("id") or it.get("product_id")
                 qty = it.get("quantity", 1)
                 sz = it.get("PRODUCT_SIZE") or it.get("size", "Standard")
-                cart_manager.add_to_cart(user_id, pid, quantity=qty, size=sz)
+                added = cart_manager.add_to_cart(user_id, pid, quantity=qty, size=sz)
+                if not added.get("success"):
+                    cart_manager.clear_cart(user_id)
+                    if original_user:
+                        for previous in original_user.get("cart", []):
+                            cart_manager.add_to_cart(user_id, previous["id"], previous.get("quantity", 1), previous.get("size"))
+                    return added
 
         res = self.create_order_from_cart(
             user_id=user_id,
@@ -80,6 +113,7 @@ class OrderManager:
             res["order_id"] = res["order"]["order_id"]
         return res
 
+    @serialized
     def create_order_from_cart(
         self,
         user_id: str,
@@ -92,6 +126,8 @@ class OrderManager:
         Creates an order from user cart.
         When initial_status is 'Confirmed' (default for online payments), atomically deducts stock in inventory.json.
         """
+        if initial_status.capitalize() not in {"Pending", "Confirmed"}:
+            return {"success": False, "error": "New orders must be Pending or Confirmed."}
         if not payment_method or "auto-pay" in payment_method.lower() or "1-click" in payment_method.lower():
             payment_method = "Razorpay Gateway (Online)"
         cart = cart_manager.get_cart(user_id)
@@ -140,7 +176,6 @@ class OrderManager:
             deducted_items = deduct_res.get("deducted_items", [])
 
         # Calculate totals (0% Tax Free Storewide in INR)
-        tax = 0.0
         total = round(subtotal, 2)
 
         order_id = f"ORD-{datetime.utcnow().strftime('%M%S')}-{uuid.uuid4().hex[:4].upper()}"
@@ -202,6 +237,7 @@ class OrderManager:
             "deducted_items": deducted_items
         }
 
+    @serialized
     def update_order_status(
         self,
         order_id: str,
@@ -235,6 +271,10 @@ class OrderManager:
 
         order = orders[order_idx]
         old_status = order.get("status", "Confirmed")
+        from backend.policy_engine import policy_engine
+        transition = policy_engine.validate_order_state_transition(old_status, status_clean)
+        if not transition.allowed:
+            return {"success": False, "error": transition.reason}
 
         # 1. Pending -> Confirmed: Trigger inventory deduction
         if old_status == "Pending" and status_clean == "Confirmed":
@@ -312,6 +352,7 @@ class OrderManager:
         trk = tracking_number or f"TRK-{uuid.uuid4().hex[:8].upper()}"
         return self.update_order_status(order_id, new_status="Dispatched", tracking_number=trk)
 
+    @serialized
     def evaluate_24h_cancellation_and_refund(self, order_id: str, reason: str = "Customer Cancellation") -> Dict[str, Any]:
         """
         Strict 24-Hour & Non-Shipped Refund Rule:
@@ -379,6 +420,7 @@ class OrderManager:
             "order": refund_res.get("order")
         }
 
+    @serialized
     def refund_order(self, order_id: str, refund_details: Dict[str, Any]) -> Dict[str, Any]:
         """
         Marks an order as Refunded, records refund details, and restocks inventory.

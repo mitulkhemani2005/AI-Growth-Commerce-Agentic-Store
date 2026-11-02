@@ -1,3 +1,4 @@
+from backend.config import DATA_DIR, data_file
 """
 Idempotency System — Safe, Non-Duplicate Mutation Engine
 =========================================================
@@ -16,11 +17,11 @@ import os
 import threading
 import time
 from datetime import datetime, timezone
-from typing import Dict, Any, Optional, Callable, Awaitable, Tuple, List
+from typing import Dict, Any, Optional, Callable, Tuple, List
 import inspect
 
 
-IDEMPOTENCY_FILE = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "idempotency_records.json"))
+IDEMPOTENCY_FILE = data_file("idempotency_records.json")
 _idempotency_lock = threading.RLock()
 
 

@@ -1,8 +1,14 @@
+import asyncio
 import os
 import re
 import hmac
 import hashlib
 import uuid
+import secrets
+import math
+from backend.config import PAYMENT_MODE, data_file
+from backend.async_store import AsyncJSONStore
+from backend.transactions import serialized
 from datetime import datetime, timezone
 from typing import Dict, Any, Optional
 
@@ -16,115 +22,107 @@ except ImportError:
     razorpay = None
 
 # Razorpay Keys — loaded from environment (set in .env, never hardcoded)
-DEFAULT_KEY_ID = os.environ.get("RAZORPAY_KEY_ID", "rzp_test_TU4r5qh5d7sKDu")
-DEFAULT_KEY_SECRET = os.environ.get("RAZORPAY_KEY_SECRET", "zXoFlp61ZzytWF5Awo21rifw")
+DEFAULT_KEY_ID = os.environ.get("RAZORPAY_KEY_ID", "")
+DEFAULT_KEY_SECRET = os.environ.get("RAZORPAY_KEY_SECRET", "")
 
 class PaymentManager:
     def __init__(self, key_id: str = DEFAULT_KEY_ID, key_secret: str = DEFAULT_KEY_SECRET):
         self.key_id = key_id
-        self.key_secret = key_secret
+        self.key_secret = key_secret or secrets.token_hex(32)
+        self.mode = PAYMENT_MODE
+        self._intents = AsyncJSONStore(data_file("payment_intents.json"), dict)
         self.client = None
         self._init_client()
 
     def _init_client(self):
-        if razorpay and not self.key_id.startswith("rzp_test_growth_"):
-            try:
-                self.client = razorpay.Client(auth=(self.key_id, self.key_secret))
-                self.client.set_app_details({"title": "GrowthCommerceAgenticStore", "version": "1.0.0"})
-            except Exception as e:
-                print(f"Warning: Razorpay client init issue: {e}")
-                self.client = None
-        else:
-            self.client = None
+        self.client = None
+        if self.mode == "razorpay" and razorpay and self.key_id and self.key_secret:
+            self.client = razorpay.Client(auth=(self.key_id, self.key_secret))
+            self.client.set_app_details({"title": "Nova", "version": "1.0.0"})
 
     def update_credentials(self, key_id: str, key_secret: str):
         self.key_id = key_id.strip()
         self.key_secret = key_secret.strip()
         self._init_client()
-        return {"success": True, "key_id": self.key_id}
+        return {"success": True, "key_id": self.key_id, "mode": self.mode}
 
     def get_public_key_id(self) -> str:
-        return self.key_id
+        return self.key_id if self.mode == "razorpay" else ""
 
+    @serialized
     def create_order(self, amount_in_usd_or_inr: float, receipt_id: str, currency: str = "INR") -> Dict[str, Any]:
-        """
-        Creates a Razorpay order using real API credentials.
-        Amount is converted to smallest currency unit (paise: multiply by 100).
-        Always uses the real Razorpay API — no sandbox fallback.
-        """
+        if not math.isfinite(amount_in_usd_or_inr) or amount_in_usd_or_inr <= 0 or currency != "INR":
+            return {"success": False, "error": "A positive INR amount is required."}
         amount_paise = int(round(amount_in_usd_or_inr * 100))
-
-        if self.client and not self.key_id.startswith("rzp_test_placeholder"):
+        if self.mode == "razorpay":
+            if not self.client:
+                return {"success": False, "error": "Configure Razorpay credentials on the server."}
             try:
-                data = {
-                    "amount": amount_paise,
-                    "currency": currency,
-                    "receipt": receipt_id,
-                    "payment_capture": 1
-                }
-                order = self.client.order.create(data=data)
-                return {
-                    "success": True,
-                    "razorpay_order_id": order.get("id"),
-                    "amount": order.get("amount"),
-                    "currency": order.get("currency", currency),
-                    "key_id": self.key_id,
-                    "is_live_sdk": True
-                }
-            except Exception as e:
-                print(f"Razorpay API call error (switching to sandbox fallback): {e}")
-
-        # Seamless Sandbox fallback when test credentials or offline
-        import time
-        mock_id = f"order_sandbox_{int(time.time() * 1000)}"
-        return {
-            "success": True,
-            "razorpay_order_id": mock_id,
-            "amount": amount_paise,
-            "currency": currency,
-            "key_id": self.key_id or "rzp_test_sandbox",
-            "is_live_sdk": False,
-            "is_sandbox": True
-        }
-
-    def verify_payment_signature(
-        self,
-        razorpay_order_id: str,
-        razorpay_payment_id: str,
-        razorpay_signature: str
-    ) -> bool:
-        """
-        Verifies the cryptographic HMAC SHA256 signature returned by Razorpay Checkout.
-        Also accepts sandbox signature when in test simulation mode.
-        """
-        if razorpay_signature in ["sandbox_verified", "sandbox_test"] or str(razorpay_order_id).startswith("order_sandbox_"):
-            return True
-
-        # Try using Razorpay client's built-in verification first
-        if self.client:
-            try:
-                self.client.utility.verify_payment_signature({
-                    'razorpay_order_id': razorpay_order_id,
-                    'razorpay_payment_id': razorpay_payment_id,
-                    'razorpay_signature': razorpay_signature
-                })
-                return True
+                order = self.client.order.create(data={"amount": amount_paise, "currency": currency,
+                                                      "receipt": receipt_id[:40], "payment_capture": 1})
             except Exception:
-                pass  # Fall through to HMAC fallback
+                return {"success": False, "error": "Razorpay order creation failed. Please retry."}
+            result = {"success": True, "razorpay_order_id": order["id"], "amount": order["amount"],
+                      "currency": currency, "key_id": self.key_id, "is_live_sdk": True, "is_sandbox": False}
+        else:
+            result = {"success": True, "razorpay_order_id": f"order_sandbox_{uuid.uuid4().hex}",
+                      "amount": amount_paise, "currency": currency, "key_id": "",
+                      "is_live_sdk": False, "is_sandbox": True}
+        intents = self._intents.get()
+        intents[result["razorpay_order_id"]] = {**result, "created_at": datetime.now(timezone.utc).timestamp()}
+        self._intents.set(intents)
+        return result
 
+    @serialized
+    def bind_checkout(self, order_data, user_id, cart):
+        if not order_data.get("success"):
+            return
+        intents = self._intents.get()
+        intent = intents[order_data["razorpay_order_id"]]
+        intent.update(user_id=user_id, cart_digest=self.generate_acp_cart_token(cart)["cart_digest"])
+        self._intents.set(intents)
 
-        # Local HMAC SHA256 verification as fallback
-        try:
-            msg = f"{razorpay_order_id}|{razorpay_payment_id}".encode("utf-8")
-            generated_signature = hmac.new(
-                self.key_secret.encode("utf-8"),
-                msg,
-                hashlib.sha256
-            ).hexdigest()
-            return hmac.compare_digest(generated_signature, razorpay_signature)
-        except Exception as e:
-            print(f"Razorpay signature verification error: {e}")
+    def verify_payment_signature(self, razorpay_order_id: str, razorpay_payment_id: str,
+                                 razorpay_signature: str) -> bool:
+        intent = self._intents.get().get(razorpay_order_id)
+        if not intent or not razorpay_payment_id:
             return False
+        if intent.get("is_sandbox"):
+            return self.mode == "demo" and razorpay_signature in {"sandbox_verified", "sandbox_test"}
+        if self.mode != "razorpay":
+            return False
+        message = f"{razorpay_order_id}|{razorpay_payment_id}".encode()
+        expected = hmac.new(self.key_secret.encode(), message, hashlib.sha256).hexdigest()
+        return hmac.compare_digest(expected, razorpay_signature)
+
+    def validate_checkout(self, user_id, order_id, payment_id, signature, cart):
+        intent = self._intents.get().get(order_id)
+        if not intent or intent.get("user_id") != user_id:
+            return {"success": False, "error": "Payment order does not belong to this customer."}
+        if not self.verify_payment_signature(order_id, payment_id, signature):
+            return {"success": False, "error": "Invalid payment signature."}
+        if intent.get("result"):
+            if intent.get("payment_id") != payment_id:
+                return {"success": False, "error": "Payment order has already been used."}
+            return {"success": True, "result": intent["result"]}
+        if datetime.now(timezone.utc).timestamp() - intent["created_at"] > 1800:
+            return {"success": False, "error": "Checkout expired. Please start checkout again."}
+        if intent.get("cart_digest") != self.generate_acp_cart_token(cart)["cart_digest"]:
+            return {"success": False, "error": "Your cart or prices changed. Please start checkout again."}
+        if not intent.get("is_sandbox"):
+            try:
+                payment = self.client.payment.fetch(payment_id)
+                if (payment.get("order_id") != order_id or payment.get("status") != "captured"
+                        or payment.get("amount") != intent["amount"] or payment.get("currency") != "INR"):
+                    return {"success": False, "error": "Payment has not been captured for this order amount."}
+            except Exception:
+                return {"success": False, "error": "Unable to confirm payment with Razorpay. Please retry."}
+        return {"success": True}
+
+    def complete_checkout(self, order_id, payment_id, result):
+        intents = self._intents.get()
+        intents[order_id].update(payment_id=payment_id, result=result)
+        self._intents.set(intents)
 
     def validate_card_details(
         self,
@@ -267,6 +265,7 @@ class PaymentManager:
         if not rzp_order.get("success"):
             return {"success": False, "error": f"Failed to create Razorpay Order: {rzp_order.get('error', 'Unknown error')}"}
 
+        self.bind_checkout(rzp_order, user_id, cart)
         user = cart_manager.get_user(user_id)
         user_name = user.get("name", "Valued Customer") if user else "Valued Customer"
 
@@ -287,11 +286,13 @@ class PaymentManager:
             "message": f"🛒 **Order Ready!** Cart Total: **₹{total_amount:,.2f}** ({cart.get('item_count', 0)} item(s)). Opening Razorpay Secure Checkout popup now..."
         }
 
+    @serialized
     def process_refund(
         self,
         order_id: str,
         amount: Optional[float] = None,
-        reason: str = "Customer Request"
+        reason: str = "Customer Request",
+        force_override: bool = False
     ) -> Dict[str, Any]:
         """
         Processes a full or partial refund on Razorpay Gateway and updates the customer order & inventory account.
@@ -306,11 +307,11 @@ class PaymentManager:
         if current_status == "Refunded":
             return {"success": False, "approved": False, "error": f"Order #{order_id} has already been refunded."}
 
-        is_owner_override = reason.startswith("[Owner Override]")
+        is_owner_override = force_override
 
         # 🔒 Strict Return Policy Check: Delivered or Shipped items cannot be refunded
         if not is_owner_override:
-            if current_status in ["Delivered", "Shipped"]:
+            if current_status in ["Delivered", "Shipped", "Dispatched"]:
                 return {
                     "success": False,
                     "approved": False,
@@ -322,6 +323,8 @@ class PaymentManager:
             if created_str:
                 try:
                     created_dt = datetime.fromisoformat(created_str.replace("Z", "+00:00"))
+                    if created_dt.tzinfo is None:
+                        created_dt = created_dt.replace(tzinfo=timezone.utc)
                     now_dt = datetime.now(timezone.utc)
                     diff = now_dt - created_dt
                     hours_elapsed = diff.total_seconds() / 3600.0
@@ -331,10 +334,14 @@ class PaymentManager:
                             "approved": False,
                             "error": f"Refund REJECTED: Order #{order_id} was placed {hours_elapsed:.1f} hours ago (exceeds the 24-hour return/cancellation window)."
                         }
-                except Exception as e:
-                    print(f"Date parse warning in process_refund: {e}")
+                except (ValueError, TypeError):
+                    return {"success": False, "error": "Invalid order timestamp; owner review required."}
+            else:
+                return {"success": False, "error": "Missing order timestamp; owner review required."}
 
         refund_amount = amount if amount is not None else order.get("total", 0.0)
+        if not math.isfinite(refund_amount) or refund_amount <= 0 or refund_amount != order.get("total", 0.0):
+            return {"success": False, "error": "Only a full positive order refund is supported."}
         amount_paise = int(round(refund_amount * 100))
 
         payment_info = order.get("payment_details", {})
@@ -343,7 +350,7 @@ class PaymentManager:
 
         refund_res_data = None
         # Attempt refund via Razorpay API if live SDK and valid payment ID
-        if self.client and payment_id and not payment_id.startswith("pay_test_"):
+        if self.mode == "razorpay" and self.client and payment_id:
             try:
                 refund_res = self.client.payment.refund(payment_id, {
                     "amount": amount_paise,
@@ -363,7 +370,10 @@ class PaymentManager:
                     "created_at": order.get("created_at")
                 }
             except Exception as e:
-                print(f"Razorpay API refund note: {e}")
+                return {"success": False, "error": "Gateway refund failed; order was not changed."}
+
+        if not refund_res_data and self.mode != "demo":
+            return {"success": False, "error": "A captured gateway payment is required for refunds."}
 
         if not refund_res_data:
             # Verified test refund
@@ -372,7 +382,7 @@ class PaymentManager:
                 "refund_id": mock_refund_id,
                 "amount": refund_amount,
                 "status": "processed",
-                "gateway": "Razorpay Gateway (Online)",
+                "gateway": "Nova Demo" if self.mode == "demo" else "Razorpay",
                 "payment_id": payment_id or f"pay_{uuid.uuid4().hex[:10]}",
                 "razorpay_order_id": rzp_order_id,
                 "reason": reason,
@@ -383,6 +393,17 @@ class PaymentManager:
         order_res = order_manager.refund_order(order_id, refund_res_data)
         if not order_res.get("success"):
             return order_res
+
+        # Deduct from treasury
+        try:
+            from backend.treasury_manager import treasury_manager
+            treasury_manager.deduct_refund(
+                amount=refund_amount,
+                order_id=order_id,
+                reason=reason
+            )
+        except Exception as e:
+            print(f"Treasury refund record note: {e}")
 
         # Emit refund event and notify fleet (Finance Manager -> Order Manager & Inventory Manager)
         try:
@@ -417,7 +438,7 @@ class PaymentManager:
         self,
         user_id: str,
         authorized_agent: str = "nova_commerce_agent",
-        spending_limit: float = 1000000.0,
+        spending_limit: float = 25000.0,
         currency: str = "INR",
         valid_days: int = 365
     ) -> Dict[str, Any]:
@@ -448,7 +469,7 @@ class PaymentManager:
             "signature": signature,
             "status": "ACTIVE_AND_VERIFIED",
             "protocol": "Google Agent Payments Protocol (AP2) v1.0",
-            "settlement_rail": "razorpay_upi_fiat"
+            "settlement_rail": "demo" if self.mode == "demo" else "razorpay_upi_fiat"
         }
 
     def verify_ap2_spending_mandate(self, mandate: Dict[str, Any], requested_amount: float) -> Dict[str, Any]:
@@ -457,38 +478,22 @@ class PaymentManager:
         """
         if not mandate or not isinstance(mandate, dict):
             return {"valid": False, "error": "Invalid or missing AP2 spending mandate."}
-
-        mandate_id = mandate.get("mandate_id")
-        user_id = mandate.get("user_id")
-        agent = mandate.get("authorized_agent")
-        limit = float(mandate.get("spending_limit_per_tx", 0.0))
-        currency = mandate.get("currency", "INR")
-        sig = mandate.get("signature", "")
-
-        if requested_amount > limit:
-            return {
-                "valid": False,
-                "error": f"Transaction amount ₹{requested_amount:,.2f} exceeds AP2 authorized spending limit of ₹{limit:,.2f}."
-            }
-
-        # Check signature
-        valid_until_str = mandate.get("valid_until")
-        if valid_until_str:
-            try:
-                valid_until_dt = datetime.fromisoformat(valid_until_str.replace("Z", "+00:00"))
-                valid_until_ts = int(valid_until_dt.timestamp())
-                payload = f"{mandate_id}:{user_id}:{agent}:{limit:.2f}:{currency}:{valid_until_ts}"
-                expected_sig = hmac.new(
-                    self.key_secret.encode("utf-8"),
-                    payload.encode("utf-8"),
-                    hashlib.sha256
-                ).hexdigest()
-                if not hmac.compare_digest(expected_sig, sig):
-                    return {"valid": False, "error": "AP2 Mandate cryptographic signature mismatch. Untrusted agent payment."}
-            except Exception:
-                pass  # Fall through if date parsing format varies
-
-        return {"valid": True, "mandate_id": mandate_id}
+        try:
+            limit = float(mandate["spending_limit_per_tx"])
+            valid_until = datetime.fromisoformat(mandate["valid_until"].replace("Z", "+00:00"))
+            if valid_until <= datetime.now(timezone.utc):
+                return {"valid": False, "error": "AP2 mandate has expired."}
+            if mandate.get("status") != "ACTIVE_AND_VERIFIED" or mandate.get("currency") != "INR":
+                return {"valid": False, "error": "AP2 mandate is inactive or has an unsupported currency."}
+            if not math.isfinite(requested_amount) or requested_amount <= 0 or requested_amount > min(limit, 25000.0):
+                return {"valid": False, "error": "Transaction exceeds AP2 authorized spending limit of ₹25,000 or is invalid."}
+            payload = f"{mandate['mandate_id']}:{mandate['user_id']}:{mandate['authorized_agent']}:{limit:.2f}:INR:{int(valid_until.timestamp())}"
+            expected = hmac.new(self.key_secret.encode(), payload.encode(), hashlib.sha256).hexdigest()
+            if not hmac.compare_digest(expected, mandate["signature"]):
+                return {"valid": False, "error": "AP2 mandate signature mismatch."}
+        except (KeyError, ValueError, TypeError, OverflowError):
+            return {"valid": False, "error": "Malformed AP2 mandate."}
+        return {"valid": True, "mandate_id": mandate["mandate_id"]}
 
     def generate_acp_cart_token(self, cart: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -531,8 +536,10 @@ class PaymentManager:
         from backend.cart_manager import cart_manager
 
         # 1. Obtain or generate verified AP2 mandate
+        if self.mode != "demo":
+            return {"success": False, "error": "Autonomous payments require a supported gateway mandate. Use Razorpay checkout."}
         mandate = cart_manager.get_ap2_payment_token(user_id)
-        if not mandate:
+        if not mandate or (self.mode == "demo" and not self.verify_ap2_spending_mandate(mandate, amount)["valid"]):
             mandate = self.create_ap2_spending_mandate(user_id=user_id, authorized_agent=authorized_agent)
             cart_manager.save_ap2_payment_token(user_id, mandate)
 
@@ -543,33 +550,16 @@ class PaymentManager:
         # 2. Generate ACP Cart Token
         acp_data = self.generate_acp_cart_token(cart)
 
-        # 3. Create real Razorpay Order
+        # 3. Create a demo order; real autonomous settlement is unsupported.
         rcpt = receipt_id or f"ap2_{user_id}_{uuid.uuid4().hex[:8]}"
         rzp_order = self.create_order(amount_in_usd_or_inr=amount, receipt_id=rcpt, currency="INR")
-        rzp_order_id = rzp_order.get("razorpay_order_id") or f"order_{uuid.uuid4().hex[:14]}"
+        if not rzp_order.get("success"):
+            return rzp_order
+        rzp_order_id = rzp_order["razorpay_order_id"]
 
-        # 4. Capture real Razorpay Payment on Razorpay rail via Headless Checkout
-        rzp_payment_id = None
-        rzp_signature = None
-        try:
-            from backend.headless_checkout import complete_headless_razorpay_checkout
-            hl_res = complete_headless_razorpay_checkout(
-                order_id=rzp_order_id,
-                amount_in_inr=amount,
-                customer_name=customer_name or "Autonomous Agent",
-                customer_email=customer_email or f"{user_id}@growthcommerce.ai",
-                customer_phone=customer_phone or "9823012345",
-                description=f"AI Buyer Autonomous Order ({user_id})"
-            )
-            rzp_payment_id = hl_res.get("razorpay_payment_id")
-            rzp_signature = hl_res.get("razorpay_signature")
-        except Exception as e:
-            print(f"[PaymentManager] Headless payment capture note: {e}", flush=True)
-
-        if not rzp_payment_id:
-            rzp_payment_id = f"pay_{uuid.uuid4().hex[:14]}"
-            msg = f"{rzp_order_id}|{rzp_payment_id}".encode("utf-8")
-            rzp_signature = hmac.new(self.key_secret.encode("utf-8"), msg, hashlib.sha256).hexdigest()
+        # 4. Record a demo payment identifier; no gateway call is made.
+        rzp_payment_id = f"pay_demo_{uuid.uuid4().hex[:14]}"
+        rzp_signature = "sandbox_verified"
 
         # 5. Build full AP2 Proof
         ap2_proof = {
@@ -587,13 +577,13 @@ class PaymentManager:
                 "tax": 0.0
             },
             "settlement_layer": {
-                "gateway": "Razorpay Gateway (Online)",
-                "gateway_mode": "Test Mode",
+                "gateway": "Nova Demo" if self.mode == "demo" else "Razorpay",
+                "gateway_mode": "Demo (no money charged)",
                 "razorpay_order_id": rzp_order_id,
                 "razorpay_payment_id": rzp_payment_id,
                 "razorpay_signature": rzp_signature,
-                "settlement_rail": "razorpay_upi_fiat",
-                "status": "CAPTURED",
+                "settlement_rail": "demo" if self.mode == "demo" else "razorpay_upi_fiat",
+                "status": "SIMULATED",
                 "captured_amount_inr": amount
             }
         }
@@ -606,11 +596,11 @@ class PaymentManager:
             "razorpay_signature": rzp_signature,
             "ap2_proof": ap2_proof,
             "payment_details": {
-                "gateway": "Razorpay Gateway (Online)",
+                "gateway": "Nova Demo" if self.mode == "demo" else "Razorpay",
                 "razorpay_order_id": rzp_order_id,
                 "razorpay_payment_id": rzp_payment_id,
                 "razorpay_signature": rzp_signature,
-                "verified": True,
+                "verified": True, "is_demo": self.mode == "demo",
                 "ap2_mandate_id": mandate.get("mandate_id"),
                 "ap2_proof": ap2_proof
             }
@@ -628,6 +618,7 @@ class PaymentManager:
             mandate["card_details"] = card_details
         return cart_manager.save_ap2_payment_token(user_id, mandate)
 
+    @serialized
     def execute_automated_preauthorized_payment(
         self,
         user_id: str,
@@ -644,7 +635,6 @@ class PaymentManager:
         from backend.cart_manager import cart_manager
         from backend.order_manager import order_manager
         from backend.treasury_manager import treasury_manager
-        from backend.inventory_manager import inventory_manager
 
         cart = cart_manager.get_cart(user_id)
         if not cart.get("items"):
@@ -679,6 +669,9 @@ class PaymentManager:
             customer_phone=customer_phone,
             notes=notes or "Pre-authorized AP2 Order"
         )
+
+        if not order_res.get("success"):
+            return order_res
 
         # Deposit sales into Treasury
         items_desc = ", ".join([f"{i.get('quantity', 1)}x {i.get('PRODUCT_NAME', 'Product')}" for i in cart.get("items", [])])
@@ -719,6 +712,7 @@ class PaymentManager:
             "order": order_res.get("order")
         }
 
+    @serialized
     def autonomous_agent_pay(self, user_id: str, shipping_address: Optional[str] = None, currency: str = "INR") -> Dict[str, Any]:
         """
         AP2 Protocol: Human-delegated autonomous checkout with pre-verified AP2 mandate.
@@ -740,86 +734,34 @@ class PaymentManager:
             notes="Customer AI Chat AP2 Autonomous Checkout"
         )
 
+    async def execute_ap2_agent_payment_async(
+        self,
+        user_id: str,
+        amount: float,
+        cart: Dict[str, Any],
+        authorized_agent: str = "nova_commerce_agent",
+        receipt_id: Optional[str] = None,
+        customer_name: Optional[str] = None,
+        customer_email: Optional[str] = None,
+        customer_phone: Optional[str] = None
+    ) -> Dict[str, Any]:
+        return await asyncio.to_thread(self.execute_ap2_agent_payment, user_id=user_id, amount=amount, cart=cart, authorized_agent=authorized_agent, receipt_id=receipt_id, customer_name=customer_name, customer_email=customer_email, customer_phone=customer_phone)
 
-    def process_refund(self, order_id: str, reason: str = "24h Auto-Approval") -> Dict[str, Any]:
-        """
-        Executes order refund:
-        - Verifies 24-hour non-shipped policy
-        - Generates Razorpay / AP2 refund ID (e.g. rfnd_xxxxxxxxxxxx)
-        - Updates order status to Refunded in orders.json
-        - Restores stock in inventory.json
-        - Deducts refund from treasury
-        """
-        from backend.order_manager import order_manager
-        from backend.treasury_manager import treasury_manager
-        
-        order = order_manager.get_order_by_id(order_id)
-        if not order:
-            return {"success": False, "error": f"Order #{order_id} not found."}
+    async def execute_automated_preauthorized_payment_async(
+        self,
+        user_id: str,
+        shipping_address: Optional[str] = None,
+        customer_name: Optional[str] = None,
+        customer_email: Optional[str] = None,
+        customer_phone: Optional[str] = None,
+        notes: Optional[str] = None,
+        currency: str = "INR"
+    ) -> Dict[str, Any]:
+        return await asyncio.to_thread(self.execute_automated_preauthorized_payment, user_id=user_id, shipping_address=shipping_address, customer_name=customer_name, customer_email=customer_email, customer_phone=customer_phone, notes=notes, currency=currency)
 
-        # Status check
-        if order.get("status") in ["Shipped", "Delivered"]:
-            return {
-                "success": False,
-                "error": f"Refund REJECTED: Order #{order_id} has already been {order.get('status')} and is in transit."
-            }
+    async def autonomous_agent_pay_async(self, user_id: str, shipping_address: Optional[str] = None, currency: str = "INR") -> Dict[str, Any]:
+        return await asyncio.to_thread(self.autonomous_agent_pay, user_id=user_id, shipping_address=shipping_address, currency=currency)
 
-        # 24-Hour window check
-        created_str = order.get("created_at")
-        hours_elapsed = 0.0
-        if created_str:
-            try:
-                created_dt = datetime.fromisoformat(created_str.replace("Z", "+00:00"))
-                if created_dt.tzinfo is None:
-                    created_dt = created_dt.replace(tzinfo=timezone.utc)
-                now_dt = datetime.now(timezone.utc)
-                diff = now_dt - created_dt
-                hours_elapsed = round(diff.total_seconds() / 3600.0, 2)
-                if hours_elapsed > 24.0:
-                    return {
-                        "success": False,
-                        "error": f"Refund REJECTED: Order #{order_id} was placed {hours_elapsed:.1f} hours ago (exceeds the 24-hour return/cancellation window)."
-                    }
-            except Exception as e:
-                print(f"Date parse warning in process_refund: {e}")
-
-        # Generate verified refund ID
-        refund_id = f"rfnd_{uuid.uuid4().hex[:14]}"
-        total_refund_amount = float(order.get("total", 0.0))
-
-        refund_details = {
-            "refund_id": refund_id,
-            "order_id": order_id,
-            "amount": total_refund_amount,
-            "currency": order.get("currency", "INR"),
-            "reason": reason,
-            "status": "processed",
-            "processed_at": datetime.now(timezone.utc).isoformat(),
-            "hours_since_order": hours_elapsed,
-            "gateway": order.get("payment_method", "Razorpay Sandbox")
-        }
-
-        # Update order in order_manager (marks as Refunded and restocks inventory!)
-        order_res = order_manager.refund_order(order_id, refund_details)
-        if not order_res.get("success"):
-            return order_res
-
-        # Deduct from treasury
-        try:
-            treasury_manager.deduct_refund(
-                amount=total_refund_amount,
-                order_id=order_id,
-                reason=reason
-            )
-        except Exception as e:
-            print(f"Treasury refund record warning: {e}")
-
-        return {
-            "success": True,
-            "message": f"Refund processed successfully for Order #{order_id}",
-            "refund_details": refund_details,
-            "order": order_res.get("order")
-        }
 
 # Global singleton
 payment_manager = PaymentManager()

@@ -1,1 +1,11 @@
-[]
+[
+  {
+    "id": "rev_bba9ae",
+    "product_id": "prod_002",
+    "product_name": "NOVA Apex Ultra Fold 5G",
+    "customer_name": "Alex Chen",
+    "rating": 4,
+    "review_text": "Revolutionary NOVA foldable smartphone with powerful 8.0-inch 120Hz inner display, titanium hinge architecture, dual periscope zoom, and multitasking stylus support. A must-have for tech enthusiasts!",
+    "created_at": "2026-11-02T18:12:29.388815+00:00"
+  }
+]

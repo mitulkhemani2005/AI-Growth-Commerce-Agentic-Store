@@ -4,24 +4,25 @@ import { api } from '../api/client';
 const AdminContext = createContext(null);
 
 // How often to poll lightweight telemetry (ms)
-const TELEMETRY_INTERVAL_MS = 6000;
+const TELEMETRY_INTERVAL_MS = 2000;
 
 export function AdminProvider({ children }) {
   const [activeTab, setActiveTab] = useState('overview');
+  const [runtime, setRuntime] = useState(null);
+  const [connectionError, setConnectionError] = useState('');
+  const [lastSync, setLastSync] = useState(null);
   const [overview, setOverview] = useState(null);
   const [agentsStatus, setAgentsStatus] = useState(null);
   const [treasury, setTreasury] = useState(null);
   const [salaries, setSalaries] = useState({});
   const [buyers, setBuyers] = useState([]);
   const [agentLogs, setAgentLogs] = useState([]);
-  const [agentMessages, setAgentMessages] = useState([]);
   const [adminOrders, setAdminOrders] = useState([]);
   const [adminReviews, setAdminReviews] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isScanningFleet, setIsScanningFleet] = useState(false);
 
   // Modals state
-  const [isAcquireModalOpen, setIsAcquireModalOpen] = useState(false);
   const [isNegotiateModalOpen, setIsNegotiateModalOpen] = useState(false);
   const [negotiatingAgent, setNegotiatingAgent] = useState(null);
   const [isAddProductModalOpen, setIsAddProductModalOpen] = useState(false);
@@ -34,23 +35,17 @@ export function AdminProvider({ children }) {
 
   // ─── Lightweight telemetry poll (fast-path: only reads in-memory state) ────────
   const fetchTelemetry = useCallback(async () => {
-    // Skip if a previous poll hasn't returned yet
     if (telemetryInFlight.current) return;
     telemetryInFlight.current = true;
     try {
-      const [ovData, agData, trData, byData] = await Promise.all([
-        api.getAdminOverview().catch(() => null),
-        api.getAdminAgentsStatus().catch(() => null),
-        api.getAdminTreasury(25).catch(() => null),
-        api.getAIBuyers().catch(() => null)
-      ]);
-
-      if (ovData) setOverview(ovData);
-      if (agData) setAgentsStatus(agData);
-      if (trData) setTreasury(trData);
-      if (byData?.buyers) setBuyers(byData.buyers);
-    } catch (e) {
-      console.warn('[Admin] Telemetry poll error:', e.message);
+      const [runtimeData, logsData] = await Promise.all([api.getRuntime(), api.getAdminAgentLogs(80)]);
+      setRuntime(runtimeData);
+      setAgentsStatus(runtimeData.fleet);
+      setAgentLogs(logsData.logs || []);
+      setLastSync(new Date());
+      setConnectionError('');
+    } catch (error) {
+      setConnectionError(error.message);
     } finally {
       telemetryInFlight.current = false;
     }
@@ -65,17 +60,17 @@ export function AdminProvider({ children }) {
       // Run all requests in one parallel batch — no serial waterfall
       const [ovData, agData, trData, byData, salData, logsData, ordData, revData] = await Promise.all([
         api.getAdminOverview().catch(() => null),
-        api.getAdminAgentsStatus().catch(() => null),
+        api.getRuntime().catch(() => null),
         api.getAdminTreasury(25).catch(() => null),
         api.getAIBuyers().catch(() => null),
         api.getAgentSalaries().catch(() => ({})),
-        api.getAdminAgentLogs(50).catch(() => ({ logs: [] })),
+        api.getAdminAgentLogs(80).catch(() => null),
         api.getAdminOrders().catch(() => ({ orders: [] })),
         api.adminGetReviews().catch(() => ({ reviews: [] }))
       ]);
 
       if (ovData) setOverview(ovData);
-      if (agData) setAgentsStatus(agData);
+      if (agData) { setRuntime(agData); setAgentsStatus(agData.fleet); }
       if (trData) setTreasury(trData);
       if (byData?.buyers) setBuyers(byData.buyers);
       if (salData) setSalaries(salData);
@@ -92,24 +87,27 @@ export function AdminProvider({ children }) {
 
   // ─── Periodic telemetry (fires when tab is visible; skips if in-flight) ─────────
   useEffect(() => {
-    loadAllAdminData();
+    if (window.location.pathname.startsWith('/admin')) loadAllAdminData();
 
     const interval = setInterval(() => {
       // Only poll when the admin page is visible
-      if (document.visibilityState === 'visible') {
+      if (document.visibilityState === 'visible' && window.location.pathname.startsWith('/admin')) {
         fetchTelemetry();
       }
     }, TELEMETRY_INTERVAL_MS);
+    const fullRefresh = setInterval(() => {
+      if (document.visibilityState === 'visible' && window.location.pathname.startsWith('/admin')) loadAllAdminData();
+    }, 10000);
 
-    return () => clearInterval(interval);
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    return () => { clearInterval(interval); clearInterval(fullRefresh); };
+  }, [loadAllAdminData, fetchTelemetry]);
 
   // ─── Trigger single agent (fire-and-forget; poll after short delay) ──────────────
   const triggerAgent = useCallback(async (agentKey) => {
     try {
       const res = await api.triggerAdminAgent(agentKey);
       // Short delay — backend fires agent in background, then poll for updated status
-      setTimeout(fetchTelemetry, 1500);
+      await fetchTelemetry();
       return res;
     } catch (e) {
       console.error(`[Admin] Failed to trigger agent ${agentKey}:`, e);
@@ -123,7 +121,7 @@ export function AdminProvider({ children }) {
     const keys = ['price_manager', 'inventory_manager', 'order_manager', 'dispatcher', 'finance_manager', 'review_manager', 'ceo'];
     try {
       // Fire all in parallel — each returns immediately (fire-and-forget on backend)
-      await Promise.all(keys.map(k => api.triggerAdminAgent(k).catch(() => null)));
+      await Promise.all(keys.map(k => api.triggerAdminAgent(k)));
       // Poll for updated telemetry after a delay for agents to complete
       setTimeout(fetchTelemetry, 2000);
     } finally {
@@ -133,6 +131,7 @@ export function AdminProvider({ children }) {
 
   return (
     <AdminContext.Provider value={{
+      runtime, connectionError, lastSync,
       activeTab,
       setActiveTab,
       overview,
@@ -141,7 +140,6 @@ export function AdminProvider({ children }) {
       salaries,
       buyers,
       agentLogs,
-      agentMessages,
       adminOrders,
       adminReviews,
       isLoading,
@@ -151,8 +149,6 @@ export function AdminProvider({ children }) {
       triggerAgent,
       triggerAllAgents,
       // Modals
-      isAcquireModalOpen,
-      setIsAcquireModalOpen,
       isNegotiateModalOpen,
       setIsNegotiateModalOpen,
       negotiatingAgent,

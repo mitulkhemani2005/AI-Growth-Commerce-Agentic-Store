@@ -39,7 +39,7 @@ export default function UserSwitchModal() {
                   height: '36px',
                   borderRadius: '50%',
                   background: isActive ? 'linear-gradient(135deg, #06b6d4, #3b82f6)' : 'rgba(255, 255, 255, 0.1)',
-                  color: '#fff',
+                  color: 'var(--text-primary)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -49,7 +49,7 @@ export default function UserSwitchModal() {
                   {user.initials}
                 </div>
                 <div>
-                  <h5 style={{ color: '#fff', fontSize: '0.9rem', fontWeight: 700 }}>
+                  <h5 style={{ color: 'var(--text-primary)', fontSize: '0.9rem', fontWeight: 700 }}>
                     {user.name} {isActive && <span style={{ color: '#06b6d4', fontSize: '0.75rem' }}>(Active)</span>}
                   </h5>
                   <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>{user.email}</span>

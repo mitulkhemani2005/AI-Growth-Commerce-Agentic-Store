@@ -1,7 +1,8 @@
+from backend.config import AI_ENABLED
 """
 Customer AI Commerce Agent ('Nova')
 ===================================
-Autonomous customer-facing AI agent for the AI Growth Commerce Store.
+Autonomous customer-facing AI agent for the Nova.
 Powered by local Ollama LLM (qwen2.5:7b / llama3.1:8b) with native high-level tool calling.
 
 Capabilities:
@@ -33,9 +34,7 @@ from backend.payment_manager import payment_manager
 from backend.review_manager import review_manager
 from backend.agent_memory import memory_manager
 from backend.agent_rl import rl_manager
-from backend.policy_engine import policy_engine, validate_policy
 from backend.observability import observability_manager
-from backend.idempotency import execute_idempotent_operation
 
 load_dotenv()
 
@@ -44,15 +43,10 @@ load_dotenv()
 # =====================================================================
 
 OLLAMA_BASE_URL = os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434/v1")
-DEFAULT_MODEL = os.environ.get("CUSTOMER_MODEL", os.environ.get("OLLAMA_MODEL", "qwen2.5:7b"))
+DEFAULT_MODEL = os.environ.get("OLLAMA_MODEL", "qwen2.5:0.5b")
 
 DEFAULT_MODELS = [
     DEFAULT_MODEL,
-    "qwen2.5:7b",
-    "llama3.1:8b",
-    "llama3:8b",
-    "qwen2.5:14b",
-    "gemma4:e2b-it-qat"
 ]
 
 
@@ -642,38 +636,15 @@ class CommerceAgent:
         max_tokens: int = 2500
     ):
         """Asynchronously calls local Ollama LLM with automatic model fallback."""
-        models_to_try = list(dict.fromkeys([self.model] + self.fallback_models))
-        last_error = None
-
-        if not self.sync_client:
-            self._init_client()
-
-        for model_name in models_to_try:
-            for attempt in range(2):
-                try:
-                    kwargs: Dict[str, Any] = {
-                        "model": model_name,
-                        "messages": messages,
-                        "temperature": temperature,
-                        "max_tokens": max_tokens,
-                        "timeout": 120.0,
-                        "extra_body": {"options": {"num_ctx": 4096, "num_gpu": 999}, "keep_alive": -1}
-                    }
-                    if tools:
-                        kwargs["tools"] = tools
-                        if tool_choice:
-                            kwargs["tool_choice"] = tool_choice
-
-                    resp = await asyncio.wait_for(
-                        asyncio.to_thread(self.sync_client.chat.completions.create, **kwargs),
-                        timeout=120.0
-                    )
-                    return resp
-                except Exception as e:
-                    last_error = e
-                    break
-
-        raise last_error or Exception("All Customer Ollama models exhausted.")
+        # Model fallback used to silently load unrelated models, violating the
+        # one-local-model / GPU-only contract and making failures look random.
+        # Opt in explicitly only when debugging a local installation.
+        if not AI_ENABLED or os.getenv("AI_RUNTIME_AVAILABLE", "true") != "true":
+            raise RuntimeError("Local AI is disabled; using catalog tools.")
+        from backend.llm_runtime import complete_chat
+        return await asyncio.to_thread(complete_chat, model=self.model, messages=messages, tools=tools,
+                                       tool_choice=tool_choice, temperature=temperature, max_tokens=max_tokens,
+                                       base_url=self.base_url, api_key=self.api_key)
 
     def _execute_raw_tool(self, tool_name: str, tool_args: Dict[str, Any], user_id: str = "user_alex") -> Dict[str, Any]:
         """Dispatches and executes backend tools with policy checks and argument parsing."""
@@ -1219,14 +1190,49 @@ class CommerceAgent:
         conversation_history: Optional[List[Dict[str, str]]] = None
     ) -> Dict[str, Any]:
         """Executes customer prompt through tool calling with hybrid memory context."""
-        memory_manager.add_turn(self.name, "user", prompt, {"user_id": user_id})
-        memory_ctx = memory_manager.build_context_package(self.name, prompt)
+        # Product discovery is an inventory query. Ground it before allowing a
+        # small local model to broaden filters or invent unrelated recommendations.
+        text = prompt.lower()
+        category = next((value for words, value in [
+            (("laptop", "workstation", "ultrabook"), "Laptops"),
+            (("smartphone", "mobile", "phone"), "Mobiles"),
+            (("headphone", "earbud", "speaker", "audio", "microphone"), "Audio"),
+            (("accessor", "charger", "keyboard", "mouse", "backpack", "watch", "powerbank"), "Accessories")
+        ] if any(word in text for word in words)), None)
+        discovery = any(word in text for word in ["show", "find", "search", "recommend", "looking for", "which", "need"])
+        purchasing = any(word in text for word in ["checkout", "auto pay", "autopay", "ap2", "place order", "add to", "buy now"])
+        if category and discovery and not purchasing:
+            filters = {"product_type": category, "in_stock_only": "in stock" in text}
+            budget = re.search(r"(?:under|below|less than|up to)\s*(?:₹|rs\.?|inr)?\s*([\d,]+)", text)
+            if budget:
+                filters["max_price"] = float(budget.group(1).replace(",", ""))
+            subtype = next((word for word in ["earbud", "headphone", "speaker", "charger", "keyboard", "mouse", "backpack", "watch", "powerbank"] if word in text), None)
+            if subtype:
+                filters["query"] = subtype
+            output = self.execute_tool("search_inventory", filters, user_id=user_id)
+            products = output.get("products", [])
+            if products:
+                lines = [f"- **{p['PRODUCT_NAME']}** — ₹{float(p['PRICE']):,.2f} · {p.get('PRODUCT_SIZE', 'Standard')} · {p.get('STOCK_REMAINING', 0)} in stock" for p in products[:6]]
+                answer = f"Here are {len(products)} matching {category.lower()} from the live catalog:\n\n" + "\n".join(lines)
+            else:
+                answer = "No products currently match those filters. Try another budget or category."
+            memory_name = f"{self.name}:{user_id}"
+            memory_manager.add_turn(memory_name, "user", prompt, {"user_id": user_id})
+            memory_manager.add_turn(memory_name, "assistant", answer, {"user_id": user_id})
+            trace = {"name": "search_inventory", "args": filters, "output": output}
+            return {"response": answer, "tool_calls": [trace], "cart": cart_manager.get_cart(user_id),
+                    "orders": order_manager.get_orders_by_user(user_id), "checkout_payload": None,
+                    "action_data": {"searched_products": products}, "response_source": "live_inventory"}
+
+        memory_name = f"{self.name}:{user_id}"
+        memory_manager.add_turn(memory_name, "user", prompt, {"user_id": user_id})
+        memory_ctx = memory_manager.build_context_package(memory_name, prompt)
         rl_guidance = rl_manager.get_agent_guidance(self.name, {"user_id": user_id})
 
         enhanced_system_prompt = f"{SYSTEM_PROMPT}\n\n{memory_ctx}\n{rl_guidance}"
         messages: List[Dict[str, Any]] = [{"role": "system", "content": enhanced_system_prompt}]
 
-        all_dialogue = memory_manager.get_recent_messages(self.name, limit=10)
+        all_dialogue = memory_manager.get_recent_messages(memory_name, limit=10)
         for d in all_dialogue:
             messages.append(d)
 
@@ -1331,6 +1337,20 @@ class CommerceAgent:
             final_text, fallback_tools = self._execute_fallback_routing(prompt, user_id, action_data)
             executed_tools_trace.extend(fallback_tools)
 
+        # Tool-capable local models can occasionally narrate an intended action
+        # instead of emitting a tool call.  A commerce request must change or
+        # inspect real store state, never merely claim it will do so.  Route
+        # these requests deterministically so the chat pipeline remains useful
+        # even when the model elects not to call a function.
+        product_intent_terms = (
+            "show", "find", "search", "recommend", "compare", "under ",
+            "product", "phone", "laptop", "earbud", "headphone", "speaker",
+            "watch", "cart", "buy", "checkout", "order", "track", "refund"
+        )
+        if not executed_tools_trace and any(term in prompt.lower() for term in product_intent_terms):
+            final_text, fallback_tools = self._execute_fallback_routing(prompt, user_id, action_data)
+            executed_tools_trace.extend(fallback_tools)
+
         # Checkout Intent Guard (AP2 vs Standard Razorpay Modal)
         prompt_lower = prompt.lower()
         is_ap2_intent = any(k in prompt_lower for k in [
@@ -1395,7 +1415,7 @@ class CommerceAgent:
                         checkout_msg = (
                             f"🛒 **Order Prepared!** {items_names}\n\n"
                             f"**Cart Total:** **₹{total_amount:,.2f}** ({current_cart.get('item_count', 0)} item(s) • 0% Tax)\n\n"
-                            f"Opening the **Razorpay Secure Checkout popup** on your screen now (supporting UPI, Cards, NetBanking, and Wallets)!"
+                            f"Your bag is ready. Complete checkout from your shopping bag to confirm payment."
                         )
                         if not final_text or ("added" in final_text and "Razorpay" not in final_text) or "Would you like" in final_text:
                             final_text = checkout_msg.strip()
@@ -1409,7 +1429,7 @@ class CommerceAgent:
         current_orders = order_manager.get_orders_by_user(user_id)
 
         final_ans = final_text or "How can I assist you with your shopping today?"
-        memory_manager.add_turn(self.name, "assistant", final_ans, {"user_id": user_id, "tool_calls_count": len(executed_tools_trace)})
+        memory_manager.add_turn(memory_name, "assistant", final_ans, {"user_id": user_id, "tool_calls_count": len(executed_tools_trace)})
 
         return {
             "response": final_ans,
@@ -1431,6 +1451,24 @@ class CommerceAgent:
         prompt_lower = prompt.lower()
         tools_run = []
 
+        if any(term in prompt_lower for term in ["track", "my orders", "order history", "shipping status"]):
+            orders = order_manager.get_orders_by_user(user_id)
+            action_data["orders"] = orders
+            tools_run.append({"name": "view_order_history", "args": {}, "output": {"orders": orders}})
+            if not orders:
+                return "You have no orders yet. Add a product to your bag to get started.", tools_run
+            return "Your latest orders:\n\n" + "\n".join(
+                f"- **{order['order_id']}**: {order['status']} · ₹{order['total']:,.2f} · {order.get('tracking_number') or 'Awaiting dispatch'}"
+                for order in orders[:5]), tools_run
+
+        if "add" in prompt_lower and any(term in prompt_lower for term in ["cart", "bag"]):
+            product = _resolve_product_from_text_or_history(prompt, None)
+            if product:
+                result = self.execute_tool("add_to_cart", {"product_name_or_id": product["id"], "quantity": 1}, user_id=user_id)
+                tools_run.append({"name": "add_to_cart", "args": {"product_name_or_id": product["id"]}, "output": result})
+                action_data["cart"] = cart_manager.get_cart(user_id)
+                return result.get("message") or result.get("error", "Unable to add this item."), tools_run
+
         if any(k in prompt_lower for k in ["explain", "detail", "tell me about", "what is", "specs", "materials", "feature"]):
             search_res = inventory_manager.search_products(query=prompt)
             if not search_res:
@@ -1449,10 +1487,24 @@ class CommerceAgent:
             action_data["cart"] = cart_out.get("cart")
             return f"🛒 Your cart contains {cart_out.get('cart', {}).get('item_count', 0)} item(s) with total ₹{cart_out.get('cart', {}).get('estimated_total', 0.0):,.2f}.", tools_run
 
-        # Default catalog search
-        res = self.execute_tool("search_inventory", {"query": prompt}, user_id=user_id)
-        tools_run.append({"name": "search_inventory", "args": {"query": prompt}, "output": res})
+        # Default catalog search: reduce natural language to catalog filters.
+        # Passing the whole sentence ("show earbuds under 5000") as a literal
+        # query is why the old fallback often returned an empty catalog.
+        category_query = next((word for word in [
+            "earbuds", "earbud", "headphones", "headphone", "speaker",
+            "laptop", "phone", "smartphone", "watch", "keyboard", "mouse",
+            "charger", "backpack"
+        ] if word in prompt_lower), prompt)
+        price_match = re.search(r"(?:under|below|less than|upto|up to)\s*(?:₹|rs\.?|inr)?\s*([\d,]+)", prompt_lower)
+        search_args: Dict[str, Any] = {"query": category_query, "in_stock_only": True}
+        if price_match:
+            search_args["max_price"] = float(price_match.group(1).replace(",", ""))
+        res = self.execute_tool("search_inventory", search_args, user_id=user_id)
+        tools_run.append({"name": "search_inventory", "args": search_args, "output": res})
         prods = res.get("products", [])
+        if category_query != prompt:
+            category_stem = category_query.rstrip("s")
+            prods = [p for p in prods if category_stem in (p.get("PRODUCT_NAME", "") + " " + p.get("PRODUCT_TYPE", "")).lower()]
         if prods:
             lines = [f"- **{p['PRODUCT_NAME']}**: ₹{p['PRICE']:,.2f} ({p.get('STOCK_REMAINING', 0)} in stock)" for p in prods[:4]]
             return f"Here are the top products matching your search:\n\n" + "\n".join(lines), tools_run

@@ -1,1 +1,2491 @@
-{}
+{
+  "CEO Agent": [
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from Inventory Manager Agent [RESTOCK_REQUEST]: {\"product_id\": \"prod_027\", \"product_name\": \"NOVA HyperGaN 140W Quad-Port Pro Charger\", \"requested_quantity\": 5, \"base_price\": 38.0, \"total_cost\": 190.0, \"reason\": \"Autonomous stockout protection\"}",
+      "timestamp": "2026-11-02T18:12:34.255690+00:00",
+      "metadata": {
+        "msg_id": "msg_1c407d5c",
+        "from": "Inventory Manager Agent",
+        "subject": "RESTOCK_REQUEST",
+        "correlation_id": "corr_f8b75d23"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from Inventory Manager Agent [WAREHOUSE_STATUS_REPORT]: {\"total_skus\": 27, \"total_units\": 69, \"low_stock_count\": 14, \"low_stock_items\": [\"NOVA Apex Ultra Fold 5G\", \"NOVA Pulse Ultra Smartwatch\", \"NOVA Pulse Slim Smartwatch\", \"NOVA AirType Low-Profile Wireless Keyboard\", \"NOVA ErgoMaster Silent Wireless Mouse\"], \"restocked_items\": [\"NOVA ErgoMaster Silent Wireless Mouse (+5 @ \\u20b920.00)\", \"NOVA TurboFlash 30W Mobile Fast Charger (+5 @ \\u20b915.00)\"], \"requests_submitted\": [\"NOVA Apex Ultra Fold 5G\", \"NOVA Pulse Ultra Smartwatch\", \"NOVA Pulse Slim Smartwatch\", \"NOVA AirType Low-Profile Wireless Keyboard\", \"NOVA ErgoMaster Silent Wireless Mouse\", \"NOVA ViperBlade 26K DPI Gaming Mouse\", \"NOVA TitanVolt MagSafe PowerBank 10k\", \"NOVA TitanVolt HyperCharge PowerBank 20k\", \"NOVA Stealth Commuter Smart Backpack\", \"NOVA Stealth Travel Expandable Smart Backpack\", \"NOVA PowerStream 100W USB-C Laptop Charger\", \"NOVA TurboFlash 30W Mobile Fast Charger\", \"NOVA HyperGaN 65W 3-Port Fast Charger\", \"NOVA HyperGaN 140W Quad-Port Pro Charger\"]}",
+      "timestamp": "2026-11-02T18:12:34.313802+00:00",
+      "metadata": {
+        "msg_id": "msg_454febc1",
+        "from": "Inventory Manager Agent",
+        "subject": "WAREHOUSE_STATUS_REPORT",
+        "correlation_id": "corr_bad4c495"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from Dispatcher Agent [LOGISTICS_STATUS_REPORT]: {\"dispatched_count\": 0, \"dispatched_items\": [], \"queue_empty\": true, \"preferred_carrier\": \"BlueDart Express Logistics\"}",
+      "timestamp": "2026-11-02T18:12:35.422204+00:00",
+      "metadata": {
+        "msg_id": "msg_73153629",
+        "from": "Dispatcher Agent",
+        "subject": "LOGISTICS_STATUS_REPORT",
+        "correlation_id": "corr_07c4b79d"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from Finance Manager Agent [FINANCIAL_STATUS_REPORT]: {\"bank_balance\": 43.7, \"total_sales_revenue\": 153.7, \"net_profit\": -9956.3, \"total_inventory_spend\": 10110.0, \"total_salaries_paid\": 0.0, \"total_refunds_deducted\": 0.0, \"reconciliation_status\": \"MATCHED\", \"refunds_processed\": []}",
+      "timestamp": "2026-11-02T18:12:35.518176+00:00",
+      "metadata": {
+        "msg_id": "msg_ca7c75a0",
+        "from": "Finance Manager Agent",
+        "subject": "FINANCIAL_STATUS_REPORT",
+        "correlation_id": "corr_85716912"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from Price Manager Agent [PRICING_STATUS_REPORT]: {\"total_skus\": 27, \"adjusted_count\": 0, \"adjusted_items\": [], \"anomalies_corrected\": 0, \"details\": \"Audited 27 catalog SKUs. Dynamically adjusted 0 prices. Corrected 0 anomalies.\"}",
+      "timestamp": "2026-11-02T18:12:35.676179+00:00",
+      "metadata": {
+        "msg_id": "msg_960a3915",
+        "from": "Price Manager Agent",
+        "subject": "PRICING_STATUS_REPORT",
+        "correlation_id": "corr_28d16d9a"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from Order Management Agent [ORDER_PIPELINE_REPORT]: {\"total_orders\": 1, \"status_breakdown\": {\"Dispatched\": 1}, \"auto_advanced\": [], \"sla_breaches\": 0}",
+      "timestamp": "2026-11-02T18:12:35.736516+00:00",
+      "metadata": {
+        "msg_id": "msg_1dc3dc2b",
+        "from": "Order Management Agent",
+        "subject": "ORDER_PIPELINE_REPORT",
+        "correlation_id": "corr_fe08afa2"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from Review and Feedback Manager [SENTIMENT_STATUS_REPORT]: {\"average_rating\": 4.0, \"total_reviews\": 1, \"issue_clusters\": {\"battery_performance\": 0, \"shipping_speed\": 0, \"audio_clarity\": 0, \"build_quality\": 0, \"general_satisfaction\": 1}, \"quality_alerts_count\": 0}",
+      "timestamp": "2026-11-02T18:12:35.883927+00:00",
+      "metadata": {
+        "msg_id": "msg_35af12a4",
+        "from": "Review and Feedback Manager",
+        "subject": "SENTIMENT_STATUS_REPORT",
+        "correlation_id": "corr_dd9c980c"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to Inventory Manager Agent [RESTOCK_DENIED]: {\"product_id\": \"prod_002\", \"product_name\": \"NOVA Apex Ultra Fold 5G\", \"reason\": \"Treasury reserve conserved\"}",
+      "timestamp": "2026-11-02T18:12:36.995840+00:00",
+      "metadata": {
+        "msg_id": "msg_502e26fc",
+        "to": "Inventory Manager Agent",
+        "subject": "RESTOCK_DENIED",
+        "correlation_id": "corr_66854269"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to Inventory Manager Agent [RESTOCK_DENIED]: {\"product_id\": \"prod_014\", \"product_name\": \"NOVA Pulse Ultra Smartwatch\", \"reason\": \"Treasury reserve conserved\"}",
+      "timestamp": "2026-11-02T18:12:37.033616+00:00",
+      "metadata": {
+        "msg_id": "msg_b00ed380",
+        "to": "Inventory Manager Agent",
+        "subject": "RESTOCK_DENIED",
+        "correlation_id": "corr_2426a0f5"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to Inventory Manager Agent [RESTOCK_DENIED]: {\"product_id\": \"prod_015\", \"product_name\": \"NOVA Pulse Slim Smartwatch\", \"reason\": \"Treasury reserve conserved\"}",
+      "timestamp": "2026-11-02T18:12:37.078102+00:00",
+      "metadata": {
+        "msg_id": "msg_43da21fb",
+        "to": "Inventory Manager Agent",
+        "subject": "RESTOCK_DENIED",
+        "correlation_id": "corr_5619e5a8"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to Inventory Manager Agent [RESTOCK_DENIED]: {\"product_id\": \"prod_017\", \"product_name\": \"NOVA AirType Low-Profile Wireless Keyboard\", \"reason\": \"Treasury reserve conserved\"}",
+      "timestamp": "2026-11-02T18:12:37.131877+00:00",
+      "metadata": {
+        "msg_id": "msg_ff3f03b4",
+        "to": "Inventory Manager Agent",
+        "subject": "RESTOCK_DENIED",
+        "correlation_id": "corr_4e97d6d1"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to Inventory Manager Agent [RESTOCK_DENIED]: {\"product_id\": \"prod_018\", \"product_name\": \"NOVA ErgoMaster Silent Wireless Mouse\", \"reason\": \"Treasury reserve conserved\"}",
+      "timestamp": "2026-11-02T18:12:37.185566+00:00",
+      "metadata": {
+        "msg_id": "msg_e6848045",
+        "to": "Inventory Manager Agent",
+        "subject": "RESTOCK_DENIED",
+        "correlation_id": "corr_4b2c848a"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to Inventory Manager Agent [RESTOCK_DENIED]: {\"product_id\": \"prod_019\", \"product_name\": \"NOVA ViperBlade 26K DPI Gaming Mouse\", \"reason\": \"Treasury reserve conserved\"}",
+      "timestamp": "2026-11-02T18:12:37.241589+00:00",
+      "metadata": {
+        "msg_id": "msg_2b1d2dfe",
+        "to": "Inventory Manager Agent",
+        "subject": "RESTOCK_DENIED",
+        "correlation_id": "corr_952bc6b3"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to Inventory Manager Agent [RESTOCK_DENIED]: {\"product_id\": \"prod_020\", \"product_name\": \"NOVA TitanVolt MagSafe PowerBank 10k\", \"reason\": \"Treasury reserve conserved\"}",
+      "timestamp": "2026-11-02T18:12:37.294025+00:00",
+      "metadata": {
+        "msg_id": "msg_8278b179",
+        "to": "Inventory Manager Agent",
+        "subject": "RESTOCK_DENIED",
+        "correlation_id": "corr_d5ddbbcb"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to Inventory Manager Agent [RESTOCK_DENIED]: {\"product_id\": \"prod_021\", \"product_name\": \"NOVA TitanVolt HyperCharge PowerBank 20k\", \"reason\": \"Treasury reserve conserved\"}",
+      "timestamp": "2026-11-02T18:12:37.351311+00:00",
+      "metadata": {
+        "msg_id": "msg_f933610a",
+        "to": "Inventory Manager Agent",
+        "subject": "RESTOCK_DENIED",
+        "correlation_id": "corr_c39964d1"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to Inventory Manager Agent [RESTOCK_DENIED]: {\"product_id\": \"prod_022\", \"product_name\": \"NOVA Stealth Commuter Smart Backpack\", \"reason\": \"Treasury reserve conserved\"}",
+      "timestamp": "2026-11-02T18:12:37.407069+00:00",
+      "metadata": {
+        "msg_id": "msg_43fd3e44",
+        "to": "Inventory Manager Agent",
+        "subject": "RESTOCK_DENIED",
+        "correlation_id": "corr_b47702cc"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to Inventory Manager Agent [RESTOCK_DENIED]: {\"product_id\": \"prod_023\", \"product_name\": \"NOVA Stealth Travel Expandable Smart Backpack\", \"reason\": \"Treasury reserve conserved\"}",
+      "timestamp": "2026-11-02T18:12:37.459961+00:00",
+      "metadata": {
+        "msg_id": "msg_fe07367f",
+        "to": "Inventory Manager Agent",
+        "subject": "RESTOCK_DENIED",
+        "correlation_id": "corr_97474cf4"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to Inventory Manager Agent [RESTOCK_DENIED]: {\"product_id\": \"prod_024\", \"product_name\": \"NOVA PowerStream 100W USB-C Laptop Charger\", \"reason\": \"Treasury reserve conserved\"}",
+      "timestamp": "2026-11-02T18:12:37.501595+00:00",
+      "metadata": {
+        "msg_id": "msg_ed62bef7",
+        "to": "Inventory Manager Agent",
+        "subject": "RESTOCK_DENIED",
+        "correlation_id": "corr_b9450416"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to Inventory Manager Agent [RESTOCK_DENIED]: {\"product_id\": \"prod_025\", \"product_name\": \"NOVA TurboFlash 30W Mobile Fast Charger\", \"reason\": \"Treasury reserve conserved\"}",
+      "timestamp": "2026-11-02T18:12:37.558373+00:00",
+      "metadata": {
+        "msg_id": "msg_721b517f",
+        "to": "Inventory Manager Agent",
+        "subject": "RESTOCK_DENIED",
+        "correlation_id": "corr_848d3cfd"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to Inventory Manager Agent [RESTOCK_DENIED]: {\"product_id\": \"prod_026\", \"product_name\": \"NOVA HyperGaN 65W 3-Port Fast Charger\", \"reason\": \"Treasury reserve conserved\"}",
+      "timestamp": "2026-11-02T18:12:37.614847+00:00",
+      "metadata": {
+        "msg_id": "msg_ae01bf57",
+        "to": "Inventory Manager Agent",
+        "subject": "RESTOCK_DENIED",
+        "correlation_id": "corr_4527c97b"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to Inventory Manager Agent [RESTOCK_DENIED]: {\"product_id\": \"prod_027\", \"product_name\": \"NOVA HyperGaN 140W Quad-Port Pro Charger\", \"reason\": \"Treasury reserve conserved\"}",
+      "timestamp": "2026-11-02T18:12:37.668505+00:00",
+      "metadata": {
+        "msg_id": "msg_0613b7b1",
+        "to": "Inventory Manager Agent",
+        "subject": "RESTOCK_DENIED",
+        "correlation_id": "corr_1227db12"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from Inventory Manager Agent [RESTOCK_REQUEST]: {\"product_id\": \"prod_002\", \"product_name\": \"NOVA Apex Ultra Fold 5G\", \"requested_quantity\": 5, \"base_price\": 99.0, \"total_cost\": 495.0, \"reason\": \"Autonomous stockout protection\"}",
+      "timestamp": "2026-11-02T18:12:38.751282+00:00",
+      "metadata": {
+        "msg_id": "msg_d4b7b401",
+        "from": "Inventory Manager Agent",
+        "subject": "RESTOCK_REQUEST",
+        "correlation_id": "corr_87740c71"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from Inventory Manager Agent [RESTOCK_REQUEST]: {\"product_id\": \"prod_014\", \"product_name\": \"NOVA Pulse Ultra Smartwatch\", \"requested_quantity\": 5, \"base_price\": 65.0, \"total_cost\": 325.0, \"reason\": \"Autonomous stockout protection\"}",
+      "timestamp": "2026-11-02T18:12:38.801848+00:00",
+      "metadata": {
+        "msg_id": "msg_3ddd9bcb",
+        "from": "Inventory Manager Agent",
+        "subject": "RESTOCK_REQUEST",
+        "correlation_id": "corr_6eee3771"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from Inventory Manager Agent [RESTOCK_REQUEST]: {\"product_id\": \"prod_015\", \"product_name\": \"NOVA Pulse Slim Smartwatch\", \"requested_quantity\": 5, \"base_price\": 49.0, \"total_cost\": 245.0, \"reason\": \"Autonomous stockout protection\"}",
+      "timestamp": "2026-11-02T18:12:38.873127+00:00",
+      "metadata": {
+        "msg_id": "msg_281cd43e",
+        "from": "Inventory Manager Agent",
+        "subject": "RESTOCK_REQUEST",
+        "correlation_id": "corr_3f124cd5"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from Inventory Manager Agent [RESTOCK_REQUEST]: {\"product_id\": \"prod_017\", \"product_name\": \"NOVA AirType Low-Profile Wireless Keyboard\", \"requested_quantity\": 5, \"base_price\": 42.0, \"total_cost\": 210.0, \"reason\": \"Autonomous stockout protection\"}",
+      "timestamp": "2026-11-02T18:12:38.937871+00:00",
+      "metadata": {
+        "msg_id": "msg_41be6061",
+        "from": "Inventory Manager Agent",
+        "subject": "RESTOCK_REQUEST",
+        "correlation_id": "corr_7af54bba"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from Inventory Manager Agent [RESTOCK_REQUEST]: {\"product_id\": \"prod_019\", \"product_name\": \"NOVA ViperBlade 26K DPI Gaming Mouse\", \"requested_quantity\": 5, \"base_price\": 28.0, \"total_cost\": 140.0, \"reason\": \"Autonomous stockout protection\"}",
+      "timestamp": "2026-11-02T18:12:39.003594+00:00",
+      "metadata": {
+        "msg_id": "msg_391b1553",
+        "from": "Inventory Manager Agent",
+        "subject": "RESTOCK_REQUEST",
+        "correlation_id": "corr_0e2b4807"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from Inventory Manager Agent [RESTOCK_REQUEST]: {\"product_id\": \"prod_020\", \"product_name\": \"NOVA TitanVolt MagSafe PowerBank 10k\", \"requested_quantity\": 5, \"base_price\": 25.0, \"total_cost\": 125.0, \"reason\": \"Autonomous stockout protection\"}",
+      "timestamp": "2026-11-02T18:12:39.073865+00:00",
+      "metadata": {
+        "msg_id": "msg_2b569ad5",
+        "from": "Inventory Manager Agent",
+        "subject": "RESTOCK_REQUEST",
+        "correlation_id": "corr_c40f1b80"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from Inventory Manager Agent [RESTOCK_REQUEST]: {\"product_id\": \"prod_021\", \"product_name\": \"NOVA TitanVolt HyperCharge PowerBank 20k\", \"requested_quantity\": 5, \"base_price\": 35.0, \"total_cost\": 175.0, \"reason\": \"Autonomous stockout protection\"}",
+      "timestamp": "2026-11-02T18:12:39.137521+00:00",
+      "metadata": {
+        "msg_id": "msg_4af28613",
+        "from": "Inventory Manager Agent",
+        "subject": "RESTOCK_REQUEST",
+        "correlation_id": "corr_48e0b195"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from Inventory Manager Agent [RESTOCK_REQUEST]: {\"product_id\": \"prod_022\", \"product_name\": \"NOVA Stealth Commuter Smart Backpack\", \"requested_quantity\": 5, \"base_price\": 30.0, \"total_cost\": 150.0, \"reason\": \"Autonomous stockout protection\"}",
+      "timestamp": "2026-11-02T18:12:39.197373+00:00",
+      "metadata": {
+        "msg_id": "msg_24ee736f",
+        "from": "Inventory Manager Agent",
+        "subject": "RESTOCK_REQUEST",
+        "correlation_id": "corr_0f24eca4"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from Inventory Manager Agent [RESTOCK_REQUEST]: {\"product_id\": \"prod_023\", \"product_name\": \"NOVA Stealth Travel Expandable Smart Backpack\", \"requested_quantity\": 5, \"base_price\": 40.0, \"total_cost\": 200.0, \"reason\": \"Autonomous stockout protection\"}",
+      "timestamp": "2026-11-02T18:12:39.273849+00:00",
+      "metadata": {
+        "msg_id": "msg_8d0fc6f2",
+        "from": "Inventory Manager Agent",
+        "subject": "RESTOCK_REQUEST",
+        "correlation_id": "corr_a0808d51"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from Inventory Manager Agent [RESTOCK_REQUEST]: {\"product_id\": \"prod_024\", \"product_name\": \"NOVA PowerStream 100W USB-C Laptop Charger\", \"requested_quantity\": 5, \"base_price\": 25.0, \"total_cost\": 125.0, \"reason\": \"Autonomous stockout protection\"}",
+      "timestamp": "2026-11-02T18:12:39.340154+00:00",
+      "metadata": {
+        "msg_id": "msg_a9bf05cb",
+        "from": "Inventory Manager Agent",
+        "subject": "RESTOCK_REQUEST",
+        "correlation_id": "corr_1a910d43"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from Inventory Manager Agent [RESTOCK_REQUEST]: {\"product_id\": \"prod_026\", \"product_name\": \"NOVA HyperGaN 65W 3-Port Fast Charger\", \"requested_quantity\": 5, \"base_price\": 22.0, \"total_cost\": 110.0, \"reason\": \"Autonomous stockout protection\"}",
+      "timestamp": "2026-11-02T18:12:39.416065+00:00",
+      "metadata": {
+        "msg_id": "msg_c233cdc1",
+        "from": "Inventory Manager Agent",
+        "subject": "RESTOCK_REQUEST",
+        "correlation_id": "corr_361bada6"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from Inventory Manager Agent [RESTOCK_REQUEST]: {\"product_id\": \"prod_027\", \"product_name\": \"NOVA HyperGaN 140W Quad-Port Pro Charger\", \"requested_quantity\": 5, \"base_price\": 38.0, \"total_cost\": 190.0, \"reason\": \"Autonomous stockout protection\"}",
+      "timestamp": "2026-11-02T18:12:39.482426+00:00",
+      "metadata": {
+        "msg_id": "msg_6266fd1c",
+        "from": "Inventory Manager Agent",
+        "subject": "RESTOCK_REQUEST",
+        "correlation_id": "corr_9487a602"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from Inventory Manager Agent [WAREHOUSE_STATUS_REPORT]: {\"total_skus\": 27, \"total_units\": 79, \"low_stock_count\": 12, \"low_stock_items\": [\"NOVA Apex Ultra Fold 5G\", \"NOVA Pulse Ultra Smartwatch\", \"NOVA Pulse Slim Smartwatch\", \"NOVA AirType Low-Profile Wireless Keyboard\", \"NOVA ViperBlade 26K DPI Gaming Mouse\"], \"restocked_items\": [], \"requests_submitted\": [\"NOVA Apex Ultra Fold 5G\", \"NOVA Pulse Ultra Smartwatch\", \"NOVA Pulse Slim Smartwatch\", \"NOVA AirType Low-Profile Wireless Keyboard\", \"NOVA ViperBlade 26K DPI Gaming Mouse\", \"NOVA TitanVolt MagSafe PowerBank 10k\", \"NOVA TitanVolt HyperCharge PowerBank 20k\", \"NOVA Stealth Commuter Smart Backpack\", \"NOVA Stealth Travel Expandable Smart Backpack\", \"NOVA PowerStream 100W USB-C Laptop Charger\", \"NOVA HyperGaN 65W 3-Port Fast Charger\", \"NOVA HyperGaN 140W Quad-Port Pro Charger\"]}",
+      "timestamp": "2026-11-02T18:12:39.541778+00:00",
+      "metadata": {
+        "msg_id": "msg_601c11c0",
+        "from": "Inventory Manager Agent",
+        "subject": "WAREHOUSE_STATUS_REPORT",
+        "correlation_id": "corr_3cc007d2"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from Dispatcher Agent [LOGISTICS_STATUS_REPORT]: {\"dispatched_count\": 0, \"dispatched_items\": [], \"queue_empty\": true, \"preferred_carrier\": \"BlueDart Express Logistics\"}",
+      "timestamp": "2026-11-02T18:12:40.656336+00:00",
+      "metadata": {
+        "msg_id": "msg_0b5b3d34",
+        "from": "Dispatcher Agent",
+        "subject": "LOGISTICS_STATUS_REPORT",
+        "correlation_id": "corr_15d7a3ef"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from Order Management Agent [ORDER_PIPELINE_REPORT]: {\"total_orders\": 1, \"status_breakdown\": {\"Dispatched\": 1}, \"auto_advanced\": [], \"sla_breaches\": 0}",
+      "timestamp": "2026-11-02T18:12:40.738368+00:00",
+      "metadata": {
+        "msg_id": "msg_d33bc0d6",
+        "from": "Order Management Agent",
+        "subject": "ORDER_PIPELINE_REPORT",
+        "correlation_id": "corr_2eb2f5a1"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from Review and Feedback Manager [SENTIMENT_STATUS_REPORT]: {\"average_rating\": 4.0, \"total_reviews\": 1, \"issue_clusters\": {\"battery_performance\": 0, \"shipping_speed\": 0, \"audio_clarity\": 0, \"build_quality\": 0, \"general_satisfaction\": 1}, \"quality_alerts_count\": 0}",
+      "timestamp": "2026-11-02T18:12:40.815575+00:00",
+      "metadata": {
+        "msg_id": "msg_72c0f79d",
+        "from": "Review and Feedback Manager",
+        "subject": "SENTIMENT_STATUS_REPORT",
+        "correlation_id": "corr_a571e396"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to Inventory Manager Agent [RESTOCK_DENIED]: {\"product_id\": \"prod_002\", \"product_name\": \"NOVA Apex Ultra Fold 5G\", \"reason\": \"Treasury reserve conserved\"}",
+      "timestamp": "2026-11-02T18:12:41.923196+00:00",
+      "metadata": {
+        "msg_id": "msg_00cd7acb",
+        "to": "Inventory Manager Agent",
+        "subject": "RESTOCK_DENIED",
+        "correlation_id": "corr_e97f10b7"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to Inventory Manager Agent [RESTOCK_DENIED]: {\"product_id\": \"prod_014\", \"product_name\": \"NOVA Pulse Ultra Smartwatch\", \"reason\": \"Treasury reserve conserved\"}",
+      "timestamp": "2026-11-02T18:12:41.981253+00:00",
+      "metadata": {
+        "msg_id": "msg_24a172be",
+        "to": "Inventory Manager Agent",
+        "subject": "RESTOCK_DENIED",
+        "correlation_id": "corr_1c7f0a14"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to Inventory Manager Agent [RESTOCK_DENIED]: {\"product_id\": \"prod_015\", \"product_name\": \"NOVA Pulse Slim Smartwatch\", \"reason\": \"Treasury reserve conserved\"}",
+      "timestamp": "2026-11-02T18:12:42.028482+00:00",
+      "metadata": {
+        "msg_id": "msg_48802065",
+        "to": "Inventory Manager Agent",
+        "subject": "RESTOCK_DENIED",
+        "correlation_id": "corr_f1026963"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to Inventory Manager Agent [RESTOCK_DENIED]: {\"product_id\": \"prod_017\", \"product_name\": \"NOVA AirType Low-Profile Wireless Keyboard\", \"reason\": \"Treasury reserve conserved\"}",
+      "timestamp": "2026-11-02T18:12:42.087912+00:00",
+      "metadata": {
+        "msg_id": "msg_6fd234ff",
+        "to": "Inventory Manager Agent",
+        "subject": "RESTOCK_DENIED",
+        "correlation_id": "corr_d7a9d505"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to Inventory Manager Agent [RESTOCK_DENIED]: {\"product_id\": \"prod_019\", \"product_name\": \"NOVA ViperBlade 26K DPI Gaming Mouse\", \"reason\": \"Treasury reserve conserved\"}",
+      "timestamp": "2026-11-02T18:12:42.139436+00:00",
+      "metadata": {
+        "msg_id": "msg_36a0142c",
+        "to": "Inventory Manager Agent",
+        "subject": "RESTOCK_DENIED",
+        "correlation_id": "corr_d33fe651"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to Inventory Manager Agent [RESTOCK_DENIED]: {\"product_id\": \"prod_020\", \"product_name\": \"NOVA TitanVolt MagSafe PowerBank 10k\", \"reason\": \"Treasury reserve conserved\"}",
+      "timestamp": "2026-11-02T18:12:42.185385+00:00",
+      "metadata": {
+        "msg_id": "msg_a8c903ff",
+        "to": "Inventory Manager Agent",
+        "subject": "RESTOCK_DENIED",
+        "correlation_id": "corr_b7a3ed2d"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to Inventory Manager Agent [RESTOCK_DENIED]: {\"product_id\": \"prod_021\", \"product_name\": \"NOVA TitanVolt HyperCharge PowerBank 20k\", \"reason\": \"Treasury reserve conserved\"}",
+      "timestamp": "2026-11-02T18:12:42.241030+00:00",
+      "metadata": {
+        "msg_id": "msg_53593f51",
+        "to": "Inventory Manager Agent",
+        "subject": "RESTOCK_DENIED",
+        "correlation_id": "corr_9c58900a"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to Inventory Manager Agent [RESTOCK_DENIED]: {\"product_id\": \"prod_022\", \"product_name\": \"NOVA Stealth Commuter Smart Backpack\", \"reason\": \"Treasury reserve conserved\"}",
+      "timestamp": "2026-11-02T18:12:42.286687+00:00",
+      "metadata": {
+        "msg_id": "msg_ead7be46",
+        "to": "Inventory Manager Agent",
+        "subject": "RESTOCK_DENIED",
+        "correlation_id": "corr_e17572d6"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to Inventory Manager Agent [RESTOCK_DENIED]: {\"product_id\": \"prod_023\", \"product_name\": \"NOVA Stealth Travel Expandable Smart Backpack\", \"reason\": \"Treasury reserve conserved\"}",
+      "timestamp": "2026-11-02T18:12:42.344258+00:00",
+      "metadata": {
+        "msg_id": "msg_73c40abb",
+        "to": "Inventory Manager Agent",
+        "subject": "RESTOCK_DENIED",
+        "correlation_id": "corr_12e96087"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to Inventory Manager Agent [RESTOCK_DENIED]: {\"product_id\": \"prod_024\", \"product_name\": \"NOVA PowerStream 100W USB-C Laptop Charger\", \"reason\": \"Treasury reserve conserved\"}",
+      "timestamp": "2026-11-02T18:12:42.391576+00:00",
+      "metadata": {
+        "msg_id": "msg_8c98ffc4",
+        "to": "Inventory Manager Agent",
+        "subject": "RESTOCK_DENIED",
+        "correlation_id": "corr_2c55cccf"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to Inventory Manager Agent [RESTOCK_DENIED]: {\"product_id\": \"prod_026\", \"product_name\": \"NOVA HyperGaN 65W 3-Port Fast Charger\", \"reason\": \"Treasury reserve conserved\"}",
+      "timestamp": "2026-11-02T18:12:42.451077+00:00",
+      "metadata": {
+        "msg_id": "msg_189bbf1f",
+        "to": "Inventory Manager Agent",
+        "subject": "RESTOCK_DENIED",
+        "correlation_id": "corr_150a15a6"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to Inventory Manager Agent [RESTOCK_DENIED]: {\"product_id\": \"prod_027\", \"product_name\": \"NOVA HyperGaN 140W Quad-Port Pro Charger\", \"reason\": \"Treasury reserve conserved\"}",
+      "timestamp": "2026-11-02T18:12:42.507060+00:00",
+      "metadata": {
+        "msg_id": "msg_90ac2dcf",
+        "to": "Inventory Manager Agent",
+        "subject": "RESTOCK_DENIED",
+        "correlation_id": "corr_66c169fa"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to ALL_AGENTS [CEO_FLEET_DIRECTIVE]: {\"cycle\": 40, \"directive\": \"Maintain order fulfillment velocity, enforce BASE_PRICE floors, and preserve treasury solvency.\", \"bank_balance\": 43.7, \"active_orders\": 1}",
+      "timestamp": "2026-11-02T18:12:42.589375+00:00",
+      "metadata": {
+        "msg_id": "msg_79ca28c9",
+        "to": "ALL_AGENTS",
+        "subject": "CEO_FLEET_DIRECTIVE",
+        "correlation_id": "corr_2bcf2e7c"
+      }
+    }
+  ],
+  "Dispatcher Agent": [
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to CEO Agent [LOGISTICS_STATUS_REPORT]: {\"dispatched_count\": 0, \"dispatched_items\": [], \"queue_empty\": true, \"preferred_carrier\": \"BlueDart Express Logistics\"}",
+      "timestamp": "2026-11-02T18:11:51.726382+00:00",
+      "metadata": {
+        "msg_id": "msg_353d487a",
+        "to": "CEO Agent",
+        "subject": "LOGISTICS_STATUS_REPORT",
+        "correlation_id": "corr_d7b7d07d"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce2 Broadcast from CEO Agent [CEO_FLEET_DIRECTIVE]: {\"cycle\": 35, \"directive\": \"Maintain order fulfillment velocity, enforce BASE_PRICE floors, and preserve treasury solvency.\", \"bank_balance\": 10000.0, \"active_orders\": 0}",
+      "timestamp": "2026-11-02T18:12:06.282087+00:00",
+      "metadata": {
+        "msg_id": "msg_d6fcc42b",
+        "from": "CEO Agent",
+        "subject": "CEO_FLEET_DIRECTIVE",
+        "correlation_id": "corr_759e1e76"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to CEO Agent [LOGISTICS_STATUS_REPORT]: {\"dispatched_count\": 0, \"dispatched_items\": [], \"queue_empty\": true, \"preferred_carrier\": \"BlueDart Express Logistics\"}",
+      "timestamp": "2026-11-02T18:12:07.376700+00:00",
+      "metadata": {
+        "msg_id": "msg_32252ccb",
+        "to": "CEO Agent",
+        "subject": "LOGISTICS_STATUS_REPORT",
+        "correlation_id": "corr_c25acc1c"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to CEO Agent [LOGISTICS_STATUS_REPORT]: {\"dispatched_count\": 0, \"dispatched_items\": [], \"queue_empty\": true, \"preferred_carrier\": \"BlueDart Express Logistics\"}",
+      "timestamp": "2026-11-02T18:12:12.740694+00:00",
+      "metadata": {
+        "msg_id": "msg_6cb10cf8",
+        "to": "CEO Agent",
+        "subject": "LOGISTICS_STATUS_REPORT",
+        "correlation_id": "corr_0f78ac60"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to CEO Agent [LOGISTICS_STATUS_REPORT]: {\"dispatched_count\": 0, \"dispatched_items\": [], \"queue_empty\": true, \"preferred_carrier\": \"BlueDart Express Logistics\"}",
+      "timestamp": "2026-11-02T18:12:18.315364+00:00",
+      "metadata": {
+        "msg_id": "msg_c54f4940",
+        "to": "CEO Agent",
+        "subject": "LOGISTICS_STATUS_REPORT",
+        "correlation_id": "corr_f11b1f86"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from Order Management Agent [ORDER_CONFIRMED]: {\"order_id\": \"ORD-1222-7B53\", \"total\": 153.7, \"items_summary\": \"NOVA Apex Ultra Fold 5G (x1)\", \"shipping_address\": \"Alex Chen Residence, Innovation Hub Blvd, Sector 4\", \"action_required\": \"Assign express courier tracking (TRK-XXXXX) and prepare package dispatch.\"}",
+      "timestamp": "2026-11-02T18:12:22.245892+00:00",
+      "metadata": {
+        "msg_id": "msg_c06fcb58",
+        "from": "Order Management Agent",
+        "subject": "ORDER_CONFIRMED",
+        "correlation_id": "corr_b38540f6"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to Order Management Agent [ORDER_DISPATCHED]: {\"order_id\": \"ORD-1222-7B53\", \"tracking_number\": \"TRK-3CE5A2\", \"carrier\": \"BlueDart Express Logistics\", \"eta\": \"2-3 Business Days\", \"details\": \"Parcel handed to BlueDart Express Logistics under tracking #TRK-3CE5A2.\"}",
+      "timestamp": "2026-11-02T18:12:30.538122+00:00",
+      "metadata": {
+        "msg_id": "msg_ecbfc4e8",
+        "to": "Order Management Agent",
+        "subject": "ORDER_DISPATCHED",
+        "correlation_id": "corr_1a72923a"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to Order Management Agent [ORDER_DISPATCHED]: {\"order_id\": \"ORD-1222-7B53\", \"tracking_number\": \"TRK-3CE5A2\", \"carrier\": \"BlueDart Express Logistics\", \"eta\": \"2-3 Business Days\"}",
+      "timestamp": "2026-11-02T18:12:30.600625+00:00",
+      "metadata": {
+        "msg_id": "msg_5b1a744e",
+        "to": "Order Management Agent",
+        "subject": "ORDER_DISPATCHED",
+        "correlation_id": "corr_7d0b6594"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to CEO Agent [DISPATCH_COMPLETED]: {\"order_id\": \"ORD-1222-7B53\", \"tracking_number\": \"TRK-3CE5A2\", \"carrier\": \"BlueDart Express Logistics\"}",
+      "timestamp": "2026-11-02T18:12:30.660707+00:00",
+      "metadata": {
+        "msg_id": "msg_061aa6ac",
+        "to": "CEO Agent",
+        "subject": "DISPATCH_COMPLETED",
+        "correlation_id": "corr_9efd413f"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to CEO Agent [LOGISTICS_STATUS_REPORT]: {\"dispatched_count\": 1, \"dispatched_items\": [\"#ORD-1222-7B53 (TRK-3CE5A2)\"], \"queue_empty\": false, \"preferred_carrier\": \"BlueDart Express Logistics\"}",
+      "timestamp": "2026-11-02T18:12:30.718844+00:00",
+      "metadata": {
+        "msg_id": "msg_142cf246",
+        "to": "CEO Agent",
+        "subject": "LOGISTICS_STATUS_REPORT",
+        "correlation_id": "corr_b6e08f47"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to CEO Agent [LOGISTICS_STATUS_REPORT]: {\"dispatched_count\": 0, \"dispatched_items\": [], \"queue_empty\": true, \"preferred_carrier\": \"BlueDart Express Logistics\"}",
+      "timestamp": "2026-11-02T18:12:35.426596+00:00",
+      "metadata": {
+        "msg_id": "msg_73153629",
+        "to": "CEO Agent",
+        "subject": "LOGISTICS_STATUS_REPORT",
+        "correlation_id": "corr_07c4b79d"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to CEO Agent [LOGISTICS_STATUS_REPORT]: {\"dispatched_count\": 0, \"dispatched_items\": [], \"queue_empty\": true, \"preferred_carrier\": \"BlueDart Express Logistics\"}",
+      "timestamp": "2026-11-02T18:12:40.660616+00:00",
+      "metadata": {
+        "msg_id": "msg_0b5b3d34",
+        "to": "CEO Agent",
+        "subject": "LOGISTICS_STATUS_REPORT",
+        "correlation_id": "corr_15d7a3ef"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce2 Broadcast from CEO Agent [CEO_FLEET_DIRECTIVE]: {\"cycle\": 40, \"directive\": \"Maintain order fulfillment velocity, enforce BASE_PRICE floors, and preserve treasury solvency.\", \"bank_balance\": 43.7, \"active_orders\": 1}",
+      "timestamp": "2026-11-02T18:12:42.580238+00:00",
+      "metadata": {
+        "msg_id": "msg_79ca28c9",
+        "from": "CEO Agent",
+        "subject": "CEO_FLEET_DIRECTIVE",
+        "correlation_id": "corr_2bcf2e7c"
+      }
+    }
+  ],
+  "Order Management Agent": [
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to CEO Agent [ORDER_PIPELINE_REPORT]: {\"total_orders\": 0, \"status_breakdown\": {}, \"auto_advanced\": [], \"sla_breaches\": 0}",
+      "timestamp": "2026-11-02T18:11:55.812205+00:00",
+      "metadata": {
+        "msg_id": "msg_30b6e8b4",
+        "to": "CEO Agent",
+        "subject": "ORDER_PIPELINE_REPORT",
+        "correlation_id": "corr_61783a2a"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce2 Broadcast from CEO Agent [CEO_FLEET_DIRECTIVE]: {\"cycle\": 35, \"directive\": \"Maintain order fulfillment velocity, enforce BASE_PRICE floors, and preserve treasury solvency.\", \"bank_balance\": 10000.0, \"active_orders\": 0}",
+      "timestamp": "2026-11-02T18:12:06.276585+00:00",
+      "metadata": {
+        "msg_id": "msg_d6fcc42b",
+        "from": "CEO Agent",
+        "subject": "CEO_FLEET_DIRECTIVE",
+        "correlation_id": "corr_759e1e76"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to CEO Agent [ORDER_PIPELINE_REPORT]: {\"total_orders\": 0, \"status_breakdown\": {}, \"auto_advanced\": [], \"sla_breaches\": 0}",
+      "timestamp": "2026-11-02T18:12:11.553652+00:00",
+      "metadata": {
+        "msg_id": "msg_3ddc1f6b",
+        "to": "CEO Agent",
+        "subject": "ORDER_PIPELINE_REPORT",
+        "correlation_id": "corr_c4d96c6c"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to CEO Agent [ORDER_PIPELINE_REPORT]: {\"total_orders\": 0, \"status_breakdown\": {}, \"auto_advanced\": [], \"sla_breaches\": 0}",
+      "timestamp": "2026-11-02T18:12:17.139309+00:00",
+      "metadata": {
+        "msg_id": "msg_3ce5fed5",
+        "to": "CEO Agent",
+        "subject": "ORDER_PIPELINE_REPORT",
+        "correlation_id": "corr_ce3c285f"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to CEO Agent [ORDER_PIPELINE_REPORT]: {\"total_orders\": 0, \"status_breakdown\": {}, \"auto_advanced\": [], \"sla_breaches\": 0}",
+      "timestamp": "2026-11-02T18:12:22.044077+00:00",
+      "metadata": {
+        "msg_id": "msg_8380fb05",
+        "to": "CEO Agent",
+        "subject": "ORDER_PIPELINE_REPORT",
+        "correlation_id": "corr_f5328d69"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to Dispatcher Agent [ORDER_CONFIRMED]: {\"order_id\": \"ORD-1222-7B53\", \"total\": 153.7, \"items_summary\": \"NOVA Apex Ultra Fold 5G (x1)\", \"shipping_address\": \"Alex Chen Residence, Innovation Hub Blvd, Sector 4\", \"action_required\": \"Assign express courier tracking (TRK-XXXXX) and prepare package dispatch.\"}",
+      "timestamp": "2026-11-02T18:12:22.250476+00:00",
+      "metadata": {
+        "msg_id": "msg_c06fcb58",
+        "to": "Dispatcher Agent",
+        "subject": "ORDER_CONFIRMED",
+        "correlation_id": "corr_b38540f6"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to Finance Manager Agent [ORDER_PAYMENT_CAPTURED]: {\"order_id\": \"ORD-1222-7B53\", \"total\": 153.7, \"payment_method\": \"Razorpay Gateway (Online)\", \"action_required\": \"Verify settlement and reconcile treasury ledger.\"}",
+      "timestamp": "2026-11-02T18:12:22.296296+00:00",
+      "metadata": {
+        "msg_id": "msg_de72f70c",
+        "to": "Finance Manager Agent",
+        "subject": "ORDER_PAYMENT_CAPTURED",
+        "correlation_id": "corr_b38540f6"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from Finance Manager Agent [PAYMENT_RECEIVED]: {\"order_id\": \"ORD-1222-7B53\", \"payment_id\": \"pay_demo_5a2c56d51f584c\", \"amount\": 153.7, \"method\": \"AP2 Agentic Auto-Pay (Razorpay Verified)\"}",
+      "timestamp": "2026-11-02T18:12:22.361052+00:00",
+      "metadata": {
+        "msg_id": "msg_7313a4c1",
+        "from": "Finance Manager Agent",
+        "subject": "PAYMENT_RECEIVED",
+        "correlation_id": "corr_869b3714"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from Dispatcher Agent [ORDER_DISPATCHED]: {\"order_id\": \"ORD-1222-7B53\", \"tracking_number\": \"TRK-3CE5A2\", \"carrier\": \"BlueDart Express Logistics\", \"eta\": \"2-3 Business Days\", \"details\": \"Parcel handed to BlueDart Express Logistics under tracking #TRK-3CE5A2.\"}",
+      "timestamp": "2026-11-02T18:12:30.532450+00:00",
+      "metadata": {
+        "msg_id": "msg_ecbfc4e8",
+        "from": "Dispatcher Agent",
+        "subject": "ORDER_DISPATCHED",
+        "correlation_id": "corr_1a72923a"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from Dispatcher Agent [ORDER_DISPATCHED]: {\"order_id\": \"ORD-1222-7B53\", \"tracking_number\": \"TRK-3CE5A2\", \"carrier\": \"BlueDart Express Logistics\", \"eta\": \"2-3 Business Days\"}",
+      "timestamp": "2026-11-02T18:12:30.595331+00:00",
+      "metadata": {
+        "msg_id": "msg_5b1a744e",
+        "from": "Dispatcher Agent",
+        "subject": "ORDER_DISPATCHED",
+        "correlation_id": "corr_7d0b6594"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to CEO Agent [ORDER_PIPELINE_REPORT]: {\"total_orders\": 1, \"status_breakdown\": {\"Dispatched\": 1}, \"auto_advanced\": [], \"sla_breaches\": 0}",
+      "timestamp": "2026-11-02T18:12:31.017426+00:00",
+      "metadata": {
+        "msg_id": "msg_53f8efeb",
+        "to": "CEO Agent",
+        "subject": "ORDER_PIPELINE_REPORT",
+        "correlation_id": "corr_44f80af7"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to CEO Agent [ORDER_PIPELINE_REPORT]: {\"total_orders\": 1, \"status_breakdown\": {\"Dispatched\": 1}, \"auto_advanced\": [], \"sla_breaches\": 0}",
+      "timestamp": "2026-11-02T18:12:35.741707+00:00",
+      "metadata": {
+        "msg_id": "msg_1dc3dc2b",
+        "to": "CEO Agent",
+        "subject": "ORDER_PIPELINE_REPORT",
+        "correlation_id": "corr_fe08afa2"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to CEO Agent [ORDER_PIPELINE_REPORT]: {\"total_orders\": 1, \"status_breakdown\": {\"Dispatched\": 1}, \"auto_advanced\": [], \"sla_breaches\": 0}",
+      "timestamp": "2026-11-02T18:12:40.742588+00:00",
+      "metadata": {
+        "msg_id": "msg_d33bc0d6",
+        "to": "CEO Agent",
+        "subject": "ORDER_PIPELINE_REPORT",
+        "correlation_id": "corr_2eb2f5a1"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce2 Broadcast from CEO Agent [CEO_FLEET_DIRECTIVE]: {\"cycle\": 40, \"directive\": \"Maintain order fulfillment velocity, enforce BASE_PRICE floors, and preserve treasury solvency.\", \"bank_balance\": 43.7, \"active_orders\": 1}",
+      "timestamp": "2026-11-02T18:12:42.571285+00:00",
+      "metadata": {
+        "msg_id": "msg_79ca28c9",
+        "from": "CEO Agent",
+        "subject": "CEO_FLEET_DIRECTIVE",
+        "correlation_id": "corr_2bcf2e7c"
+      }
+    }
+  ],
+  "Price Manager Agent": [
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to CEO Agent [PRICE_CHANGED]: {\"product_id\": \"prod_002\", \"product_name\": \"NOVA Apex Ultra Fold 5G\", \"old_price\": 123.75, \"new_price\": 153.7, \"reason\": \"Low stock scarcity surge\"}",
+      "timestamp": "2026-11-02T18:11:56.891225+00:00",
+      "metadata": {
+        "msg_id": "msg_d4d00733",
+        "to": "CEO Agent",
+        "subject": "PRICE_CHANGED",
+        "correlation_id": "corr_d5e6fc8a"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to CEO Agent [PRICE_CHANGED]: {\"product_id\": \"prod_003\", \"product_name\": \"NOVA Prime 5G Smartphone\", \"old_price\": 86.25, \"new_price\": 107.12, \"reason\": \"Low stock scarcity surge\"}",
+      "timestamp": "2026-11-02T18:11:56.914805+00:00",
+      "metadata": {
+        "msg_id": "msg_e05afc32",
+        "to": "CEO Agent",
+        "subject": "PRICE_CHANGED",
+        "correlation_id": "corr_1ef40051"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to CEO Agent [PRICE_CHANGED]: {\"product_id\": \"prod_004\", \"product_name\": \"NOVA ZenBook Ultra 14 M3 Laptop\", \"old_price\": 106.25, \"new_price\": 131.96, \"reason\": \"Low stock scarcity surge\"}",
+      "timestamp": "2026-11-02T18:11:56.936893+00:00",
+      "metadata": {
+        "msg_id": "msg_06e235e5",
+        "to": "CEO Agent",
+        "subject": "PRICE_CHANGED",
+        "correlation_id": "corr_9b005067"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to CEO Agent [PRICE_CHANGED]: {\"product_id\": \"prod_005\", \"product_name\": \"NOVA BladeForge RTX 4080 Gaming Laptop\", \"old_price\": 125.0, \"new_price\": 155.25, \"reason\": \"Low stock scarcity surge\"}",
+      "timestamp": "2026-11-02T18:11:56.958561+00:00",
+      "metadata": {
+        "msg_id": "msg_90c84f9c",
+        "to": "CEO Agent",
+        "subject": "PRICE_CHANGED",
+        "correlation_id": "corr_5a170bbb"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to CEO Agent [PRICE_CHANGED]: {\"product_id\": \"prod_006\", \"product_name\": \"NOVA AeroBook Slim i7 Ultrabook\", \"old_price\": 93.75, \"new_price\": 116.44, \"reason\": \"Low stock scarcity surge\"}",
+      "timestamp": "2026-11-02T18:11:56.983234+00:00",
+      "metadata": {
+        "msg_id": "msg_499726fb",
+        "to": "CEO Agent",
+        "subject": "PRICE_CHANGED",
+        "correlation_id": "corr_5b578bc7"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to CEO Agent [PRICE_CHANGED]: {\"product_id\": \"prod_007\", \"product_name\": \"NOVA ClarityFlow Studio Wired In-Ear Monitors\", \"old_price\": 31.25, \"new_price\": 38.81, \"reason\": \"Low stock scarcity surge\"}",
+      "timestamp": "2026-11-02T18:11:57.006933+00:00",
+      "metadata": {
+        "msg_id": "msg_3507d2ea",
+        "to": "CEO Agent",
+        "subject": "PRICE_CHANGED",
+        "correlation_id": "corr_888449eb"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to CEO Agent [PRICE_CHANGED]: {\"product_id\": \"prod_008\", \"product_name\": \"NOVA AeroPods Pro ANC Wireless Earbuds\", \"old_price\": 56.25, \"new_price\": 69.86, \"reason\": \"Low stock scarcity surge\"}",
+      "timestamp": "2026-11-02T18:11:57.031021+00:00",
+      "metadata": {
+        "msg_id": "msg_91444037",
+        "to": "CEO Agent",
+        "subject": "PRICE_CHANGED",
+        "correlation_id": "corr_d725f997"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to CEO Agent [PRICE_CHANGED]: {\"product_id\": \"prod_009\", \"product_name\": \"NOVA BoomPulse 360 Bluetooth Speaker\", \"old_price\": 48.75, \"new_price\": 60.55, \"reason\": \"Low stock scarcity surge\"}",
+      "timestamp": "2026-11-02T18:11:57.054377+00:00",
+      "metadata": {
+        "msg_id": "msg_2dc62b28",
+        "to": "CEO Agent",
+        "subject": "PRICE_CHANGED",
+        "correlation_id": "corr_ad826915"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to CEO Agent [PRICE_CHANGED]: {\"product_id\": \"prod_010\", \"product_name\": \"NOVA StudioMaster Pro Hi-Fi Wired Headphones\", \"old_price\": 68.75, \"new_price\": 85.39, \"reason\": \"Low stock scarcity surge\"}",
+      "timestamp": "2026-11-02T18:11:57.075960+00:00",
+      "metadata": {
+        "msg_id": "msg_82c5e3d2",
+        "to": "CEO Agent",
+        "subject": "PRICE_CHANGED",
+        "correlation_id": "corr_a00a10b6"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to CEO Agent [PRICE_CHANGED]: {\"product_id\": \"prod_011\", \"product_name\": \"NOVA SonicFlow ANC Pro Wireless Headphones\", \"old_price\": 73.75, \"new_price\": 91.6, \"reason\": \"Low stock scarcity surge\"}",
+      "timestamp": "2026-11-02T18:11:57.101232+00:00",
+      "metadata": {
+        "msg_id": "msg_8a9fa2f9",
+        "to": "CEO Agent",
+        "subject": "PRICE_CHANGED",
+        "correlation_id": "corr_39ef444c"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to CEO Agent [PRICE_CHANGED]: {\"product_id\": \"prod_012\", \"product_name\": \"NOVA VoiceCraft XLR Studio Condenser Wired Mic\", \"old_price\": 61.25, \"new_price\": 76.07, \"reason\": \"Low stock scarcity surge\"}",
+      "timestamp": "2026-11-02T18:11:57.124693+00:00",
+      "metadata": {
+        "msg_id": "msg_912f3269",
+        "to": "CEO Agent",
+        "subject": "PRICE_CHANGED",
+        "correlation_id": "corr_a868e35b"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to CEO Agent [PRICE_CHANGED]: {\"product_id\": \"prod_013\", \"product_name\": \"NOVA StreamAir Dual Wireless Lavalier Mic System\", \"old_price\": 65.0, \"new_price\": 80.73, \"reason\": \"Low stock scarcity surge\"}",
+      "timestamp": "2026-11-02T18:11:57.147489+00:00",
+      "metadata": {
+        "msg_id": "msg_ea4160e8",
+        "to": "CEO Agent",
+        "subject": "PRICE_CHANGED",
+        "correlation_id": "corr_968bf063"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to CEO Agent [PRICE_CHANGED]: {\"product_id\": \"prod_014\", \"product_name\": \"NOVA Pulse Ultra Smartwatch\", \"old_price\": 81.25, \"new_price\": 100.91, \"reason\": \"Low stock scarcity surge\"}",
+      "timestamp": "2026-11-02T18:11:57.170600+00:00",
+      "metadata": {
+        "msg_id": "msg_00f87ddb",
+        "to": "CEO Agent",
+        "subject": "PRICE_CHANGED",
+        "correlation_id": "corr_9a7e0cd7"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to CEO Agent [PRICE_CHANGED]: {\"product_id\": \"prod_015\", \"product_name\": \"NOVA Pulse Slim Smartwatch\", \"old_price\": 61.25, \"new_price\": 76.07, \"reason\": \"Low stock scarcity surge\"}",
+      "timestamp": "2026-11-02T18:11:57.194624+00:00",
+      "metadata": {
+        "msg_id": "msg_723b4e54",
+        "to": "CEO Agent",
+        "subject": "PRICE_CHANGED",
+        "correlation_id": "corr_50eafa05"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to CEO Agent [PRICE_CHANGED]: {\"product_id\": \"prod_016\", \"product_name\": \"NOVA Vortex Pro RGB Wired Mechanical Keyboard\", \"old_price\": 43.75, \"new_price\": 54.34, \"reason\": \"Low stock scarcity surge\"}",
+      "timestamp": "2026-11-02T18:11:57.219445+00:00",
+      "metadata": {
+        "msg_id": "msg_89ca35d0",
+        "to": "CEO Agent",
+        "subject": "PRICE_CHANGED",
+        "correlation_id": "corr_e031e381"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to CEO Agent [PRICE_CHANGED]: {\"product_id\": \"prod_017\", \"product_name\": \"NOVA AirType Low-Profile Wireless Keyboard\", \"old_price\": 52.5, \"new_price\": 65.2, \"reason\": \"Low stock scarcity surge\"}",
+      "timestamp": "2026-11-02T18:11:57.242668+00:00",
+      "metadata": {
+        "msg_id": "msg_d17308de",
+        "to": "CEO Agent",
+        "subject": "PRICE_CHANGED",
+        "correlation_id": "corr_9c70b6fc"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to CEO Agent [PRICE_CHANGED]: {\"product_id\": \"prod_018\", \"product_name\": \"NOVA ErgoMaster Silent Wireless Mouse\", \"old_price\": 25.0, \"new_price\": 31.05, \"reason\": \"Low stock scarcity surge\"}",
+      "timestamp": "2026-11-02T18:11:57.267525+00:00",
+      "metadata": {
+        "msg_id": "msg_e2594e5e",
+        "to": "CEO Agent",
+        "subject": "PRICE_CHANGED",
+        "correlation_id": "corr_ca7de726"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to CEO Agent [PRICE_CHANGED]: {\"product_id\": \"prod_019\", \"product_name\": \"NOVA ViperBlade 26K DPI Gaming Mouse\", \"old_price\": 35.0, \"new_price\": 43.47, \"reason\": \"Low stock scarcity surge\"}",
+      "timestamp": "2026-11-02T18:11:57.290510+00:00",
+      "metadata": {
+        "msg_id": "msg_245a8d1b",
+        "to": "CEO Agent",
+        "subject": "PRICE_CHANGED",
+        "correlation_id": "corr_84a9fd84"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to CEO Agent [PRICE_CHANGED]: {\"product_id\": \"prod_020\", \"product_name\": \"NOVA TitanVolt MagSafe PowerBank 10k\", \"old_price\": 31.25, \"new_price\": 38.81, \"reason\": \"Low stock scarcity surge\"}",
+      "timestamp": "2026-11-02T18:11:57.313828+00:00",
+      "metadata": {
+        "msg_id": "msg_7293a01b",
+        "to": "CEO Agent",
+        "subject": "PRICE_CHANGED",
+        "correlation_id": "corr_0ae578f2"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to CEO Agent [PRICE_CHANGED]: {\"product_id\": \"prod_021\", \"product_name\": \"NOVA TitanVolt HyperCharge PowerBank 20k\", \"old_price\": 43.75, \"new_price\": 54.34, \"reason\": \"Low stock scarcity surge\"}",
+      "timestamp": "2026-11-02T18:11:57.339200+00:00",
+      "metadata": {
+        "msg_id": "msg_d73da300",
+        "to": "CEO Agent",
+        "subject": "PRICE_CHANGED",
+        "correlation_id": "corr_cb4f49e9"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to CEO Agent [PRICE_CHANGED]: {\"product_id\": \"prod_022\", \"product_name\": \"NOVA Stealth Commuter Smart Backpack\", \"old_price\": 37.5, \"new_price\": 46.57, \"reason\": \"Low stock scarcity surge\"}",
+      "timestamp": "2026-11-02T18:11:57.363951+00:00",
+      "metadata": {
+        "msg_id": "msg_23da073c",
+        "to": "CEO Agent",
+        "subject": "PRICE_CHANGED",
+        "correlation_id": "corr_37a0bd7c"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to CEO Agent [PRICE_CHANGED]: {\"product_id\": \"prod_023\", \"product_name\": \"NOVA Stealth Travel Expandable Smart Backpack\", \"old_price\": 50.0, \"new_price\": 62.1, \"reason\": \"Low stock scarcity surge\"}",
+      "timestamp": "2026-11-02T18:11:57.390244+00:00",
+      "metadata": {
+        "msg_id": "msg_2c08a1f6",
+        "to": "CEO Agent",
+        "subject": "PRICE_CHANGED",
+        "correlation_id": "corr_7b12ae8e"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to CEO Agent [PRICE_CHANGED]: {\"product_id\": \"prod_024\", \"product_name\": \"NOVA PowerStream 100W USB-C Laptop Charger\", \"old_price\": 31.25, \"new_price\": 38.81, \"reason\": \"Low stock scarcity surge\"}",
+      "timestamp": "2026-11-02T18:11:57.415971+00:00",
+      "metadata": {
+        "msg_id": "msg_20a0bfe1",
+        "to": "CEO Agent",
+        "subject": "PRICE_CHANGED",
+        "correlation_id": "corr_a70f7c0e"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to CEO Agent [PRICE_CHANGED]: {\"product_id\": \"prod_025\", \"product_name\": \"NOVA TurboFlash 30W Mobile Fast Charger\", \"old_price\": 18.75, \"new_price\": 23.29, \"reason\": \"Low stock scarcity surge\"}",
+      "timestamp": "2026-11-02T18:11:57.439854+00:00",
+      "metadata": {
+        "msg_id": "msg_86756cfc",
+        "to": "CEO Agent",
+        "subject": "PRICE_CHANGED",
+        "correlation_id": "corr_e3dc0bb6"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to CEO Agent [PRICE_CHANGED]: {\"product_id\": \"prod_026\", \"product_name\": \"NOVA HyperGaN 65W 3-Port Fast Charger\", \"old_price\": 27.5, \"new_price\": 34.16, \"reason\": \"Low stock scarcity surge\"}",
+      "timestamp": "2026-11-02T18:11:57.467406+00:00",
+      "metadata": {
+        "msg_id": "msg_fe9ee102",
+        "to": "CEO Agent",
+        "subject": "PRICE_CHANGED",
+        "correlation_id": "corr_397c934d"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to CEO Agent [PRICE_CHANGED]: {\"product_id\": \"prod_027\", \"product_name\": \"NOVA HyperGaN 140W Quad-Port Pro Charger\", \"old_price\": 47.5, \"new_price\": 58.99, \"reason\": \"Low stock scarcity surge\"}",
+      "timestamp": "2026-11-02T18:11:57.493267+00:00",
+      "metadata": {
+        "msg_id": "msg_6d4fbc86",
+        "to": "CEO Agent",
+        "subject": "PRICE_CHANGED",
+        "correlation_id": "corr_059a390e"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to CEO Agent [PRICING_STATUS_REPORT]: {\"total_skus\": 27, \"adjusted_count\": 27, \"adjusted_items\": [\"NOVA Apex Pro 5G Smartphone -> \\u20b91,863.00\", \"NOVA Apex Ultra Fold 5G -> \\u20b9153.70\", \"NOVA Prime 5G Smartphone -> \\u20b9107.12\", \"NOVA ZenBook Ultra 14 M3 Laptop -> \\u20b9131.96\", \"NOVA BladeForge RTX 4080 Gaming Laptop -> \\u20b9155.25\", \"NOVA AeroBook Slim i7 Ultrabook -> \\u20b9116.44\", \"NOVA ClarityFlow Studio Wired In-Ear Monitors -> \\u20b938.81\", \"NOVA AeroPods Pro ANC Wireless Earbuds -> \\u20b969.86\", \"NOVA BoomPulse 360 Bluetooth Speaker -> \\u20b960.55\", \"NOVA StudioMaster Pro Hi-Fi Wired Headphones -> \\u20b985.39\", \"NOVA SonicFlow ANC Pro Wireless Headphones -> \\u20b991.60\", \"NOVA VoiceCraft XLR Studio Condenser Wired Mic -> \\u20b976.07\", \"NOVA StreamAir Dual Wireless Lavalier Mic System -> \\u20b980.73\", \"NOVA Pulse Ultra Smartwatch -> \\u20b9100.91\", \"NOVA Pulse Slim Smartwatch -> \\u20b976.07\", \"NOVA Vortex Pro RGB Wired Mechanical Keyboard -> \\u20b954.34\", \"NOVA AirType Low-Profile Wireless Keyboard -> \\u20b965.20\", \"NOVA ErgoMaster Silent Wireless Mouse -> \\u20b931.05\", \"NOVA ViperBlade 26K DPI Gaming Mouse -> \\u20b943.47\", \"NOVA TitanVolt MagSafe PowerBank 10k -> \\u20b938.81\", \"NOVA TitanVolt HyperCharge PowerBank 20k -> \\u20b954.34\", \"NOVA Stealth Commuter Smart Backpack -> \\u20b946.57\", \"NOVA Stealth Travel Expandable Smart Backpack -> \\u20b962.10\", \"NOVA PowerStream 100W USB-C Laptop Charger -> \\u20b938.81\", \"NOVA TurboFlash 30W Mobile Fast Charger -> \\u20b923.29\", \"NOVA HyperGaN 65W 3-Port Fast Charger -> \\u20b934.16\", \"NOVA HyperGaN 140W Quad-Port Pro Charger -> \\u20b958.99\"], \"anomalies_corrected\": 0, \"details\": \"Audited 27 catalog SKUs. Dynamically adjusted 27 prices. Corrected 0 anomalies.\"}",
+      "timestamp": "2026-11-02T18:11:57.524245+00:00",
+      "metadata": {
+        "msg_id": "msg_5e8ed298",
+        "to": "CEO Agent",
+        "subject": "PRICING_STATUS_REPORT",
+        "correlation_id": "corr_68cf9cb9"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce2 Broadcast from CEO Agent [CEO_FLEET_DIRECTIVE]: {\"cycle\": 35, \"directive\": \"Maintain order fulfillment velocity, enforce BASE_PRICE floors, and preserve treasury solvency.\", \"bank_balance\": 10000.0, \"active_orders\": 0}",
+      "timestamp": "2026-11-02T18:12:06.269955+00:00",
+      "metadata": {
+        "msg_id": "msg_d6fcc42b",
+        "from": "CEO Agent",
+        "subject": "CEO_FLEET_DIRECTIVE",
+        "correlation_id": "corr_759e1e76"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from Inventory Manager Agent [INVENTORY_RESTOCKED]: {\"product_id\": \"prod_001\", \"product_name\": \"NOVA Apex Pro 5G Smartphone\", \"quantity_added\": 5, \"action_required\": \"Normalize selling price following stock replenishment.\"}",
+      "timestamp": "2026-11-02T18:12:07.436765+00:00",
+      "metadata": {
+        "msg_id": "msg_a17c9875",
+        "from": "Inventory Manager Agent",
+        "subject": "INVENTORY_RESTOCKED",
+        "correlation_id": "corr_a66c7dd6"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from Inventory Manager Agent [INVENTORY_RESTOCKED]: {\"product_id\": \"prod_002\", \"product_name\": \"NOVA Apex Ultra Fold 5G\", \"quantity_added\": 5, \"action_required\": \"Normalize selling price following stock replenishment.\"}",
+      "timestamp": "2026-11-02T18:12:07.590170+00:00",
+      "metadata": {
+        "msg_id": "msg_453221e5",
+        "from": "Inventory Manager Agent",
+        "subject": "INVENTORY_RESTOCKED",
+        "correlation_id": "corr_5bcfcf21"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from Inventory Manager Agent [INVENTORY_RESTOCKED]: {\"product_id\": \"prod_003\", \"product_name\": \"NOVA Prime 5G Smartphone\", \"quantity_added\": 5, \"action_required\": \"Normalize selling price following stock replenishment.\"}",
+      "timestamp": "2026-11-02T18:12:07.738298+00:00",
+      "metadata": {
+        "msg_id": "msg_5cd704ce",
+        "from": "Inventory Manager Agent",
+        "subject": "INVENTORY_RESTOCKED",
+        "correlation_id": "corr_81d8e394"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from Inventory Manager Agent [INVENTORY_RESTOCKED]: {\"product_id\": \"prod_004\", \"product_name\": \"NOVA ZenBook Ultra 14 M3 Laptop\", \"quantity_added\": 5, \"action_required\": \"Normalize selling price following stock replenishment.\"}",
+      "timestamp": "2026-11-02T18:12:08.246922+00:00",
+      "metadata": {
+        "msg_id": "msg_0edeeab5",
+        "from": "Inventory Manager Agent",
+        "subject": "INVENTORY_RESTOCKED",
+        "correlation_id": "corr_d7fc284f"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from Inventory Manager Agent [INVENTORY_RESTOCKED]: {\"product_id\": \"prod_005\", \"product_name\": \"NOVA BladeForge RTX 4080 Gaming Laptop\", \"quantity_added\": 5, \"action_required\": \"Normalize selling price following stock replenishment.\"}",
+      "timestamp": "2026-11-02T18:12:08.422031+00:00",
+      "metadata": {
+        "msg_id": "msg_1fd90f10",
+        "from": "Inventory Manager Agent",
+        "subject": "INVENTORY_RESTOCKED",
+        "correlation_id": "corr_9ed82334"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from Inventory Manager Agent [INVENTORY_RESTOCKED]: {\"product_id\": \"prod_006\", \"product_name\": \"NOVA AeroBook Slim i7 Ultrabook\", \"quantity_added\": 5, \"action_required\": \"Normalize selling price following stock replenishment.\"}",
+      "timestamp": "2026-11-02T18:12:08.608490+00:00",
+      "metadata": {
+        "msg_id": "msg_2500c41a",
+        "from": "Inventory Manager Agent",
+        "subject": "INVENTORY_RESTOCKED",
+        "correlation_id": "corr_d35a683b"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from Inventory Manager Agent [INVENTORY_RESTOCKED]: {\"product_id\": \"prod_007\", \"product_name\": \"NOVA ClarityFlow Studio Wired In-Ear Monitors\", \"quantity_added\": 5, \"action_required\": \"Normalize selling price following stock replenishment.\"}",
+      "timestamp": "2026-11-02T18:12:08.790451+00:00",
+      "metadata": {
+        "msg_id": "msg_4e451e23",
+        "from": "Inventory Manager Agent",
+        "subject": "INVENTORY_RESTOCKED",
+        "correlation_id": "corr_4164830d"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from Inventory Manager Agent [INVENTORY_RESTOCKED]: {\"product_id\": \"prod_008\", \"product_name\": \"NOVA AeroPods Pro ANC Wireless Earbuds\", \"quantity_added\": 5, \"action_required\": \"Normalize selling price following stock replenishment.\"}",
+      "timestamp": "2026-11-02T18:12:08.950802+00:00",
+      "metadata": {
+        "msg_id": "msg_e4eaf0e5",
+        "from": "Inventory Manager Agent",
+        "subject": "INVENTORY_RESTOCKED",
+        "correlation_id": "corr_ccfd72f5"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from Inventory Manager Agent [INVENTORY_RESTOCKED]: {\"product_id\": \"prod_009\", \"product_name\": \"NOVA BoomPulse 360 Bluetooth Speaker\", \"quantity_added\": 5, \"action_required\": \"Normalize selling price following stock replenishment.\"}",
+      "timestamp": "2026-11-02T18:12:09.097709+00:00",
+      "metadata": {
+        "msg_id": "msg_f37efa37",
+        "from": "Inventory Manager Agent",
+        "subject": "INVENTORY_RESTOCKED",
+        "correlation_id": "corr_dbe0eafa"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from Inventory Manager Agent [INVENTORY_RESTOCKED]: {\"product_id\": \"prod_010\", \"product_name\": \"NOVA StudioMaster Pro Hi-Fi Wired Headphones\", \"quantity_added\": 5, \"action_required\": \"Normalize selling price following stock replenishment.\"}",
+      "timestamp": "2026-11-02T18:12:09.273040+00:00",
+      "metadata": {
+        "msg_id": "msg_8f7583a1",
+        "from": "Inventory Manager Agent",
+        "subject": "INVENTORY_RESTOCKED",
+        "correlation_id": "corr_b42ea787"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from Inventory Manager Agent [INVENTORY_RESTOCKED]: {\"product_id\": \"prod_011\", \"product_name\": \"NOVA SonicFlow ANC Pro Wireless Headphones\", \"quantity_added\": 5, \"action_required\": \"Normalize selling price following stock replenishment.\"}",
+      "timestamp": "2026-11-02T18:12:09.452214+00:00",
+      "metadata": {
+        "msg_id": "msg_86b86589",
+        "from": "Inventory Manager Agent",
+        "subject": "INVENTORY_RESTOCKED",
+        "correlation_id": "corr_9e6cfeef"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from Inventory Manager Agent [INVENTORY_RESTOCKED]: {\"product_id\": \"prod_012\", \"product_name\": \"NOVA VoiceCraft XLR Studio Condenser Wired Mic\", \"quantity_added\": 5, \"action_required\": \"Normalize selling price following stock replenishment.\"}",
+      "timestamp": "2026-11-02T18:12:09.632862+00:00",
+      "metadata": {
+        "msg_id": "msg_c8e0c03f",
+        "from": "Inventory Manager Agent",
+        "subject": "INVENTORY_RESTOCKED",
+        "correlation_id": "corr_a9d6ef69"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from Inventory Manager Agent [INVENTORY_RESTOCKED]: {\"product_id\": \"prod_013\", \"product_name\": \"NOVA StreamAir Dual Wireless Lavalier Mic System\", \"quantity_added\": 5, \"action_required\": \"Normalize selling price following stock replenishment.\"}",
+      "timestamp": "2026-11-02T18:12:09.829623+00:00",
+      "metadata": {
+        "msg_id": "msg_2347c427",
+        "from": "Inventory Manager Agent",
+        "subject": "INVENTORY_RESTOCKED",
+        "correlation_id": "corr_850ecb45"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from Inventory Manager Agent [INVENTORY_RESTOCKED]: {\"product_id\": \"prod_016\", \"product_name\": \"NOVA Vortex Pro RGB Wired Mechanical Keyboard\", \"quantity_added\": 5, \"action_required\": \"Normalize selling price following stock replenishment.\"}",
+      "timestamp": "2026-11-02T18:12:10.030728+00:00",
+      "metadata": {
+        "msg_id": "msg_524e8bd2",
+        "from": "Inventory Manager Agent",
+        "subject": "INVENTORY_RESTOCKED",
+        "correlation_id": "corr_d7b3e050"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to CEO Agent [PRICING_STATUS_REPORT]: {\"total_skus\": 27, \"adjusted_count\": 0, \"adjusted_items\": [], \"anomalies_corrected\": 0, \"details\": \"Audited 27 catalog SKUs. Dynamically adjusted 0 prices. Corrected 0 anomalies.\"}",
+      "timestamp": "2026-11-02T18:12:11.514569+00:00",
+      "metadata": {
+        "msg_id": "msg_6de741b0",
+        "to": "CEO Agent",
+        "subject": "PRICING_STATUS_REPORT",
+        "correlation_id": "corr_91e32b10"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from Inventory Manager Agent [LOW_STOCK_SCARCITY_ALERT]: {\"product_id\": \"prod_002\", \"product_name\": \"NOVA Apex Ultra Fold 5G\", \"stock_remaining\": 4, \"action_required\": \"Evaluate margin surge for remaining stock.\"}",
+      "timestamp": "2026-11-02T18:12:22.179936+00:00",
+      "metadata": {
+        "msg_id": "msg_520872c6",
+        "from": "Inventory Manager Agent",
+        "subject": "LOW_STOCK_SCARCITY_ALERT",
+        "correlation_id": "corr_b0f48019"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from Review and Feedback Manager [REVIEW_SUBMITTED]: {\"product_id\": \"prod_002\", \"product_name\": \"NOVA Apex Ultra Fold 5G\", \"rating\": 4, \"review\": \"Revolutionary NOVA foldable smartphone with powerful 8.0-inch 120Hz inner display, titanium hinge ar\"}",
+      "timestamp": "2026-11-02T18:12:29.402492+00:00",
+      "metadata": {
+        "msg_id": "msg_74122256",
+        "from": "Review and Feedback Manager",
+        "subject": "REVIEW_SUBMITTED",
+        "correlation_id": "corr_d9d87d8d"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to CEO Agent [PRICING_STATUS_REPORT]: {\"total_skus\": 27, \"adjusted_count\": 0, \"adjusted_items\": [], \"anomalies_corrected\": 0, \"details\": \"Audited 27 catalog SKUs. Dynamically adjusted 0 prices. Corrected 0 anomalies.\"}",
+      "timestamp": "2026-11-02T18:12:30.952400+00:00",
+      "metadata": {
+        "msg_id": "msg_9359d34a",
+        "to": "CEO Agent",
+        "subject": "PRICING_STATUS_REPORT",
+        "correlation_id": "corr_25574e93"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from Inventory Manager Agent [INVENTORY_RESTOCKED]: {\"product_id\": \"prod_018\", \"product_name\": \"NOVA ErgoMaster Silent Wireless Mouse\", \"quantity_added\": 5, \"action_required\": \"Normalize selling price following stock replenishment.\"}",
+      "timestamp": "2026-11-02T18:12:33.024309+00:00",
+      "metadata": {
+        "msg_id": "msg_6dab93ea",
+        "from": "Inventory Manager Agent",
+        "subject": "INVENTORY_RESTOCKED",
+        "correlation_id": "corr_56824045"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from Inventory Manager Agent [INVENTORY_RESTOCKED]: {\"product_id\": \"prod_025\", \"product_name\": \"NOVA TurboFlash 30W Mobile Fast Charger\", \"quantity_added\": 5, \"action_required\": \"Normalize selling price following stock replenishment.\"}",
+      "timestamp": "2026-11-02T18:12:33.251282+00:00",
+      "metadata": {
+        "msg_id": "msg_51a736b6",
+        "from": "Inventory Manager Agent",
+        "subject": "INVENTORY_RESTOCKED",
+        "correlation_id": "corr_fe81058a"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to CEO Agent [PRICING_STATUS_REPORT]: {\"total_skus\": 27, \"adjusted_count\": 0, \"adjusted_items\": [], \"anomalies_corrected\": 0, \"details\": \"Audited 27 catalog SKUs. Dynamically adjusted 0 prices. Corrected 0 anomalies.\"}",
+      "timestamp": "2026-11-02T18:12:35.683608+00:00",
+      "metadata": {
+        "msg_id": "msg_960a3915",
+        "to": "CEO Agent",
+        "subject": "PRICING_STATUS_REPORT",
+        "correlation_id": "corr_28d16d9a"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce2 Broadcast from CEO Agent [CEO_FLEET_DIRECTIVE]: {\"cycle\": 40, \"directive\": \"Maintain order fulfillment velocity, enforce BASE_PRICE floors, and preserve treasury solvency.\", \"bank_balance\": 43.7, \"active_orders\": 1}",
+      "timestamp": "2026-11-02T18:12:42.562767+00:00",
+      "metadata": {
+        "msg_id": "msg_79ca28c9",
+        "from": "CEO Agent",
+        "subject": "CEO_FLEET_DIRECTIVE",
+        "correlation_id": "corr_2bcf2e7c"
+      }
+    }
+  ],
+  "Inventory Manager Agent": [
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to CEO Agent [RESTOCK_REQUEST]: {\"product_id\": \"prod_019\", \"product_name\": \"NOVA ViperBlade 26K DPI Gaming Mouse\", \"requested_quantity\": 5, \"base_price\": 28.0, \"total_cost\": 140.0, \"reason\": \"Autonomous stockout protection\"}",
+      "timestamp": "2026-11-02T18:12:33.801778+00:00",
+      "metadata": {
+        "msg_id": "msg_c427bf0e",
+        "to": "CEO Agent",
+        "subject": "RESTOCK_REQUEST",
+        "correlation_id": "corr_9d1a05cf"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to CEO Agent [RESTOCK_REQUEST]: {\"product_id\": \"prod_020\", \"product_name\": \"NOVA TitanVolt MagSafe PowerBank 10k\", \"requested_quantity\": 5, \"base_price\": 25.0, \"total_cost\": 125.0, \"reason\": \"Autonomous stockout protection\"}",
+      "timestamp": "2026-11-02T18:12:33.855955+00:00",
+      "metadata": {
+        "msg_id": "msg_58471df0",
+        "to": "CEO Agent",
+        "subject": "RESTOCK_REQUEST",
+        "correlation_id": "corr_e7312867"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to CEO Agent [RESTOCK_REQUEST]: {\"product_id\": \"prod_021\", \"product_name\": \"NOVA TitanVolt HyperCharge PowerBank 20k\", \"requested_quantity\": 5, \"base_price\": 35.0, \"total_cost\": 175.0, \"reason\": \"Autonomous stockout protection\"}",
+      "timestamp": "2026-11-02T18:12:33.914950+00:00",
+      "metadata": {
+        "msg_id": "msg_4b0e9cad",
+        "to": "CEO Agent",
+        "subject": "RESTOCK_REQUEST",
+        "correlation_id": "corr_afd6d72f"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to CEO Agent [RESTOCK_REQUEST]: {\"product_id\": \"prod_022\", \"product_name\": \"NOVA Stealth Commuter Smart Backpack\", \"requested_quantity\": 5, \"base_price\": 30.0, \"total_cost\": 150.0, \"reason\": \"Autonomous stockout protection\"}",
+      "timestamp": "2026-11-02T18:12:33.972876+00:00",
+      "metadata": {
+        "msg_id": "msg_6b89f396",
+        "to": "CEO Agent",
+        "subject": "RESTOCK_REQUEST",
+        "correlation_id": "corr_9cd585a2"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to CEO Agent [RESTOCK_REQUEST]: {\"product_id\": \"prod_023\", \"product_name\": \"NOVA Stealth Travel Expandable Smart Backpack\", \"requested_quantity\": 5, \"base_price\": 40.0, \"total_cost\": 200.0, \"reason\": \"Autonomous stockout protection\"}",
+      "timestamp": "2026-11-02T18:12:34.036563+00:00",
+      "metadata": {
+        "msg_id": "msg_54923226",
+        "to": "CEO Agent",
+        "subject": "RESTOCK_REQUEST",
+        "correlation_id": "corr_3a586c0b"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to CEO Agent [RESTOCK_REQUEST]: {\"product_id\": \"prod_024\", \"product_name\": \"NOVA PowerStream 100W USB-C Laptop Charger\", \"requested_quantity\": 5, \"base_price\": 25.0, \"total_cost\": 125.0, \"reason\": \"Autonomous stockout protection\"}",
+      "timestamp": "2026-11-02T18:12:34.098024+00:00",
+      "metadata": {
+        "msg_id": "msg_34951f51",
+        "to": "CEO Agent",
+        "subject": "RESTOCK_REQUEST",
+        "correlation_id": "corr_db90003d"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to CEO Agent [RESTOCK_REQUEST]: {\"product_id\": \"prod_025\", \"product_name\": \"NOVA TurboFlash 30W Mobile Fast Charger\", \"requested_quantity\": 5, \"base_price\": 15.0, \"total_cost\": 75.0, \"reason\": \"Autonomous stockout protection\"}",
+      "timestamp": "2026-11-02T18:12:34.154588+00:00",
+      "metadata": {
+        "msg_id": "msg_0d360559",
+        "to": "CEO Agent",
+        "subject": "RESTOCK_REQUEST",
+        "correlation_id": "corr_ef836f39"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to CEO Agent [RESTOCK_REQUEST]: {\"product_id\": \"prod_026\", \"product_name\": \"NOVA HyperGaN 65W 3-Port Fast Charger\", \"requested_quantity\": 5, \"base_price\": 22.0, \"total_cost\": 110.0, \"reason\": \"Autonomous stockout protection\"}",
+      "timestamp": "2026-11-02T18:12:34.216443+00:00",
+      "metadata": {
+        "msg_id": "msg_b6ac1e4f",
+        "to": "CEO Agent",
+        "subject": "RESTOCK_REQUEST",
+        "correlation_id": "corr_05df6cc5"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to CEO Agent [RESTOCK_REQUEST]: {\"product_id\": \"prod_027\", \"product_name\": \"NOVA HyperGaN 140W Quad-Port Pro Charger\", \"requested_quantity\": 5, \"base_price\": 38.0, \"total_cost\": 190.0, \"reason\": \"Autonomous stockout protection\"}",
+      "timestamp": "2026-11-02T18:12:34.261972+00:00",
+      "metadata": {
+        "msg_id": "msg_1c407d5c",
+        "to": "CEO Agent",
+        "subject": "RESTOCK_REQUEST",
+        "correlation_id": "corr_f8b75d23"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to CEO Agent [WAREHOUSE_STATUS_REPORT]: {\"total_skus\": 27, \"total_units\": 69, \"low_stock_count\": 14, \"low_stock_items\": [\"NOVA Apex Ultra Fold 5G\", \"NOVA Pulse Ultra Smartwatch\", \"NOVA Pulse Slim Smartwatch\", \"NOVA AirType Low-Profile Wireless Keyboard\", \"NOVA ErgoMaster Silent Wireless Mouse\"], \"restocked_items\": [\"NOVA ErgoMaster Silent Wireless Mouse (+5 @ \\u20b920.00)\", \"NOVA TurboFlash 30W Mobile Fast Charger (+5 @ \\u20b915.00)\"], \"requests_submitted\": [\"NOVA Apex Ultra Fold 5G\", \"NOVA Pulse Ultra Smartwatch\", \"NOVA Pulse Slim Smartwatch\", \"NOVA AirType Low-Profile Wireless Keyboard\", \"NOVA ErgoMaster Silent Wireless Mouse\", \"NOVA ViperBlade 26K DPI Gaming Mouse\", \"NOVA TitanVolt MagSafe PowerBank 10k\", \"NOVA TitanVolt HyperCharge PowerBank 20k\", \"NOVA Stealth Commuter Smart Backpack\", \"NOVA Stealth Travel Expandable Smart Backpack\", \"NOVA PowerStream 100W USB-C Laptop Charger\", \"NOVA TurboFlash 30W Mobile Fast Charger\", \"NOVA HyperGaN 65W 3-Port Fast Charger\", \"NOVA HyperGaN 140W Quad-Port Pro Charger\"]}",
+      "timestamp": "2026-11-02T18:12:34.319869+00:00",
+      "metadata": {
+        "msg_id": "msg_454febc1",
+        "to": "CEO Agent",
+        "subject": "WAREHOUSE_STATUS_REPORT",
+        "correlation_id": "corr_bad4c495"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from CEO Agent [RESTOCK_DENIED]: {\"product_id\": \"prod_002\", \"product_name\": \"NOVA Apex Ultra Fold 5G\", \"reason\": \"Treasury reserve conserved\"}",
+      "timestamp": "2026-11-02T18:12:36.991604+00:00",
+      "metadata": {
+        "msg_id": "msg_502e26fc",
+        "from": "CEO Agent",
+        "subject": "RESTOCK_DENIED",
+        "correlation_id": "corr_66854269"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from CEO Agent [RESTOCK_DENIED]: {\"product_id\": \"prod_014\", \"product_name\": \"NOVA Pulse Ultra Smartwatch\", \"reason\": \"Treasury reserve conserved\"}",
+      "timestamp": "2026-11-02T18:12:37.029420+00:00",
+      "metadata": {
+        "msg_id": "msg_b00ed380",
+        "from": "CEO Agent",
+        "subject": "RESTOCK_DENIED",
+        "correlation_id": "corr_2426a0f5"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from CEO Agent [RESTOCK_DENIED]: {\"product_id\": \"prod_015\", \"product_name\": \"NOVA Pulse Slim Smartwatch\", \"reason\": \"Treasury reserve conserved\"}",
+      "timestamp": "2026-11-02T18:12:37.073768+00:00",
+      "metadata": {
+        "msg_id": "msg_43da21fb",
+        "from": "CEO Agent",
+        "subject": "RESTOCK_DENIED",
+        "correlation_id": "corr_5619e5a8"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from CEO Agent [RESTOCK_DENIED]: {\"product_id\": \"prod_017\", \"product_name\": \"NOVA AirType Low-Profile Wireless Keyboard\", \"reason\": \"Treasury reserve conserved\"}",
+      "timestamp": "2026-11-02T18:12:37.127543+00:00",
+      "metadata": {
+        "msg_id": "msg_ff3f03b4",
+        "from": "CEO Agent",
+        "subject": "RESTOCK_DENIED",
+        "correlation_id": "corr_4e97d6d1"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from CEO Agent [RESTOCK_DENIED]: {\"product_id\": \"prod_018\", \"product_name\": \"NOVA ErgoMaster Silent Wireless Mouse\", \"reason\": \"Treasury reserve conserved\"}",
+      "timestamp": "2026-11-02T18:12:37.181518+00:00",
+      "metadata": {
+        "msg_id": "msg_e6848045",
+        "from": "CEO Agent",
+        "subject": "RESTOCK_DENIED",
+        "correlation_id": "corr_4b2c848a"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from CEO Agent [RESTOCK_DENIED]: {\"product_id\": \"prod_019\", \"product_name\": \"NOVA ViperBlade 26K DPI Gaming Mouse\", \"reason\": \"Treasury reserve conserved\"}",
+      "timestamp": "2026-11-02T18:12:37.237564+00:00",
+      "metadata": {
+        "msg_id": "msg_2b1d2dfe",
+        "from": "CEO Agent",
+        "subject": "RESTOCK_DENIED",
+        "correlation_id": "corr_952bc6b3"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from CEO Agent [RESTOCK_DENIED]: {\"product_id\": \"prod_020\", \"product_name\": \"NOVA TitanVolt MagSafe PowerBank 10k\", \"reason\": \"Treasury reserve conserved\"}",
+      "timestamp": "2026-11-02T18:12:37.290029+00:00",
+      "metadata": {
+        "msg_id": "msg_8278b179",
+        "from": "CEO Agent",
+        "subject": "RESTOCK_DENIED",
+        "correlation_id": "corr_d5ddbbcb"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from CEO Agent [RESTOCK_DENIED]: {\"product_id\": \"prod_021\", \"product_name\": \"NOVA TitanVolt HyperCharge PowerBank 20k\", \"reason\": \"Treasury reserve conserved\"}",
+      "timestamp": "2026-11-02T18:12:37.346985+00:00",
+      "metadata": {
+        "msg_id": "msg_f933610a",
+        "from": "CEO Agent",
+        "subject": "RESTOCK_DENIED",
+        "correlation_id": "corr_c39964d1"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from CEO Agent [RESTOCK_DENIED]: {\"product_id\": \"prod_022\", \"product_name\": \"NOVA Stealth Commuter Smart Backpack\", \"reason\": \"Treasury reserve conserved\"}",
+      "timestamp": "2026-11-02T18:12:37.402653+00:00",
+      "metadata": {
+        "msg_id": "msg_43fd3e44",
+        "from": "CEO Agent",
+        "subject": "RESTOCK_DENIED",
+        "correlation_id": "corr_b47702cc"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from CEO Agent [RESTOCK_DENIED]: {\"product_id\": \"prod_023\", \"product_name\": \"NOVA Stealth Travel Expandable Smart Backpack\", \"reason\": \"Treasury reserve conserved\"}",
+      "timestamp": "2026-11-02T18:12:37.455941+00:00",
+      "metadata": {
+        "msg_id": "msg_fe07367f",
+        "from": "CEO Agent",
+        "subject": "RESTOCK_DENIED",
+        "correlation_id": "corr_97474cf4"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from CEO Agent [RESTOCK_DENIED]: {\"product_id\": \"prod_024\", \"product_name\": \"NOVA PowerStream 100W USB-C Laptop Charger\", \"reason\": \"Treasury reserve conserved\"}",
+      "timestamp": "2026-11-02T18:12:37.497568+00:00",
+      "metadata": {
+        "msg_id": "msg_ed62bef7",
+        "from": "CEO Agent",
+        "subject": "RESTOCK_DENIED",
+        "correlation_id": "corr_b9450416"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from CEO Agent [RESTOCK_DENIED]: {\"product_id\": \"prod_025\", \"product_name\": \"NOVA TurboFlash 30W Mobile Fast Charger\", \"reason\": \"Treasury reserve conserved\"}",
+      "timestamp": "2026-11-02T18:12:37.554313+00:00",
+      "metadata": {
+        "msg_id": "msg_721b517f",
+        "from": "CEO Agent",
+        "subject": "RESTOCK_DENIED",
+        "correlation_id": "corr_848d3cfd"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from CEO Agent [RESTOCK_DENIED]: {\"product_id\": \"prod_026\", \"product_name\": \"NOVA HyperGaN 65W 3-Port Fast Charger\", \"reason\": \"Treasury reserve conserved\"}",
+      "timestamp": "2026-11-02T18:12:37.610299+00:00",
+      "metadata": {
+        "msg_id": "msg_ae01bf57",
+        "from": "CEO Agent",
+        "subject": "RESTOCK_DENIED",
+        "correlation_id": "corr_4527c97b"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from CEO Agent [RESTOCK_DENIED]: {\"product_id\": \"prod_027\", \"product_name\": \"NOVA HyperGaN 140W Quad-Port Pro Charger\", \"reason\": \"Treasury reserve conserved\"}",
+      "timestamp": "2026-11-02T18:12:37.664380+00:00",
+      "metadata": {
+        "msg_id": "msg_0613b7b1",
+        "from": "CEO Agent",
+        "subject": "RESTOCK_DENIED",
+        "correlation_id": "corr_1227db12"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to CEO Agent [RESTOCK_REQUEST]: {\"product_id\": \"prod_002\", \"product_name\": \"NOVA Apex Ultra Fold 5G\", \"requested_quantity\": 5, \"base_price\": 99.0, \"total_cost\": 495.0, \"reason\": \"Autonomous stockout protection\"}",
+      "timestamp": "2026-11-02T18:12:38.755779+00:00",
+      "metadata": {
+        "msg_id": "msg_d4b7b401",
+        "to": "CEO Agent",
+        "subject": "RESTOCK_REQUEST",
+        "correlation_id": "corr_87740c71"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to CEO Agent [RESTOCK_REQUEST]: {\"product_id\": \"prod_014\", \"product_name\": \"NOVA Pulse Ultra Smartwatch\", \"requested_quantity\": 5, \"base_price\": 65.0, \"total_cost\": 325.0, \"reason\": \"Autonomous stockout protection\"}",
+      "timestamp": "2026-11-02T18:12:38.808723+00:00",
+      "metadata": {
+        "msg_id": "msg_3ddd9bcb",
+        "to": "CEO Agent",
+        "subject": "RESTOCK_REQUEST",
+        "correlation_id": "corr_6eee3771"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to CEO Agent [RESTOCK_REQUEST]: {\"product_id\": \"prod_015\", \"product_name\": \"NOVA Pulse Slim Smartwatch\", \"requested_quantity\": 5, \"base_price\": 49.0, \"total_cost\": 245.0, \"reason\": \"Autonomous stockout protection\"}",
+      "timestamp": "2026-11-02T18:12:38.877696+00:00",
+      "metadata": {
+        "msg_id": "msg_281cd43e",
+        "to": "CEO Agent",
+        "subject": "RESTOCK_REQUEST",
+        "correlation_id": "corr_3f124cd5"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to CEO Agent [RESTOCK_REQUEST]: {\"product_id\": \"prod_017\", \"product_name\": \"NOVA AirType Low-Profile Wireless Keyboard\", \"requested_quantity\": 5, \"base_price\": 42.0, \"total_cost\": 210.0, \"reason\": \"Autonomous stockout protection\"}",
+      "timestamp": "2026-11-02T18:12:38.942047+00:00",
+      "metadata": {
+        "msg_id": "msg_41be6061",
+        "to": "CEO Agent",
+        "subject": "RESTOCK_REQUEST",
+        "correlation_id": "corr_7af54bba"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to CEO Agent [RESTOCK_REQUEST]: {\"product_id\": \"prod_019\", \"product_name\": \"NOVA ViperBlade 26K DPI Gaming Mouse\", \"requested_quantity\": 5, \"base_price\": 28.0, \"total_cost\": 140.0, \"reason\": \"Autonomous stockout protection\"}",
+      "timestamp": "2026-11-02T18:12:39.009391+00:00",
+      "metadata": {
+        "msg_id": "msg_391b1553",
+        "to": "CEO Agent",
+        "subject": "RESTOCK_REQUEST",
+        "correlation_id": "corr_0e2b4807"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to CEO Agent [RESTOCK_REQUEST]: {\"product_id\": \"prod_020\", \"product_name\": \"NOVA TitanVolt MagSafe PowerBank 10k\", \"requested_quantity\": 5, \"base_price\": 25.0, \"total_cost\": 125.0, \"reason\": \"Autonomous stockout protection\"}",
+      "timestamp": "2026-11-02T18:12:39.078740+00:00",
+      "metadata": {
+        "msg_id": "msg_2b569ad5",
+        "to": "CEO Agent",
+        "subject": "RESTOCK_REQUEST",
+        "correlation_id": "corr_c40f1b80"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to CEO Agent [RESTOCK_REQUEST]: {\"product_id\": \"prod_021\", \"product_name\": \"NOVA TitanVolt HyperCharge PowerBank 20k\", \"requested_quantity\": 5, \"base_price\": 35.0, \"total_cost\": 175.0, \"reason\": \"Autonomous stockout protection\"}",
+      "timestamp": "2026-11-02T18:12:39.141703+00:00",
+      "metadata": {
+        "msg_id": "msg_4af28613",
+        "to": "CEO Agent",
+        "subject": "RESTOCK_REQUEST",
+        "correlation_id": "corr_48e0b195"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to CEO Agent [RESTOCK_REQUEST]: {\"product_id\": \"prod_022\", \"product_name\": \"NOVA Stealth Commuter Smart Backpack\", \"requested_quantity\": 5, \"base_price\": 30.0, \"total_cost\": 150.0, \"reason\": \"Autonomous stockout protection\"}",
+      "timestamp": "2026-11-02T18:12:39.201787+00:00",
+      "metadata": {
+        "msg_id": "msg_24ee736f",
+        "to": "CEO Agent",
+        "subject": "RESTOCK_REQUEST",
+        "correlation_id": "corr_0f24eca4"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to CEO Agent [RESTOCK_REQUEST]: {\"product_id\": \"prod_023\", \"product_name\": \"NOVA Stealth Travel Expandable Smart Backpack\", \"requested_quantity\": 5, \"base_price\": 40.0, \"total_cost\": 200.0, \"reason\": \"Autonomous stockout protection\"}",
+      "timestamp": "2026-11-02T18:12:39.279815+00:00",
+      "metadata": {
+        "msg_id": "msg_8d0fc6f2",
+        "to": "CEO Agent",
+        "subject": "RESTOCK_REQUEST",
+        "correlation_id": "corr_a0808d51"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to CEO Agent [RESTOCK_REQUEST]: {\"product_id\": \"prod_024\", \"product_name\": \"NOVA PowerStream 100W USB-C Laptop Charger\", \"requested_quantity\": 5, \"base_price\": 25.0, \"total_cost\": 125.0, \"reason\": \"Autonomous stockout protection\"}",
+      "timestamp": "2026-11-02T18:12:39.344359+00:00",
+      "metadata": {
+        "msg_id": "msg_a9bf05cb",
+        "to": "CEO Agent",
+        "subject": "RESTOCK_REQUEST",
+        "correlation_id": "corr_1a910d43"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to CEO Agent [RESTOCK_REQUEST]: {\"product_id\": \"prod_026\", \"product_name\": \"NOVA HyperGaN 65W 3-Port Fast Charger\", \"requested_quantity\": 5, \"base_price\": 22.0, \"total_cost\": 110.0, \"reason\": \"Autonomous stockout protection\"}",
+      "timestamp": "2026-11-02T18:12:39.422276+00:00",
+      "metadata": {
+        "msg_id": "msg_c233cdc1",
+        "to": "CEO Agent",
+        "subject": "RESTOCK_REQUEST",
+        "correlation_id": "corr_361bada6"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to CEO Agent [RESTOCK_REQUEST]: {\"product_id\": \"prod_027\", \"product_name\": \"NOVA HyperGaN 140W Quad-Port Pro Charger\", \"requested_quantity\": 5, \"base_price\": 38.0, \"total_cost\": 190.0, \"reason\": \"Autonomous stockout protection\"}",
+      "timestamp": "2026-11-02T18:12:39.486983+00:00",
+      "metadata": {
+        "msg_id": "msg_6266fd1c",
+        "to": "CEO Agent",
+        "subject": "RESTOCK_REQUEST",
+        "correlation_id": "corr_9487a602"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to CEO Agent [WAREHOUSE_STATUS_REPORT]: {\"total_skus\": 27, \"total_units\": 79, \"low_stock_count\": 12, \"low_stock_items\": [\"NOVA Apex Ultra Fold 5G\", \"NOVA Pulse Ultra Smartwatch\", \"NOVA Pulse Slim Smartwatch\", \"NOVA AirType Low-Profile Wireless Keyboard\", \"NOVA ViperBlade 26K DPI Gaming Mouse\"], \"restocked_items\": [], \"requests_submitted\": [\"NOVA Apex Ultra Fold 5G\", \"NOVA Pulse Ultra Smartwatch\", \"NOVA Pulse Slim Smartwatch\", \"NOVA AirType Low-Profile Wireless Keyboard\", \"NOVA ViperBlade 26K DPI Gaming Mouse\", \"NOVA TitanVolt MagSafe PowerBank 10k\", \"NOVA TitanVolt HyperCharge PowerBank 20k\", \"NOVA Stealth Commuter Smart Backpack\", \"NOVA Stealth Travel Expandable Smart Backpack\", \"NOVA PowerStream 100W USB-C Laptop Charger\", \"NOVA HyperGaN 65W 3-Port Fast Charger\", \"NOVA HyperGaN 140W Quad-Port Pro Charger\"]}",
+      "timestamp": "2026-11-02T18:12:39.546608+00:00",
+      "metadata": {
+        "msg_id": "msg_601c11c0",
+        "to": "CEO Agent",
+        "subject": "WAREHOUSE_STATUS_REPORT",
+        "correlation_id": "corr_3cc007d2"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from CEO Agent [RESTOCK_DENIED]: {\"product_id\": \"prod_002\", \"product_name\": \"NOVA Apex Ultra Fold 5G\", \"reason\": \"Treasury reserve conserved\"}",
+      "timestamp": "2026-11-02T18:12:41.918530+00:00",
+      "metadata": {
+        "msg_id": "msg_00cd7acb",
+        "from": "CEO Agent",
+        "subject": "RESTOCK_DENIED",
+        "correlation_id": "corr_e97f10b7"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from CEO Agent [RESTOCK_DENIED]: {\"product_id\": \"prod_014\", \"product_name\": \"NOVA Pulse Ultra Smartwatch\", \"reason\": \"Treasury reserve conserved\"}",
+      "timestamp": "2026-11-02T18:12:41.976962+00:00",
+      "metadata": {
+        "msg_id": "msg_24a172be",
+        "from": "CEO Agent",
+        "subject": "RESTOCK_DENIED",
+        "correlation_id": "corr_1c7f0a14"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from CEO Agent [RESTOCK_DENIED]: {\"product_id\": \"prod_015\", \"product_name\": \"NOVA Pulse Slim Smartwatch\", \"reason\": \"Treasury reserve conserved\"}",
+      "timestamp": "2026-11-02T18:12:42.023976+00:00",
+      "metadata": {
+        "msg_id": "msg_48802065",
+        "from": "CEO Agent",
+        "subject": "RESTOCK_DENIED",
+        "correlation_id": "corr_f1026963"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from CEO Agent [RESTOCK_DENIED]: {\"product_id\": \"prod_017\", \"product_name\": \"NOVA AirType Low-Profile Wireless Keyboard\", \"reason\": \"Treasury reserve conserved\"}",
+      "timestamp": "2026-11-02T18:12:42.083705+00:00",
+      "metadata": {
+        "msg_id": "msg_6fd234ff",
+        "from": "CEO Agent",
+        "subject": "RESTOCK_DENIED",
+        "correlation_id": "corr_d7a9d505"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from CEO Agent [RESTOCK_DENIED]: {\"product_id\": \"prod_019\", \"product_name\": \"NOVA ViperBlade 26K DPI Gaming Mouse\", \"reason\": \"Treasury reserve conserved\"}",
+      "timestamp": "2026-11-02T18:12:42.135176+00:00",
+      "metadata": {
+        "msg_id": "msg_36a0142c",
+        "from": "CEO Agent",
+        "subject": "RESTOCK_DENIED",
+        "correlation_id": "corr_d33fe651"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from CEO Agent [RESTOCK_DENIED]: {\"product_id\": \"prod_020\", \"product_name\": \"NOVA TitanVolt MagSafe PowerBank 10k\", \"reason\": \"Treasury reserve conserved\"}",
+      "timestamp": "2026-11-02T18:12:42.181247+00:00",
+      "metadata": {
+        "msg_id": "msg_a8c903ff",
+        "from": "CEO Agent",
+        "subject": "RESTOCK_DENIED",
+        "correlation_id": "corr_b7a3ed2d"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from CEO Agent [RESTOCK_DENIED]: {\"product_id\": \"prod_021\", \"product_name\": \"NOVA TitanVolt HyperCharge PowerBank 20k\", \"reason\": \"Treasury reserve conserved\"}",
+      "timestamp": "2026-11-02T18:12:42.236763+00:00",
+      "metadata": {
+        "msg_id": "msg_53593f51",
+        "from": "CEO Agent",
+        "subject": "RESTOCK_DENIED",
+        "correlation_id": "corr_9c58900a"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from CEO Agent [RESTOCK_DENIED]: {\"product_id\": \"prod_022\", \"product_name\": \"NOVA Stealth Commuter Smart Backpack\", \"reason\": \"Treasury reserve conserved\"}",
+      "timestamp": "2026-11-02T18:12:42.282485+00:00",
+      "metadata": {
+        "msg_id": "msg_ead7be46",
+        "from": "CEO Agent",
+        "subject": "RESTOCK_DENIED",
+        "correlation_id": "corr_e17572d6"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from CEO Agent [RESTOCK_DENIED]: {\"product_id\": \"prod_023\", \"product_name\": \"NOVA Stealth Travel Expandable Smart Backpack\", \"reason\": \"Treasury reserve conserved\"}",
+      "timestamp": "2026-11-02T18:12:42.339951+00:00",
+      "metadata": {
+        "msg_id": "msg_73c40abb",
+        "from": "CEO Agent",
+        "subject": "RESTOCK_DENIED",
+        "correlation_id": "corr_12e96087"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from CEO Agent [RESTOCK_DENIED]: {\"product_id\": \"prod_024\", \"product_name\": \"NOVA PowerStream 100W USB-C Laptop Charger\", \"reason\": \"Treasury reserve conserved\"}",
+      "timestamp": "2026-11-02T18:12:42.387146+00:00",
+      "metadata": {
+        "msg_id": "msg_8c98ffc4",
+        "from": "CEO Agent",
+        "subject": "RESTOCK_DENIED",
+        "correlation_id": "corr_2c55cccf"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from CEO Agent [RESTOCK_DENIED]: {\"product_id\": \"prod_026\", \"product_name\": \"NOVA HyperGaN 65W 3-Port Fast Charger\", \"reason\": \"Treasury reserve conserved\"}",
+      "timestamp": "2026-11-02T18:12:42.446935+00:00",
+      "metadata": {
+        "msg_id": "msg_189bbf1f",
+        "from": "CEO Agent",
+        "subject": "RESTOCK_DENIED",
+        "correlation_id": "corr_150a15a6"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from CEO Agent [RESTOCK_DENIED]: {\"product_id\": \"prod_027\", \"product_name\": \"NOVA HyperGaN 140W Quad-Port Pro Charger\", \"reason\": \"Treasury reserve conserved\"}",
+      "timestamp": "2026-11-02T18:12:42.502937+00:00",
+      "metadata": {
+        "msg_id": "msg_90ac2dcf",
+        "from": "CEO Agent",
+        "subject": "RESTOCK_DENIED",
+        "correlation_id": "corr_66c169fa"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce2 Broadcast from CEO Agent [CEO_FLEET_DIRECTIVE]: {\"cycle\": 40, \"directive\": \"Maintain order fulfillment velocity, enforce BASE_PRICE floors, and preserve treasury solvency.\", \"bank_balance\": 43.7, \"active_orders\": 1}",
+      "timestamp": "2026-11-02T18:12:42.566999+00:00",
+      "metadata": {
+        "msg_id": "msg_79ca28c9",
+        "from": "CEO Agent",
+        "subject": "CEO_FLEET_DIRECTIVE",
+        "correlation_id": "corr_2bcf2e7c"
+      }
+    }
+  ],
+  "Finance Manager Agent": [
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to CEO Agent [FINANCIAL_STATUS_REPORT]: {\"bank_balance\": 10000.0, \"total_sales_revenue\": 0.0, \"net_profit\": 0.0, \"total_inventory_spend\": 0.0, \"total_salaries_paid\": 0.0, \"total_refunds_deducted\": 0.0, \"reconciliation_status\": \"MATCHED\", \"refunds_processed\": []}",
+      "timestamp": "2026-11-02T18:12:04.372650+00:00",
+      "metadata": {
+        "msg_id": "msg_9c6834f0",
+        "to": "CEO Agent",
+        "subject": "FINANCIAL_STATUS_REPORT",
+        "correlation_id": "corr_71810525"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce2 Broadcast from CEO Agent [CEO_FLEET_DIRECTIVE]: {\"cycle\": 35, \"directive\": \"Maintain order fulfillment velocity, enforce BASE_PRICE floors, and preserve treasury solvency.\", \"bank_balance\": 10000.0, \"active_orders\": 0}",
+      "timestamp": "2026-11-02T18:12:06.279400+00:00",
+      "metadata": {
+        "msg_id": "msg_d6fcc42b",
+        "from": "CEO Agent",
+        "subject": "CEO_FLEET_DIRECTIVE",
+        "correlation_id": "corr_759e1e76"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from Inventory Manager Agent [STOCK_PURCHASE_COMPLETED]: {\"product_id\": \"prod_001\", \"product_name\": \"NOVA Apex Pro 5G Smartphone\", \"quantity\": 5, \"cost\": 6000.0}",
+      "timestamp": "2026-11-02T18:12:07.471814+00:00",
+      "metadata": {
+        "msg_id": "msg_979c472f",
+        "from": "Inventory Manager Agent",
+        "subject": "STOCK_PURCHASE_COMPLETED",
+        "correlation_id": "corr_a66c7dd6"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from Inventory Manager Agent [STOCK_PURCHASE_COMPLETED]: {\"product\": \"NOVA Apex Pro 5G Smartphone\", \"product_id\": \"prod_001\", \"quantity\": 5, \"cost\": 6000.0}",
+      "timestamp": "2026-11-02T18:12:07.508859+00:00",
+      "metadata": {
+        "msg_id": "msg_1db962d1",
+        "from": "Inventory Manager Agent",
+        "subject": "STOCK_PURCHASE_COMPLETED",
+        "correlation_id": "corr_51718fb3"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from Inventory Manager Agent [STOCK_PURCHASE_COMPLETED]: {\"product_id\": \"prod_002\", \"product_name\": \"NOVA Apex Ultra Fold 5G\", \"quantity\": 5, \"cost\": 495.0}",
+      "timestamp": "2026-11-02T18:12:07.628218+00:00",
+      "metadata": {
+        "msg_id": "msg_32482236",
+        "from": "Inventory Manager Agent",
+        "subject": "STOCK_PURCHASE_COMPLETED",
+        "correlation_id": "corr_5bcfcf21"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from Inventory Manager Agent [STOCK_PURCHASE_COMPLETED]: {\"product\": \"NOVA Apex Ultra Fold 5G\", \"product_id\": \"prod_002\", \"quantity\": 5, \"cost\": 495.0}",
+      "timestamp": "2026-11-02T18:12:07.656410+00:00",
+      "metadata": {
+        "msg_id": "msg_a649fd82",
+        "from": "Inventory Manager Agent",
+        "subject": "STOCK_PURCHASE_COMPLETED",
+        "correlation_id": "corr_b8e28544"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from Inventory Manager Agent [STOCK_PURCHASE_COMPLETED]: {\"product_id\": \"prod_003\", \"product_name\": \"NOVA Prime 5G Smartphone\", \"quantity\": 5, \"cost\": 345.0}",
+      "timestamp": "2026-11-02T18:12:08.136986+00:00",
+      "metadata": {
+        "msg_id": "msg_1dfb093b",
+        "from": "Inventory Manager Agent",
+        "subject": "STOCK_PURCHASE_COMPLETED",
+        "correlation_id": "corr_81d8e394"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from Inventory Manager Agent [STOCK_PURCHASE_COMPLETED]: {\"product\": \"NOVA Prime 5G Smartphone\", \"product_id\": \"prod_003\", \"quantity\": 5, \"cost\": 345.0}",
+      "timestamp": "2026-11-02T18:12:08.165991+00:00",
+      "metadata": {
+        "msg_id": "msg_e57983c3",
+        "from": "Inventory Manager Agent",
+        "subject": "STOCK_PURCHASE_COMPLETED",
+        "correlation_id": "corr_daf33c98"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from Inventory Manager Agent [STOCK_PURCHASE_COMPLETED]: {\"product_id\": \"prod_004\", \"product_name\": \"NOVA ZenBook Ultra 14 M3 Laptop\", \"quantity\": 5, \"cost\": 425.0}",
+      "timestamp": "2026-11-02T18:12:08.278321+00:00",
+      "metadata": {
+        "msg_id": "msg_5f0b0e34",
+        "from": "Inventory Manager Agent",
+        "subject": "STOCK_PURCHASE_COMPLETED",
+        "correlation_id": "corr_d7fc284f"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from Inventory Manager Agent [STOCK_PURCHASE_COMPLETED]: {\"product\": \"NOVA ZenBook Ultra 14 M3 Laptop\", \"product_id\": \"prod_004\", \"quantity\": 5, \"cost\": 425.0}",
+      "timestamp": "2026-11-02T18:12:08.320005+00:00",
+      "metadata": {
+        "msg_id": "msg_dccc3897",
+        "from": "Inventory Manager Agent",
+        "subject": "STOCK_PURCHASE_COMPLETED",
+        "correlation_id": "corr_9054369d"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from Inventory Manager Agent [STOCK_PURCHASE_COMPLETED]: {\"product_id\": \"prod_005\", \"product_name\": \"NOVA BladeForge RTX 4080 Gaming Laptop\", \"quantity\": 5, \"cost\": 500.0}",
+      "timestamp": "2026-11-02T18:12:08.460670+00:00",
+      "metadata": {
+        "msg_id": "msg_76bc7b68",
+        "from": "Inventory Manager Agent",
+        "subject": "STOCK_PURCHASE_COMPLETED",
+        "correlation_id": "corr_9ed82334"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from Inventory Manager Agent [STOCK_PURCHASE_COMPLETED]: {\"product\": \"NOVA BladeForge RTX 4080 Gaming Laptop\", \"product_id\": \"prod_005\", \"quantity\": 5, \"cost\": 500.0}",
+      "timestamp": "2026-11-02T18:12:08.504780+00:00",
+      "metadata": {
+        "msg_id": "msg_8c4989e4",
+        "from": "Inventory Manager Agent",
+        "subject": "STOCK_PURCHASE_COMPLETED",
+        "correlation_id": "corr_25bdbdce"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from Inventory Manager Agent [STOCK_PURCHASE_COMPLETED]: {\"product_id\": \"prod_006\", \"product_name\": \"NOVA AeroBook Slim i7 Ultrabook\", \"quantity\": 5, \"cost\": 375.0}",
+      "timestamp": "2026-11-02T18:12:08.640666+00:00",
+      "metadata": {
+        "msg_id": "msg_1df089ba",
+        "from": "Inventory Manager Agent",
+        "subject": "STOCK_PURCHASE_COMPLETED",
+        "correlation_id": "corr_d35a683b"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from Inventory Manager Agent [STOCK_PURCHASE_COMPLETED]: {\"product\": \"NOVA AeroBook Slim i7 Ultrabook\", \"product_id\": \"prod_006\", \"quantity\": 5, \"cost\": 375.0}",
+      "timestamp": "2026-11-02T18:12:08.687134+00:00",
+      "metadata": {
+        "msg_id": "msg_810bad13",
+        "from": "Inventory Manager Agent",
+        "subject": "STOCK_PURCHASE_COMPLETED",
+        "correlation_id": "corr_2b412916"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from Inventory Manager Agent [STOCK_PURCHASE_COMPLETED]: {\"product_id\": \"prod_007\", \"product_name\": \"NOVA ClarityFlow Studio Wired In-Ear Monitors\", \"quantity\": 5, \"cost\": 125.0}",
+      "timestamp": "2026-11-02T18:12:08.832677+00:00",
+      "metadata": {
+        "msg_id": "msg_f9bb1bdb",
+        "from": "Inventory Manager Agent",
+        "subject": "STOCK_PURCHASE_COMPLETED",
+        "correlation_id": "corr_4164830d"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from Inventory Manager Agent [STOCK_PURCHASE_COMPLETED]: {\"product\": \"NOVA ClarityFlow Studio Wired In-Ear Monitors\", \"product_id\": \"prod_007\", \"quantity\": 5, \"cost\": 125.0}",
+      "timestamp": "2026-11-02T18:12:08.867315+00:00",
+      "metadata": {
+        "msg_id": "msg_cd3a4de7",
+        "from": "Inventory Manager Agent",
+        "subject": "STOCK_PURCHASE_COMPLETED",
+        "correlation_id": "corr_d972e15e"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from Inventory Manager Agent [STOCK_PURCHASE_COMPLETED]: {\"product_id\": \"prod_008\", \"product_name\": \"NOVA AeroPods Pro ANC Wireless Earbuds\", \"quantity\": 5, \"cost\": 225.0}",
+      "timestamp": "2026-11-02T18:12:08.991458+00:00",
+      "metadata": {
+        "msg_id": "msg_e160acf2",
+        "from": "Inventory Manager Agent",
+        "subject": "STOCK_PURCHASE_COMPLETED",
+        "correlation_id": "corr_ccfd72f5"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from Inventory Manager Agent [STOCK_PURCHASE_COMPLETED]: {\"product\": \"NOVA AeroPods Pro ANC Wireless Earbuds\", \"product_id\": \"prod_008\", \"quantity\": 5, \"cost\": 225.0}",
+      "timestamp": "2026-11-02T18:12:09.026666+00:00",
+      "metadata": {
+        "msg_id": "msg_71335928",
+        "from": "Inventory Manager Agent",
+        "subject": "STOCK_PURCHASE_COMPLETED",
+        "correlation_id": "corr_e79ba541"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from Inventory Manager Agent [STOCK_PURCHASE_COMPLETED]: {\"product_id\": \"prod_009\", \"product_name\": \"NOVA BoomPulse 360 Bluetooth Speaker\", \"quantity\": 5, \"cost\": 195.0}",
+      "timestamp": "2026-11-02T18:12:09.136054+00:00",
+      "metadata": {
+        "msg_id": "msg_578b7885",
+        "from": "Inventory Manager Agent",
+        "subject": "STOCK_PURCHASE_COMPLETED",
+        "correlation_id": "corr_dbe0eafa"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from Inventory Manager Agent [STOCK_PURCHASE_COMPLETED]: {\"product\": \"NOVA BoomPulse 360 Bluetooth Speaker\", \"product_id\": \"prod_009\", \"quantity\": 5, \"cost\": 195.0}",
+      "timestamp": "2026-11-02T18:12:09.177112+00:00",
+      "metadata": {
+        "msg_id": "msg_5d842683",
+        "from": "Inventory Manager Agent",
+        "subject": "STOCK_PURCHASE_COMPLETED",
+        "correlation_id": "corr_a0728fb6"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from Inventory Manager Agent [STOCK_PURCHASE_COMPLETED]: {\"product_id\": \"prod_010\", \"product_name\": \"NOVA StudioMaster Pro Hi-Fi Wired Headphones\", \"quantity\": 5, \"cost\": 275.0}",
+      "timestamp": "2026-11-02T18:12:09.324128+00:00",
+      "metadata": {
+        "msg_id": "msg_9e2698d4",
+        "from": "Inventory Manager Agent",
+        "subject": "STOCK_PURCHASE_COMPLETED",
+        "correlation_id": "corr_b42ea787"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from Inventory Manager Agent [STOCK_PURCHASE_COMPLETED]: {\"product\": \"NOVA StudioMaster Pro Hi-Fi Wired Headphones\", \"product_id\": \"prod_010\", \"quantity\": 5, \"cost\": 275.0}",
+      "timestamp": "2026-11-02T18:12:09.361954+00:00",
+      "metadata": {
+        "msg_id": "msg_3c9db771",
+        "from": "Inventory Manager Agent",
+        "subject": "STOCK_PURCHASE_COMPLETED",
+        "correlation_id": "corr_26989a03"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from Inventory Manager Agent [STOCK_PURCHASE_COMPLETED]: {\"product_id\": \"prod_011\", \"product_name\": \"NOVA SonicFlow ANC Pro Wireless Headphones\", \"quantity\": 5, \"cost\": 295.0}",
+      "timestamp": "2026-11-02T18:12:09.488967+00:00",
+      "metadata": {
+        "msg_id": "msg_a493a126",
+        "from": "Inventory Manager Agent",
+        "subject": "STOCK_PURCHASE_COMPLETED",
+        "correlation_id": "corr_9e6cfeef"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from Inventory Manager Agent [STOCK_PURCHASE_COMPLETED]: {\"product\": \"NOVA SonicFlow ANC Pro Wireless Headphones\", \"product_id\": \"prod_011\", \"quantity\": 5, \"cost\": 295.0}",
+      "timestamp": "2026-11-02T18:12:09.533526+00:00",
+      "metadata": {
+        "msg_id": "msg_48658963",
+        "from": "Inventory Manager Agent",
+        "subject": "STOCK_PURCHASE_COMPLETED",
+        "correlation_id": "corr_33989857"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from Inventory Manager Agent [STOCK_PURCHASE_COMPLETED]: {\"product_id\": \"prod_012\", \"product_name\": \"NOVA VoiceCraft XLR Studio Condenser Wired Mic\", \"quantity\": 5, \"cost\": 245.0}",
+      "timestamp": "2026-11-02T18:12:09.678405+00:00",
+      "metadata": {
+        "msg_id": "msg_7ab0858d",
+        "from": "Inventory Manager Agent",
+        "subject": "STOCK_PURCHASE_COMPLETED",
+        "correlation_id": "corr_a9d6ef69"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from Inventory Manager Agent [STOCK_PURCHASE_COMPLETED]: {\"product\": \"NOVA VoiceCraft XLR Studio Condenser Wired Mic\", \"product_id\": \"prod_012\", \"quantity\": 5, \"cost\": 245.0}",
+      "timestamp": "2026-11-02T18:12:09.728664+00:00",
+      "metadata": {
+        "msg_id": "msg_f3628e44",
+        "from": "Inventory Manager Agent",
+        "subject": "STOCK_PURCHASE_COMPLETED",
+        "correlation_id": "corr_1314be5a"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from Inventory Manager Agent [STOCK_PURCHASE_COMPLETED]: {\"product_id\": \"prod_013\", \"product_name\": \"NOVA StreamAir Dual Wireless Lavalier Mic System\", \"quantity\": 5, \"cost\": 260.0}",
+      "timestamp": "2026-11-02T18:12:09.878883+00:00",
+      "metadata": {
+        "msg_id": "msg_c2a4feb6",
+        "from": "Inventory Manager Agent",
+        "subject": "STOCK_PURCHASE_COMPLETED",
+        "correlation_id": "corr_850ecb45"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from Inventory Manager Agent [STOCK_PURCHASE_COMPLETED]: {\"product\": \"NOVA StreamAir Dual Wireless Lavalier Mic System\", \"product_id\": \"prod_013\", \"quantity\": 5, \"cost\": 260.0}",
+      "timestamp": "2026-11-02T18:12:09.925928+00:00",
+      "metadata": {
+        "msg_id": "msg_127c92de",
+        "from": "Inventory Manager Agent",
+        "subject": "STOCK_PURCHASE_COMPLETED",
+        "correlation_id": "corr_f9837b64"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from Inventory Manager Agent [STOCK_PURCHASE_COMPLETED]: {\"product_id\": \"prod_016\", \"product_name\": \"NOVA Vortex Pro RGB Wired Mechanical Keyboard\", \"quantity\": 5, \"cost\": 175.0}",
+      "timestamp": "2026-11-02T18:12:10.081192+00:00",
+      "metadata": {
+        "msg_id": "msg_e6cdac28",
+        "from": "Inventory Manager Agent",
+        "subject": "STOCK_PURCHASE_COMPLETED",
+        "correlation_id": "corr_d7b3e050"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from Inventory Manager Agent [STOCK_PURCHASE_COMPLETED]: {\"product\": \"NOVA Vortex Pro RGB Wired Mechanical Keyboard\", \"product_id\": \"prod_016\", \"quantity\": 5, \"cost\": 175.0}",
+      "timestamp": "2026-11-02T18:12:10.122722+00:00",
+      "metadata": {
+        "msg_id": "msg_11ad8edf",
+        "from": "Inventory Manager Agent",
+        "subject": "STOCK_PURCHASE_COMPLETED",
+        "correlation_id": "corr_ba9fac38"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to CEO Agent [FINANCIAL_STATUS_REPORT]: {\"bank_balance\": 65.0, \"total_sales_revenue\": 0.0, \"net_profit\": -9935.0, \"total_inventory_spend\": 9935.0, \"total_salaries_paid\": 0.0, \"total_refunds_deducted\": 0.0, \"reconciliation_status\": \"MATCHED\", \"refunds_processed\": []}",
+      "timestamp": "2026-11-02T18:12:12.805634+00:00",
+      "metadata": {
+        "msg_id": "msg_65c03c4f",
+        "to": "CEO Agent",
+        "subject": "FINANCIAL_STATUS_REPORT",
+        "correlation_id": "corr_59dfec6b"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from Order Management Agent [ORDER_PAYMENT_CAPTURED]: {\"order_id\": \"ORD-1222-7B53\", \"total\": 153.7, \"payment_method\": \"Razorpay Gateway (Online)\", \"action_required\": \"Verify settlement and reconcile treasury ledger.\"}",
+      "timestamp": "2026-11-02T18:12:22.291485+00:00",
+      "metadata": {
+        "msg_id": "msg_de72f70c",
+        "from": "Order Management Agent",
+        "subject": "ORDER_PAYMENT_CAPTURED",
+        "correlation_id": "corr_b38540f6"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to Order Management Agent [PAYMENT_RECEIVED]: {\"order_id\": \"ORD-1222-7B53\", \"payment_id\": \"pay_demo_5a2c56d51f584c\", \"amount\": 153.7, \"method\": \"AP2 Agentic Auto-Pay (Razorpay Verified)\"}",
+      "timestamp": "2026-11-02T18:12:22.365594+00:00",
+      "metadata": {
+        "msg_id": "msg_7313a4c1",
+        "to": "Order Management Agent",
+        "subject": "PAYMENT_RECEIVED",
+        "correlation_id": "corr_869b3714"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to CEO Agent [FINANCIAL_STATUS_REPORT]: {\"bank_balance\": 218.7, \"total_sales_revenue\": 153.7, \"net_profit\": -9781.3, \"total_inventory_spend\": 9935.0, \"total_salaries_paid\": 0.0, \"total_refunds_deducted\": 0.0, \"reconciliation_status\": \"MATCHED\", \"refunds_processed\": []}",
+      "timestamp": "2026-11-02T18:12:30.803914+00:00",
+      "metadata": {
+        "msg_id": "msg_5e6c6fdb",
+        "to": "CEO Agent",
+        "subject": "FINANCIAL_STATUS_REPORT",
+        "correlation_id": "corr_97b8fb4d"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from Inventory Manager Agent [STOCK_PURCHASE_COMPLETED]: {\"product_id\": \"prod_018\", \"product_name\": \"NOVA ErgoMaster Silent Wireless Mouse\", \"quantity\": 5, \"cost\": 100.0}",
+      "timestamp": "2026-11-02T18:12:33.058029+00:00",
+      "metadata": {
+        "msg_id": "msg_f1597fa7",
+        "from": "Inventory Manager Agent",
+        "subject": "STOCK_PURCHASE_COMPLETED",
+        "correlation_id": "corr_56824045"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from Inventory Manager Agent [STOCK_PURCHASE_COMPLETED]: {\"product\": \"NOVA ErgoMaster Silent Wireless Mouse\", \"product_id\": \"prod_018\", \"quantity\": 5, \"cost\": 100.0}",
+      "timestamp": "2026-11-02T18:12:33.118249+00:00",
+      "metadata": {
+        "msg_id": "msg_f5ba3226",
+        "from": "Inventory Manager Agent",
+        "subject": "STOCK_PURCHASE_COMPLETED",
+        "correlation_id": "corr_02956a08"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from Inventory Manager Agent [STOCK_PURCHASE_COMPLETED]: {\"product_id\": \"prod_025\", \"product_name\": \"NOVA TurboFlash 30W Mobile Fast Charger\", \"quantity\": 5, \"cost\": 75.0}",
+      "timestamp": "2026-11-02T18:12:33.311102+00:00",
+      "metadata": {
+        "msg_id": "msg_154d7feb",
+        "from": "Inventory Manager Agent",
+        "subject": "STOCK_PURCHASE_COMPLETED",
+        "correlation_id": "corr_fe81058a"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce8 Message from Inventory Manager Agent [STOCK_PURCHASE_COMPLETED]: {\"product\": \"NOVA TurboFlash 30W Mobile Fast Charger\", \"product_id\": \"prod_025\", \"quantity\": 5, \"cost\": 75.0}",
+      "timestamp": "2026-11-02T18:12:33.378953+00:00",
+      "metadata": {
+        "msg_id": "msg_4d2c8cb3",
+        "from": "Inventory Manager Agent",
+        "subject": "STOCK_PURCHASE_COMPLETED",
+        "correlation_id": "corr_a8dc07cb"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to CEO Agent [FINANCIAL_STATUS_REPORT]: {\"bank_balance\": 43.7, \"total_sales_revenue\": 153.7, \"net_profit\": -9956.3, \"total_inventory_spend\": 10110.0, \"total_salaries_paid\": 0.0, \"total_refunds_deducted\": 0.0, \"reconciliation_status\": \"MATCHED\", \"refunds_processed\": []}",
+      "timestamp": "2026-11-02T18:12:35.522275+00:00",
+      "metadata": {
+        "msg_id": "msg_ca7c75a0",
+        "to": "CEO Agent",
+        "subject": "FINANCIAL_STATUS_REPORT",
+        "correlation_id": "corr_85716912"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce2 Broadcast from CEO Agent [CEO_FLEET_DIRECTIVE]: {\"cycle\": 40, \"directive\": \"Maintain order fulfillment velocity, enforce BASE_PRICE floors, and preserve treasury solvency.\", \"bank_balance\": 43.7, \"active_orders\": 1}",
+      "timestamp": "2026-11-02T18:12:42.575742+00:00",
+      "metadata": {
+        "msg_id": "msg_79ca28c9",
+        "from": "CEO Agent",
+        "subject": "CEO_FLEET_DIRECTIVE",
+        "correlation_id": "corr_2bcf2e7c"
+      }
+    }
+  ],
+  "Review and Feedback Manager": [
+    {
+      "role": "directive",
+      "content": "\ud83d\udce2 Broadcast from CEO Agent [CEO_FLEET_DIRECTIVE]: {\"cycle\": 35, \"directive\": \"Maintain order fulfillment velocity, enforce BASE_PRICE floors, and preserve treasury solvency.\", \"bank_balance\": 10000.0, \"active_orders\": 0}",
+      "timestamp": "2026-11-02T18:12:06.285286+00:00",
+      "metadata": {
+        "msg_id": "msg_d6fcc42b",
+        "from": "CEO Agent",
+        "subject": "CEO_FLEET_DIRECTIVE",
+        "correlation_id": "corr_759e1e76"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to CEO Agent [SENTIMENT_STATUS_REPORT]: {\"average_rating\": 4.8, \"total_reviews\": 0, \"issue_clusters\": {\"battery_performance\": 0, \"shipping_speed\": 0, \"audio_clarity\": 0, \"build_quality\": 0, \"general_satisfaction\": 0}, \"quality_alerts_count\": 0}",
+      "timestamp": "2026-11-02T18:12:11.639101+00:00",
+      "metadata": {
+        "msg_id": "msg_04257d1d",
+        "to": "CEO Agent",
+        "subject": "SENTIMENT_STATUS_REPORT",
+        "correlation_id": "corr_38124e6d"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to CEO Agent [SENTIMENT_STATUS_REPORT]: {\"average_rating\": 4.8, \"total_reviews\": 0, \"issue_clusters\": {\"battery_performance\": 0, \"shipping_speed\": 0, \"audio_clarity\": 0, \"build_quality\": 0, \"general_satisfaction\": 0}, \"quality_alerts_count\": 0}",
+      "timestamp": "2026-11-02T18:12:17.224386+00:00",
+      "metadata": {
+        "msg_id": "msg_0931aced",
+        "to": "CEO Agent",
+        "subject": "SENTIMENT_STATUS_REPORT",
+        "correlation_id": "corr_b8b52fa8"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to Price Manager Agent [REVIEW_SUBMITTED]: {\"product_id\": \"prod_002\", \"product_name\": \"NOVA Apex Ultra Fold 5G\", \"rating\": 4, \"review\": \"Revolutionary NOVA foldable smartphone with powerful 8.0-inch 120Hz inner display, titanium hinge ar\"}",
+      "timestamp": "2026-11-02T18:12:29.406398+00:00",
+      "metadata": {
+        "msg_id": "msg_74122256",
+        "to": "Price Manager Agent",
+        "subject": "REVIEW_SUBMITTED",
+        "correlation_id": "corr_d9d87d8d"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to CEO Agent [SENTIMENT_STATUS_REPORT]: {\"average_rating\": 4.0, \"total_reviews\": 1, \"issue_clusters\": {\"battery_performance\": 0, \"shipping_speed\": 0, \"audio_clarity\": 0, \"build_quality\": 0, \"general_satisfaction\": 1}, \"quality_alerts_count\": 0}",
+      "timestamp": "2026-11-02T18:12:31.111464+00:00",
+      "metadata": {
+        "msg_id": "msg_a3aac71c",
+        "to": "CEO Agent",
+        "subject": "SENTIMENT_STATUS_REPORT",
+        "correlation_id": "corr_0fbcd837"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to CEO Agent [SENTIMENT_STATUS_REPORT]: {\"average_rating\": 4.0, \"total_reviews\": 1, \"issue_clusters\": {\"battery_performance\": 0, \"shipping_speed\": 0, \"audio_clarity\": 0, \"build_quality\": 0, \"general_satisfaction\": 1}, \"quality_alerts_count\": 0}",
+      "timestamp": "2026-11-02T18:12:35.890044+00:00",
+      "metadata": {
+        "msg_id": "msg_35af12a4",
+        "to": "CEO Agent",
+        "subject": "SENTIMENT_STATUS_REPORT",
+        "correlation_id": "corr_dd9c980c"
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "\ud83d\udce4 Sent to CEO Agent [SENTIMENT_STATUS_REPORT]: {\"average_rating\": 4.0, \"total_reviews\": 1, \"issue_clusters\": {\"battery_performance\": 0, \"shipping_speed\": 0, \"audio_clarity\": 0, \"build_quality\": 0, \"general_satisfaction\": 1}, \"quality_alerts_count\": 0}",
+      "timestamp": "2026-11-02T18:12:40.819964+00:00",
+      "metadata": {
+        "msg_id": "msg_72c0f79d",
+        "to": "CEO Agent",
+        "subject": "SENTIMENT_STATUS_REPORT",
+        "correlation_id": "corr_a571e396"
+      }
+    },
+    {
+      "role": "directive",
+      "content": "\ud83d\udce2 Broadcast from CEO Agent [CEO_FLEET_DIRECTIVE]: {\"cycle\": 40, \"directive\": \"Maintain order fulfillment velocity, enforce BASE_PRICE floors, and preserve treasury solvency.\", \"bank_balance\": 43.7, \"active_orders\": 1}",
+      "timestamp": "2026-11-02T18:12:42.584806+00:00",
+      "metadata": {
+        "msg_id": "msg_79ca28c9",
+        "from": "CEO Agent",
+        "subject": "CEO_FLEET_DIRECTIVE",
+        "correlation_id": "corr_2bcf2e7c"
+      }
+    }
+  ]
+}

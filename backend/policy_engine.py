@@ -1,7 +1,7 @@
 """
 Policy Engine — Deterministic Business Rules & Safety Validation
 ================================================================
-Centralized deterministic policy enforcement for the AI Growth Commerce Store.
+Centralized deterministic policy enforcement for the Nova.
 The LLM is NEVER the final authority on policy enforcement; all state-changing
 actions must pass deterministic policy validation before execution.
 
@@ -20,7 +20,7 @@ Enforces:
 import os
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
-from typing import Dict, Any, List, Optional, Tuple, Set
+from typing import Dict, Any, List, Optional, Set
 
 
 # Configurable policy constants
@@ -320,7 +320,7 @@ class PolicyEngine:
             )
 
         # Shipped and Delivered items are strictly non-refundable
-        if status in ["Shipped", "Delivered"]:
+        if status in ["Dispatched", "Shipped", "Delivered"]:
             return PolicyResult(
                 allowed=False,
                 reason=f"Order #{order.get('order_id')} is currently '{status}'. Shipped and Delivered orders are strictly non-refundable per store policy.",

@@ -1,67 +1,112 @@
 /* =====================================================================
-   GROWTH COMMERCE AI — NIKE.IN EDITORIAL DESIGN SYSTEM
+   NOVA AGENTIC COMMERCE — FUTURISTIC CYBER-GLASS DESIGN SYSTEM
+   Ultra-Premium 2026 Autonomous Multi-Agent Commerce OS
    ===================================================================== */
 
 :root {
-  /* Core High-Contrast Neutral Palette */
-  --nike-black: #111111;
-  --nike-white: #ffffff;
-  --nike-pedestal: #f6f6f6;
-  --nike-gray-light: #f5f5f5;
-  --nike-gray-mid: #e5e5e5;
-  --nike-gray-muted: #707072;
-  --nike-gray-dark: #222222;
+  /* Canvas & Dark Glass Surfaces */
+  --bg-canvas: #07080c;
+  --bg-surface: #0e111a;
+  --bg-card: rgba(16, 20, 32, 0.75);
+  --bg-card-hover: rgba(25, 33, 54, 0.88);
+  --bg-card-solid: #121624;
+  --bg-glass: rgba(14, 18, 29, 0.78);
+  --bg-glass-subtle: rgba(255, 255, 255, 0.04);
+  --bg-glass-input: rgba(10, 14, 24, 0.85);
 
-  /* Signature Athletic Accents */
-  --nike-volt: #d4ff00;
-  --nike-volt-glow: rgba(212, 255, 0, 0.35);
-  --nike-infrared: #fa5400;
-  --nike-blue: #0070f3;
-  --nike-cyan: #00f0ff;
-  --nike-emerald: #10b981;
+  /* Borders & Dividers */
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-glass: rgba(255, 255, 255, 0.12);
+  --border-hover: rgba(0, 240, 255, 0.45);
+  --border-focus: rgba(139, 92, 246, 0.65);
 
-  /* Dark Theme Surfaces (for Admin Studio & Dark Mode) */
-  --dark-bg: #0c0c0e;
-  --dark-surface: #141417;
-  --dark-card: #1a1a1f;
-  --dark-border: rgba(255, 255, 255, 0.1);
+  /* Cyber & Neon Accent Palette */
+  --cyber-cyan: #00f0ff;
+  --cyber-cyan-glow: rgba(0, 240, 255, 0.35);
+  --cyber-cyan-dim: rgba(0, 240, 255, 0.12);
 
-  /* Typography */
-  --font-display: 'Anton', 'Bebas Neue', 'Oswald', -apple-system, sans-serif;
-  --font-subhead: 'Oswald', 'Bebas Neue', sans-serif;
-  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --electric-purple: #8b5cf6;
+  --electric-purple-glow: rgba(139, 92, 246, 0.4);
+  --electric-purple-dim: rgba(139, 92, 246, 0.15);
+
+  --neon-emerald: #10b981;
+  --neon-emerald-glow: rgba(16, 185, 129, 0.35);
+  --neon-emerald-dim: rgba(16, 185, 129, 0.15);
+
+  --solar-amber: #f59e0b;
+  --solar-amber-glow: rgba(245, 158, 11, 0.35);
+  --solar-amber-dim: rgba(245, 158, 11, 0.15);
+
+  --crimson-rose: #f43f5e;
+  --crimson-rose-glow: rgba(244, 63, 94, 0.35);
+  --crimson-rose-dim: rgba(244, 63, 94, 0.15);
+
+  /* Typography Text Tokens */
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --text-dim: #475569;
+  --text-bright: #ffffff;
+
+  /* Font Families */
+  --font-display: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
 
-  /* UI Tokens */
+  /* UI Geometry Tokens */
   --radius-full: 9999px;
+  --radius-2xl: 20px;
+  --radius-xl: 16px;
   --radius-lg: 12px;
   --radius-md: 8px;
-  --radius-sm: 4px;
+  --radius-sm: 6px;
 
+  /* Transitions */
   --transition-fast: 0.18s cubic-bezier(0.16, 1, 0.3, 1);
-  --transition-normal: 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-smooth: 0.28s cubic-bezier(0.16, 1, 0.3, 1);
   --transition-slow: 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 
-  --shadow-subtle: 0 4px 14px rgba(0, 0, 0, 0.04);
-  --shadow-hover: 0 12px 28px rgba(0, 0, 0, 0.08);
-  --shadow-elevated: 0 16px 36px rgba(0, 0, 0, 0.14);
+  /* Glows & Shadows */
+  --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.45);
+  --shadow-card: 0 12px 30px -6px rgba(0, 0, 0, 0.6);
+  --shadow-card-hover: 0 20px 45px -8px rgba(0, 240, 255, 0.18), 0 10px 25px -4px rgba(0, 0, 0, 0.8);
+  --shadow-glow-cyan: 0 0 25px rgba(0, 240, 255, 0.28);
+  --shadow-glow-purple: 0 0 25px rgba(139, 92, 246, 0.3);
+
+  /* Backdrop Blur */
+  --blur-glass: blur(16px);
+  --blur-panel: blur(24px);
 }
 
-/* Reset & Base */
+/* =====================================================================
+   GLOBAL RESET & BASE
+   ===================================================================== */
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
+html {
+  scroll-behavior: smooth;
+  color-scheme: dark;
+}
+
 body {
   font-family: var(--font-body);
-  background-color: var(--nike-white);
-  color: var(--nike-black);
-  line-height: 1.5;
+  background-color: var(--bg-canvas);
+  background-image:
+    radial-gradient(ellipse at 50% -10%, rgba(139, 92, 246, 0.18) 0%, transparent 60%),
+    radial-gradient(ellipse at 85% 25%, rgba(0, 240, 255, 0.09) 0%, transparent 50%),
+    radial-gradient(ellipse at 15% 75%, rgba(16, 185, 129, 0.07) 0%, transparent 50%),
+    linear-gradient(180deg, #07080c 0%, #0a0d16 100%);
+  background-attachment: fixed;
+  color: var(--text-primary);
+  line-height: 1.55;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
 }
 
 a {
@@ -71,420 +116,485 @@ a {
 
 button {
   font-family: inherit;
+  border: none;
+  background: none;
   cursor: pointer;
+  outline: none;
 }
 
-/* Scrollbars */
+input, textarea, select {
+  font-family: inherit;
+  color: var(--text-primary);
+  outline: none;
+}
+
+/* Custom Futuristic Scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 7px;
+  height: 7px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--nike-white);
+  background: #080a10;
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--nike-gray-mid);
+  background: rgba(255, 255, 255, 0.14);
   border-radius: var(--radius-full);
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--nike-gray-muted);
+  background: var(--cyber-cyan);
+  box-shadow: var(--shadow-glow-cyan);
+}
+
+/* Base Keyframe Animations */
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.8; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.08); filter: drop-shadow(0 0 8px var(--cyber-cyan)); }
+}
+
+@keyframes float-soft {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-7px); }
+}
+
+@keyframes marquee-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
 }
 
 .app-container {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  position: relative;
 }
 
 /* =====================================================================
-   NIKE-STYLE 3-TIER HEADER
+   CYBER-GLASS UTILITY NAVIGATION BAR
    ===================================================================== */
-
-/* Tier 1: Sub-Utility Bar */
-.nike-utility-bar {
-  background: var(--nike-gray-light);
-  border-bottom: 1px solid var(--nike-gray-mid);
-  padding: 0.35rem 2.5rem;
+.nike-utility-bar, .cyber-utility-bar {
+  background: rgba(8, 10, 16, 0.88);
+  backdrop-filter: var(--blur-glass);
+  -webkit-backdrop-filter: var(--blur-glass);
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 0.5rem 2rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: 0.74rem;
-  font-weight: 600;
-  color: var(--nike-gray-muted);
-}
-
-.utility-left {
-  display: flex;
-  align-items: center;
-  gap: 1.25rem;
-}
-
-.utility-brand-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  color: var(--nike-black);
-  font-weight: 700;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  font-weight: 500;
   letter-spacing: 0.02em;
-  transition: var(--transition-fast);
-}
-.utility-brand-link:hover {
-  opacity: 0.7;
 }
 
-.utility-right {
-  display: flex;
-  align-items: center;
-  gap: 1.25rem;
-}
-
-.utility-item {
-  cursor: pointer;
-  transition: var(--transition-fast);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-}
-.utility-item:hover {
-  color: var(--nike-black);
-}
-
-/* Tier 2: Main Sticky Header */
-.nike-main-nav {
-  position: sticky;
-  top: 0;
-  z-index: 150;
-  background: var(--nike-white);
-  border-bottom: 1px solid var(--nike-gray-mid);
-  padding: 0.75rem 2.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 2rem;
-}
-
-.nike-logo-box {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-}
-
-.nike-brand-title {
-  font-family: var(--font-display);
-  font-size: 1.75rem;
-  letter-spacing: -0.03em;
-  line-height: 1;
-  color: var(--nike-black);
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
-}
-
-.volt-pill {
-  font-family: var(--font-body);
-  font-size: 0.65rem;
-  font-weight: 800;
-  background: var(--nike-volt);
-  color: var(--nike-black);
-  padding: 0.15rem 0.5rem;
-  border-radius: var(--radius-full);
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-}
-
-/* Category Navigation Links */
-.nike-nav-categories {
-  display: flex;
-  align-items: center;
-  gap: 2rem;
-}
-
-.nav-cat-link {
-  font-size: 0.92rem;
-  font-weight: 700;
-  color: var(--nike-black);
-  position: relative;
-  padding: 0.35rem 0;
-  background: transparent;
-  border: none;
-  transition: var(--transition-fast);
-}
-.nav-cat-link::after {
-  content: '';
-  position: absolute;
-  bottom: -2px;
-  left: 0;
-  width: 0;
-  height: 2px;
-  background: var(--nike-black);
-  transition: width var(--transition-fast);
-}
-.nav-cat-link:hover::after,
-.nav-cat-link.active::after {
-  width: 100%;
-}
-.nav-cat-link.active {
-  color: var(--nike-black);
-}
-
-/* Nav Right Tools */
-.nike-nav-right {
+.utility-left, .utility-right {
   display: flex;
   align-items: center;
   gap: 1rem;
 }
 
-.nike-search-bar {
+.utility-brand-link {
   display: flex;
   align-items: center;
-  background: var(--nike-gray-light);
+  gap: 6px;
+  color: #c084fc;
+  font-weight: 600;
+  transition: var(--transition-fast);
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+  background: rgba(168, 85, 247, 0.12);
+  border: 1px solid rgba(168, 85, 247, 0.25);
+}
+.utility-brand-link:hover {
+  background: rgba(168, 85, 247, 0.25);
+  color: #ffffff;
+  box-shadow: 0 0 14px rgba(168, 85, 247, 0.35);
+}
+
+.utility-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  padding: 3px 6px;
+  border-radius: var(--radius-sm);
+}
+.utility-item:hover {
+  color: var(--cyber-cyan);
+}
+
+/* Pulsing Dots */
+.pulse-dot {
+  width: 7px;
+  height: 7px;
   border-radius: var(--radius-full);
-  padding: 0.45rem 1rem;
-  gap: 0.6rem;
-  width: 180px;
-  transition: width var(--transition-normal);
+  display: inline-block;
+  background-color: var(--cyber-cyan);
+  box-shadow: 0 0 8px var(--cyber-cyan);
+  animation: pulse-glow 2s infinite ease-in-out;
 }
-.nike-search-bar:focus-within {
-  width: 260px;
-  background: var(--nike-gray-mid);
+.pulse-dot.emerald {
+  background-color: var(--neon-emerald);
+  box-shadow: 0 0 8px var(--neon-emerald);
 }
-.nike-search-bar input {
-  background: transparent;
-  border: none;
-  outline: none;
-  font-size: 0.82rem;
-  font-weight: 500;
-  color: var(--nike-black);
-  width: 100%;
+.pulse-dot.purple {
+  background-color: var(--electric-purple);
+  box-shadow: 0 0 8px var(--electric-purple);
 }
-.nike-search-bar input::placeholder {
-  color: var(--nike-gray-muted);
+
+/* Admin Mode Switcher Pill */
+.admin-mode-pill-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.2) 0%, rgba(236, 72, 153, 0.2) 100%);
+  border: 1px solid rgba(168, 85, 247, 0.4);
+  color: #f1f5f9;
+  font-family: var(--font-display);
+  font-size: 0.78rem;
+  font-weight: 700;
+  transition: var(--transition-smooth);
+}
+.admin-mode-pill-btn:hover {
+  background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+  color: #ffffff;
+  box-shadow: 0 0 16px rgba(168, 85, 247, 0.5);
+  transform: translateY(-1px);
+}
+
+/* =====================================================================
+   MAIN FLOATING CYBER-GLASS HEADER
+   ===================================================================== */
+.nike-main-nav, .cyber-nav-main {
+  background: rgba(12, 16, 26, 0.85);
+  backdrop-filter: var(--blur-panel);
+  -webkit-backdrop-filter: var(--blur-panel);
+  border-bottom: 1px solid var(--border-glass);
+  padding: 0.85rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  position: relative;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.45);
+}
+
+.nike-logo-box {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+.nike-brand-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-display);
+  font-size: 1.45rem;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  background: linear-gradient(135deg, #ffffff 30%, var(--cyber-cyan) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.volt-pill {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: #050811;
+  background: linear-gradient(90deg, var(--cyber-cyan) 0%, #38bdf8 100%);
+  padding: 2px 7px;
+  border-radius: var(--radius-full);
+  letter-spacing: 0.06em;
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.5);
+  -webkit-text-fill-color: #050811;
+}
+
+.nike-nav-categories {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: rgba(18, 24, 38, 0.7);
+  padding: 4px 6px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border-subtle);
+}
+
+.nav-cat-link {
+  font-family: var(--font-body);
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  padding: 0.45rem 1.15rem;
+  border-radius: var(--radius-full);
+  transition: var(--transition-fast);
+  white-space: nowrap;
+}
+.nav-cat-link:hover {
+  color: var(--text-bright);
+  background: rgba(255, 255, 255, 0.06);
+}
+.nav-cat-link.active {
+  color: #050811;
+  background: linear-gradient(135deg, var(--cyber-cyan) 0%, #38bdf8 100%);
+  font-weight: 700;
+  box-shadow: 0 0 16px rgba(0, 240, 255, 0.4);
+}
+
+.nike-nav-right {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
 }
 
 .nike-icon-btn {
-  background: transparent;
-  border: none;
   width: 40px;
   height: 40px;
-  border-radius: 50%;
+  border-radius: var(--radius-full);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--nike-black);
+  color: var(--text-secondary);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-subtle);
+  transition: var(--transition-fast);
   position: relative;
-  transition: background var(--transition-fast);
 }
 .nike-icon-btn:hover {
-  background: var(--nike-gray-light);
+  color: var(--text-bright);
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--border-glass);
+  transform: translateY(-2px);
 }
 
 .nike-bag-badge {
   position: absolute;
-  top: 4px;
-  right: 4px;
-  background: var(--nike-black);
-  color: var(--nike-white);
-  font-size: 0.65rem;
+  top: -4px;
+  right: -4px;
+  background: var(--cyber-cyan);
+  color: #050811;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
   font-weight: 800;
-  width: 17px;
-  height: 17px;
-  border-radius: 50%;
+  width: 19px;
+  height: 19px;
+  border-radius: var(--radius-full);
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 0 10px var(--cyber-cyan);
 }
 
-.admin-mode-pill-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  background: var(--nike-black);
-  color: var(--nike-white);
-  padding: 0.45rem 1.15rem;
-  border-radius: var(--radius-full);
-  font-size: 0.8rem;
-  font-weight: 700;
-  border: none;
-  transition: var(--transition-fast);
-}
-.admin-mode-pill-btn:hover {
-  background: #333333;
-  transform: translateY(-1px);
-}
-
-/* Tier 3: Animated Marquee Announcement Ticker */
+/* Tier 3: Announcement Marquee */
 .nike-announcement-marquee {
-  background: var(--nike-black);
-  color: var(--nike-white);
-  padding: 0.55rem 0;
+  background: rgba(10, 14, 24, 0.95);
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 0.35rem 0;
   overflow: hidden;
   white-space: nowrap;
-  position: relative;
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
+  font-size: 0.74rem;
+  letter-spacing: 0.03em;
 }
 
 .marquee-inner {
   display: inline-flex;
-  gap: 3rem;
-  animation: marquee-scroll 28s linear infinite;
+  gap: 3.5rem;
+  animation: marquee-scroll 32s linear infinite;
 }
-
 .marquee-item {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 6px;
+  color: var(--text-secondary);
 }
-.marquee-item span.volt {
-  color: var(--nike-volt);
-}
-
-@keyframes marquee-scroll {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
+.marquee-item .volt {
+  color: var(--cyber-cyan);
+  font-family: var(--font-mono);
+  font-weight: 700;
 }
 
 /* =====================================================================
-   NIKE EDITORIAL HERO BANNER
+   HERO BANNER & AMBIENT AURA
    ===================================================================== */
 .nike-hero-banner {
-  padding: 3rem 2.5rem 2.5rem;
+  position: relative;
+  padding: 5rem 2rem 4rem 2rem;
   text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
-  max-width: 1200px;
-  margin: 0 auto;
+  overflow: hidden;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.nike-hero-banner::before {
+  content: '';
+  position: absolute;
+  top: -25%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 850px;
+  height: 420px;
+  background: radial-gradient(ellipse at center, rgba(0, 240, 255, 0.16) 0%, rgba(139, 92, 246, 0.12) 40%, transparent 75%);
+  filter: blur(48px);
+  pointer-events: none;
+  z-index: 0;
 }
 
 .hero-kicker-tag {
-  font-size: 0.82rem;
-  font-weight: 800;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--nike-black);
-  margin-bottom: 0.6rem;
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 8px;
+  background: rgba(0, 240, 255, 0.08);
+  border: 1px solid rgba(0, 240, 255, 0.28);
+  padding: 0.35rem 1rem;
+  border-radius: var(--radius-full);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--cyber-cyan);
+  margin-bottom: 1.5rem;
+  box-shadow: 0 0 16px rgba(0, 240, 255, 0.15);
+  position: relative;
+  z-index: 1;
 }
 
 .hero-headline-massive {
   font-family: var(--font-display);
-  font-size: clamp(3.2rem, 8vw, 6.2rem);
+  font-size: clamp(2.4rem, 5.2vw, 4.6rem);
   font-weight: 900;
+  line-height: 1.05;
   letter-spacing: -0.02em;
-  line-height: 0.92;
-  text-transform: uppercase;
-  color: var(--nike-black);
+  background: linear-gradient(180deg, #ffffff 30%, #94a3b8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  max-width: 950px;
   margin-bottom: 1.25rem;
+  position: relative;
+  z-index: 1;
 }
 
 .hero-subcopy {
   font-size: 1.05rem;
-  font-weight: 500;
-  color: var(--nike-gray-muted);
-  max-width: 640px;
-  line-height: 1.5;
-  margin-bottom: 2rem;
+  color: var(--text-secondary);
+  max-width: 680px;
+  line-height: 1.6;
+  margin-bottom: 2.5rem;
+  position: relative;
+  z-index: 1;
 }
 
 .hero-cta-group {
   display: flex;
   align-items: center;
-  gap: 0.85rem;
-  flex-wrap: wrap;
   justify-content: center;
+  gap: 1.2rem;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 1;
 }
 
 .nike-pill-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  padding: 0.85rem 2rem;
-  border-radius: var(--radius-full);
+  font-family: var(--font-display);
   font-size: 0.95rem;
   font-weight: 700;
-  border: 1.5px solid var(--nike-black);
-  transition: var(--transition-fast);
-  cursor: pointer;
+  letter-spacing: 0.03em;
+  padding: 0.85rem 1.8rem;
+  border-radius: var(--radius-full);
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  transition: var(--transition-smooth);
 }
+
 .nike-pill-btn.primary-black {
-  background: var(--nike-black);
-  color: var(--nike-white);
+  background: linear-gradient(135deg, var(--cyber-cyan) 0%, #38bdf8 100%);
+  color: #050811;
+  box-shadow: 0 0 24px rgba(0, 240, 255, 0.4);
 }
 .nike-pill-btn.primary-black:hover {
-  background: #333;
-  transform: translateY(-2px);
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 0 35px rgba(0, 240, 255, 0.65);
 }
 
 .nike-pill-btn.secondary-white {
-  background: var(--nike-white);
-  color: var(--nike-black);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border-glass);
+  color: var(--text-bright);
+  backdrop-filter: var(--blur-glass);
 }
 .nike-pill-btn.secondary-white:hover {
-  background: var(--nike-gray-light);
-  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-3px);
 }
 
 .nike-pill-btn.accent-volt {
-  background: var(--nike-volt);
-  color: var(--nike-black);
-  border-color: var(--nike-volt);
+  background: linear-gradient(135deg, var(--electric-purple) 0%, #a855f7 100%);
+  color: #ffffff;
+  box-shadow: 0 0 24px rgba(139, 92, 246, 0.4);
 }
 .nike-pill-btn.accent-volt:hover {
-  background: #c2eb00;
-  transform: translateY(-2px);
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 0 35px rgba(139, 92, 246, 0.65);
 }
 
 /* =====================================================================
-   HORIZONTAL FEATURED DROPS CAROUSEL (NIKE SNAP SLIDER)
+   FEATURED DROPS HORIZONTAL SNAP CAROUSEL
    ===================================================================== */
 .carousel-section {
-  padding: 3rem 2.5rem;
-  max-width: 1750px;
+  padding: 3.5rem 2rem;
+  max-width: 1440px;
   margin: 0 auto;
-  width: 100%;
 }
 
 .carousel-header-row {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.8rem;
 }
-
 .carousel-header-row h3 {
   font-family: var(--font-display);
-  font-size: 2.2rem;
+  font-size: 1.8rem;
+  font-weight: 800;
   letter-spacing: -0.01em;
-  text-transform: uppercase;
-  color: var(--nike-black);
-  line-height: 1;
+  color: var(--text-bright);
 }
 
 .carousel-arrows {
   display: flex;
-  gap: 0.75rem;
+  align-items: center;
+  gap: 0.6rem;
 }
-
 .arrow-circle-btn {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: var(--nike-gray-light);
-  border: 1px solid var(--nike-gray-mid);
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--nike-black);
   transition: var(--transition-fast);
 }
 .arrow-circle-btn:hover {
-  background: var(--nike-gray-mid);
+  background: rgba(0, 240, 255, 0.15);
+  border-color: var(--cyber-cyan);
+  color: var(--cyber-cyan);
 }
 
 .carousel-snap-track {
@@ -493,1299 +603,985 @@ button {
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   padding-bottom: 1rem;
-  scrollbar-width: none;
-}
-.carousel-snap-track::-webkit-scrollbar {
-  display: none;
+  scrollbar-width: thin;
 }
 
 .carousel-item-card {
-  min-width: 320px;
-  max-width: 360px;
-  flex: 0 0 auto;
+  flex: 0 0 320px;
   scroll-snap-align: start;
 }
 
 /* =====================================================================
-   PRODUCT PEDESTAL CARDS (NIKE MINIMALISM)
-   ===================================================================== */
-.nike-product-card {
-  display: flex;
-  flex-direction: column;
-  cursor: pointer;
-  position: relative;
-  transition: var(--transition-normal);
-}
-
-.product-pedestal {
-  background: var(--nike-pedestal);
-  height: 340px;
-  border-radius: var(--radius-sm);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 2.5rem;
-  position: relative;
-  overflow: hidden;
-  transition: background var(--transition-fast);
-}
-.nike-product-card:hover .product-pedestal {
-  background: #ebebeb;
-}
-
-.pedestal-img {
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
-  transition: transform var(--transition-slow);
-}
-.nike-product-card:hover .pedestal-img {
-  transform: scale(1.08) translateY(-4px);
-}
-
-.badge-top-left {
-  position: absolute;
-  top: 1rem;
-  left: 1rem;
-  font-size: 0.72rem;
-  font-weight: 800;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-}
-.badge-top-left.volt {
-  background: var(--nike-volt);
-  color: var(--nike-black);
-  padding: 0.2rem 0.55rem;
-  border-radius: var(--radius-full);
-}
-.badge-top-left.hot {
-  background: var(--nike-infrared);
-  color: var(--nike-white);
-  padding: 0.2rem 0.55rem;
-  border-radius: var(--radius-full);
-}
-.badge-top-left.normal {
-  color: var(--nike-gray-muted);
-}
-
-.floating-quick-add {
-  position: absolute;
-  bottom: 1rem;
-  right: 1rem;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: var(--nike-white);
-  border: 1px solid var(--nike-gray-mid);
-  color: var(--nike-black);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  transform: translateY(8px);
-  transition: all var(--transition-fast);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
-}
-.nike-product-card:hover .floating-quick-add {
-  opacity: 1;
-  transform: translateY(0);
-}
-.floating-quick-add:hover {
-  background: var(--nike-black);
-  color: var(--nike-white);
-}
-
-/* Product Meta Info */
-.product-meta-block {
-  padding-top: 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.prod-kicker {
-  font-size: 0.78rem;
-  font-weight: 700;
-  color: #a13d00;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-.prod-kicker.volt-text {
-  color: #2e7d32;
-}
-
-.prod-headline {
-  font-family: var(--font-body);
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--nike-black);
-  line-height: 1.3;
-}
-
-.prod-subtext {
-  font-size: 0.82rem;
-  color: var(--nike-gray-muted);
-}
-
-.prod-price-line {
-  font-size: 0.95rem;
-  font-weight: 700;
-  color: var(--nike-black);
-  margin-top: 0.35rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-.mrp-label {
-  font-size: 0.76rem;
-  font-weight: 600;
-  color: var(--nike-gray-muted);
-}
-
-/* =====================================================================
-   EDITORIAL STORIES & INNOVATION SECTION
-   ===================================================================== */
-.editorial-stories-section {
-  padding: 4rem 2.5rem;
-  max-width: 1750px;
-  margin: 0 auto;
-  width: 100%;
-}
-
-.editorial-heading-huge {
-  font-family: var(--font-display);
-  font-size: clamp(2.5rem, 5vw, 4rem);
-  text-transform: uppercase;
-  line-height: 0.95;
-  margin-bottom: 2rem;
-  color: var(--nike-black);
-}
-
-.stories-grid-3col {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-  gap: 1.5rem;
-}
-
-.story-card-editorial {
-  background: var(--nike-black);
-  color: var(--nike-white);
-  border-radius: var(--radius-sm);
-  padding: 2.5rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  min-height: 380px;
-  position: relative;
-  overflow: hidden;
-  transition: transform var(--transition-normal);
-}
-.story-card-editorial:hover {
-  transform: translateY(-4px);
-}
-
-.story-number {
-  font-family: var(--font-display);
-  font-size: 4rem;
-  color: rgba(255, 255, 255, 0.15);
-  line-height: 1;
-}
-.story-card-editorial:hover .story-number {
-  color: var(--nike-volt);
-}
-
-.story-title {
-  font-family: var(--font-display);
-  font-size: 2rem;
-  line-height: 1.05;
-  text-transform: uppercase;
-  margin-bottom: 0.75rem;
-}
-
-.story-desc {
-  font-size: 0.88rem;
-  color: #a1a1a6;
-  line-height: 1.6;
-}
-
-/* =====================================================================
-   MAIN CATALOG SECTION & STICKY SUB-BAR
+   PRODUCT CATALOG & 3D GLASS CARDS
    ===================================================================== */
 .catalog-container-full {
-  padding: 2rem 2.5rem 5rem;
-  max-width: 1750px;
+  padding: 3rem 2rem 5rem 2rem;
+  max-width: 1440px;
   margin: 0 auto;
-  width: 100%;
 }
 
 .sticky-subfilter-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem 0;
-  border-bottom: 1px solid var(--nike-gray-mid);
-  margin-bottom: 2rem;
-  flex-wrap: wrap;
-  gap: 1rem;
+  margin-bottom: 2.2rem;
+  padding: 1rem 1.5rem;
+  background: rgba(14, 18, 29, 0.82);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-xl);
+  backdrop-filter: var(--blur-glass);
+  position: sticky;
+  top: 85px;
+  z-index: 50;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
 .subfilter-left {
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: 1rem;
 }
-
 .catalog-heading-title {
   font-family: var(--font-display);
-  font-size: 1.85rem;
-  text-transform: uppercase;
-  color: var(--nike-black);
+  font-size: 1.4rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--text-bright);
 }
 
 .subfilter-right {
   display: flex;
   align-items: center;
-  gap: 1.25rem;
+  gap: 1.2rem;
+}
+
+.nike-search-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-glass-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-full);
+  padding: 0.45rem 1rem;
+  color: var(--text-primary);
+  font-size: 0.84rem;
+  transition: var(--transition-smooth);
+}
+.nike-search-bar:focus-within {
+  border-color: var(--cyber-cyan);
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.25);
+}
+.nike-search-bar input {
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-size: 0.84rem;
+  width: 100%;
 }
 
 .filter-pill-toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  background: var(--nike-gray-light);
-  border: 1px solid var(--nike-gray-mid);
-  padding: 0.45rem 1rem;
+  background: var(--bg-glass-input);
+  border: 1px solid var(--border-subtle);
   border-radius: var(--radius-full);
+  padding: 0.45rem 1rem;
+  color: var(--text-primary);
   font-size: 0.82rem;
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
-  transition: var(--transition-fast);
 }
-.filter-pill-toggle:hover {
-  background: var(--nike-gray-mid);
+.filter-pill-toggle:focus {
+  border-color: var(--cyber-cyan);
 }
 
-/* Products Grid */
+/* Product Cards Grid */
 .nike-products-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 2.25rem 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 1.8rem;
+}
+
+.nike-product-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  backdrop-filter: var(--blur-glass);
+  display: flex;
+  flex-direction: column;
+  transition: var(--transition-smooth);
+  position: relative;
+}
+.nike-product-card:hover {
+  transform: translateY(-8px);
+  border-color: var(--border-hover);
+  box-shadow: var(--shadow-card-hover);
+}
+
+/* Pedestal */
+.product-pedestal {
+  position: relative;
+  background: radial-gradient(circle at center, rgba(30, 42, 70, 0.4) 0%, rgba(12, 16, 26, 0.85) 100%);
+  padding: 2.5rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 220px;
+  overflow: hidden;
+}
+
+.pedestal-img {
+  max-height: 160px;
+  max-width: 100%;
+  object-fit: contain;
+  transition: var(--transition-smooth);
+  filter: drop-shadow(0 15px 25px rgba(0, 0, 0, 0.7));
+}
+.nike-product-card:hover .pedestal-img {
+  transform: scale(1.08) translateY(-4px);
+}
+
+/* Badges */
+.badge-top-left {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: var(--radius-full);
+}
+.badge-top-left.volt {
+  background: rgba(0, 240, 255, 0.15);
+  border: 1px solid rgba(0, 240, 255, 0.4);
+  color: var(--cyber-cyan);
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.3);
+}
+.badge-top-left.hot {
+  background: rgba(244, 63, 94, 0.15);
+  border: 1px solid rgba(244, 63, 94, 0.4);
+  color: var(--crimson-rose);
+}
+.badge-top-left.normal {
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  color: var(--neon-emerald);
+}
+
+.floating-quick-add {
+  position: absolute;
+  bottom: 14px;
+  right: 14px;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-full);
+  background: rgba(12, 16, 26, 0.9);
+  border: 1px solid var(--border-glass);
+  color: var(--text-bright);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition-fast);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+}
+.floating-quick-add:hover {
+  background: var(--cyber-cyan);
+  border-color: var(--cyber-cyan);
+  color: #050811;
+  box-shadow: 0 0 20px var(--cyber-cyan);
+  transform: scale(1.1);
+}
+
+/* Product Meta Block */
+.product-meta-block {
+  padding: 1.4rem;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.prod-kicker {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 700;
+}
+.prod-kicker.volt-text {
+  color: var(--cyber-cyan);
+}
+
+.prod-headline {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-bright);
+  line-height: 1.3;
+  margin: 0.4rem 0 0.3rem 0;
+}
+
+.prod-subtext {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 1.2rem;
+}
+
+.prod-price-line {
+  margin-top: auto;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--text-bright);
+}
+.mrp-label {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-weight: 600;
 }
 
 /* =====================================================================
-   NIKE SLIDE-OVER BAG (CART DRAWER)
+   INNOVATION STORIES SECTION
    ===================================================================== */
-.nike-bag-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.45);
-  backdrop-filter: blur(4px);
-  z-index: 300;
-  display: flex;
-  justify-content: flex-end;
+.editorial-stories-section {
+  padding: 5rem 2rem;
+  max-width: 1440px;
+  margin: 0 auto;
 }
 
-.nike-bag-panel {
-  width: 100%;
-  max-width: 500px;
-  height: 100%;
-  background: var(--nike-white);
-  display: flex;
-  flex-direction: column;
-  box-shadow: -8px 0 32px rgba(0, 0, 0, 0.15);
-  animation: slide-left 0.28s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.bag-header-row {
-  padding: 1.5rem 2rem;
-  border-bottom: 1px solid var(--nike-gray-mid);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.bag-header-title {
+.editorial-heading-huge {
   font-family: var(--font-display);
-  font-size: 1.6rem;
-  text-transform: uppercase;
-  color: var(--nike-black);
+  font-size: clamp(2.2rem, 4vw, 3.2rem);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  background: linear-gradient(180deg, #ffffff 30%, #94a3b8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-.free-shipping-meter {
-  background: var(--nike-gray-light);
-  padding: 0.75rem 2rem;
-  border-bottom: 1px solid var(--nike-gray-mid);
-  display: flex;
-  align-items: center;
-  gap: 0.65rem;
-  font-size: 0.8rem;
-  font-weight: 700;
-}
-
-.bag-items-list {
-  flex: 1;
-  overflow-y: auto;
-  padding: 1.5rem 2rem;
-  display: flex;
-  flex-direction: column;
+.stories-grid-3col {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 1.5rem;
 }
 
-.bag-item-card {
-  display: grid;
-  grid-template-columns: 100px 1fr;
-  gap: 1.25rem;
-  padding-bottom: 1.5rem;
-  border-bottom: 1px solid var(--nike-gray-mid);
-}
-
-.bag-item-thumb {
-  background: var(--nike-pedestal);
-  height: 100px;
-  border-radius: var(--radius-sm);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.75rem;
-}
-.bag-item-thumb img {
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
-}
-
-.bag-item-details {
+.story-card-editorial {
+  background: var(--bg-card);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-xl);
+  padding: 2rem;
+  backdrop-filter: var(--blur-glass);
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  min-height: 240px;
+  transition: var(--transition-smooth);
+}
+.story-card-editorial:hover {
+  border-color: var(--cyber-cyan);
+  box-shadow: var(--shadow-card-hover);
+  transform: translateY(-5px);
 }
 
-.bag-item-title {
-  font-size: 0.95rem;
-  font-weight: 700;
-  color: var(--nike-black);
-}
-.bag-item-cat {
-  font-size: 0.78rem;
-  color: var(--nike-gray-muted);
-}
-.bag-item-price {
-  font-size: 0.9rem;
-  font-weight: 700;
-  margin-top: 0.35rem;
+.story-number {
+  font-family: var(--font-mono);
+  font-size: 2rem;
+  font-weight: 900;
+  color: rgba(255, 255, 255, 0.15);
 }
 
-.bag-stepper-row {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  margin-top: 0.6rem;
-}
-.bag-qty-btn {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: var(--nike-gray-light);
-  border: 1px solid var(--nike-gray-mid);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  font-size: 0.85rem;
-}
-
-/* Bag Summary & Checkout */
-.bag-footer-checkout {
-  padding: 1.5rem 2rem;
-  border-top: 1px solid var(--nike-gray-mid);
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  background: var(--nike-white);
-}
-
-.bag-summary-line {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.88rem;
-  color: var(--nike-gray-muted);
-}
-.bag-summary-line.total {
-  font-family: var(--font-body);
-  font-size: 1.15rem;
+.story-title {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
   font-weight: 800;
-  color: var(--nike-black);
-  padding-top: 0.5rem;
-  border-top: 1px solid var(--nike-gray-mid);
+  color: var(--text-bright);
+  letter-spacing: -0.01em;
+  margin-bottom: 0.6rem;
+}
+
+.story-desc {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
 }
 
 /* =====================================================================
-   FLOATING NOVA AI COPILOT CAPSULE (NIKE ASSISTANT)
+   NOVA AI COPILOT 2.0 (FLOATING CHAT WINDOW)
    ===================================================================== */
-.floating-nova-capsule {
+.nova-copilot-pill {
   position: fixed;
-  bottom: 2rem;
-  right: 2rem;
-  z-index: 200;
+  bottom: 26px;
+  right: 26px;
+  z-index: 900;
+  background: linear-gradient(135deg, rgba(14, 18, 29, 0.95) 0%, rgba(25, 32, 54, 0.95) 100%);
+  border: 1px solid var(--cyber-cyan);
+  box-shadow: 0 10px 35px rgba(0, 240, 255, 0.35);
+  border-radius: var(--radius-full);
+  padding: 0.65rem 1.25rem;
   display: flex;
   align-items: center;
-  gap: 0.6rem;
-  background: var(--nike-black);
-  color: var(--nike-white);
-  padding: 0.75rem 1.4rem;
-  border-radius: var(--radius-full);
-  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.25);
+  gap: 10px;
+  color: var(--text-bright);
+  font-family: var(--font-display);
+  font-size: 0.92rem;
+  font-weight: 700;
   cursor: pointer;
-  transition: var(--transition-fast);
-  border: 2px solid transparent;
+  backdrop-filter: var(--blur-panel);
+  transition: var(--transition-smooth);
 }
-.floating-nova-capsule:hover {
-  transform: translateY(-3px);
-  border-color: var(--nike-volt);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+.nova-copilot-pill:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 15px 45px rgba(0, 240, 255, 0.55);
 }
 
 .nova-flyout-window {
   position: fixed;
-  bottom: 5.5rem;
-  right: 2rem;
-  width: 400px;
-  height: 580px;
-  background: var(--nike-white);
-  border-radius: var(--radius-lg);
-  box-shadow: 0 16px 44px rgba(0, 0, 0, 0.2);
-  border: 1px solid var(--nike-gray-mid);
-  z-index: 250;
+  bottom: 90px;
+  right: 26px;
+  width: 420px;
+  height: 600px;
+  max-width: calc(100vw - 32px);
+  max-height: calc(100vh - 120px);
+  z-index: 900;
+  background: rgba(12, 16, 26, 0.95);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-2xl);
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85), var(--shadow-glow-cyan);
+  backdrop-filter: var(--blur-panel);
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  animation: modal-pop 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: scale-in 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .nova-window-header {
-  background: var(--nike-black);
-  color: var(--nike-white);
   padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border-subtle);
+  background: rgba(18, 24, 38, 0.8);
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 .nova-window-header h4 {
   font-family: var(--font-display);
-  font-size: 1.15rem;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-bright);
 }
 
 /* =====================================================================
-   EXECUTIVE ADMIN STUDIO (NIKE HIGH-CONTRAST MONOCHROME)
+   SHOPPING BAG DRAWER (SLIDE-OVER)
    ===================================================================== */
-.admin-view-wrapper {
-  background: #fbfbfb;
-  min-height: calc(100vh - 110px);
+.nike-bag-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(4, 6, 12, 0.75);
+  backdrop-filter: blur(10px);
+  z-index: 1000;
+  display: flex;
+  justify-content: flex-end;
 }
 
-.admin-layout-nike {
-  display: grid;
-  grid-template-columns: 280px 1fr;
-  max-width: 1750px;
-  margin: 0 auto;
-  min-height: calc(100vh - 110px);
-}
-
-.admin-sidebar-nike {
-  background: var(--nike-white);
-  border-right: 1px solid var(--nike-gray-mid);
-  padding: 2rem 1.25rem;
+.nike-bag-panel {
+  width: 460px;
+  max-width: 100vw;
+  height: 100vh;
+  background: rgba(12, 16, 26, 0.97);
+  border-left: 1px solid var(--border-glass);
+  backdrop-filter: var(--blur-panel);
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  box-shadow: -15px 0 50px rgba(0, 0, 0, 0.8);
 }
 
-.admin-nav-item-nike {
+.bag-header-row {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--border-subtle);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.75rem 1rem;
-  border-radius: var(--radius-sm);
-  font-size: 0.88rem;
-  font-weight: 700;
-  color: var(--nike-gray-muted);
-  background: transparent;
-  border: none;
-  width: 100%;
-  text-align: left;
-  transition: var(--transition-fast);
 }
-.admin-nav-item-nike:hover {
-  background: var(--nike-gray-light);
-  color: var(--nike-black);
-}
-.admin-nav-item-nike.active {
-  background: var(--nike-black);
-  color: var(--nike-white);
+.bag-header-title {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: var(--text-bright);
 }
 
-.admin-main-canvas {
-  padding: 2rem 2.5rem;
+.free-shipping-meter {
+  padding: 0.65rem 1.5rem;
+  background: rgba(16, 185, 129, 0.08);
+  border-bottom: 1px solid rgba(16, 185, 129, 0.2);
+  font-size: 0.78rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.bag-items-list {
+  flex: 1;
   overflow-y: auto;
-}
-
-/* Nike Minimalist KPI Tiles */
-.nike-kpi-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-  gap: 1.25rem;
-  margin-bottom: 2rem;
-}
-
-.nike-kpi-card {
-  background: var(--nike-white);
-  border: 1px solid var(--nike-gray-mid);
-  border-radius: var(--radius-sm);
   padding: 1.5rem;
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
-  transition: var(--transition-fast);
-}
-.nike-kpi-card:hover {
-  border-color: var(--nike-black);
-  box-shadow: var(--shadow-subtle);
+  gap: 1.2rem;
 }
 
-.nike-kpi-label {
-  font-size: 0.74rem;
-  font-weight: 800;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  color: var(--nike-gray-muted);
+.bag-item-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 1rem;
+  display: flex;
+  gap: 1rem;
 }
-.nike-kpi-value {
+
+.bag-item-thumb {
+  width: 75px;
+  height: 75px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.02);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.bag-item-thumb img {
+  max-width: 85%;
+  max-height: 85%;
+  object-fit: contain;
+}
+
+.bag-item-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.bag-item-title {
   font-family: var(--font-display);
-  font-size: 1.85rem;
-  font-weight: 900;
-  color: var(--nike-black);
-  line-height: 1.1;
-}
-.nike-kpi-sub {
-  font-size: 0.72rem;
-  color: var(--nike-gray-muted);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-bright);
 }
 
-/* Clean Admin Tables */
-.nike-table-card {
-  background: var(--nike-white);
-  border: 1px solid var(--nike-gray-mid);
-  border-radius: var(--radius-sm);
-  overflow: hidden;
+.bag-item-cat {
+  font-size: 0.74rem;
+  color: var(--text-muted);
+  margin-bottom: 0.4rem;
 }
 
-.nike-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.85rem;
-  text-align: left;
-}
-
-.nike-table th {
-  background: var(--nike-gray-light);
-  font-size: 0.72rem;
+.bag-item-price {
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
   font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--nike-gray-muted);
-  padding: 0.85rem 1.25rem;
-  border-bottom: 1px solid var(--nike-gray-mid);
+  color: var(--cyber-cyan);
 }
 
-.nike-table td {
-  padding: 1rem 1.25rem;
-  border-bottom: 1px solid var(--nike-gray-mid);
-  color: var(--nike-black);
+.bag-stepper-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 0.6rem;
 }
-.nike-table tr:hover td {
-  background: #fafafa;
+.bag-qty-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-bright);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.bag-qty-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
 }
 
-/* Keyframes */
-@keyframes slide-left {
-  from { transform: translateX(100%); }
-  to { transform: translateX(0); }
+.bag-footer-checkout {
+  padding: 1.5rem;
+  border-top: 1px solid var(--border-subtle);
+  background: rgba(14, 18, 28, 0.9);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
 }
 
-@keyframes modal-pop {
-  from { transform: scale(0.96); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
+.bag-summary-line {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+.bag-summary-line.total {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--text-bright);
+  padding-top: 0.6rem;
+  border-top: 1px solid var(--border-subtle);
 }
 
-/* ==========================================================================
-   OWNER COMMAND STUDIO (DARK CYBER-LOUNGE THEME)
-   ========================================================================== */
+.btn-checkout-rzp {
+  background: linear-gradient(135deg, var(--cyber-cyan) 0%, #0284c7 100%);
+  color: #050811;
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 800;
+  padding: 0.85rem;
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.35);
+  transition: var(--transition-smooth);
+}
+.btn-checkout-rzp:hover {
+  box-shadow: 0 0 30px rgba(0, 240, 255, 0.6);
+  transform: translateY(-2px);
+}
+
+.btn-checkout-ap2 {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(168, 85, 247, 0.25) 100%);
+  border: 1px solid rgba(139, 92, 246, 0.4);
+  color: #c084fc;
+  font-family: var(--font-mono);
+  font-size: 0.88rem;
+  font-weight: 700;
+  padding: 0.85rem;
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: var(--transition-smooth);
+}
+.btn-checkout-ap2:hover {
+  background: var(--electric-purple);
+  color: #ffffff;
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.5);
+  transform: translateY(-2px);
+}
+
+/* =====================================================================
+   STORE OWNER COMMAND STUDIO (ADMIN LAYOUT & TABS)
+   ===================================================================== */
 .admin-layout {
   display: flex;
-  min-height: 100vh;
-  background-color: #090d16;
-  color: #f8fafc;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  overflow-x: hidden;
+  min-height: calc(100vh - 100px);
+  background: #07090e;
 }
 
 .admin-sidebar {
-  width: 275px;
-  min-width: 275px;
-  background-color: #0b1120;
-  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  width: 280px;
+  flex-shrink: 0;
+  background: rgba(10, 13, 22, 0.92);
+  border-right: 1px solid var(--border-subtle);
+  backdrop-filter: var(--blur-panel);
   display: flex;
   flex-direction: column;
-  padding: 1.25rem 1rem;
-  flex-shrink: 0;
-  min-height: 100vh;
+  padding: 1.5rem 1rem;
 }
 
 .sidebar-title-box {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 1.25rem;
-  padding-bottom: 0.85rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  gap: 10px;
+  margin-bottom: 1.5rem;
+  padding-left: 0.5rem;
 }
-
 .sidebar-crown-icon {
   width: 38px;
   height: 38px;
-  border-radius: 8px;
-  background: linear-gradient(135deg, #7c3aed, #4f46e5);
+  border-radius: 10px;
+  background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #fff;
-  box-shadow: 0 0 12px rgba(124, 58, 237, 0.4);
+  color: #ffffff;
+  box-shadow: 0 0 16px rgba(168, 85, 247, 0.4);
 }
-
 .sidebar-title-box h3 {
-  font-size: 0.95rem;
+  font-family: var(--font-display);
+  font-size: 1.15rem;
   font-weight: 800;
-  letter-spacing: 0.05em;
-  color: #fff;
-  margin: 0;
+  letter-spacing: 0.02em;
+  color: var(--text-bright);
 }
-
 .sidebar-title-box span {
-  font-size: 0.7rem;
-  color: #06b6d4;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  font-size: 0.72rem;
+  color: var(--text-muted);
 }
 
 .sidebar-nav-list {
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
+  gap: 4px;
   margin-top: 1rem;
-  flex: 1;
 }
 
 .nav-tab-btn {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.65rem 0.85rem;
-  border-radius: 8px;
-  border: 1px solid transparent;
-  background: transparent;
-  color: #94a3b8;
-  font-size: 0.82rem;
-  font-weight: 500;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-lg);
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  transition: var(--transition-fast);
   cursor: pointer;
-  transition: all 0.2s ease;
-  text-align: left;
-  width: 100%;
+  position: relative;
 }
-
 .nav-tab-btn:hover {
   background: rgba(255, 255, 255, 0.05);
-  color: #f8fafc;
+  color: var(--text-bright);
 }
-
 .nav-tab-btn.active {
-  background: linear-gradient(90deg, rgba(99, 102, 241, 0.2), rgba(99, 102, 241, 0.05));
-  border-color: rgba(99, 102, 241, 0.4);
-  color: #fff;
+  background: linear-gradient(90deg, rgba(0, 240, 255, 0.12) 0%, rgba(139, 92, 246, 0.15) 100%);
+  border-left: 3px solid var(--cyber-cyan);
+  color: var(--cyber-cyan);
   font-weight: 700;
-  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.15);
 }
 
 .nav-tab-left {
   display: flex;
   align-items: center;
-  gap: 0.65rem;
+  gap: 10px;
 }
 
 .tab-badge {
+  font-family: var(--font-mono);
   font-size: 0.68rem;
-  padding: 0.15rem 0.45rem;
-  border-radius: 9999px;
   font-weight: 700;
+  padding: 2px 7px;
+  border-radius: var(--radius-full);
 }
-
 .tab-badge.emerald {
-  background: rgba(16, 185, 129, 0.15);
-  color: #34d399;
-  border: 1px solid rgba(16, 185, 129, 0.3);
+  background: rgba(16, 185, 129, 0.18);
+  color: var(--neon-emerald);
 }
-
 .tab-badge.purple {
-  background: rgba(168, 85, 247, 0.15);
+  background: rgba(139, 92, 246, 0.18);
   color: #c084fc;
-  border: 1px solid rgba(168, 85, 247, 0.3);
 }
-
-.tab-badge.blue {
-  background: rgba(59, 130, 246, 0.15);
-  color: #60a5fa;
-  border: 1px solid rgba(59, 130, 246, 0.3);
-}
-
 .tab-badge.amber {
-  background: rgba(245, 158, 11, 0.15);
-  color: #fbbf24;
-  border: 1px solid rgba(245, 158, 11, 0.3);
+  background: rgba(245, 158, 11, 0.18);
+  color: var(--solar-amber);
 }
 
 .admin-main-view {
   flex: 1;
-  padding: 1.75rem 2rem;
+  padding: 2rem 2.5rem;
   overflow-y: auto;
-  max-width: calc(100vw - 275px);
-  background: #090d16;
-  color: #f8fafc;
-  min-height: 100vh;
+  max-width: 1400px;
 }
 
-/* KPI Cards */
+/* Overview KPI Cards */
 .kpi-cards-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 1rem;
-  margin-bottom: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 1.2rem;
 }
 
 .kpi-card {
-  background: rgba(17, 24, 39, 0.75);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
-  padding: 1.15rem 1.25rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-xl);
+  padding: 1.3rem;
+  backdrop-filter: var(--blur-glass);
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 1rem;
-  backdrop-filter: blur(8px);
-  transition: transform 0.2s, border-color 0.2s;
+  transition: var(--transition-smooth);
 }
-
 .kpi-card:hover {
-  transform: translateY(-2px);
-  border-color: rgba(255, 255, 255, 0.15);
+  border-color: var(--border-hover);
+  box-shadow: var(--shadow-card-hover);
+  transform: translateY(-3px);
 }
 
 .kpi-icon-wrap {
   width: 44px;
   height: 44px;
-  border-radius: 10px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
 }
-
 .kpi-card.cyan .kpi-icon-wrap {
-  background: rgba(6, 182, 212, 0.15);
-  color: #06b6d4;
-  border: 1px solid rgba(6, 182, 212, 0.3);
+  background: rgba(0, 240, 255, 0.12);
+  color: var(--cyber-cyan);
+  border: 1px solid rgba(0, 240, 255, 0.3);
 }
-
 .kpi-card.emerald .kpi-icon-wrap {
-  background: rgba(16, 185, 129, 0.15);
-  color: #10b981;
+  background: rgba(16, 185, 129, 0.12);
+  color: var(--neon-emerald);
   border: 1px solid rgba(16, 185, 129, 0.3);
 }
-
 .kpi-card.purple .kpi-icon-wrap {
-  background: rgba(168, 85, 247, 0.15);
-  color: #c084fc;
-  border: 1px solid rgba(168, 85, 247, 0.3);
+  background: rgba(139, 92, 246, 0.12);
+  color: var(--electric-purple);
+  border: 1px solid rgba(139, 92, 246, 0.3);
 }
-
 .kpi-card.amber .kpi-icon-wrap {
-  background: rgba(245, 158, 11, 0.15);
-  color: #fbbf24;
+  background: rgba(245, 158, 11, 0.12);
+  color: var(--solar-amber);
   border: 1px solid rgba(245, 158, 11, 0.3);
 }
-
 .kpi-card.blue .kpi-icon-wrap {
-  background: rgba(59, 130, 246, 0.15);
+  background: rgba(59, 130, 246, 0.12);
   color: #60a5fa;
   border: 1px solid rgba(59, 130, 246, 0.3);
 }
-
 .kpi-card.rose .kpi-icon-wrap {
-  background: rgba(244, 63, 94, 0.15);
-  color: #f43f5e;
+  background: rgba(244, 63, 94, 0.12);
+  color: var(--crimson-rose);
   border: 1px solid rgba(244, 63, 94, 0.3);
 }
 
 .kpi-details {
   display: flex;
   flex-direction: column;
-  gap: 0.15rem;
 }
-
 .kpi-lbl {
   font-size: 0.74rem;
-  color: #94a3b8;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
   font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
 }
-
 .kpi-val {
-  font-size: 1.35rem;
+  font-family: var(--font-mono);
+  font-size: 1.45rem;
   font-weight: 800;
-  color: #f8fafc;
-  font-family: monospace;
+  color: var(--text-bright);
+  line-height: 1.25;
+  margin: 0.2rem 0;
 }
-
 .kpi-sub {
-  font-size: 0.7rem;
-  color: #64748b;
+  font-size: 0.74rem;
+  color: var(--text-muted);
 }
 
-/* 2-Column Dashboard Grid */
+/* 2-Column Dashboard */
 .dashboard-2col {
   display: grid;
-  grid-template-columns: 1.15fr 0.85fr;
+  grid-template-columns: 1fr 1fr;
   gap: 1.5rem;
 }
-
 @media (max-width: 1024px) {
   .dashboard-2col {
     grid-template-columns: 1fr;
   }
 }
 
-/* Glass Panel */
 .glass-panel {
-  background: rgba(17, 24, 39, 0.75);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
-  padding: 1.25rem;
-  backdrop-filter: blur(8px);
+  background: var(--bg-card);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  backdrop-filter: var(--blur-glass);
 }
-
 .panel-header-bar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-  padding-bottom: 0.75rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-.panel-title-box {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.95rem;
-  font-weight: 700;
-  color: #f8fafc;
-}
-
-.panel-badge {
-  font-size: 0.68rem;
-  padding: 0.15rem 0.5rem;
-  border-radius: 9999px;
-  background: rgba(99, 102, 241, 0.15);
-  color: #818cf8;
-  border: 1px solid rgba(99, 102, 241, 0.3);
-  font-weight: 700;
-}
-
-/* Mini Agent Grid */
-.agents-grid-mini {
-  display: flex;
-  flex-direction: column;
-  gap: 0.65rem;
-}
-
-.agent-mini-card {
-  background: rgba(30, 41, 59, 0.5);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 8px;
-  padding: 0.75rem 1rem;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border-subtle);
+  background: rgba(14, 18, 29, 0.85);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.75rem;
-  transition: all 0.2s;
 }
-
-.agent-mini-card:hover {
-  background: rgba(30, 41, 59, 0.8);
-  border-color: rgba(255, 255, 255, 0.12);
-}
-
-.agent-mini-icon {
-  font-size: 1.3rem;
-  line-height: 1;
-}
-
-.agent-mini-info {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-}
-
-.agent-mini-info strong {
-  font-size: 0.82rem;
-  color: #f8fafc;
-}
-
-.agent-mini-info span {
-  font-size: 0.7rem;
-  color: #94a3b8;
-}
-
-.agent-mini-actions {
+.panel-header-bar h4 {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-bright);
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 8px;
+}
+
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0.4rem 0.9rem;
+  border-radius: var(--radius-md);
+  font-size: 0.78rem;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  transition: var(--transition-fast);
+}
+.action-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--text-bright);
+}
+.action-btn.danger {
+  background: rgba(244, 63, 94, 0.12);
+  border-color: rgba(244, 63, 94, 0.3);
+  color: #fb7185;
+}
+.action-btn.danger:hover {
+  background: rgba(244, 63, 94, 0.25);
+  color: #ffffff;
 }
 
 /* Terminal Feed */
 .terminal-feed-box {
-  background: #020617;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 8px;
-  padding: 0.85rem;
-  max-height: 380px;
+  padding: 1rem 1.25rem;
   overflow-y: auto;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.74rem;
   display: flex;
   flex-direction: column;
-  gap: 0.45rem;
+  gap: 0.55rem;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
 }
-
 .terminal-entry {
   display: flex;
   align-items: baseline;
-  gap: 0.6rem;
-  line-height: 1.4;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
-  padding-bottom: 0.25rem;
+  gap: 8px;
+  line-height: 1.45;
 }
-
 .term-time {
-  color: #64748b;
+  color: var(--text-dim);
   font-size: 0.7rem;
   flex-shrink: 0;
 }
-
 .term-tag {
-  padding: 0.1rem 0.35rem;
-  border-radius: 4px;
-  font-size: 0.65rem;
   font-weight: 700;
+  font-size: 0.68rem;
+  padding: 1px 6px;
+  border-radius: 4px;
   flex-shrink: 0;
 }
-
-.term-tag.purple { background: rgba(168, 85, 247, 0.2); color: #c084fc; }
-.term-tag.blue { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
-.term-tag.emerald { background: rgba(16, 185, 129, 0.2); color: #34d399; }
-.term-tag.amber { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
-.term-tag.cyan { background: rgba(6, 182, 212, 0.2); color: #22d3ee; }
-.term-tag.red { background: rgba(244, 63, 94, 0.2); color: #fb7185; }
-
-.term-msg {
-  color: #cbd5e1;
-  word-break: break-word;
+.term-tag.cyan {
+  background: rgba(0, 240, 255, 0.15);
+  color: var(--cyber-cyan);
+}
+.term-tag.emerald {
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--neon-emerald);
 }
 
-/* Dark Data Tables */
-.admin-table-wrap {
-  width: 100%;
-  overflow-x: auto;
+/* Tables */
+.data-table-container {
+  background: var(--bg-card);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  backdrop-filter: var(--blur-glass);
 }
-
-.data-table {
+.cyber-table {
   width: 100%;
   border-collapse: collapse;
+  font-size: 0.86rem;
   text-align: left;
-  font-size: 0.82rem;
 }
-
-.data-table th {
-  background: rgba(15, 23, 42, 0.7);
-  color: #94a3b8;
-  font-weight: 600;
-  padding: 0.75rem 1rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  text-transform: uppercase;
+.cyber-table th {
+  background: rgba(14, 18, 29, 0.9);
+  padding: 1rem 1.25rem;
+  font-family: var(--font-mono);
   font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
   letter-spacing: 0.05em;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border-subtle);
+}
+.cyber-table td {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+}
+.cyber-table tr:hover td {
+  background: rgba(255, 255, 255, 0.025);
 }
 
-.data-table td {
-  padding: 0.75rem 1rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-  color: #e2e8f0;
-  vertical-align: middle;
-}
-
-.data-table tr:hover td {
-  background: rgba(255, 255, 255, 0.02);
-}
-
-/* Dark Buttons & Inputs */
-.action-btn {
+/* Status Badges */
+.status-badge {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
-  padding: 0.4rem 0.8rem;
-  border-radius: 6px;
-  font-size: 0.76rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.05);
-  color: #f8fafc;
+  gap: 4px;
+}
+.status-badge.emerald {
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--neon-emerald);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+.status-badge.cyan {
+  background: rgba(0, 240, 255, 0.15);
+  color: var(--cyber-cyan);
+  border: 1px solid rgba(0, 240, 255, 0.3);
+}
+.status-badge.purple {
+  background: rgba(139, 92, 246, 0.15);
+  color: var(--electric-purple);
+  border: 1px solid rgba(139, 92, 246, 0.3);
 }
 
-.action-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.2);
-}
-
-.action-btn.primary {
-  background: linear-gradient(135deg, #7c3aed, #4f46e5);
-  border-color: #6366f1;
-  color: #fff;
-  box-shadow: 0 0 10px rgba(99, 102, 241, 0.3);
-}
-
-.action-btn.primary:hover {
-  background: linear-gradient(135deg, #6d28d9, #4338ca);
-}
-
-.action-btn.emerald {
-  background: rgba(16, 185, 129, 0.2);
-  border-color: rgba(16, 185, 129, 0.4);
-  color: #34d399;
-}
-
-.action-btn.emerald:hover {
-  background: rgba(16, 185, 129, 0.3);
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-  margin-bottom: 1rem;
-}
-
-.form-group label {
-  font-size: 0.78rem;
-  font-weight: 600;
-  color: #94a3b8;
-}
-
-.form-input, .form-select {
-  background: rgba(15, 23, 42, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 6px;
-  padding: 0.5rem 0.75rem;
-  color: #f8fafc;
-  font-size: 0.82rem;
-  outline: none;
-  transition: border-color 0.2s;
-}
-
-.form-input:focus, .form-select:focus {
-  border-color: #818cf8;
-}
-
-.prod-badge-cat {
-  font-size: 0.7rem;
-  padding: 0.2rem 0.55rem;
-  border-radius: 9999px;
-  background: rgba(59, 130, 246, 0.15);
-  color: #60a5fa;
-  border: 1px solid rgba(59, 130, 246, 0.3);
-  font-weight: 600;
-}
-
-/* =====================================================================
-   OMNIPOTENT STORE CHAT & AI COMMAND INTERFACE
-   ===================================================================== */
-.chat-bubble {
-  display: flex;
-  gap: 0.75rem;
-  width: fit-content;
-  max-width: 85%;
-  animation: fadeInBubble 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-@keyframes fadeInBubble {
-  from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.chat-bubble.copilot {
-  align-self: flex-start;
-}
-
-.chat-bubble.user {
-  align-self: flex-end;
-  flex-direction: row-reverse;
-}
-
-.bubble-avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
+/* Modals */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(4, 6, 12, 0.82);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.95rem;
-  flex-shrink: 0;
+  z-index: 1000;
+  padding: 1.5rem;
+  animation: fade-in 0.2s ease-out;
 }
 
-.bubble-avatar.copilot {
-  background: rgba(245, 158, 11, 0.15);
-  border: 1px solid rgba(245, 158, 11, 0.4);
+.modal-glass-content {
+  background: rgba(14, 18, 29, 0.96);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-2xl);
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85), 0 0 35px rgba(0, 240, 255, 0.2);
+  width: 100%;
+  max-width: 580px;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: scale-in 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.bubble-avatar.user {
-  background: rgba(99, 102, 241, 0.2);
-  border: 1px solid rgba(99, 102, 241, 0.4);
+/* Operational states and keyboard navigation. */
+.demo-mode-banner { background: #d4ff00; color: #111; text-align: center; padding: .4rem 1rem; font-size: .75rem; font-weight: 700; }
+.catalog-status, .app-error { padding: 3rem 1.5rem; text-align: center; }
+.catalog-status button { margin: 1rem auto 0; }
+.owner-access-form { display: grid; gap: 1rem; padding: 1.5rem; margin-bottom: 1.5rem; }
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 3px solid #8b5cf6; outline-offset: 3px; }
+@media (max-width: 640px) {
+  .nike-utility-bar { justify-content: center; padding: .5rem; }
+  .utility-left { display: none; }
+  .utility-right { flex-wrap: wrap; justify-content: center; gap: .5rem; }
+  .nike-main-nav { padding: .75rem 1rem; flex-wrap: wrap; gap: .75rem; }
+  .nike-nav-categories { order: 3; width: 100%; overflow-x: auto; justify-content: flex-start; }
+  .sticky-subfilter-bar, .subfilter-right { flex-wrap: wrap; gap: .75rem; }
+  .nike-search-bar { max-width: 100%; }
+  .admin-layout { display: flex; flex-direction: column; }
+  .admin-main-view { min-width: 0; padding: 1rem; }
+  .admin-sidebar { position: relative; width: 100%; height: auto; }
+  .nike-bag-panel { width: 100vw; max-width: 100vw; }
 }
-
-.bubble-content {
-  background: rgba(15, 23, 42, 0.85);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
-  padding: 0.85rem 1.15rem;
-  color: #f1f5f9;
-  font-size: 0.85rem;
-  line-height: 1.55;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
 }
-
-.chat-bubble.user .bubble-content {
-  background: linear-gradient(135deg, rgba(79, 70, 229, 0.3), rgba(124, 58, 237, 0.3));
-  border-color: rgba(124, 58, 237, 0.4);
-  color: #fff;
-}
-
-.bubble-content p {
-  margin: 0.25rem 0;
-}
-
-.bubble-content ul, .bubble-content ol {
-  padding-left: 1.25rem;
-  margin: 0.4rem 0;
-}
-
-.bubble-content strong {
-  color: #38bdf8;
-}
-
-.quick-chip-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  padding: 0.35rem 0.75rem;
-  border-radius: 9999px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #cbd5e1;
-  font-size: 0.74rem;
-  font-weight: 600;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: all 0.2s ease;
-}
-
-.quick-chip-btn:hover {
-  background: rgba(245, 158, 11, 0.15);
-  border-color: rgba(245, 158, 11, 0.4);
-  color: #fbbf24;
-  transform: translateY(-1px);
-}
-
-.copilot-input-row {
-  display: flex;
-  align-items: center;
-  gap: 0.65rem;
-  padding: 0.85rem 1.25rem;
-  background: rgba(8, 12, 21, 0.8);
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.chat-text-input {
-  flex: 1;
-  background: rgba(15, 23, 42, 0.9);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 8px;
-  padding: 0.65rem 1rem;
-  color: #fff;
-  font-size: 0.84rem;
-  outline: none;
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-.chat-text-input:focus {
-  border-color: #f59e0b;
-  box-shadow: 0 0 12px rgba(245, 158, 11, 0.2);
-}
-
-.chat-send-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 8px;
-  background: linear-gradient(135deg, #f59e0b, #d97706);
-  border: none;
-  color: #fff;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  flex-shrink: 0;
-}
-
-.chat-send-btn:hover:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow: 0 0 14px rgba(245, 158, 11, 0.4);
-}
-
-.chat-send-btn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-/* Button & layout alignment helpers */
-.modal-footer, .panel-header-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.action-btn, .quick-chip-btn, .chat-send-btn {
-  vertical-align: middle;
-}
-
-

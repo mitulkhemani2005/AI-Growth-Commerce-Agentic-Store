@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Star, Sparkles, RefreshCw, MessageSquare } from 'lucide-react';
+import { Sparkles, RefreshCw, MessageSquare } from 'lucide-react';
 import { useAdmin } from '../../context/AdminContext';
 import { useStore } from '../../context/StoreContext';
 import { api } from '../../api/client';
@@ -30,7 +30,7 @@ export default function ReviewsTab() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
       <div>
-        <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.4rem', fontWeight: 800, color: '#fff' }}>
+        <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-primary)' }}>
           AI Review & Feedback Synthesis
         </h2>
         <p style={{ fontSize: '0.82rem', color: '#94a3b8' }}>
@@ -50,7 +50,7 @@ export default function ReviewsTab() {
 
           <div style={{ padding: '1rem', display: 'flex', flexDirection: 'column', gap: '0.85rem', maxHeight: '550px', overflowY: 'auto' }}>
             {catalog.map((prod) => (
-              <div 
+              <div
                 key={prod.id}
                 style={{
                   background: 'rgba(255, 255, 255, 0.03)',
@@ -63,8 +63,8 @@ export default function ReviewsTab() {
                 }}
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <strong style={{ color: '#fff', fontSize: '0.9rem' }}>{prod.PRODUCT_NAME}</strong>
-                  <button 
+                  <strong style={{ color: 'var(--text-primary)', fontSize: '0.9rem' }}>{prod.PRODUCT_NAME}</strong>
+                  <button
                     className="action-btn"
                     style={{ padding: '0.25rem 0.55rem', fontSize: '0.72rem' }}
                     onClick={() => handleGenerateSummary(prod.id)}
@@ -99,7 +99,7 @@ export default function ReviewsTab() {
               </div>
             ) : (
               adminReviews.map((rev, idx) => (
-                <div 
+                <div
                   key={idx}
                   style={{
                     background: 'rgba(255, 255, 255, 0.03)',
@@ -113,7 +113,7 @@ export default function ReviewsTab() {
                 >
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                      <strong style={{ color: '#fff', fontSize: '0.85rem' }}>{rev.customer_name || 'Customer'}</strong>
+                      <strong style={{ color: 'var(--text-primary)', fontSize: '0.85rem' }}>{rev.customer_name || 'Customer'}</strong>
                       <span style={{ fontSize: '0.7rem', color: '#06b6d4' }}>({rev.product_name || rev.product_id})</span>
                     </div>
 
@@ -122,7 +122,7 @@ export default function ReviewsTab() {
                     </div>
                   </div>
 
-                  <p style={{ fontSize: '0.8rem', color: '#cbd5e1' }}>{rev.review_text || rev.comment}</p>
+                  <p style={{ fontSize: '0.8rem', color: 'var(--text-primary)' }}>{rev.review_text || rev.comment}</p>
                 </div>
               ))
             )}

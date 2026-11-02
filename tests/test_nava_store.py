@@ -11,15 +11,15 @@ client = TestClient(app)
 def test_store_root_and_branding():
     response = client.get("/")
     assert response.status_code == 200
-    assert '<div id="root">' in response.text
-    assert "Nava: Agentic AI Store" in response.text
+    assert response.json()["name"] == "Nova Backend"
+    assert response.json()["service"] == "api"
 
 def test_agent_readable_catalog():
     response = client.get("/.well-known/agent-catalog.json")
     assert response.status_code == 200
     data = response.json()
     assert data.get("protocol") == "UAP/ACP/AP2"
-    assert data.get("store_name") == "Nava: Agentic AI Store"
+    assert data.get("store_name") == "Nova: Agentic AI Store"
     assert "products" in data
     assert len(data["products"]) > 0
     # Check first item schema
@@ -114,4 +114,4 @@ if __name__ == "__main__":
     test_graceful_failure_handling_ap2_overspend()
     test_graceful_failure_handling_expired_refund()
     test_graceful_failure_handling_base_floor_breach()
-    print(">>> ALL NAVA STORE INTEGRATION TESTS PASSED WITH 100% SUCCESS! <<<")
+    print(">>> ALL NOVA STORE INTEGRATION TESTS PASSED WITH 100% SUCCESS! <<<")

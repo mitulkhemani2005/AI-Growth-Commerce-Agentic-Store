@@ -1,28 +1,32 @@
-import json
+from backend.transactions import serialized
+import asyncio
+from backend.config import DATA_DIR, data_file
 import os
 import threading
 from typing import List, Dict, Any, Optional
 from backend.inventory_manager import inventory_manager
+from backend.async_store import AsyncJSONStore
 
-USERS_FILE = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "users.json"))
+USERS_FILE = data_file("users.json")
 _lock = threading.RLock()
 
 
 class CartManager:
     def __init__(self, file_path: str = USERS_FILE):
         self.file_path = file_path
+        self.store = AsyncJSONStore(file_path, default_factory=list)
 
     def _read_users(self) -> List[Dict[str, Any]]:
-        with _lock:
-            if not os.path.exists(self.file_path):
-                return []
-            with open(self.file_path, "r", encoding="utf-8") as f:
-                return json.load(f)
+        return self.store.get()
 
     def _write_users(self, users: List[Dict[str, Any]]) -> None:
-        with _lock:
-            with open(self.file_path, "w", encoding="utf-8") as f:
-                json.dump(users, f, indent=2)
+        self.store.set(users)
+
+    async def _read_users_async(self) -> List[Dict[str, Any]]:
+        return await asyncio.to_thread(self._read_users, )
+
+    async def _write_users_async(self, users: List[Dict[str, Any]]) -> None:
+        return await asyncio.to_thread(self._write_users, users=users)
 
     def get_user(self, user_id: str) -> Optional[Dict[str, Any]]:
         users = self._read_users()
@@ -31,13 +35,15 @@ class CartManager:
                 return u
         return None
 
+    async def get_user_async(self, user_id: str) -> Optional[Dict[str, Any]]:
+        return await asyncio.to_thread(self.get_user, user_id=user_id)
+
     def get_cart(self, user_id: str) -> Dict[str, Any]:
         user = self.get_user(user_id)
         if not user:
             return {"user_id": user_id, "items": [], "item_count": 0, "subtotal": 0.0}
 
         cart_items = user.get("cart", [])
-        # Enrich items with latest product info and calculate totals
         enriched_items = []
         subtotal = 0.0
         total_items = 0
@@ -73,16 +79,20 @@ class CartManager:
             "estimated_total": round(subtotal, 2)
         }
 
+    async def get_cart_async(self, user_id: str) -> Dict[str, Any]:
+        return await asyncio.to_thread(self.get_cart, user_id=user_id)
+
+    @serialized
     def add_to_cart(self, user_id: str, product_identifier: str, quantity: int = 1, size: Optional[str] = None) -> Dict[str, Any]:
         """
         Adds a product to the user's cart by product ID or product name matching.
         """
-        # Find product
+        if isinstance(quantity, bool) or not isinstance(quantity, int) or quantity <= 0:
+            return {"success": False, "error": "Quantity must be a positive integer."}
         products = inventory_manager.get_all_products()
         target_prod = None
         ident_clean = product_identifier.lower().strip()
 
-        # Match exact ID or name substring
         for p in products:
             if p["id"].lower() == ident_clean:
                 target_prod = p
@@ -115,7 +125,6 @@ class CartManager:
                 break
 
         if user_idx is None:
-            # Create user if doesn't exist
             new_user = {
                 "user_id": user_id,
                 "name": "Guest User",
@@ -128,9 +137,11 @@ class CartManager:
             user_idx = len(users) - 1
 
         cart = users[user_idx].setdefault("cart", [])
+        existing_quantity = sum(it.get("quantity", 0) for it in cart if it["id"] == target_prod["id"])
+        if existing_quantity + quantity > stock:
+            return {"success": False, "error": f"Insufficient stock. Available: {stock}."}
         chosen_size = size or target_prod["PRODUCT_SIZE"]
 
-        # Check if already in cart
         found_in_cart = False
         for item in cart:
             if item["id"] == target_prod["id"]:
@@ -154,10 +165,16 @@ class CartManager:
             "cart": updated_cart
         }
 
+    async def add_to_cart_async(self, user_id: str, product_identifier: str, quantity: int = 1, size: Optional[str] = None) -> Dict[str, Any]:
+        return await asyncio.to_thread(self.add_to_cart, user_id=user_id, product_identifier=product_identifier, quantity=quantity, size=size)
+
+    @serialized
     def remove_from_cart(self, user_id: str, product_identifier: str, quantity: Optional[int] = None) -> Dict[str, Any]:
         """
         Removes a product or decreases quantity in the user's cart.
         """
+        if quantity is not None and (isinstance(quantity, bool) or not isinstance(quantity, int) or quantity <= 0):
+            return {"success": False, "error": "Quantity must be a positive integer."}
         users = self._read_users()
         user_obj = None
         for u in users:
@@ -171,7 +188,6 @@ class CartManager:
         cart = user_obj["cart"]
         ident_clean = product_identifier.lower().strip()
 
-        # Find matching item in cart
         target_item_idx = None
         target_prod = None
 
@@ -190,7 +206,6 @@ class CartManager:
                 target_prod = prod
                 break
 
-
         if target_item_idx is None:
             return {"success": False, "error": f"Item '{product_identifier}' was not found in your cart."}
 
@@ -198,7 +213,6 @@ class CartManager:
         current_qty = item.get("quantity", 1)
 
         if quantity is None or quantity >= current_qty:
-            # Remove entirely
             cart.pop(target_item_idx)
             msg = f"Removed '{target_prod['PRODUCT_NAME']}' from your cart."
         else:
@@ -213,11 +227,11 @@ class CartManager:
             "cart": updated_cart
         }
 
+    async def remove_from_cart_async(self, user_id: str, product_identifier: str, quantity: Optional[int] = None) -> Dict[str, Any]:
+        return await asyncio.to_thread(self.remove_from_cart, user_id=user_id, product_identifier=product_identifier, quantity=quantity)
+
+    @serialized
     def batch_add_to_cart(self, user_id: str, items: List[Dict[str, Any]]) -> Dict[str, Any]:
-        """
-        Adds multiple items to cart in a single batch operation.
-        Each item is dict: {'product_name_or_id': '...', 'quantity': 1, 'size': '...'}
-        """
         added = []
         errors = []
         for item in items:
@@ -242,6 +256,7 @@ class CartManager:
     add_item_by_name = add_to_cart
     remove_item_by_name = remove_from_cart
 
+    @serialized
     def clear_cart(self, user_id: str) -> Dict[str, Any]:
         users = self._read_users()
         for u in users:
@@ -251,10 +266,11 @@ class CartManager:
         self._write_users(users)
         return {"success": True, "message": "Cart cleared."}
 
+    async def clear_cart_async(self, user_id: str) -> Dict[str, Any]:
+        return await asyncio.to_thread(self.clear_cart, user_id=user_id)
+
+    @serialized
     def save_customer_payment_details(self, user_id: str, payment_details: Dict[str, Any]) -> Dict[str, Any]:
-        """
-        Saves or updates payment card details in the customer schema in users.json.
-        """
         users = self._read_users()
         user_obj = None
         for u in users:
@@ -280,21 +296,20 @@ class CartManager:
             "payment_details": payment_details
         }
 
+    async def save_customer_payment_details_async(self, user_id: str, payment_details: Dict[str, Any]) -> Dict[str, Any]:
+        return await asyncio.to_thread(self.save_customer_payment_details, user_id=user_id, payment_details=payment_details)
+
     def get_customer_payment_details(self, user_id: str) -> Optional[Dict[str, Any]]:
-        """
-        Retrieves the saved payment details for the customer.
-        """
         user = self.get_user(user_id)
         if user and "payment_details" in user and user["payment_details"]:
             return user["payment_details"]
         return None
 
+    async def get_customer_payment_details_async(self, user_id: str) -> Optional[Dict[str, Any]]:
+        return await asyncio.to_thread(self.get_customer_payment_details, user_id=user_id)
+
+    @serialized
     def save_ap2_payment_token(self, user_id: str, token_data: Dict[str, Any]) -> Dict[str, Any]:
-        """
-        AP2 Protocol: Saves the Razorpay payment authorization token for fully autonomous
-        agent payments. Token is set after the user's first verified Razorpay Checkout payment.
-        Subsequent agent payments use this token via S2S API — no human checkout popup needed.
-        """
         users = self._read_users()
         user_obj = None
         for u in users:
@@ -311,19 +326,20 @@ class CartManager:
             }
             users.append(user_obj)
         user_obj["ap2_payment_token"] = token_data
-        with _lock:
-            with open(self.file_path, "w", encoding="utf-8") as f:
-                json.dump(users, f, indent=2)
+        self._write_users(users)
         return {"success": True, "message": "AP2 payment token saved. Agent can now auto-pay.", "token_data": token_data}
 
+    async def save_ap2_payment_token_async(self, user_id: str, token_data: Dict[str, Any]) -> Dict[str, Any]:
+        return await asyncio.to_thread(self.save_ap2_payment_token, user_id=user_id, token_data=token_data)
+
     def get_ap2_payment_token(self, user_id: str) -> Optional[Dict[str, Any]]:
-        """
-        AP2 Protocol: Retrieves the Razorpay authorization token for autonomous agent payment.
-        Returns None if no token exists (user must authorize via Razorpay Checkout first).
-        """
         user = self.get_user(user_id)
         if user and user.get("ap2_payment_token"):
             return user["ap2_payment_token"]
         return None
+
+    async def get_ap2_payment_token_async(self, user_id: str) -> Optional[Dict[str, Any]]:
+        return await asyncio.to_thread(self.get_ap2_payment_token, user_id=user_id)
+
 
 cart_manager = CartManager()

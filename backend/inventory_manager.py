@@ -1,51 +1,49 @@
-import json
+from backend.transactions import serialized
+from backend.config import DATA_DIR, data_file
 import os
 import threading
-import time
 from typing import List, Dict, Any, Optional
 
-INVENTORY_FILE = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "inventory.json"))
+from backend.async_store import AsyncJSONStore
+
+INVENTORY_FILE = data_file("inventory.json")
 _lock = threading.RLock()
 
 
 class InventoryManager:
     def __init__(self, file_path: str = INVENTORY_FILE):
         self.file_path = file_path
+        self._store = AsyncJSONStore(self.file_path, default_factory=list)
 
     def _read_inventory(self) -> List[Dict[str, Any]]:
-        with _lock:
-            if not os.path.exists(self.file_path):
-                return []
-            for _ in range(5):
-                try:
-                    with open(self.file_path, "r", encoding="utf-8") as f:
-                        return json.load(f)
-                except Exception:
-                    time.sleep(0.02)
-            return []
+        return self._store.get()
 
     def _write_inventory(self, data: List[Dict[str, Any]]) -> None:
-        with _lock:
-            tmp_file = f"{self.file_path}.{os.getpid()}.{threading.get_ident()}.tmp"
-            try:
-                with open(tmp_file, "w", encoding="utf-8") as f:
-                    json.dump(data, f, indent=2)
-                os.replace(tmp_file, self.file_path)
-            except Exception:
-                if os.path.exists(tmp_file):
-                    try:
-                        os.remove(tmp_file)
-                    except Exception:
-                        pass
-                with open(self.file_path, "w", encoding="utf-8") as f:
-                    json.dump(data, f, indent=2)
+        self._store.set(data)
+
+    async def _read_inventory_async(self) -> List[Dict[str, Any]]:
+        return await self._store.get_async()
+
+    async def _write_inventory_async(self, data: List[Dict[str, Any]]) -> None:
+        await self._store.set_async(data)
 
     def get_all_products(self) -> List[Dict[str, Any]]:
-        """Returns all products in inventory."""
+        """Returns all products in inventory (served instantly from memory)."""
         return self._read_inventory()
+
+    async def get_all_products_async(self) -> List[Dict[str, Any]]:
+        """Non-blocking async retrieval of all products."""
+        return await self._read_inventory_async()
 
     def get_product_by_id(self, product_id: str) -> Optional[Dict[str, Any]]:
         products = self._read_inventory()
+        for p in products:
+            if p.get("id") == product_id or p.get("PRODUCT_NAME", "").lower() == product_id.lower():
+                return p
+        return None
+
+    async def get_product_by_id_async(self, product_id: str) -> Optional[Dict[str, Any]]:
+        products = await self._read_inventory_async()
         for p in products:
             if p.get("id") == product_id or p.get("PRODUCT_NAME", "").lower() == product_id.lower():
                 return p
@@ -146,6 +144,7 @@ class InventoryManager:
                 })
         return variants
 
+    @serialized
     def deduct_stock(self, items_or_id: Any, quantity: Optional[int] = None) -> Dict[str, Any]:
         """
         Atomically decrements STOCK_REMAINING for a list of items upon order placement.
@@ -160,6 +159,14 @@ class InventoryManager:
         else:
             items = []
 
+        aggregated = {}
+        for item in items:
+            qty = item.get("quantity", 1)
+            if isinstance(qty, bool) or not isinstance(qty, int) or qty <= 0:
+                return {"success": False, "error": "Quantity must be a positive integer."}
+            pid = item.get("id")
+            aggregated[pid] = aggregated.get(pid, 0) + qty
+        items = [{"id": pid, "quantity": qty} for pid, qty in aggregated.items()]
         with _lock:
             products = self._read_inventory()
             products_map = {p["id"]: p for p in products}
@@ -217,6 +224,7 @@ class InventoryManager:
                 "deducted_items": updated_items
             }
 
+    @serialized
     def restore_stock(self, items_or_id: Any, quantity: Optional[int] = None) -> Dict[str, Any]:
         """
         Atomically increments STOCK_REMAINING when an order is refunded or cancelled.
@@ -257,6 +265,7 @@ class InventoryManager:
         """Convenience method to increment stock for a single SKU."""
         return self.restore_stock(product_id, quantity)
 
+    @serialized
     def update_stock(self, product_id: str, new_stock: int) -> Dict[str, Any]:
         """Directly sets STOCK_REMAINING for a product."""
         with _lock:
@@ -284,6 +293,7 @@ class InventoryManager:
         """Convenience alias for update_price."""
         return self.update_price(product_id, new_price)
 
+    @serialized
     def update_price(self, product_id: str, new_price: float, base_price: Optional[float] = None, enforce_base_price: bool = True) -> Dict[str, Any]:
         """Directly sets PRICE for a product, ensuring it meets or exceeds BASE_PRICE floor if enforced."""
         with _lock:
@@ -331,6 +341,7 @@ class InventoryManager:
                 "product": target
             }
 
+    @serialized
     def update_base_price(self, product_id: str, new_base_price: float) -> Dict[str, Any]:
         """Sets the BASE_PRICE threshold for a product and adjusts current PRICE if below base."""
         with _lock:
@@ -356,6 +367,7 @@ class InventoryManager:
                 "product": target
             }
 
+    @serialized
     def acquire_wholesale_stock(self, product_identifier: str, quantity: int, actor: str = "CEO Agent") -> Dict[str, Any]:
         """
         Acquires inventory stock at wholesale BASE_PRICE using the store Treasury Bank Balance.
@@ -419,6 +431,7 @@ class InventoryManager:
                 "new_bank_balance": spend_res["new_balance"]
             }
 
+    @serialized
     def restock_product(self, product_identifier: str, quantity: int) -> Dict[str, Any]:
         """Increments stock for a product by a specified quantity."""
         with _lock:
@@ -444,13 +457,14 @@ class InventoryManager:
             }
 
 
+    @serialized
     def add_product(self, product_data: Dict[str, Any]) -> Dict[str, Any]:
         """Adds a brand new product to the catalog with BASE_PRICE."""
         with _lock:
             products = self._read_inventory()
             import uuid
             new_id = product_data.get("id") or f"prod_{uuid.uuid4().hex[:6]}"
-            base_p = float(product_data.get("BASE_PRICE", product_data.get("PRICE", 49.99)))
+            base_p = float(product_data.get("BASE_PRICE") if product_data.get("BASE_PRICE") is not None else product_data.get("PRICE", 49.99))
             price_p = max(base_p, float(product_data.get("PRICE", base_p)))
             new_prod = {
                 "id": new_id,
@@ -474,6 +488,7 @@ class InventoryManager:
                 "product": new_prod
             }
 
+    @serialized
     def bulk_price_adjustment(self, category: Optional[str] = None, percentage: float = 0.0) -> Dict[str, Any]:
         """
         Adjusts prices by percentage (+10 for +10%, -5 for -5% discount).
@@ -531,6 +546,7 @@ class InventoryManager:
         products = self._read_inventory()
         return [p for p in products if p.get("STOCK_REMAINING", 0) <= threshold]
 
+    @serialized
     def reset_to_zero_stock(self) -> Dict[str, Any]:
         """Sets all product inventory stock to 0."""
         with _lock:

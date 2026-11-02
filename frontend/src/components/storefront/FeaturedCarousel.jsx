@@ -1,9 +1,9 @@
 import React, { useRef } from 'react';
-import { ChevronLeft, ChevronRight, ShoppingBag, Plus } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
 
 export default function FeaturedCarousel() {
-  const { catalog, addToCart, showToast } = useStore();
+  const { catalog, addToCart } = useStore();
   const trackRef = useRef(null);
 
   const scroll = (direction) => {
@@ -27,15 +27,15 @@ export default function FeaturedCarousel() {
         </div>
 
         <div className="carousel-arrows">
-          <button 
-            className="arrow-circle-btn" 
+          <button
+            className="arrow-circle-btn"
             onClick={() => scroll('left')}
             title="Previous item"
           >
             <ChevronLeft size={20} />
           </button>
-          <button 
-            className="arrow-circle-btn" 
+          <button
+            className="arrow-circle-btn"
             onClick={() => scroll('right')}
             title="Next item"
           >
@@ -55,9 +55,9 @@ export default function FeaturedCarousel() {
           return (
             <div key={prod.id} className="carousel-item-card nike-product-card">
               <div className="product-pedestal">
-                <img 
-                  src={prod.IMAGE || '/static/images/phone_flagship.svg'} 
-                  alt={prod.PRODUCT_NAME} 
+                <img
+                  src={prod.IMAGE || '/static/images/phone_flagship.svg'}
+                  alt={prod.PRODUCT_NAME}
                   className="pedestal-img"
                   loading="lazy"
                 />
@@ -70,13 +70,13 @@ export default function FeaturedCarousel() {
                   <span className="badge-top-left normal">Just In</span>
                 )}
 
-                <button 
+                <button
                   className="floating-quick-add"
                   title="Add to Bag"
                   disabled={stock <= 0}
                   onClick={(e) => {
                     e.stopPropagation();
-                    addToCart(prod.id, prod.PRODUCT_SIZE);
+                    addToCart(prod.id, prod.PRODUCT_SIZE).catch(() => {});
                   }}
                 >
                   <Plus size={20} />
@@ -89,7 +89,7 @@ export default function FeaturedCarousel() {
                 </span>
                 <h4 className="prod-headline">{prod.PRODUCT_NAME}</h4>
                 <span className="prod-subtext">{prod.PRODUCT_SIZE || 'Standard Edition'}</span>
-                
+
                 <div className="prod-price-line">
                   <span className="mrp-label">MRP :</span>
                   <span>₹{sellingPrice.toFixed(2)}</span>

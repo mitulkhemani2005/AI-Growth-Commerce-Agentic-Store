@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { CreditCard, KeyRound, CheckCircle2 } from 'lucide-react';
+import { CreditCard, KeyRound } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
 import { api } from '../../api/client';
 import Modal from '../shared/Modal';
@@ -52,7 +52,7 @@ export default function RazorpayConfigModal() {
           padding: '0.75rem 1rem',
           borderRadius: '8px',
           fontSize: '0.8rem',
-          color: '#cbd5e1'
+          color: 'var(--text-primary)'
         }}>
           <strong>⚡ Sandbox & Live Ready:</strong>
           <p style={{ marginTop: '4px', color: '#94a3b8' }}>
@@ -62,7 +62,7 @@ export default function RazorpayConfigModal() {
 
         <div className="form-group">
           <label>Razorpay Key ID (e.g. <code>rzp_test_...</code>)</label>
-          <input 
+          <input
             type="text"
             className="form-input"
             value={keyId}
@@ -74,7 +74,7 @@ export default function RazorpayConfigModal() {
 
         <div className="form-group">
           <label>Razorpay Key Secret</label>
-          <input 
+          <input
             type="password"
             className="form-input"
             value={keySecret}
@@ -84,9 +84,9 @@ export default function RazorpayConfigModal() {
           />
         </div>
 
-        <button 
-          type="submit" 
-          className="checkout-btn" 
+        <button
+          type="submit"
+          className="checkout-btn"
           disabled={isSaving}
           style={{ marginTop: '0.5rem' }}
         >

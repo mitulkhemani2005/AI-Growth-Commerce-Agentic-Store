@@ -1,4 +1,5 @@
-import json
+import asyncio
+from backend.config import DATA_DIR, data_file
 import os
 import threading
 import uuid
@@ -7,11 +8,13 @@ from typing import List, Dict, Any, Optional
 from openai import AsyncOpenAI
 from backend.inventory_manager import inventory_manager
 
-REVIEWS_FILE = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "reviews.json"))
+from backend.async_store import AsyncJSONStore
+
+REVIEWS_FILE = data_file("reviews.json")
 _lock = threading.RLock()
 
 OLLAMA_BASE_URL = os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434/v1")
-DEFAULT_MODEL = os.environ.get("REVIEW_MANAGER_MODEL", os.environ.get("OLLAMA_MODEL", "gemma4:e2b-it-qat"))
+DEFAULT_MODEL = os.environ.get("REVIEW_MANAGER_MODEL", os.environ.get("OLLAMA_MODEL", "qwen2.5:0.5b"))
 
 class ReviewManager:
     def __init__(self, file_path: str = REVIEWS_FILE, base_url: str = OLLAMA_BASE_URL, api_key: str = "ollama", model: str = DEFAULT_MODEL):
@@ -19,6 +22,7 @@ class ReviewManager:
         self.base_url = base_url
         self.api_key = api_key or "ollama"
         self.model = model
+        self.store = AsyncJSONStore(file_path, default_factory=list)
         self._init_client()
 
     def _init_client(self):
@@ -28,21 +32,23 @@ class ReviewManager:
             print(f"ReviewManager Ollama client warning: {e}")
             self.client = None
 
-
     def _read_reviews(self) -> List[Dict[str, Any]]:
-        with _lock:
-            if not os.path.exists(self.file_path):
-                return []
-            with open(self.file_path, "r", encoding="utf-8") as f:
-                return json.load(f)
+        return self.store.get()
 
     def _write_reviews(self, reviews: List[Dict[str, Any]]) -> None:
-        with _lock:
-            with open(self.file_path, "w", encoding="utf-8") as f:
-                json.dump(reviews, f, indent=2)
+        self.store.set(reviews)
+
+    async def _read_reviews_async(self) -> List[Dict[str, Any]]:
+        return await self.store.get_async()
+
+    async def _write_reviews_async(self, reviews: List[Dict[str, Any]]) -> None:
+        await self.store.set_async(reviews)
 
     def get_all_reviews(self) -> List[Dict[str, Any]]:
         return self._read_reviews()
+
+    async def get_all_reviews_async(self) -> List[Dict[str, Any]]:
+        return await self._read_reviews_async()
 
     def get_reviews_for_product(self, product_id_or_name: str) -> List[Dict[str, Any]]:
         reviews = self._read_reviews()
@@ -55,9 +61,24 @@ class ReviewManager:
                 matched.append(r)
         return matched
 
+    async def get_reviews_for_product_async(self, product_id_or_name: str) -> List[Dict[str, Any]]:
+        reviews = await self._read_reviews_async()
+        ident_clean = product_id_or_name.lower().strip()
+        matched = []
+        for r in reviews:
+            r_pid = r.get("product_id", "").lower()
+            r_pname = r.get("product_name", "").lower()
+            if ident_clean == r_pid or ident_clean in r_pname or r_pid in ident_clean:
+                matched.append(r)
+        return matched
+
     def get_product_reviews(self, product_id_or_name: str) -> List[Dict[str, Any]]:
         """Alias for get_reviews_for_product."""
         return self.get_reviews_for_product(product_id_or_name)
+
+    async def get_product_reviews_async(self, product_id_or_name: str) -> List[Dict[str, Any]]:
+        """Alias for get_reviews_for_product_async."""
+        return await self.get_reviews_for_product_async(product_id_or_name)
 
     def add_review(
         self,
@@ -96,6 +117,62 @@ class ReviewManager:
             )
 
         # Emit review event to notify Price Manager & Fleet
+        try:
+            from backend.events import emit_store_event, EventType
+            emit_store_event(
+                event_type=EventType.REVIEW_SUBMITTED,
+                source_agent="Review and Feedback Manager",
+                payload={
+                    "product_id": product_id,
+                    "product_name": p_name,
+                    "rating": new_rev["rating"],
+                    "review_text": new_rev["review_text"]
+                }
+            )
+        except Exception as e:
+            print(f"[Review Event Error]: {e}", flush=True)
+
+        return {
+            "success": True,
+            "message": f"Review added for '{p_name}'.",
+            "review": new_rev
+        }
+
+    async def add_review_async(
+        self,
+        product_id: str,
+        customer_name: str,
+        rating: int,
+        review_text: str,
+        product_name: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """Non-blocking async version of add_review."""
+        reviews = await self._read_reviews_async()
+        prod = await inventory_manager.get_product_by_id_async(product_id)
+        p_name = product_name or (prod.get("PRODUCT_NAME") if prod else product_id)
+
+        new_rev = {
+            "id": f"rev_{uuid.uuid4().hex[:6]}",
+            "product_id": product_id,
+            "product_name": p_name,
+            "customer_name": customer_name or "Verified Buyer",
+            "rating": max(1, min(5, int(rating))),
+            "review_text": review_text.strip(),
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+
+        reviews.append(new_rev)
+        await self._write_reviews_async(reviews)
+
+        prod_reviews = [r for r in reviews if r.get("product_id") == product_id]
+        if prod_reviews and prod:
+            avg_rating = round(sum(r.get("rating", 5) for r in prod_reviews) / len(prod_reviews), 1)
+            inventory_manager.update_product_ai_summary(
+                product_id=product_id,
+                ai_summary=prod.get("AI_REVIEW_SUMMARY", "Great customer satisfaction."),
+                rating=avg_rating
+            )
+
         try:
             from backend.events import emit_store_event, EventType
             emit_store_event(
@@ -172,30 +249,22 @@ Generate a concise, high-impact, professional executive summary with:
 Format with clear bullet points and bold highlights. Keep it under 150 words."""
 
         summary_text = ""
-        if self.client:
-            models_to_try = list(dict.fromkeys([self.model, "gemma4:e2b-it-qat", "gemma4:e4b", "qwen2.5:7b"]))
-            for model_candidate in models_to_try:
-                try:
-                    chat_resp = await self.client.chat.completions.create(
-                        model=model_candidate,
-                        messages=[
-                            {"role": "system", "content": "You are a concise, analytical e-commerce review synthesis specialist."},
-                            {"role": "user", "content": prompt}
-                        ],
-                        temperature=0.3,
-                        max_tokens=1000,
-                        extra_body={"options": {"num_ctx": 4096, "num_gpu": 999}, "keep_alive": -1}
-                    )
-                    raw_text = chat_resp.choices[0].message.content or ""
-                    import re
-                    summary_text = re.sub(r'<think>.*?</think>', '', raw_text, flags=re.DOTALL).strip()
-                    if summary_text:
-                        break
-                except Exception as e:
-                    print(f"Ollama review summary model {model_candidate} warning: {e}")
-
+        from backend.config import AI_ENABLED
+        if AI_ENABLED:
+            from backend.llm_runtime import complete_chat, configured_model
+            try:
+                chat_resp = await asyncio.to_thread(
+                    complete_chat, model=configured_model(), messages=[
+                        {"role": "system", "content": "Summarize only the supplied reviews. Do not invent claims."},
+                        {"role": "user", "content": prompt}
+                    ], temperature=0.2, max_tokens=350)
+                import re
+                summary_text = re.sub(r'<think>.*?</think>', '', chat_resp.choices[0].message.content or "", flags=re.DOTALL).strip()
+            except Exception as error:
+                print(f"Review synthesis unavailable: {error}", flush=True)
         if not summary_text:
-            summary_text = f"🌟 **Overall Rating ({avg_rating}/5)**: Based on {len(reviews)} reviews. Customers praise the build quality and performance. Highly recommended in the {prod.get('PRODUCT_TYPE')} collection."
+            summary_text = f"Average customer rating: {avg_rating}/5 from {len(reviews)} reviews. "
+            summary_text += "Recent feedback: " + " · ".join(str(review.get("review_text", ""))[:150] for review in reviews[:3])
 
         # Commit AI summary & rating update directly to product in inventory.json
         inventory_manager.update_product_ai_summary(p_id, summary_text, rating=avg_rating)

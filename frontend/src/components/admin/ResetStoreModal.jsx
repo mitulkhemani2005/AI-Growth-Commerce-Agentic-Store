@@ -41,7 +41,7 @@ export default function ResetStoreModal() {
       icon={AlertTriangle}
       maxWidth="480px"
     >
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', color: '#cbd5e1', fontSize: '0.86rem' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', color: 'var(--text-primary)', fontSize: '0.86rem' }}>
         <p>This action will reset the store to initial clean conditions:</p>
         <ul style={{ marginLeft: '1.25rem', display: 'flex', flexDirection: 'column', gap: '0.35rem', color: '#94a3b8' }}>
           <li>Set all catalog products to <strong>0 STOCK</strong> (Wholesale restock required).</li>
@@ -52,16 +52,16 @@ export default function ResetStoreModal() {
         </ul>
 
         <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end', marginTop: '0.5rem' }}>
-          <button 
+          <button
             className="action-btn"
             onClick={() => setIsResetConfirmModalOpen(false)}
             disabled={isResetting}
           >
             Cancel
           </button>
-          <button 
+          <button
             className="action-btn"
-            style={{ background: '#f43f5e', borderColor: '#f43f5e', color: '#fff' }}
+            style={{ background: '#f43f5e', borderColor: '#f43f5e', color: 'var(--text-primary)' }}
             onClick={handleConfirmReset}
             disabled={isResetting}
           >

@@ -8,11 +8,11 @@ and 'Paid' orders that are immediately visible on the Razorpay Dashboard.
 
 import time
 import os
-import sys
 import hmac
 import hashlib
+import asyncio
 from concurrent.futures import ThreadPoolExecutor
-from typing import Dict, Any, Optional
+from typing import Dict, Any
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -53,7 +53,7 @@ def _execute_playwright_flow(
             try:
                 page.goto(runner_url, wait_until="domcontentloaded", timeout=10000)
             except Exception:
-                page.goto(f"{base_url}/frontend/index.html", wait_until="domcontentloaded", timeout=10000)
+                page.goto(f"{base_url}/", wait_until="domcontentloaded", timeout=10000)
             time.sleep(1)
 
             effective_phone = DEFAULT_TEST_CONTACT if (not customer_phone or customer_phone == "9876543210") else customer_phone
@@ -210,15 +210,45 @@ def complete_headless_razorpay_checkout(
         print(f"[HeadlessCheckout] Pool execution error: {e}", flush=True)
         return _mock_fallback(order_id, key_secret)
 
+async def complete_headless_razorpay_checkout_async(
+    order_id: str,
+    amount_in_inr: float,
+    customer_name: str,
+    customer_email: str,
+    customer_phone: str = DEFAULT_TEST_CONTACT,
+    description: str = "AI Buyer Autonomous Order",
+    base_url: str = "http://127.0.0.1:8000"
+) -> Dict[str, Any]:
+    """
+    Non-blocking async headless checkout executed via ThreadPoolExecutor.
+    Never blocks the FastAPI asyncio event loop.
+    """
+    from backend.payment_manager import payment_manager
+
+    key_id = payment_manager.key_id
+    key_secret = payment_manager.key_secret
+    amount_paise = int(round(amount_in_inr * 100))
+
+    try:
+        loop = asyncio.get_running_loop()
+        res = await loop.run_in_executor(
+            _checkout_pool,
+            _execute_playwright_flow,
+            order_id,
+            amount_paise,
+            customer_name,
+            customer_email,
+            customer_phone,
+            description,
+            base_url,
+            key_id,
+            key_secret
+        )
+        return res
+    except Exception as e:
+        print(f"[HeadlessCheckout] Pool async execution error: {e}", flush=True)
+        return _mock_fallback(order_id, key_secret)
+
 def _mock_fallback(order_id: str, key_secret: str) -> Dict[str, Any]:
-    import uuid
-    pid = f"pay_{uuid.uuid4().hex[:14]}"
-    msg = f"{order_id}|{pid}".encode("utf-8")
-    sig = hmac.new(key_secret.encode("utf-8"), msg, hashlib.sha256).hexdigest()
-    return {
-        "success": True,
-        "razorpay_payment_id": pid,
-        "razorpay_order_id": order_id,
-        "razorpay_signature": sig,
-        "status": "authorized_fallback"
-    }
+    return {"success": False, "razorpay_order_id": order_id,
+            "error": "Gateway payment could not be completed. Use interactive Razorpay checkout."}

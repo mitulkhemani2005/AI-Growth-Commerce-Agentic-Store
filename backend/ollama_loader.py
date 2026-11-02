@@ -11,9 +11,13 @@ from typing import Optional, Dict, Any, List
 # OLLAMA_NUM_GPU=-1   → offload every single layer to GPU; never spill to RAM
 # OLLAMA_GPU_OVERHEAD=0 → remove the system-RAM safety buffer Ollama reserves
 # OLLAMA_MAX_LOADED_MODELS=1 → only one model in memory at a time (no RAM overflow)
-os.environ.setdefault("OLLAMA_NUM_GPU", "-1")
-os.environ.setdefault("OLLAMA_GPU_OVERHEAD", "0")
+# The server, rather than individual requests, owns model residency.  Do not
+# configure a made-up GPU layer count here: Ollama's scheduler will place a
+# model entirely on the GPU only when it actually fits.  We verify that fact
+# below and refuse to start the agents otherwise.
 os.environ.setdefault("OLLAMA_MAX_LOADED_MODELS", "1")
+os.environ.setdefault("OLLAMA_NUM_PARALLEL", "1")
+os.environ.setdefault("OLLAMA_MAX_QUEUE", "32")
 # ─────────────────────────────────────────────────────────────────────────────
 
 def get_ollama_models_dir() -> Optional[str]:
@@ -138,6 +142,17 @@ def get_running_vram_models(host: Optional[str] = None) -> List[Dict[str, Any]]:
         return []
 
 
+def model_is_fully_gpu_resident(model_name: str, host: Optional[str] = None) -> bool:
+    """Return true only when Ollama reports all model weights in VRAM."""
+    normalized = model_name if ":" in model_name else f"{model_name}:latest"
+    for running in get_running_vram_models(host):
+        name = running.get("name") or running.get("model") or ""
+        if name == normalized:
+            size = int(running.get("size") or 0)
+            return size > 0 and int(running.get("size_vram") or 0) >= size
+    return False
+
+
 def preload_model_in_vram(model_name: str, host: Optional[str] = None) -> bool:
     """
     Sends a warm-up/preload request to Ollama with keep_alive=-1 to load the model
@@ -148,13 +163,11 @@ def preload_model_in_vram(model_name: str, host: Optional[str] = None) -> bool:
     ctx_len = int(os.environ.get("OLLAMA_NUM_CTX", "4096"))
     payload = {
         "model": model_name,
-        "keep_alive": -1,  # Keeps model indefinitely resident in GPU VRAM
+        "keep_alive": -1,  # Keeps model resident for the process lifetime
         "options": {
-            "num_gpu": 999,   # Offload ALL layers to GPU; Ollama caps safely
-            "main_gpu": 0,    # Target primary GPU (index 0)
-            "low_vram": False, # Disable low-VRAM mode that causes RAM spill
             "num_ctx": ctx_len
-        }
+        },
+        "stream": False,
     }
     try:
         print(f"[Ollama Loader] Preloading '{model_name}' into GPU VRAM (keep_alive: Forever)...", flush=True)
@@ -165,20 +178,14 @@ def preload_model_in_vram(model_name: str, host: Optional[str] = None) -> bool:
         )
         with urllib.request.urlopen(req, timeout=60) as resp:
             if resp.status == 200:
-                # Verify VRAM status
-                running = get_running_vram_models(host)
-                matched = next((m for m in running if model_name in m.get("name", "")), None)
-                if matched:
-                    vram_mb = round(matched.get("size_vram", 0) / (1024 * 1024), 1)
-                    total_mb = round(matched.get("size", 0) / (1024 * 1024), 1)
-                    pct = round((matched.get("size_vram", 0) / max(matched.get("size", 1), 1)) * 100)
-                    print(
-                        f"[Ollama Loader] Model '{model_name}' loaded in GPU VRAM: {vram_mb} MB / {total_mb} MB ({pct}% offloaded, Context: {matched.get('context_length', 4096)} tokens)",
-                        flush=True
-                    )
-                else:
-                    print(f"[Ollama Loader] Model '{model_name}' preload confirmed.", flush=True)
-                return True
+                # A request succeeding is not evidence of GPU-only inference.
+                # Ollama reports the authoritative model/VRAM sizes via /api/ps.
+                if model_is_fully_gpu_resident(model_name, host):
+                    print(f"[Ollama] {model_name}: 100% GPU verified.", flush=True)
+                    return True
+                unload_model_from_vram(model_name, host)
+                print(f"[Ollama] {model_name}: GPU residency could not be verified; CPU/RAM fallback blocked.", flush=True)
+                return False
     except urllib.error.HTTPError as e:
         print(f"[Ollama Loader Warning] Preload request returned HTTP {e.code}: {e.reason}", flush=True)
     except Exception as e:
@@ -203,46 +210,14 @@ def ensure_ollama_ready(preferred_model: Optional[str] = None) -> bool:
             print("=" * 60 + "\n", flush=True)
             return False
 
-    # 2. Identify candidate model
-    available = get_available_models()
-    if not available:
-        print("[Ollama Loader Warning] Ollama is running but no models were found in local catalog.", flush=True)
+    target = preferred_model or os.getenv("OLLAMA_MODEL", "qwen2.5:0.5b")
+    normalized = target if ":" in target else f"{target}:latest"
+    if normalized not in get_available_models() or "cloud" in normalized.lower():
+        print(f"[Ollama] Configured local model '{normalized}' is not installed. No alternate model will be loaded.", flush=True)
         return False
-
-    target = preferred_model or os.environ.get("ADMIN_MODEL", os.environ.get("OLLAMA_MODEL", "qwen2.5:7b"))
-    
-    # Preference matching: first try exact match, then tag match
-    preference_order = [target, "qwen2.5:7b", "llama3.1:8b", "llama3:8b", "qwen2.5:14b", "gemma4:e2b-it-qat"]
-    chosen_model = None
-    
-    # 1. Exact match pass
-    for cand in preference_order:
-        if cand in available:
-            chosen_model = cand
-            break
-            
-    # 2. Family match fallback pass if no exact match found
-    if not chosen_model:
-        for cand in preference_order:
-            family = cand.split(":")[0]
-            matched = next((a for a in available if a.startswith(family + ":")), None)
-            if matched:
-                chosen_model = matched
-                break
-
-    chosen_model = chosen_model or (available[0] if available else target)
-    
-    # 3. Check if already loaded in VRAM
-    running = get_running_vram_models()
-    already_loaded = next((m for m in running if chosen_model in m.get("name", "")), None)
-    if already_loaded:
-        vram_mb = round(already_loaded.get("size_vram", 0) / (1024 * 1024), 1)
-        total_mb = round(already_loaded.get("size", 0) / (1024 * 1024), 1)
-        print(f"[Ollama Loader] Model '{chosen_model}' already active in GPU VRAM ({vram_mb} MB / {total_mb} MB).", flush=True)
+    if model_is_fully_gpu_resident(normalized):
         return True
-
-    # 4. Preload model into GPU VRAM
-    return preload_model_in_vram(chosen_model)
+    return preload_model_in_vram(normalized)
 
 
 def unload_model_from_vram(model_name: str, host: Optional[str] = None) -> bool:

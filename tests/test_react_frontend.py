@@ -8,16 +8,18 @@ from backend.main import app
 
 client = TestClient(app)
 
-def test_root_serves_react_frontend():
+def test_root_is_backend_service_only():
     response = client.get("/")
     assert response.status_code == 200
-    assert '<div id="root">' in response.text
-    assert "src=\"/assets/" in response.text or "module" in response.text
+    assert response.json()["service"] == "api"
+    assert "5173" in response.json()["frontend"]
+    assert "<html" not in response.text
 
-def test_admin_serves_react_frontend():
-    response = client.get("/admin")
-    assert response.status_code == 200
-    assert '<div id="root">' in response.text
+
+def test_backend_does_not_serve_frontend_routes():
+    assert client.get("/admin").status_code == 404
+    assert client.get("/assets/nonexistent.js").status_code == 404
+
 
 def test_inventory_api():
     response = client.get("/api/inventory")
@@ -53,8 +55,8 @@ def test_admin_buyers_api():
     assert len(data.get("buyers", [])) >= 5
 
 if __name__ == "__main__":
-    test_root_serves_react_frontend()
-    test_admin_serves_react_frontend()
+    test_root_is_backend_service_only()
+    test_backend_does_not_serve_frontend_routes()
     test_inventory_api()
     test_cart_api()
     test_admin_overview_api()

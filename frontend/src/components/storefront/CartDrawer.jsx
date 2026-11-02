@@ -1,23 +1,25 @@
 import React, { useState, useEffect } from 'react';
-import { X, Trash2, ShieldCheck, ShieldAlert, CreditCard, Lock, Sparkles, Zap } from 'lucide-react';
+import { X, Trash2, ShieldCheck, ShieldAlert, CreditCard, Lock, Zap } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { useStore } from '../../context/StoreContext';
 import { api } from '../../api/client';
+import { loadPaymentSdk } from '../../api/paymentSdk';
 
 export default function CartDrawer() {
-  const { 
-    currentUser, 
-    cart, 
-    isCartOpen, 
-    setIsCartOpen, 
-    addToCart, 
-    removeFromCart, 
-    ap2Status, 
+  const {
+    currentUser,
+    serviceStatus,
+    cart,
+    isCartOpen,
+    setIsCartOpen,
+    addToCart,
+    removeFromCart,
+    ap2Status,
     refreshAP2Status,
     refreshCart,
     refreshOrders,
     refreshCatalog,
-    showToast 
+    showToast
   } = useStore();
 
   const [isCheckingOut, setIsCheckingOut] = useState(false);
@@ -96,14 +98,17 @@ export default function CartDrawer() {
         throw new Error(orderData.error || 'Payment initialization failed.');
       }
 
-      if (window.Razorpay) {
+      if (!orderData.is_sandbox) await loadPaymentSdk();
+      if (orderData.is_sandbox) {
+        setSimModalData({ orderData, isAuthorizeMode });
+      } else if (window.Razorpay) {
         const options = {
           key: orderData.key_id,
           amount: orderData.amount,
           currency: orderData.currency || 'INR',
-          name: 'Growth Commerce AI Store',
-          description: isAuthorizeMode 
-            ? '🔐 AP2 Auto-Pay Spending Mandate Authorization' 
+          name: 'Nova',
+          description: isAuthorizeMode
+            ? '🔐 AP2 Auto-Pay Spending Mandate Authorization'
             : 'Order Checkout • 0% Tax Standard Settlement',
           image: '/static/images/phone_flagship.svg',
           order_id: orderData.razorpay_order_id,
@@ -122,16 +127,20 @@ export default function CartDrawer() {
           },
           theme: {
             color: '#111111'
+          },
+          modal: {
+            ondismiss: () => setIsCheckingOut(false)
           }
         };
 
         const rzp = new window.Razorpay(options);
         rzp.on('payment.failed', (res) => {
+          setIsCheckingOut(false);
           showToast(`Payment failed: ${res.error?.description || 'Declined'}`, 'error');
         });
         rzp.open();
       } else {
-        setSimModalData({ orderData, isAuthorizeMode });
+        throw new Error('Razorpay checkout could not load. Please check your connection and retry.');
       }
     } catch (err) {
       showToast(err.message, 'error');
@@ -141,6 +150,8 @@ export default function CartDrawer() {
   };
 
   const finalizePayment = async (payload, isAuthorizeMode = false) => {
+    if (isCheckingOut) return;
+    setIsCheckingOut(true);
     try {
       const verifyRes = await api.verifyRazorpayPayment({
         user_id: currentUser.id,
@@ -166,14 +177,16 @@ export default function CartDrawer() {
         ]);
 
         showToast(
-          isAuthorizeMode 
-            ? '🔐 AP2 Mandate verified! Agent Nova can now place future orders automatically.' 
+          isAuthorizeMode
+            ? '🔐 AP2 Mandate verified! Agent Nova can now place future orders automatically.'
             : `🎉 Order Confirmed! Payment ID: ${verifyRes.razorpay_payment_id}`,
           'success'
         );
       }
     } catch (err) {
       showToast(`Verification error: ${err.message}`, 'error');
+    } finally {
+      setIsCheckingOut(false);
     }
   };
 
@@ -184,8 +197,8 @@ export default function CartDrawer() {
           {/* Header */}
           <div className="bag-header-row">
             <h3 className="bag-header-title">BAG ({cart?.item_count || 0})</h3>
-            <button 
-              className="nike-icon-btn" 
+            <button
+              className="nike-icon-btn"
               onClick={() => setIsCartOpen(false)}
               title="Close Bag"
             >
@@ -202,17 +215,17 @@ export default function CartDrawer() {
           {/* Items */}
           <div className="bag-items-list">
             {items.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '4rem 1rem', color: '#707072' }}>
-                <h4 style={{ fontFamily: 'var(--font-display)', fontSize: '1.6rem', color: '#111', textTransform: 'uppercase' }}>
+              <div style={{ textAlign: 'center', padding: '4rem 1rem', color: 'var(--text-muted)' }}>
+                <h4 style={{ fontFamily: 'var(--font-display)', fontSize: '1.6rem', color: 'var(--text-bright)', textTransform: 'uppercase' }}>
                   Your Bag is Empty
                 </h4>
-                <p style={{ fontSize: '0.85rem', marginTop: '0.35rem' }}>
+                <p style={{ fontSize: '0.85rem', marginTop: '0.35rem', color: 'var(--text-secondary)' }}>
                   Explore trending drops or ask Nova Copilot to discover hardware for you.
                 </p>
               </div>
             ) : (
               items.map((item) => {
-                const itemTotal = Number(item.PRICE || 0) * (item.quantity || 1);
+
                 return (
                   <div key={item.id} className="bag-item-card">
                     <div className="bag-item-thumb">
@@ -225,25 +238,25 @@ export default function CartDrawer() {
                       <div className="bag-item-price">MRP : ₹{Number(item.PRICE).toFixed(2)}</div>
 
                       <div className="bag-stepper-row">
-                        <button 
+                        <button
                           className="bag-qty-btn"
-                          onClick={() => removeFromCart(item.id, 1)}
+                          onClick={() => removeFromCart(item.id, 1).catch(() => {})}
                         >
                           -
                         </button>
                         <span style={{ fontSize: '0.88rem', fontWeight: 800, minWidth: '20px', textAlign: 'center' }}>
                           {item.quantity}
                         </span>
-                        <button 
+                        <button
                           className="bag-qty-btn"
-                          onClick={() => addToCart(item.id, item.PRODUCT_SIZE)}
+                          onClick={() => addToCart(item.id, item.PRODUCT_SIZE).catch(() => {})}
                         >
                           +
                         </button>
 
-                        <button 
-                          onClick={() => removeFromCart(item.id, item.quantity)}
-                          style={{ marginLeft: 'auto', background: 'transparent', border: 'none', color: '#707072', cursor: 'pointer' }}
+                        <button
+                          onClick={() => removeFromCart(item.id, item.quantity).catch(() => {})}
+                          style={{ marginLeft: 'auto', background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}
                           title="Remove item"
                         >
                           <Trash2 size={15} />
@@ -257,19 +270,19 @@ export default function CartDrawer() {
 
             {/* Cross-Sell Recommendations */}
             {items.length > 0 && crossSells.length > 0 && (
-              <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid #e5e5e5' }}>
-                <span style={{ fontSize: '0.74rem', fontWeight: 800, color: '#707072', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
-                  Frequently Paired Accessories (Save 10% Bundle)
+              <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid var(--border-subtle)' }}>
+                <span style={{ fontSize: '0.74rem', fontWeight: 800, color: 'var(--cyber-cyan)', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                  Recommended accessories
                 </span>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginTop: '0.65rem' }}>
                   {crossSells.map((rec) => (
-                    <div 
+                    <div
                       key={rec.product_id}
                       style={{
-                        background: '#f9f9f9',
-                        border: '1px solid #e5e5e5',
-                        borderRadius: '6px',
-                        padding: '0.65rem',
+                        background: 'rgba(255, 255, 255, 0.03)',
+                        border: '1px solid var(--border-glass)',
+                        borderRadius: '8px',
+                        padding: '0.75rem',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'space-between',
@@ -277,24 +290,24 @@ export default function CartDrawer() {
                       }}
                     >
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
-                        <img 
-                          src={rec.image || '/static/images/phone_flagship.svg'} 
+                        <img
+                          src={rec.image || '/static/images/phone_flagship.svg'}
                           alt={rec.product_name}
                           style={{ width: '40px', height: '40px', objectFit: 'contain' }}
                         />
                         <div>
-                          <strong style={{ fontSize: '0.82rem', color: '#111', display: 'block' }}>{rec.product_name}</strong>
-                          <span style={{ fontSize: '0.7rem', color: '#707072' }}>{rec.rationale}</span>
-                          <div style={{ fontSize: '0.78rem', fontWeight: 700, color: '#16a34a' }}>
-                            Bundle: ₹{rec.bundle_price.toFixed(2)} <span style={{ color: '#707072', textDecoration: 'line-through', fontSize: '0.72rem' }}>₹{rec.original_price.toFixed(2)}</span>
+                          <strong style={{ fontSize: '0.84rem', color: 'var(--text-bright)', display: 'block' }}>{rec.product_name}</strong>
+                          <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>{rec.rationale}</span>
+                          <div style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--neon-emerald)' }}>
+                            ₹{Number(rec.original_price).toFixed(2)}
                           </div>
                         </div>
                       </div>
 
-                      <button 
+                      <button
                         className="nike-pill-btn secondary-white"
                         style={{ padding: '0.35rem 0.85rem', fontSize: '0.75rem' }}
-                        onClick={() => addToCart(rec.product_id)}
+                        onClick={() => addToCart(rec.product_id).catch(() => {})}
                       >
                         + Add
                       </button>
@@ -310,25 +323,25 @@ export default function CartDrawer() {
           <div className="bag-footer-checkout">
             {/* AP2 Status Mini Box */}
             <div style={{
-              background: ap2Status?.authorized ? '#f0fdf4' : '#fffbeb',
-              border: `1px solid ${ap2Status?.authorized ? '#bbf7d0' : '#fde68a'}`,
-              borderRadius: '6px',
-              padding: '0.65rem 0.85rem',
+              background: ap2Status?.authorized ? 'rgba(16, 185, 129, 0.12)' : 'rgba(245, 158, 11, 0.12)',
+              border: `1px solid ${ap2Status?.authorized ? 'rgba(16, 185, 129, 0.3)' : 'rgba(245, 158, 11, 0.3)'}`,
+              borderRadius: '8px',
+              padding: '0.75rem 1rem',
               display: 'flex',
               alignItems: 'center',
-              gap: '0.6rem',
-              fontSize: '0.78rem'
+              gap: '0.75rem',
+              fontSize: '0.8rem'
             }}>
               {ap2Status?.authorized ? (
-                <ShieldCheck size={18} style={{ color: '#16a34a', flexShrink: 0 }} />
+                <ShieldCheck size={18} style={{ color: 'var(--neon-emerald)', flexShrink: 0 }} />
               ) : (
-                <ShieldAlert size={18} style={{ color: '#d97706', flexShrink: 0 }} />
+                <ShieldAlert size={18} style={{ color: 'var(--solar-amber)', flexShrink: 0 }} />
               )}
               <div>
-                <strong style={{ color: '#111' }}>
+                <strong style={{ color: 'var(--text-bright)' }}>
                   {ap2Status?.authorized ? 'AP2 Auto-Pay Protocol Active' : 'AP2 Auto-Pay Available'}
                 </strong>
-                <div style={{ color: '#707072', fontSize: '0.72rem' }}>
+                <div style={{ color: 'var(--text-muted)', fontSize: '0.72rem' }}>
                   {ap2Status?.authorized ? 'Agent Nova can checkout without modal popups' : 'Authorize once to enable autonomous AI payments'}
                 </div>
               </div>
@@ -354,7 +367,7 @@ export default function CartDrawer() {
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem', marginTop: '0.5rem' }}>
               {ap2Status?.authorized && items.length > 0 && (
-                <button 
+                <button
                   className="nike-pill-btn accent-volt"
                   style={{ width: '100%', color: '#111', fontWeight: 800, justifyContent: 'center' }}
                   onClick={handleAP2DirectPay}
@@ -365,8 +378,8 @@ export default function CartDrawer() {
                 </button>
               )}
 
-              {!ap2Status?.authorized && items.length > 0 && (
-                <button 
+              {serviceStatus?.payment_mode === 'demo' && !ap2Status?.authorized && items.length > 0 && (
+                <button
                   className="nike-pill-btn secondary-white"
                   style={{ width: '100%', justifyContent: 'center' }}
                   onClick={() => handleRazorpayPay(true)}
@@ -377,14 +390,14 @@ export default function CartDrawer() {
                 </button>
               )}
 
-              <button 
+              <button
                 className="nike-pill-btn primary-black"
                 style={{ width: '100%', justifyContent: 'center' }}
                 onClick={() => handleRazorpayPay(false)}
                 disabled={items.length === 0 || isCheckingOut}
               >
                 <CreditCard size={17} />
-                <span>{isCheckingOut ? 'Opening Gateway...' : 'Member Checkout / Razorpay'}</span>
+                <span>{isCheckingOut ? 'Opening Gateway...' : (serviceStatus?.payment_mode === 'demo' ? 'Demo checkout' : 'Secure checkout')}</span>
               </button>
             </div>
 
@@ -398,7 +411,7 @@ export default function CartDrawer() {
           <div className="modal-content-box" style={{ maxWidth: '420px', background: '#fff', color: '#111', margin: 'auto' }} onClick={(e) => e.stopPropagation()}>
             <div className="modal-header" style={{ borderColor: '#e5e5e5' }}>
               <h3 style={{ color: '#111', fontFamily: 'var(--font-display)', textTransform: 'uppercase' }}>
-                Razorpay Test Simulator
+                Nova Demo Checkout
               </h3>
               <button className="drawer-close-btn" onClick={() => setSimModalData(null)}>
                 <X size={18} />
@@ -410,15 +423,16 @@ export default function CartDrawer() {
                 ₹{(simModalData.orderData.amount / 100).toFixed(2)}
               </div>
               <span style={{ fontSize: '0.72rem', background: '#f5f5f5', color: '#111', padding: '0.2rem 0.6rem', borderRadius: '9999px', fontWeight: 700 }}>
-                0% Tax • Test Sandbox Mode
+                Demo only • No money is charged
               </span>
 
-              <button 
+              <button
                 className="nike-pill-btn primary-black"
+                disabled={isCheckingOut}
                 style={{ width: '100%', marginTop: '1.5rem' }}
                 onClick={() => finalizePayment({
                   razorpay_order_id: simModalData.orderData.razorpay_order_id,
-                  razorpay_payment_id: `pay_nike_sim_${Date.now()}`,
+                  razorpay_payment_id: `pay_demo_${Date.now()}`,
                   razorpay_signature: 'sandbox_verified'
                 }, simModalData.isAuthorizeMode)}
               >

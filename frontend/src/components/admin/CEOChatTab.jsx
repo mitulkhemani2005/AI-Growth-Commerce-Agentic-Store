@@ -1,5 +1,6 @@
+import MessageText from '../shared/MessageText';
 import React, { useState, useRef, useEffect } from 'react';
-import { Crown, Send, Zap, Sparkles, CheckCircle2, RotateCcw, Wrench } from 'lucide-react';
+import { Crown, Send, Zap, RotateCcw, Wrench } from 'lucide-react';
 import { api } from '../../api/client';
 import { useAdmin } from '../../context/AdminContext';
 import { useStore } from '../../context/StoreContext';
@@ -74,8 +75,8 @@ export default function CEOChatTab() {
     } catch (err) {
       setMessages(prev => [
         ...prev,
-        { 
-          role: 'assistant', 
+        {
+          role: 'assistant',
           content: `⚠️ **Command Execution Error:** ${err.message}`,
           timestamp: new Date().toLocaleTimeString()
         }
@@ -89,7 +90,7 @@ export default function CEOChatTab() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', height: 'calc(100vh - 180px)' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
-          <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.4rem', fontWeight: 800, color: '#fff' }}>
+          <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-primary)' }}>
             👑 Omnipotent Store Owner AI Command Center
           </h2>
           <p style={{ fontSize: '0.82rem', color: '#94a3b8' }}>
@@ -97,7 +98,7 @@ export default function CEOChatTab() {
           </p>
         </div>
 
-        <button 
+        <button
           className="action-btn"
           style={{ fontSize: '0.74rem' }}
           onClick={handleClearChat}
@@ -120,7 +121,7 @@ export default function CEOChatTab() {
                 </div>
                 <div className="bubble-content">
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem', gap: '1rem' }}>
-                    <strong style={{ fontSize: '0.74rem', color: isAgent ? '#fbbf24' : '#c084fc', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                    <strong style={{ fontSize: '0.74rem', color: isAgent ? '#92733b' : '#7a6f50', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                       {isAgent ? 'Omnipotent CEO Command Agent' : 'Store Owner Direct Directive'}
                     </strong>
                     {msg.timestamp && (
@@ -131,7 +132,7 @@ export default function CEOChatTab() {
                   </div>
 
                   <div style={{ whiteSpace: 'pre-wrap', lineHeight: 1.6 }}>
-                    {msg.content}
+                    <MessageText text={msg.content} />
                   </div>
 
                   {/* Tool execution badges */}
@@ -146,7 +147,7 @@ export default function CEOChatTab() {
                           fontFamily: 'monospace',
                           background: 'rgba(16, 185, 129, 0.1)',
                           border: '1px solid rgba(16, 185, 129, 0.25)',
-                          color: '#34d399',
+                          color: '#4a7042',
                           padding: '0.25rem 0.55rem',
                           borderRadius: '4px',
                           display: 'flex',
@@ -180,8 +181,8 @@ export default function CEOChatTab() {
         {/* Quick Suggestion Chips */}
         <div style={{ padding: '0.65rem 1.25rem', background: 'rgba(8, 12, 21, 0.65)', borderTop: '1px solid rgba(255, 255, 255, 0.06)', display: 'flex', gap: '0.5rem', overflowX: 'auto' }}>
           {ADMIN_CHIPS.map((chip, idx) => (
-            <button 
-              key={idx} 
+            <button
+              key={idx}
               className="quick-chip-btn"
               onClick={() => handleSend(chip.prompt)}
               disabled={isTyping}
@@ -193,22 +194,22 @@ export default function CEOChatTab() {
         </div>
 
         {/* Input Bar */}
-        <form 
+        <form
           className="copilot-input-row"
           onSubmit={(e) => {
             e.preventDefault();
             handleSend();
           }}
         >
-          <input 
+          <input
             type="text"
             className="chat-text-input"
             placeholder="Give a strategic order to any specialist AI agent or database..."
             value={inputVal}
             onChange={(e) => setInputVal(e.target.value)}
           />
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             className="chat-send-btn"
             disabled={!inputVal.trim() || isTyping}
             title="Send Directive"

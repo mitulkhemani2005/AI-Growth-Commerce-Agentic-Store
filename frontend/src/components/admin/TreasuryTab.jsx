@@ -1,31 +1,17 @@
 import React, { useState } from 'react';
-import { 
-  Wallet, 
-  PlusCircle, 
-  Send, 
-  CheckCircle, 
-  Users, 
-  Receipt, 
-  MessagesSquare, 
-  Sparkles, 
-  Play, 
-  TrendingUp, 
-  Award, 
-  RotateCcw,
-  IndianRupee 
-} from 'lucide-react';
+import { PlusCircle, Send, CheckCircle, Receipt, MessagesSquare, Play, Award, RotateCcw } from 'lucide-react';
 import { useAdmin } from '../../context/AdminContext';
 import { useStore } from '../../context/StoreContext';
 import { api } from '../../api/client';
 
 export default function TreasuryTab() {
-  const { 
-    treasury, 
-    salaries, 
-    loadAllAdminData, 
-    setNegotiatingAgent, 
+  const {
+    treasury,
+    salaries,
+    loadAllAdminData,
+    setNegotiatingAgent,
     setIsNegotiateModalOpen,
-    setIsResetConfirmModalOpen 
+    setIsResetConfirmModalOpen
   } = useAdmin();
   const { catalog, refreshCatalog, showToast } = useStore();
 
@@ -112,7 +98,7 @@ export default function TreasuryTab() {
       {/* Intro & Actions */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
-          <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.4rem', fontWeight: 800, color: '#fff' }}>
+          <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-primary)' }}>
             💰 CEO Treasury, Wholesale Stock Acquisition & Agent Salaries
           </h2>
           <p style={{ fontSize: '0.82rem', color: '#94a3b8' }}>
@@ -121,7 +107,7 @@ export default function TreasuryTab() {
         </div>
 
         <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
-          <button 
+          <button
             className="action-btn danger"
             style={{ background: 'rgba(244, 63, 94, 0.12)', borderColor: 'rgba(244, 63, 94, 0.35)', color: '#fb7185' }}
             onClick={() => setIsResetConfirmModalOpen(true)}
@@ -130,9 +116,9 @@ export default function TreasuryTab() {
             <span>Reset to Base Condition</span>
           </button>
 
-          <button 
+          <button
             className="action-btn"
-            style={{ background: 'linear-gradient(135deg, #10b981, #059669)', color: '#fff', border: 'none' }}
+            style={{ background: 'linear-gradient(135deg, #10b981, #059669)', color: 'var(--text-primary)', border: 'none' }}
             onClick={handleDisbursePayroll}
           >
             <Send size={15} />
@@ -202,7 +188,7 @@ export default function TreasuryTab() {
               <PlusCircle size={18} style={{ color: '#06b6d4' }} />
               <span>📦 Wholesale Inventory Stock Acquisition Console</span>
             </h4>
-            <span style={{ fontSize: '0.68rem', background: 'rgba(6, 182, 212, 0.2)', color: '#22d3ee', padding: '0.15rem 0.5rem', borderRadius: '4px', fontWeight: 700 }}>
+            <span style={{ fontSize: '0.68rem', background: 'rgba(6, 182, 212, 0.2)', color: '#4a7042', padding: '0.15rem 0.5rem', borderRadius: '4px', fontWeight: 700 }}>
               BASE_PRICE Floor
             </span>
           </div>
@@ -214,7 +200,7 @@ export default function TreasuryTab() {
 
             <div className="form-group">
               <label>Select Product to Restock</label>
-              <select 
+              <select
                 className="form-select"
                 value={selectedProdId}
                 onChange={(e) => setSelectedProdId(e.target.value)}
@@ -240,30 +226,30 @@ export default function TreasuryTab() {
             }}>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <span style={{ color: '#94a3b8' }}>Current Stock:</span>
-                <strong style={{ color: (targetProd.STOCK_REMAINING || 0) <= 0 ? '#fb7185' : '#34d399' }}>
+                <strong style={{ color: (targetProd.STOCK_REMAINING || 0) <= 0 ? '#fb7185' : '#4a7042' }}>
                   {targetProd.STOCK_REMAINING || 0} Units {(targetProd.STOCK_REMAINING || 0) <= 0 ? '(OUT OF STOCK)' : ''}
                 </strong>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <span style={{ color: '#94a3b8' }}>Wholesale Base Price (Cost):</span>
-                <strong style={{ color: '#fff' }}>₹{basePrice.toFixed(2)}</strong>
+                <strong style={{ color: 'var(--text-primary)' }}>₹{basePrice.toFixed(2)}</strong>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <span style={{ color: '#94a3b8' }}>Current Selling Price:</span>
-                <strong style={{ color: '#22d3ee' }}>₹{sellingPrice.toFixed(2)}</strong>
+                <strong style={{ color: '#4a7042' }}>₹{sellingPrice.toFixed(2)}</strong>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <span style={{ color: '#94a3b8' }}>Gross Margin Per Unit:</span>
-                <strong style={{ color: '#34d399' }}>+₹{unitMargin.toFixed(2)}</strong>
+                <strong style={{ color: '#4a7042' }}>+₹{unitMargin.toFixed(2)}</strong>
               </div>
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
               <div className="form-group" style={{ marginBottom: 0 }}>
                 <label>Units to Purchase</label>
-                <input 
-                  type="number" 
-                  min="1" 
+                <input
+                  type="number"
+                  min="1"
                   max="500"
                   className="form-input"
                   value={acquireQty}
@@ -272,11 +258,11 @@ export default function TreasuryTab() {
               </div>
               <div className="form-group" style={{ marginBottom: 0 }}>
                 <label>Total Acquisition Cost</label>
-                <input 
-                  type="text" 
-                  readOnly 
-                  className="form-input" 
-                  style={{ background: 'rgba(255, 255, 255, 0.04)', color: '#22d3ee', fontWeight: 800 }}
+                <input
+                  type="text"
+                  readOnly
+                  className="form-input"
+                  style={{ background: 'rgba(255, 255, 255, 0.04)', color: '#4a7042', fontWeight: 800 }}
                   value={`₹${totalCost.toFixed(2)}`}
                 />
               </div>
@@ -284,12 +270,12 @@ export default function TreasuryTab() {
 
             <div style={{ fontSize: '0.76rem', color: '#94a3b8', display: 'flex', justifyContent: 'space-between' }}>
               <span>Bank Balance after purchase:</span>
-              <strong style={{ color: remainingBalance >= 0 ? '#34d399' : '#fb7185' }}>
+              <strong style={{ color: remainingBalance >= 0 ? '#4a7042' : '#fb7185' }}>
                 ₹{remainingBalance.toFixed(2)}
               </strong>
             </div>
 
-            <button 
+            <button
               className="checkout-btn"
               onClick={handleAcquireStock}
               disabled={isAcquiring || totalCost > bankBalance}
@@ -307,7 +293,7 @@ export default function TreasuryTab() {
               <Receipt size={18} style={{ color: '#10b981' }} />
               <span>📑 Live Treasury Cash-Flow Ledger</span>
             </h4>
-            <span style={{ fontSize: '0.68rem', background: 'rgba(16, 185, 129, 0.2)', color: '#34d399', padding: '0.15rem 0.5rem', borderRadius: '4px', fontWeight: 700 }}>
+            <span style={{ fontSize: '0.68rem', background: 'rgba(16, 185, 129, 0.2)', color: '#4a7042', padding: '0.15rem 0.5rem', borderRadius: '4px', fontWeight: 700 }}>
               AUDITED
             </span>
           </div>
@@ -336,15 +322,15 @@ export default function TreasuryTab() {
                           <span style={{
                             fontSize: '0.7rem',
                             fontWeight: 700,
-                            color: isCredit ? '#34d399' : '#fb7185'
+                            color: isCredit ? '#4a7042' : '#fb7185'
                           }}>
                             {tx.type}
                           </span>
                         </td>
-                        <td style={{ fontFamily: 'monospace', fontWeight: 700, color: isCredit ? '#34d399' : '#fb7185' }}>
+                        <td style={{ fontFamily: 'monospace', fontWeight: 700, color: isCredit ? '#4a7042' : '#fb7185' }}>
                           {isCredit ? '+' : '-'}₹{Math.abs(Number(tx.amount || 0)).toFixed(2)}
                         </td>
-                        <td style={{ fontFamily: 'monospace', color: '#cbd5e1' }}>
+                        <td style={{ fontFamily: 'monospace', color: 'var(--text-primary)' }}>
                           ₹{Number(tx.balance_after || 0).toFixed(2)}
                         </td>
                         <td style={{ fontSize: '0.74rem', color: '#94a3b8' }}>
@@ -367,7 +353,7 @@ export default function TreasuryTab() {
             <Award size={18} style={{ color: '#f59e0b' }} />
             <span>💼 Specialist Agent Salary Management & Interactive Negotiation</span>
           </h4>
-          <span style={{ fontSize: '0.72rem', background: 'rgba(245, 158, 11, 0.2)', color: '#fbbf24', padding: '0.2rem 0.6rem', borderRadius: '4px', fontWeight: 700 }}>
+          <span style={{ fontSize: '0.72rem', background: 'rgba(245, 158, 11, 0.2)', color: '#92733b', padding: '0.2rem 0.6rem', borderRadius: '4px', fontWeight: 700 }}>
             Payroll Pool
           </span>
         </div>
@@ -387,8 +373,8 @@ export default function TreasuryTab() {
             </thead>
             <tbody>
               {(() => {
-                const salaryItems = Array.isArray(salaries?.salaries) 
-                  ? salaries.salaries 
+                const salaryItems = Array.isArray(salaries?.salaries)
+                  ? salaries.salaries
                   : (salaries?.salaries_map ? Object.entries(salaries.salaries_map).map(([k, v]) => ({ agent_name: k, ...v })) : []);
 
                 if (salaryItems.length === 0) {
@@ -412,21 +398,21 @@ export default function TreasuryTab() {
                   return (
                     <tr key={agentName}>
                       <td>
-                        <strong style={{ color: '#fff' }}>{agentName}</strong>
+                        <strong style={{ color: 'var(--text-primary)' }}>{agentName}</strong>
                       </td>
                       <td style={{ fontSize: '0.78rem', color: '#94a3b8' }}>
                         {roleTitle}
                       </td>
-                      <td style={{ fontFamily: 'monospace', fontWeight: 700, color: '#34d399' }}>
+                      <td style={{ fontFamily: 'monospace', fontWeight: 700, color: '#4a7042' }}>
                         ₹{rate.toFixed(2)}
                       </td>
-                      <td style={{ fontFamily: 'monospace', color: '#cbd5e1' }}>
+                      <td style={{ fontFamily: 'monospace', color: 'var(--text-primary)' }}>
                         ₹{totalEarned.toFixed(2)}
                       </td>
                       <td>
                         <span style={{
                           background: 'rgba(16, 185, 129, 0.15)',
-                          color: '#34d399',
+                          color: '#4a7042',
                           padding: '0.15rem 0.45rem',
                           borderRadius: '4px',
                           fontWeight: 700,
@@ -441,7 +427,7 @@ export default function TreasuryTab() {
                         </span>
                       </td>
                       <td>
-                        <button 
+                        <button
                           className="action-btn"
                           style={{ padding: '0.25rem 0.65rem', fontSize: '0.72rem' }}
                           onClick={() => {
@@ -476,7 +462,7 @@ export default function TreasuryTab() {
 
         <div style={{ padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
-            <input 
+            <input
               type="text"
               className="form-input"
               style={{ flex: 2 }}
@@ -484,7 +470,7 @@ export default function TreasuryTab() {
               onChange={(e) => setMeetingTopic(e.target.value)}
               placeholder="Discussion Agenda..."
             />
-            <button 
+            <button
               className="action-btn primary"
               onClick={handleConveneMeeting}
               disabled={isConvening}
@@ -511,15 +497,15 @@ export default function TreasuryTab() {
               </div>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                <h5 style={{ color: '#c084fc', fontSize: '0.9rem', borderBottom: '1px solid rgba(255, 255, 255, 0.08)', paddingBottom: '0.4rem' }}>
+                <h5 style={{ color: '#7a6f50', fontSize: '0.9rem', borderBottom: '1px solid rgba(255, 255, 255, 0.08)', paddingBottom: '0.4rem' }}>
                   Agenda: {meetingTranscript.topic || meetingTopic}
                 </h5>
                 {(meetingTranscript.dialogue || meetingTranscript.turns || []).map((turn, tIdx) => (
                   <div key={tIdx} style={{ display: 'flex', gap: '0.65rem' }}>
-                    <strong style={{ color: '#22d3ee', minWidth: '130px', flexShrink: 0 }}>
+                    <strong style={{ color: '#4a7042', minWidth: '130px', flexShrink: 0 }}>
                       {turn.speaker || turn.agent || 'Agent'}:
                     </strong>
-                    <span style={{ color: '#cbd5e1' }}>{turn.text || turn.statement || turn.message}</span>
+                    <span style={{ color: 'var(--text-primary)' }}>{turn.text || turn.statement || turn.message}</span>
                   </div>
                 ))}
               </div>

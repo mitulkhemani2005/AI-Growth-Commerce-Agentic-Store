@@ -2,7 +2,7 @@ import asyncio
 import os
 import time
 from datetime import datetime, timezone
-from typing import Dict, Any, Optional
+from typing import Dict, Any
 
 from backend.admin_agents import (
     price_manager_agent,
@@ -12,8 +12,10 @@ from backend.admin_agents import (
     dispatcher_agent,
     review_feedback_agent,
     ceo_agent,
-    message_bus
+    message_bus,
+    log_agent_action
 )
+from backend.agent_tasks import task_manager
 
 
 def format_interval_human(seconds: int) -> str:
@@ -32,6 +34,7 @@ class BackgroundAgentWorker:
     def __init__(self):
         self._running = False
         self._task = None
+        self._agent_locks: Dict[str, asyncio.Lock] = {}
         self.tick_sleep_seconds = 1  # Evaluation loop tick every 1 second
 
         # Per-agent independent schedule configurations (Event-driven autonomous cycles)
@@ -139,11 +142,15 @@ class BackgroundAgentWorker:
         if self._running:
             return
         self._running = True
+        log_agent_action("Nova Runtime", "Fleet started", "Seven specialist agents and the configured buyer simulation are scheduled.")
         try:
-            loop = asyncio.get_event_loop()
+            loop = asyncio.get_running_loop()
             self._task = loop.create_task(self._run_loop())
         except RuntimeError:
-            pass
+            # The FastAPI lifespan always has a running loop.  Keeping this
+            # explicit prevents a deceptive "RUNNING" UI state in scripts.
+            self._running = False
+            raise RuntimeError("BackgroundAgentWorker.start() requires a running asyncio loop")
         print("[24/7 Background Workers] Autonomous AI Agent Fleet & 5 AI Shoppers running 24/7!", flush=True)
 
     def stop(self):
@@ -170,6 +177,10 @@ class BackgroundAgentWorker:
         """
         import random
         from backend.buyer_agents import buyer_agents_fleet
+        # Recover after a server/process interruption before dispatching fresh
+        # work.  Without this, an interrupted task is invisible forever.
+        stale_seconds = max(30, int(os.environ.get("AGENT_TASK_STALE_SECONDS", "300")))
+        recovered_tasks = task_manager.recover_stale_claims(stale_seconds)
         now_ts = time.time()
         agents_map = {
             "dispatcher": dispatcher_agent,
@@ -182,6 +193,17 @@ class BackgroundAgentWorker:
         }
 
         async def _run_agent(key: str, agent_instance: Any):
+            # An HTTP manual trigger and the ticker used to invoke the same
+            # agent concurrently.  JSON persistence then raced and tasks could
+            # remain permanently 'running'.  One lock per specialist gives a
+            # single, observable execution lane without serialising the fleet.
+            lock = self._agent_locks.setdefault(key, asyncio.Lock())
+            if lock.locked():
+                return key, {"skipped": "already_executing"}
+            async with lock:
+                return await _run_agent_locked(key, agent_instance)
+
+        async def _run_agent_locked(key: str, agent_instance: Any):
             state = self.agent_states.get(key, {})
             if not state.get("enabled", True):
                 return key, None
@@ -217,17 +239,24 @@ class BackgroundAgentWorker:
             if time_due or event_due:
                 try:
                     state["status"] = "EXECUTING"
-                    res = await agent_instance.run_autonomous_cycle()
+                    state["started_at"] = datetime.now(timezone.utc).isoformat()
+                    timeout_seconds = max(10, int(os.environ.get("AGENT_CYCLE_TIMEOUT_SECONDS", "90")))
+                    res = await asyncio.wait_for(agent_instance.run_autonomous_cycle(), timeout=timeout_seconds)
                     state["last_run"] = datetime.now(timezone.utc).isoformat()
                     state["last_run_ts"] = time.time()
                     state["actions_count"] += 1
                     state["status"] = "RUNNING 24/7"
+                    state["last_error"] = None
+                    state["last_summary"] = str(res.get("details") or res.get("message") or "Cycle completed")[:600]
                     # Calculate new organic interval with +/- 25% random jitter
                     jitter_factor = random.uniform(0.75, 1.25)
                     state["effective_interval"] = max(5, int(base_interval * jitter_factor))
                     return key, res
                 except Exception as e:
                     state["status"] = "ERROR"
+                    state["last_error"] = str(e)
+                    state["error_count"] = int(state.get("error_count", 0)) + 1
+                    log_agent_action(state.get("name", key), "Cycle failed", str(e))
                     print(f"Error running autonomous agent '{key}': {e}", flush=True)
                     return key, {"error": str(e)}
             return key, None
@@ -243,6 +272,8 @@ class BackgroundAgentWorker:
         )
 
         results = {}
+        if recovered_tasks:
+            results["recovered_tasks"] = recovered_tasks
         for item in results_list:
             if isinstance(item, tuple) and len(item) == 2:
                 k, res = item
@@ -266,33 +297,56 @@ class BackgroundAgentWorker:
 
         if agent_key in ["buyer_agents", "buyers", "all_buyers"]:
             state = self.agent_states.get("buyer_agents", {})
-            state["status"] = "EXECUTING"
-            try:
-                res = await buyer_agents_fleet.run_all_buyers_step()
-                state["last_run"] = datetime.now(timezone.utc).isoformat()
-                state["last_run_ts"] = time.time()
-                state["actions_count"] += 1
-                state["status"] = "RUNNING 24/7"
-                return {"success": True, "agent": "buyer_agents", "result": res}
-            except Exception as e:
-                state["status"] = "ERROR"
-                return {"success": False, "error": str(e)}
+            lock = self._agent_locks.setdefault("buyer_agents", asyncio.Lock())
+            if lock.locked():
+                return {"success": False, "agent": "buyer_agents", "error": "Agent is already executing"}
+            async with lock:
+                state["status"] = "EXECUTING"
+                try:
+                    res = await buyer_agents_fleet.run_all_buyers_step()
+                    state["last_run"] = datetime.now(timezone.utc).isoformat()
+                    state["last_run_ts"] = time.time()
+                    state["actions_count"] += 1
+                    state["status"] = "RUNNING 24/7"
+                    return {"success": True, "agent": "buyer_agents", "result": res}
+                except Exception as e:
+                    state["status"] = "ERROR"
+                    state["last_error"] = str(e)
+                    state["error_count"] = int(state.get("error_count", 0)) + 1
+                    return {"success": False, "error": str(e)}
 
         if agent_key not in agents_map:
             return {"success": False, "error": f"Unknown agent '{agent_key}'"}
 
         agent = agents_map[agent_key]
         state = self.agent_states.get(agent_key, {})
+        lock = self._agent_locks.setdefault(agent_key, asyncio.Lock())
+        if lock.locked():
+            return {"success": False, "agent": agent_key, "error": "Agent is already executing"}
+        async with lock:
+            return await self._trigger_agent_locked(agent_key, agent, state)
+
+    async def _trigger_agent_locked(self, agent_key: str, agent: Any, state: Dict[str, Any]) -> Dict[str, Any]:
+        """Run a single manually requested cycle under the agent's lock."""
         state["status"] = "EXECUTING"
+        state["started_at"] = datetime.now(timezone.utc).isoformat()
+        log_agent_action(state.get("name", agent_key), "Cycle started", "Executing a requested agent cycle.", autonomous=False)
         try:
-            res = await agent.run_autonomous_cycle()
+            timeout_seconds = max(10, int(os.environ.get("AGENT_CYCLE_TIMEOUT_SECONDS", "90")))
+            res = await asyncio.wait_for(agent.run_autonomous_cycle(), timeout=timeout_seconds)
             state["last_run"] = datetime.now(timezone.utc).isoformat()
             state["last_run_ts"] = time.time()
             state["actions_count"] += 1
             state["status"] = "RUNNING 24/7"
+            state["last_error"] = None
+            state["last_summary"] = str(res.get("details") or res.get("message") or "Cycle completed")[:600]
+            log_agent_action(state.get("name", agent_key), "Cycle completed", state["last_summary"], autonomous=False)
             return {"success": True, "agent": agent_key, "result": res}
         except Exception as e:
             state["status"] = "ERROR"
+            state["last_error"] = str(e)
+            state["error_count"] = int(state.get("error_count", 0)) + 1
+            log_agent_action(state.get("name", agent_key), "Cycle failed", str(e), autonomous=False)
             return {"success": False, "error": str(e)}
 
 
@@ -318,6 +372,8 @@ class BackgroundAgentWorker:
         now_ts = time.time()
         for k, v in self.agent_states.items():
             enriched = dict(v)
+            if not self._running and enriched.get("status") != "EXECUTING":
+                enriched["status"] = "MANUAL"
             interval = v.get("interval_seconds", 300)
             last_ts = v.get("last_run_ts", 0.0)
             elapsed = int(now_ts - last_ts) if last_ts > 0 else None

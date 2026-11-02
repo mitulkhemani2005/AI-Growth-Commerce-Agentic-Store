@@ -1,18 +1,9 @@
 /**
- * AI Growth Commerce API Client
+ * Nova API Client
  * Clean, promise-based API abstraction layer for all Storefront and Admin endpoints.
  */
 
-const getApiBase = () => {
-  if (typeof window !== 'undefined' && window.location) {
-    if (window.location.port && window.location.port !== '8000') {
-      return `http://${window.location.hostname || '127.0.0.1'}:8000`;
-    }
-  }
-  return '';
-};
-
-const API_BASE = getApiBase();
+const API_BASE = (import.meta.env?.VITE_API_BASE_URL || '').replace(/\/$/, '');
 
 // ─── In-flight request deduplication ─────────────────────────────────────────────
 // If the same GET URL is requested while a previous fetch for it is in-flight,
@@ -31,11 +22,14 @@ async function apiRequest(endpoint, options = {}) {
   }
 
   const config = {
+    ...options,
+    signal: options.signal || AbortSignal.timeout(/chat|generate-summary|ceo\/discussion|salaries\/negotiate|runtime\/retry/.test(endpoint) ? 120000 : 15000),
     headers: {
       'Content-Type': 'application/json',
+      ...(typeof sessionStorage !== 'undefined' && sessionStorage.getItem('novaAdminToken')
+        ? { Authorization: `Bearer ${sessionStorage.getItem('novaAdminToken')}` } : {}),
       ...options.headers
-    },
-    ...options
+    }
   };
 
   if (config.body && typeof config.body === 'object') {
@@ -54,7 +48,13 @@ async function apiRequest(endpoint, options = {}) {
       }
 
       if (!res.ok) {
-        const errorMsg = (data && data.detail) || (data && data.error) || (data && data.message) || `Request failed (${res.status})`;
+        if (res.status === 401 && typeof window !== 'undefined') {
+          window.dispatchEvent(new Event('nova:owner-access-required'));
+        }
+        const detail = data?.detail || data?.error || data?.message;
+        const errorMsg = Array.isArray(detail)
+          ? detail.map(error => `${error.loc?.slice(1).join('.') || 'Request'}: ${error.msg}`).join('; ')
+          : typeof detail === 'string' ? detail : `Request failed (${res.status})`;
         throw new Error(errorMsg);
       }
       return data;
@@ -78,6 +78,9 @@ async function apiRequest(endpoint, options = {}) {
 
 
 export const api = {
+  getHealth: () => apiRequest('/api/health'),
+  getRuntime: () => apiRequest('/api/admin/runtime'),
+  retryRuntime: () => apiRequest('/api/admin/runtime/retry', { method: 'POST' }),
   // --- USER & CATALOG ---
   getUserProfile: (userId = 'user_alex') => apiRequest(`/api/user?user_id=${encodeURIComponent(userId)}`),
   getInventory: (params = {}) => {
@@ -88,28 +91,25 @@ export const api = {
 
   // --- CART ---
   getCart: (userId = 'user_alex') => apiRequest(`/api/cart?user_id=${encodeURIComponent(userId)}`),
-  addToCart: (userId, productId, quantity = 1, size = null) => 
+  addToCart: (userId, productId, quantity = 1, size = null) =>
     apiRequest('/api/cart/add', {
       method: 'POST',
       body: { user_id: userId, product_id: productId, quantity, size }
     }),
-  removeFromCart: (userId, productId, quantity = null) => 
+  removeFromCart: (userId, productId, quantity = null) =>
     apiRequest('/api/cart/remove', {
       method: 'POST',
       body: { user_id: userId, product_id: productId, quantity }
     }),
-  clearCart: (userId = 'user_alex') => 
+  clearCart: (userId = 'user_alex') =>
     apiRequest(`/api/cart/clear?user_id=${encodeURIComponent(userId)}`, { method: 'POST' }),
 
   // --- ORDERS ---
-  getOrders: (userId = null) => 
+  getOrders: (userId = null) =>
     apiRequest(userId ? `/api/orders?user_id=${encodeURIComponent(userId)}` : '/api/orders'),
   getOrderDetails: (orderId) => apiRequest(`/api/orders/${orderId}`),
-  refundOrder: (orderId, reason = 'Customer Request') => 
-    apiRequest(`/api/orders/${orderId}/refund?reason=${encodeURIComponent(reason)}`, { method: 'POST' }),
-
   // --- NOVA AI COPILOT ---
-  chatWithNova: (prompt, userId = 'user_alex', conversationHistory = null) => 
+  chatWithNova: (prompt, userId = 'user_alex', conversationHistory = null) =>
     apiRequest('/api/chat', {
       method: 'POST',
       body: { prompt, user_id: userId, conversation_history: conversationHistory }
@@ -117,24 +117,24 @@ export const api = {
 
   // --- RAZORPAY & AP2 ---
   getPaymentConfig: () => apiRequest('/api/payment/config'),
-  createRazorpayOrder: (userId = 'user_alex', currency = 'INR') => 
+  createRazorpayOrder: (userId = 'user_alex', currency = 'INR') =>
     apiRequest('/api/payment/create-order', {
       method: 'POST',
       body: { user_id: userId, currency }
     }),
-  verifyRazorpayPayment: (payload) => 
+  verifyRazorpayPayment: (payload) =>
     apiRequest('/api/payment/verify', {
       method: 'POST',
       body: payload
     }),
-  updateRazorpayCredentials: (keyId, keySecret) => 
+  updateRazorpayCredentials: (keyId, keySecret) =>
     apiRequest('/api/payment/credentials', {
       method: 'POST',
       body: { key_id: keyId, key_secret: keySecret }
     }),
-  getAP2Status: (userId = 'user_alex') => 
+  getAP2Status: (userId = 'user_alex') =>
     apiRequest(`/api/payment/ap2-status?user_id=${encodeURIComponent(userId)}`),
-  agentAutonomousPay: (userId = 'user_alex', shippingAddress = null) => 
+  agentAutonomousPay: (userId = 'user_alex', shippingAddress = null) =>
     apiRequest('/api/payment/agent-autopay', {
       method: 'POST',
       body: { user_id: userId, shipping_address: shippingAddress }
@@ -143,42 +143,42 @@ export const api = {
   // --- ADMIN COMMAND STUDIO ---
   getAdminOverview: () => apiRequest('/api/admin/overview'),
   getAdminAgentsStatus: () => apiRequest('/api/admin/agents/status'),
-  triggerAdminAgent: (agentKey) => 
+  triggerAdminAgent: (agentKey) =>
     apiRequest('/api/admin/agents/trigger', {
       method: 'POST',
       body: { agent_key: agentKey }
     }),
-  updateAgentInterval: (agentKey, intervalSeconds) => 
+  updateAgentInterval: (agentKey, intervalSeconds) =>
     apiRequest('/api/admin/agents/interval', {
       method: 'POST',
       body: { agent_key: agentKey, interval_seconds: intervalSeconds }
     }),
   getAdminAgentLogs: (limit = 60) => apiRequest(`/api/admin/agent-logs?limit=${limit}`),
   getAdminAgentMessages: (limit = 60) => apiRequest(`/api/admin/agent-messages?limit=${limit}`),
-  getAdminAgentConversations: (agentName = null, limit = 20) => 
+  getAdminAgentConversations: (agentName = null, limit = 20) =>
     apiRequest(agentName ? `/api/admin/agent-conversations?agent_name=${encodeURIComponent(agentName)}&limit=${limit}` : `/api/admin/agent-conversations?limit=${limit}`),
 
   // Treasury & Wholesale Acquisition
   getAdminTreasury: (limit = 30) => apiRequest(`/api/admin/treasury?limit=${limit}`),
-  acquireWholesaleStock: (productId, quantity = 20, actor = 'Store Owner') => 
+  acquireWholesaleStock: (productId, quantity = 20, actor = 'Store Owner') =>
     apiRequest('/api/admin/treasury/acquire-stock', {
       method: 'POST',
       body: { product_id: productId, quantity, actor }
     }),
-  
+
   // Agent Salaries & Interactive Negotiation
   getAgentSalaries: () => apiRequest('/api/admin/salaries'),
-  negotiateAgentSalary: (agentName, proposedSalary, rationale = 'Performance review') => 
+  negotiateAgentSalary: (agentName, proposedSalary, rationale = 'Performance review') =>
     apiRequest('/api/admin/salaries/negotiate', {
       method: 'POST',
       body: { agent_name: agentName, proposed_salary: proposedSalary, rationale }
     }),
-  payAgentSalaries: (agentName = null, actor = 'Store Owner') => 
+  payAgentSalaries: (agentName = null, actor = 'Store Owner') =>
     apiRequest('/api/admin/salaries/pay', {
       method: 'POST',
       body: { agent_name: agentName, actor }
     }),
-  updateAgentSalary: (agentName, newSalary, status = 'Agreed') => 
+  updateAgentSalary: (agentName, newSalary, status = 'Agreed') =>
     apiRequest('/api/admin/salaries/update', {
       method: 'POST',
       body: { agent_name: agentName, new_salary: newSalary, status }
@@ -186,12 +186,12 @@ export const api = {
 
   // AI Autonomous Shoppers
   getAIBuyers: () => apiRequest('/api/admin/buyers'),
-  triggerAIBuyer: (buyerId = 'all') => 
+  triggerAIBuyer: (buyerId = 'all') =>
     apiRequest('/api/admin/buyers/trigger', {
       method: 'POST',
       body: { buyer_id: buyerId }
     }),
-  toggleAIBuyers: (enabled = null) => 
+  toggleAIBuyers: (enabled = null) =>
     apiRequest('/api/admin/buyers/toggle', {
       method: 'POST',
       body: { enabled }
@@ -204,24 +204,24 @@ export const api = {
 
 
   // CEO Roundtable Discussion
-  startCEODiscussion: (topic, participants = 'ALL_AGENTS') => 
+  startCEODiscussion: (topic, participants = 'ALL_AGENTS') =>
     apiRequest('/api/admin/ceo/discussion', {
       method: 'POST',
       body: { topic, participants }
     }),
 
   // Inventory & Pricing Management
-  adminUpdateInventory: (payload) => 
+  adminUpdateInventory: (payload) =>
     apiRequest('/api/admin/inventory/update', {
       method: 'POST',
       body: payload
     }),
-  adminAddProduct: (payload) => 
+  adminAddProduct: (payload) =>
     apiRequest('/api/admin/inventory/add', {
       method: 'POST',
       body: payload
     }),
-  adminBulkPrice: (category, percentage) => 
+  adminBulkPrice: (category, percentage) =>
     apiRequest('/api/admin/inventory/bulk-price', {
       method: 'POST',
       body: { category, percentage }
@@ -229,17 +229,17 @@ export const api = {
 
   // Orders in Admin
   getAdminOrders: () => apiRequest('/api/admin/orders'),
-  adminUpdateOrderStatus: (orderId, status, trackingNumber = null, notes = null) => 
+  adminUpdateOrderStatus: (orderId, status, trackingNumber = null, notes = null) =>
     apiRequest(`/api/admin/orders/${orderId}/status`, {
       method: 'POST',
       body: { status, tracking_number: trackingNumber, notes }
     }),
   // Refunds
-  refundOrder: (orderId, reason = 'Customer Request') => 
+  refundOrder: (orderId, reason = 'Customer Request') =>
     apiRequest(`/api/orders/${encodeURIComponent(orderId)}/refund?reason=${encodeURIComponent(reason)}`, {
       method: 'POST'
     }),
-  adminCancelOrder: (orderId, reason = 'Customer Request', forceOverride = false) => 
+  adminCancelOrder: (orderId, reason = 'Customer Request', forceOverride = false) =>
     apiRequest(`/api/admin/orders/${orderId}/cancel`, {
       method: 'POST',
       body: { reason, force_override: forceOverride }
@@ -247,19 +247,19 @@ export const api = {
 
   // Reviews
   adminGetReviews: () => apiRequest('/api/admin/reviews'),
-  adminAddReview: (payload) => 
+  adminAddReview: (payload) =>
     apiRequest('/api/admin/reviews/add', {
       method: 'POST',
       body: payload
     }),
-  adminGenerateReviewSummary: (productId) => 
+  adminGenerateReviewSummary: (productId) =>
     apiRequest('/api/admin/reviews/generate-summary', {
       method: 'POST',
       body: { product_id: productId }
     }),
 
   // CEO Direct Admin Chat
-  adminChat: (prompt, conversationHistory = null) => 
+  adminChat: (prompt, conversationHistory = null) =>
     apiRequest('/api/admin/chat', {
       method: 'POST',
       body: { prompt, conversation_history: conversationHistory }
@@ -275,13 +275,13 @@ export const api = {
   getAP2Manifest: () => apiRequest('/.well-known/ap2-manifest.json'),
 
   // Upsell & Cross-Sells
-  getCartCrossSells: (userId = 'user_alex') => 
+  getCartCrossSells: (userId = 'user_alex') =>
     apiRequest(`/api/cart/cross-sells?user_id=${encodeURIComponent(userId)}`),
 
   // Campaign Orchestrator
   getActiveCampaign: () => apiRequest('/api/campaigns/active'),
   getAdminCampaigns: () => apiRequest('/api/admin/campaigns'),
-  launchAdminCampaign: (payload) => 
+  launchAdminCampaign: (payload) =>
     apiRequest('/api/admin/campaigns/launch', {
       method: 'POST',
       body: payload
@@ -301,7 +301,7 @@ export const api = {
 
 
   // Conversational In-App Checkout
-  conversationalCheckout: (payload) => 
+  conversationalCheckout: (payload) =>
     apiRequest('/api/chat/conversational-checkout', {
       method: 'POST',
       body: payload
@@ -309,7 +309,7 @@ export const api = {
 
   // Explainable Audit Trail & Failure Simulation
   getAuditTrail: () => apiRequest('/api/admin/audit-trail'),
-  simulateFailure: (failureType) => 
+  simulateFailure: (failureType) =>
     apiRequest('/api/simulation/failure-test', {
       method: 'POST',
       body: { failure_type: failureType }

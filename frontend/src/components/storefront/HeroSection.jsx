@@ -1,86 +1,27 @@
 import React from 'react';
-import { ArrowDown, Sparkles, ShieldCheck, Zap } from 'lucide-react';
+import { ArrowRight, Sparkles, ShieldCheck, Truck, Cpu } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
 
 export default function HeroSection({ onOpenNova, onExploreAgents }) {
-  const { catalog } = useStore();
-  const inStockCount = catalog.filter(p => (p.STOCK_REMAINING || 0) > 0).length;
-
-  const scrollToCatalog = () => {
-    const el = document.getElementById('catalog-grid-anchor');
-    if (el) el.scrollIntoView({ behavior: 'smooth' });
-  };
-
-  return (
-    <section className="nike-hero-banner">
-      <div className="hero-kicker-tag">
-        <Sparkles size={14} style={{ color: '#d4ff00' }} />
-        <span>NAVA: AGENTIC AI STORE • 24/7 AUTONOMOUS COMMERCE</span>
+  const { serviceStatus } = useStore();
+  const shop = () => document.getElementById('catalog-grid-anchor')?.scrollIntoView({ behavior: 'smooth' });
+  return <>
+    <section className="store-hero page-width">
+      <div className="hero-copy">
+        <span className="eyebrow"><span className="little-line" /> A BETTER KIND OF TECH STORE</span>
+        <h1>Great tech.<br /><em>Zero guesswork.</em></h1>
+        <p>The devices you love. A store that thinks ahead. Discover your next upgrade with a little help from Nova.</p>
+        <div className="hero-actions"><button className="button button-dark" onClick={shop}>Explore the collection<ArrowRight size={17} /></button><button className="button button-link" onClick={onOpenNova}><Sparkles size={16} />Ask Nova</button></div>
+        <div className="hero-proof"><span className="avatar-stack"><b>N</b><b>✳</b><b>AI</b></span><span><strong>7 specialist agents. One seamless store.</strong><small>{serviceStatus?.background_agents_enabled ? 'Working together, around the clock.' : 'Inventory, pricing, fulfillment, and more.'}</small></span></div>
       </div>
-
-      <h1 className="hero-headline-massive">
-        ENGINEERED FOR SUPREMACY.
-      </h1>
-
-      <p className="hero-subcopy">
-        Next-gen 5G smartphones, M3 titanium workstations, and audiophile acoustics. 
-        Continuously audited and dynamically priced by 7 autonomous AI agents running locally. 
-        Zero tax storewide, 1-click Razorpay checkout.
-      </p>
-
-      <div className="hero-cta-group">
-        <button 
-          className="nike-pill-btn primary-black"
-          onClick={scrollToCatalog}
-        >
-          <span>Shop Latest Drops</span>
-          <ArrowDown size={16} />
-        </button>
-
-        <button 
-          className="nike-pill-btn secondary-white"
-          onClick={onExploreAgents}
-        >
-          <span>Meet the 7 AI Agents</span>
-        </button>
-
-        <button 
-          className="nike-pill-btn accent-volt"
-          onClick={onOpenNova}
-        >
-          <Zap size={16} />
-          <span>Ask Nava Copilot</span>
-        </button>
-      </div>
-
-
-      {/* Hero Stats Mini-Row */}
-      <div style={{
-        display: 'flex',
-        gap: '2.5rem',
-        marginTop: '3.5rem',
-        borderTop: '1px solid #e5e5e5',
-        paddingTop: '1.75rem',
-        flexWrap: 'wrap',
-        justifyContent: 'center'
-      }}>
-        <div style={{ textAlign: 'center' }}>
-          <div style={{ fontFamily: 'var(--font-display)', fontSize: '2rem', fontWeight: 900, color: '#111' }}>24/7</div>
-          <div style={{ fontSize: '0.74rem', color: '#707072', textTransform: 'uppercase', fontWeight: 700 }}>Autonomous Cycles</div>
-        </div>
-        <div style={{ textAlign: 'center' }}>
-          <div style={{ fontFamily: 'var(--font-display)', fontSize: '2rem', fontWeight: 900, color: '#2e7d32' }}>₹ 0.00</div>
-          <div style={{ fontSize: '0.74rem', color: '#707072', textTransform: 'uppercase', fontWeight: 700 }}>Tax Storewide</div>
-        </div>
-        <div style={{ textAlign: 'center' }}>
-          <div style={{ fontFamily: 'var(--font-display)', fontSize: '2rem', fontWeight: 900, color: '#111' }}>100%</div>
-          <div style={{ fontSize: '0.74rem', color: '#707072', textTransform: 'uppercase', fontWeight: 700 }}>Base Floor Safe</div>
-        </div>
-        <div style={{ textAlign: 'center' }}>
-          <div style={{ fontFamily: 'var(--font-display)', fontSize: '2rem', fontWeight: 900, color: '#fa5400' }}>{inStockCount} / {catalog.length}</div>
-          <div style={{ fontSize: '0.74rem', color: '#707072', textTransform: 'uppercase', fontWeight: 700 }}>SKUs Ready to Ship</div>
-        </div>
+      <div className="hero-art" aria-label="Featured Nova technology">
+        <span className="art-caption">CURATED FOR YOUR EVERYDAY</span><span className="art-circle" />
+        <img className="hero-laptop" src="/static/images/laptop_pro.svg" alt="Nova laptop" />
+        <img className="hero-phone" src="/static/images/phone_flagship.svg" alt="Nova flagship phone" />
+        <div className="floating-note"><span className="note-icon"><Sparkles size={18} /></span><div><strong>A smarter match.</strong><small>Picked for the way you live.</small></div></div>
+        <button className="art-bottom" onClick={onExploreAgents}><span><i /> Intelligence, behind the scenes.</span><ArrowRight size={16} /></button>
       </div>
     </section>
-  );
+    <div className="benefit-strip page-width"><span><Truck size={19} /><b>Free delivery</b><small>On every order</small></span><span><ShieldCheck size={19} /><b>Shop with confidence</b><small>Clear checkout and order tracking</small></span><span><Cpu size={19} /><b>Locally powered AI</b><small>{serviceStatus?.gpu?.gpu_resident ? 'Running on your GPU' : 'Your personal shopping copilot'}</small></span></div>
+  </>;
 }

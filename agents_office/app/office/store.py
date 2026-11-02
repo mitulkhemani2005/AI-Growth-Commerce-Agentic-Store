@@ -9,7 +9,7 @@ from typing import Any, Dict, List, Optional
 
 from app.models import now_iso
 
-DATA_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "data"))
+DATA_DIR = os.path.abspath(os.environ.get("NOVA_DATA_DIR", os.path.join(os.path.dirname(__file__), "..", "..", "..", "data")))
 JSON_FILE = os.path.join(DATA_DIR, "agents_office.json")
 INVENTORY_FILE = os.path.join(DATA_DIR, "inventory.json")
 
@@ -481,6 +481,37 @@ class OfficeStore:
         return [
             {"model_name": "ollama/qwen2.5:7b", "provider": "ollama", "input_price": 0.0, "output_price": 0.0},
         ]
+
+    def _product_store(self):
+        # Imported office records are separate from the live Nova inventory.
+        from backend.async_store import AsyncJSONStore
+        return AsyncJSONStore(os.path.join(DATA_DIR, "office_products.json"), list)
+
+    def save_products(self, products: List[Dict[str, Any]], source: str, batch_id: str) -> List[Dict[str, Any]]:
+        records = [{**product, "source": source, "batch_id": batch_id, "updated_at": now_iso()}
+                   for product in products]
+
+        def upsert(existing):
+            by_key = {(record["platform"], record["product_id"]): record for record in existing}
+            for record in records:
+                by_key[(record["platform"], record["product_id"])] = record
+            return list(by_key.values())
+
+        self._product_store().mutate(upsert)
+        return records
+
+    def list_products(self, platform=None, category=None, keyword=None, limit=100, offset=0):
+        records = self._product_store().get()
+        if platform:
+            records = [record for record in records if record.get("platform") == platform]
+        if category:
+            records = [record for record in records if record.get("category") == category]
+        if keyword:
+            records = [record for record in records if keyword.casefold() in record["name"].casefold()]
+        return records[offset:] if limit is None else records[offset:offset + limit]
+
+    def count_products(self, platform=None, category=None, keyword=None):
+        return len(self.list_products(platform=platform, category=category, keyword=keyword, limit=None))
 
     def execute_query(self, query: str) -> Dict[str, Any]:
         """Read directly from data/inventory.json for data manager queries without SQL."""

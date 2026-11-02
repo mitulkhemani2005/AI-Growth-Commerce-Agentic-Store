@@ -1,11 +1,13 @@
-# 🛍️ AI Growth Commerce - Agentic Store
+> Historical design notes. See [README.md](README.md) for current setup, runtime modes, and implementation limits.
+
+# 🛍️ Nova
 ## Complete Project Architecture, Design & Engineering Explanation
 
 ---
 
 ## 📖 1. Executive Summary & Vision
 
-**AI Growth Commerce Agentic Store** is a next-generation autonomous e-commerce enterprise built with state-of-the-art multi-agent AI architecture. Unlike traditional e-commerce platforms that rely on static databases and manual administrative tasks, this platform operates **24/7 autonomously** with a collaborative fleet of specialized AI agents running on locally installed Ollama LLM (`gemma4:e2b-it-qat`).
+**Nova** is a next-generation autonomous e-commerce enterprise built with state-of-the-art multi-agent AI architecture. Unlike traditional e-commerce platforms that rely on static databases and manual administrative tasks, this platform operates **24/7 autonomously** with a collaborative fleet of specialized AI agents running on locally installed Ollama LLM (`gemma4:e2b-it-qat`).
 
 ### Core Pillars
 1. **Autonomous Multi-Agent Fleet**: 7 specialized agents communicating in a closed-loop message bus to audit inventory, dynamically optimize prices, fulfill orders, process refunds, and report to the CEO.

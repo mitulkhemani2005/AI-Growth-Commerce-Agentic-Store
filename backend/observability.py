@@ -1,3 +1,4 @@
+from backend.config import DATA_DIR, data_file
 """
 Observability & Telemetry — Metrics, Audit Tracing & Alert Aggregation
 =======================================================================
@@ -14,8 +15,8 @@ from datetime import datetime, timezone
 from typing import Dict, Any, List, Optional
 
 
-METRICS_FILE = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "agent_metrics.json"))
-ALERTS_FILE = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "agent_alerts.json"))
+METRICS_FILE = data_file("agent_metrics.json")
+ALERTS_FILE = data_file("agent_alerts.json")
 _obs_lock = threading.RLock()
 
 

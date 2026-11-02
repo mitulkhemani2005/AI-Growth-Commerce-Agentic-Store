@@ -1,1 +1,67 @@
-[]
+[
+  {
+    "order_id": "ORD-1222-7B53",
+    "user_id": "buyer_alex",
+    "customer_name": "Alex Chen",
+    "created_at": "2026-11-02T18:12:22.236571+00:00",
+    "status": "Dispatched",
+    "delivery_estimate": "2-3 Business Days",
+    "tracking_number": "TRK-3CE5A2",
+    "items": [
+      {
+        "id": "prod_002",
+        "PRODUCT_NAME": "NOVA Apex Ultra Fold 5G",
+        "PRODUCT_TYPE": "Mobiles",
+        "PRODUCT_SIZE": "16GB RAM / 512GB",
+        "quantity": 1,
+        "price": 153.7,
+        "item_total": 153.7,
+        "IMAGE": "/static/images/phone_fold.svg"
+      }
+    ],
+    "currency": "INR",
+    "subtotal": 153.7,
+    "tax": 0.0,
+    "total": 153.7,
+    "payment_method": "Razorpay Gateway (Online)",
+    "razorpay_order_id": "order_sandbox_c51f03ad257540f1a4a01c6e7baff976",
+    "razorpay_payment_id": "pay_demo_5a2c56d51f584c",
+    "payment_details": {
+      "gateway": "Nova Demo",
+      "razorpay_order_id": "order_sandbox_c51f03ad257540f1a4a01c6e7baff976",
+      "razorpay_payment_id": "pay_demo_5a2c56d51f584c",
+      "razorpay_signature": "sandbox_verified",
+      "verified": true,
+      "is_demo": true,
+      "ap2_mandate_id": "mandate_ap2_94f356741060",
+      "ap2_proof": {
+        "protocol": "AP2 (Google Agent Payments Protocol) + ACP + Razorpay Rail",
+        "authorization_layer": {
+          "mandate_id": "mandate_ap2_94f356741060",
+          "authorized_agent": "nova_commerce_agent",
+          "spending_mandate_signature": "42dcbc9521120a8816b366c8a1f89a5ae7966fb63741f5f0b718d908764d48a3",
+          "status": "VERIFIED_AND_ACTIVE"
+        },
+        "checkout_layer_acp": {
+          "acp_token": "acp_tok_d0e661e5162d",
+          "cart_digest": "205227cb886e549f542fb7ff80272cc9a49b4e5ab5ee6527321cb39ed76f50d3",
+          "currency": "INR",
+          "tax": 0.0
+        },
+        "settlement_layer": {
+          "gateway": "Nova Demo",
+          "gateway_mode": "Demo (no money charged)",
+          "razorpay_order_id": "order_sandbox_c51f03ad257540f1a4a01c6e7baff976",
+          "razorpay_payment_id": "pay_demo_5a2c56d51f584c",
+          "razorpay_signature": "sandbox_verified",
+          "settlement_rail": "demo",
+          "status": "SIMULATED",
+          "captured_amount_inr": 153.7
+        }
+      }
+    },
+    "shipping_address": "Alex Chen Residence, Innovation Hub Blvd, Sector 4",
+    "inventory_deducted": true,
+    "last_updated_at": "2026-11-02T18:12:30.492182+00:00"
+  }
+]

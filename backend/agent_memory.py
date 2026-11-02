@@ -1,3 +1,4 @@
+from backend.config import DATA_DIR, env_bool
 """
 Hybrid Layered Memory System for AI Agents
 ==========================================
@@ -30,7 +31,6 @@ import hashlib
 import threading
 import datetime
 from typing import Dict, List, Any, Optional, Tuple
-from collections import deque
 
 # ── Sentence-Transformers for semantic vector retrieval ────────────────────────
 _ST_AVAILABLE = False
@@ -52,7 +52,7 @@ def _lazy_load_embeddings():
 
 
 # ── Constants ──────────────────────────────────────────────────────────────────
-DATA_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data"))
+DATA_DIR = str(DATA_DIR)
 MEMORY_FILE = os.path.join(DATA_DIR, "agent_memory.json")
 RECENT_CONTEXT_SIZE = 20        # Up to 20 recent turns kept in raw memory
 EPISODIC_MAX_SIZE = 100         # Up to 100 episodic events per agent
@@ -319,7 +319,8 @@ class MemoryManager:
         self._last_save: float = 0.0
         self._save_interval: float = 15.0
         self._load_from_disk()
-        threading.Thread(target=_lazy_load_embeddings, daemon=True).start()
+        if env_bool("SEMANTIC_EMBEDDINGS_ENABLED"):
+            threading.Thread(target=_lazy_load_embeddings, daemon=True).start()
 
     def get_agent_memory(self, agent_name: str) -> AgentMemory:
         with self._lock:

@@ -11,7 +11,7 @@ from fastapi import APIRouter, HTTPException, Query, UploadFile, File
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
-from app.models import ApiEnvelope, make_id
+from app.models import ApiEnvelope, ProductImportRequest, make_id
 from app.office.models import (
     AgentCreateRequest,
     AgentSkillBindRequest,
@@ -1506,8 +1506,6 @@ def list_products(
 @router.get("/products/schema")
 def products_import_schema() -> ApiEnvelope:
     """返回商品导入接口的 JSON Schema，方便外部系统对接。"""
-    from app.models import ProductImportRequest
-
     trace_id = make_id("trc")
     return _envelope(trace_id=trace_id, data={
         "schema": ProductImportRequest.model_json_schema(),

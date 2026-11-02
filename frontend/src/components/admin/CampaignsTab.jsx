@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Megaphone, PlusCircle, CheckCircle, TrendingUp, Clock, Zap, Play, Square, Trash2, ShieldCheck, AlertCircle } from 'lucide-react';
+import { Megaphone, Zap, Play, Square, Trash2 } from 'lucide-react';
 import { api } from '../../api/client';
 import { useStore } from '../../context/StoreContext';
 
@@ -119,7 +119,7 @@ export default function CampaignsTab() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.75rem' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
-          <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.4rem', fontWeight: 800, color: '#fff' }}>
+          <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-primary)' }}>
             ⚡ Promotional Campaign Orchestrator
           </h2>
           <p style={{ fontSize: '0.82rem', color: '#94a3b8' }}>
@@ -138,7 +138,7 @@ export default function CampaignsTab() {
                 padding: '0.2rem 0.6rem',
                 borderRadius: '6px',
                 background: hasActive ? 'rgba(16, 185, 129, 0.15)' : 'rgba(255, 255, 255, 0.05)',
-                color: hasActive ? '#34d399' : '#94a3b8',
+                color: hasActive ? '#4a7042' : '#94a3b8',
                 border: `1px solid ${hasActive ? 'rgba(16, 185, 129, 0.35)' : 'rgba(255, 255, 255, 0.08)'}`
               }}>
                 {cat}: {hasActive ? '1 Active' : 'Idle'}
@@ -148,17 +148,18 @@ export default function CampaignsTab() {
         </div>
       </div>
 
+      {isLoading && <p role="status">Loading campaigns…</p>}
       {/* Launch New Campaign Card */}
       <div className="glass-panel">
-        <h4 style={{ fontSize: '1rem', fontWeight: 800, color: '#fff', textTransform: 'uppercase', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <Zap size={18} style={{ color: '#fbbf24' }} />
+        <h4 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--text-primary)', textTransform: 'uppercase', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <Zap size={18} style={{ color: '#92733b' }} />
           <span>Create or Launch Targeted Promotional Campaign</span>
         </h4>
 
         <form onSubmit={handleLaunch} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', alignItems: 'flex-end' }}>
           <div className="form-group" style={{ marginBottom: 0 }}>
             <label style={{ fontSize: '0.78rem', fontWeight: 700 }}>Campaign Title</label>
-            <input 
+            <input
               type="text"
               className="form-input"
               value={newTitle}
@@ -170,7 +171,7 @@ export default function CampaignsTab() {
 
           <div className="form-group" style={{ marginBottom: 0 }}>
             <label style={{ fontSize: '0.78rem', fontWeight: 700 }}>Target Category</label>
-            <select 
+            <select
               className="form-select"
               value={newCategory}
               onChange={(e) => setNewCategory(e.target.value)}
@@ -185,7 +186,7 @@ export default function CampaignsTab() {
 
           <div className="form-group" style={{ marginBottom: 0 }}>
             <label style={{ fontSize: '0.78rem', fontWeight: 700 }}>Discount % (Gated 1%-25%)</label>
-            <input 
+            <input
               type="number"
               step="0.5"
               min="1"
@@ -197,7 +198,12 @@ export default function CampaignsTab() {
             />
           </div>
 
-          <button 
+          <div className="form-group" style={{ marginBottom: 0 }}>
+            <label htmlFor="campaign-duration">Duration (hours)</label>
+            <input id="campaign-duration" type="number" className="form-input" min="1" max="8760" required
+              value={newDuration} onChange={event => setNewDuration(event.target.value)} />
+          </div>
+          <button
             type="submit"
             className="action-btn primary"
             disabled={isLaunching}
@@ -212,7 +218,7 @@ export default function CampaignsTab() {
       {/* Campaigns History Table */}
       <div className="glass-panel">
         <div className="panel-header-bar" style={{ padding: '1rem 1.25rem', borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>
-          <h4 style={{ fontSize: '1rem', fontWeight: 800, color: '#fff', textTransform: 'uppercase' }}>
+          <h4 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--text-primary)', textTransform: 'uppercase' }}>
             Store Campaigns ({campaigns.length}) — Owner Governance
           </h4>
           <span style={{ fontSize: '0.74rem', color: '#94a3b8' }}>
@@ -247,25 +253,25 @@ export default function CampaignsTab() {
                         padding: '0.2rem 0.55rem',
                         borderRadius: '9999px',
                         background: isActive ? 'rgba(16, 185, 129, 0.2)' : 'rgba(255, 255, 255, 0.08)',
-                        color: isActive ? '#34d399' : '#94a3b8',
+                        color: isActive ? '#4a7042' : '#94a3b8',
                         border: `1px solid ${isActive ? 'rgba(16, 185, 129, 0.4)' : 'rgba(255, 255, 255, 0.1)'}`
                       }}>
                         {c.status}
                       </span>
                     </td>
                     <td>
-                      <strong style={{ color: '#fff' }}>{c.title}</strong>
+                      <strong style={{ color: 'var(--text-primary)' }}>{c.title}</strong>
                       <div style={{ fontSize: '0.72rem', color: '#94a3b8', fontFamily: 'monospace' }}>{c.id}</div>
                     </td>
                     <td>
                       <span className="prod-badge-cat" style={{ position: 'static' }}>{c.category}</span>
                     </td>
                     <td>
-                      <span style={{ fontWeight: 800, color: '#34d399', fontFamily: 'monospace' }}>
+                      <span style={{ fontWeight: 800, color: '#4a7042', fontFamily: 'monospace' }}>
                         {c.discount_percent}% OFF
                       </span>
                     </td>
-                    <td style={{ fontSize: '0.78rem', color: '#e2e8f0', maxWidth: '280px' }}>
+                    <td style={{ fontSize: '0.78rem', color: 'var(--text-primary)', maxWidth: '280px' }}>
                       {c.banner_text}
                     </td>
                     <td style={{ fontSize: '0.75rem', color: '#94a3b8' }}>
@@ -274,14 +280,14 @@ export default function CampaignsTab() {
                     <td>
                       <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
                         {!isActive ? (
-                          <button 
+                          <button
                             className="action-btn"
-                            style={{ 
-                              padding: '0.25rem 0.6rem', 
-                              fontSize: '0.72rem', 
-                              color: '#34d399', 
-                              background: 'rgba(16, 185, 129, 0.12)', 
-                              borderColor: 'rgba(16, 185, 129, 0.35)' 
+                            style={{
+                              padding: '0.25rem 0.6rem',
+                              fontSize: '0.72rem',
+                              color: '#4a7042',
+                              background: 'rgba(16, 185, 129, 0.12)',
+                              borderColor: 'rgba(16, 185, 129, 0.35)'
                             }}
                             onClick={() => handleActivate(c.id, c.category)}
                             disabled={isProcessing}
@@ -291,14 +297,14 @@ export default function CampaignsTab() {
                             <span>Activate</span>
                           </button>
                         ) : (
-                          <button 
+                          <button
                             className="action-btn"
-                            style={{ 
-                              padding: '0.25rem 0.6rem', 
-                              fontSize: '0.72rem', 
-                              color: '#fbbf24', 
-                              background: 'rgba(245, 158, 11, 0.12)', 
-                              borderColor: 'rgba(245, 158, 11, 0.35)' 
+                            style={{
+                              padding: '0.25rem 0.6rem',
+                              fontSize: '0.72rem',
+                              color: '#92733b',
+                              background: 'rgba(245, 158, 11, 0.12)',
+                              borderColor: 'rgba(245, 158, 11, 0.35)'
                             }}
                             onClick={() => handleStop(c.id)}
                             disabled={isProcessing}
@@ -309,14 +315,14 @@ export default function CampaignsTab() {
                           </button>
                         )}
 
-                        <button 
+                        <button
                           className="action-btn danger"
-                          style={{ 
-                            padding: '0.25rem 0.5rem', 
-                            fontSize: '0.72rem', 
-                            color: '#fb7185', 
-                            background: 'rgba(244, 63, 94, 0.12)', 
-                            borderColor: 'rgba(244, 63, 94, 0.35)' 
+                          style={{
+                            padding: '0.25rem 0.5rem',
+                            fontSize: '0.72rem',
+                            color: '#fb7185',
+                            background: 'rgba(244, 63, 94, 0.12)',
+                            borderColor: 'rgba(244, 63, 94, 0.35)'
                           }}
                           onClick={() => handleDelete(c.id)}
                           disabled={isProcessing}

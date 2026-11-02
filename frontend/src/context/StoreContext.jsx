@@ -23,14 +23,21 @@ export function StoreProvider({ children }) {
   const [isRzpModalOpen, setIsRzpModalOpen] = useState(false);
   const [isUserModalOpen, setIsUserModalOpen] = useState(false);
   const [isLoadingCatalog, setIsLoadingCatalog] = useState(false);
+  const [catalogError, setCatalogError] = useState('');
+  const [serviceStatus, setServiceStatus] = useState(null);
   const [toastMessage, setToastMessage] = useState(null);
 
   // In-flight guard for catalog/cart background polls
   const catalogInFlight = useRef(false);
+  const activeUserId = useRef(currentUser.id);
+  const toastTimer = useRef(null);
+
+  useEffect(() => () => clearTimeout(toastTimer.current), []);
 
   const showToast = useCallback((msg, type = 'info') => {
     setToastMessage({ msg, type });
-    setTimeout(() => setToastMessage(null), 4000);
+    clearTimeout(toastTimer.current);
+    toastTimer.current = setTimeout(() => setToastMessage(null), 4000);
   }, []);
 
   // ─── Fetch catalog (with in-flight guard) ────────────────────────────────────────
@@ -38,7 +45,9 @@ export function StoreProvider({ children }) {
     try {
       const data = await api.getInventory();
       setCatalog(data.products || []);
+      setCatalogError('');
     } catch (e) {
+      setCatalogError('The catalog could not load. Check that the Nova server is running and retry.');
       console.error('[Store] Failed to load catalog:', e.message);
     }
   }, []);
@@ -47,6 +56,7 @@ export function StoreProvider({ children }) {
   const refreshCart = useCallback(async (userId = currentUser.id) => {
     try {
       const cartData = await api.getCart(userId);
+      if (activeUserId.current !== userId) return;
       setCart(cartData || { items: [], item_count: 0, subtotal: 0, estimated_tax: 0, estimated_total: 0 });
     } catch (e) {
       console.error('[Store] Failed to load cart:', e.message);
@@ -57,6 +67,7 @@ export function StoreProvider({ children }) {
   const refreshOrders = useCallback(async (userId = currentUser.id) => {
     try {
       const data = await api.getOrders(userId);
+      if (activeUserId.current !== userId) return;
       setOrders(data.orders || []);
     } catch (e) {
       console.error('[Store] Failed to load orders:', e.message);
@@ -67,6 +78,7 @@ export function StoreProvider({ children }) {
   const refreshAP2Status = useCallback(async (userId = currentUser.id) => {
     try {
       const data = await api.getAP2Status(userId);
+      if (activeUserId.current !== userId) return;
       setAp2Status(data);
     } catch (e) {
       console.error('[Store] Failed to check AP2 status:', e.message);
@@ -85,7 +97,11 @@ export function StoreProvider({ children }) {
 
   // ─── Switch user profile ──────────────────────────────────────────────────────────
   const switchUser = useCallback((user) => {
+    activeUserId.current = user.id;
     setCurrentUser(user);
+    setCart({ items: [], item_count: 0, subtotal: 0, estimated_total: 0 });
+    setOrders([]);
+    setAp2Status({ authorized: false });
     setIsUserModalOpen(false);
     refreshCart(user.id);
     refreshOrders(user.id);
@@ -97,7 +113,7 @@ export function StoreProvider({ children }) {
   const addToCart = useCallback(async (productId, size = null) => {
     try {
       const res = await api.addToCart(currentUser.id, productId, 1, size);
-      if (res.cart) setCart(res.cart);
+      if (res.cart && activeUserId.current === currentUser.id) setCart(res.cart);
       showToast('Item added to cart!', 'success');
       return res;
     } catch (e) {
@@ -110,7 +126,7 @@ export function StoreProvider({ children }) {
   const removeFromCart = useCallback(async (productId, quantity = 1) => {
     try {
       const res = await api.removeFromCart(currentUser.id, productId, quantity);
-      if (res.cart) setCart(res.cart);
+      if (res.cart && activeUserId.current === currentUser.id) setCart(res.cart);
       return res;
     } catch (e) {
       showToast(e.message, 'error');
@@ -122,6 +138,7 @@ export function StoreProvider({ children }) {
   useEffect(() => {
     setIsLoadingCatalog(true);
     Promise.all([
+      api.getHealth().then(setServiceStatus).catch(() => {}),
       refreshCatalog(),
       refreshCart(),
       refreshOrders(),
@@ -138,7 +155,7 @@ export function StoreProvider({ children }) {
       if (catalogInFlight.current) return;
       catalogInFlight.current = true;
       try {
-        await Promise.all([refreshCatalog(), refreshCart()]);
+        await Promise.all([refreshCatalog(), refreshCart(), api.getHealth().then(setServiceStatus).catch(() => setServiceStatus(null))]);
       } finally {
         catalogInFlight.current = false;
       }
@@ -154,6 +171,8 @@ export function StoreProvider({ children }) {
       catalog,
       refreshCatalog,
       isLoadingCatalog,
+      catalogError,
+      serviceStatus,
       cart,
       refreshCart,
       addToCart,

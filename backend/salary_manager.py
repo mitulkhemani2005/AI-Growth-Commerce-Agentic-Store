@@ -1,12 +1,11 @@
+from backend.config import DATA_DIR, data_file
 import asyncio
-import json
 import os
 import threading
-import uuid
 from datetime import datetime, timezone
-from typing import List, Dict, Any, Optional
+from typing import Dict, Any, Optional
 
-SALARIES_FILE = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "agent_salaries.json"))
+SALARIES_FILE = data_file("agent_salaries.json")
 _lock = threading.RLock()
 
 
@@ -155,6 +154,8 @@ DEFAULT_AGENT_SALARIES = {
 
 
 
+from backend.async_store import AsyncJSONStore
+
 class AgentSalaryManager:
     """
     Manages salary scales, performance evaluations, salary negotiations,
@@ -167,75 +168,91 @@ class AgentSalaryManager:
     """
     def __init__(self, file_path: str = SALARIES_FILE):
         self.file_path = file_path
+        self.store = AsyncJSONStore(file_path, default_factory=lambda: dict(DEFAULT_AGENT_SALARIES))
         self._ensure_file()
 
     def _ensure_file(self):
-        with _lock:
-            if not os.path.exists(self.file_path):
-                self._write_salaries(DEFAULT_AGENT_SALARIES)
-            else:
-                # Ensure CEO entry exists in existing file
-                try:
-                    data = self._read_salaries()
-                    if "CEO Agent" not in data:
-                        data["CEO Agent"] = DEFAULT_AGENT_SALARIES["CEO Agent"]
-                        self._write_salaries(data)
-                except Exception:
-                    pass
+        data = self.store.get()
+        if not data or "CEO Agent" not in data:
+            merged = dict(DEFAULT_AGENT_SALARIES)
+            if data:
+                merged.update(data)
+            self.store.set(merged)
 
     def _read_salaries(self) -> Dict[str, Any]:
-        with _lock:
-            if not os.path.exists(self.file_path):
-                self._ensure_file()
-            try:
-                with open(self.file_path, "r", encoding="utf-8") as f:
-                    return json.load(f)
-            except Exception:
-                return DEFAULT_AGENT_SALARIES
+        data = self.store.get()
+        if not data:
+            return DEFAULT_AGENT_SALARIES
+        return data
 
     def _write_salaries(self, data: Dict[str, Any]) -> None:
-        with _lock:
-            tmp_file = f"{self.file_path}.{os.getpid()}.{threading.get_ident()}.tmp"
-            try:
-                with open(tmp_file, "w", encoding="utf-8") as f:
-                    json.dump(data, f, indent=2)
-                os.replace(tmp_file, self.file_path)
-            except Exception:
-                if os.path.exists(tmp_file):
-                    try:
-                        os.remove(tmp_file)
-                    except Exception:
-                        pass
-                with open(self.file_path, "w", encoding="utf-8") as f:
-                    json.dump(data, f, indent=2)
+        self.store.set(data)
+
+    async def _read_salaries_async(self) -> Dict[str, Any]:
+        data = await self.store.get_async()
+        if not data:
+            return DEFAULT_AGENT_SALARIES
+        return data
+
+    async def _write_salaries_async(self, data: Dict[str, Any]) -> None:
+        await self.store.set_async(data)
 
     def get_all_salaries(self) -> Dict[str, Any]:
         """Returns all agent salaries and total payroll liability per cycle."""
-        with _lock:
-            salaries = self._read_salaries()
-            total_cycle_liability = sum(float(a.get("current_salary", 0.0)) for a in salaries.values())
-            salaries_list = []
-            for k, v in salaries.items():
-                item = dict(v)
-                item["agent_name"] = k
-                item["role"] = v.get("role_title", "Specialist Agent")
-                item["salary_amount"] = round(float(v.get("current_salary", 7000.0)), 2)
-                item["owner_decided"] = v.get("owner_decided", False)
-                salaries_list.append(item)
+        salaries = self._read_salaries()
+        total_cycle_liability = sum(float(a.get("current_salary", 0.0)) for a in salaries.values())
+        salaries_list = []
+        for k, v in salaries.items():
+            item = dict(v)
+            item["agent_name"] = k
+            item["role"] = v.get("role_title", "Specialist Agent")
+            item["salary_amount"] = round(float(v.get("current_salary", 7000.0)), 2)
+            item["owner_decided"] = v.get("owner_decided", False)
+            salaries_list.append(item)
 
-            return {
-                "success": True,
-                "currency": "INR",
-                "total_cycle_liability": round(total_cycle_liability, 2),
-                "total_payroll_per_cycle": round(total_cycle_liability, 2),
-                "agents_count": len(salaries),
-                "salaries": salaries_list,
-                "salaries_map": salaries
-            }
+        return {
+            "success": True,
+            "currency": "INR",
+            "total_cycle_liability": round(total_cycle_liability, 2),
+            "total_payroll_per_cycle": round(total_cycle_liability, 2),
+            "agents_count": len(salaries),
+            "salaries": salaries_list,
+            "salaries_map": salaries
+        }
+
+    async def get_all_salaries_async(self) -> Dict[str, Any]:
+        """Non-blocking async version of get_all_salaries."""
+        salaries = await self._read_salaries_async()
+        total_cycle_liability = sum(float(a.get("current_salary", 0.0)) for a in salaries.values())
+        salaries_list = []
+        for k, v in salaries.items():
+            item = dict(v)
+            item["agent_name"] = k
+            item["role"] = v.get("role_title", "Specialist Agent")
+            item["salary_amount"] = round(float(v.get("current_salary", 7000.0)), 2)
+            item["owner_decided"] = v.get("owner_decided", False)
+            salaries_list.append(item)
+
+        return {
+            "success": True,
+            "currency": "INR",
+            "total_cycle_liability": round(total_cycle_liability, 2),
+            "total_payroll_per_cycle": round(total_cycle_liability, 2),
+            "agents_count": len(salaries),
+            "salaries": salaries_list,
+            "salaries_map": salaries
+        }
 
 
     def get_agent_salary(self, agent_name: str) -> Optional[Dict[str, Any]]:
         salaries = self._read_salaries()
+        for k, v in salaries.items():
+            if k.lower() == agent_name.lower() or v.get("agent_key", "").lower() == agent_name.lower():
+                return v
+        return None
+
+    async def get_agent_salary_async(self, agent_name: str) -> Optional[Dict[str, Any]]:
+        salaries = await self._read_salaries_async()
         for k, v in salaries.items():
             if k.lower() == agent_name.lower() or v.get("agent_key", "").lower() == agent_name.lower():
                 return v
@@ -360,7 +377,7 @@ class AgentSalaryManager:
         from backend.admin_agents import _call_ollama_sync, clean_think_tags, message_bus, conversation_history
 
         negotiation_prompt = (
-            f"You are the {matched_key} ({role}) of the AI Growth Commerce Store.\n"
+            f"You are the {matched_key} ({role}) of the Nova.\n"
             f"Your current salary is ₹{current_salary:,.2f}/cycle (Market baseline: ₹{base_market:,.2f}).\n"
             f"Your performance rating is {perf_score}/10.\n\n"
             f"The {speaker} is negotiating your salary with the following proposal:\n"
@@ -380,7 +397,7 @@ class AgentSalaryManager:
         try:
             resp = await asyncio.to_thread(
                 _call_ollama_sync,
-                "ollama", "qwen2.5:7b",
+                "ollama", os.environ.get("OLLAMA_MODEL", "qwen2.5:0.5b"),
                 [{"role": "system", "content": f"You are {matched_key}, negotiating your salary with {speaker}."},
                  {"role": "user", "content": negotiation_prompt}],
                 temperature=0.2, max_tokens=400, fallback_models=["llama3:8b", "gemma4:e2b-it-qat"]

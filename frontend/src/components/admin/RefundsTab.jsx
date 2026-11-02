@@ -1,5 +1,5 @@
 import React from 'react';
-import { RotateCcw, AlertTriangle, CheckCircle2, XCircle } from 'lucide-react';
+import { RotateCcw, CheckCircle2, XCircle } from 'lucide-react';
 import { useAdmin } from '../../context/AdminContext';
 import { useStore } from '../../context/StoreContext';
 import { api } from '../../api/client';
@@ -9,8 +9,8 @@ export default function RefundsTab() {
   const { refreshCatalog, showToast } = useStore();
 
   const handleCancelOrder = async (orderId, force = false) => {
-    const confirmMsg = force 
-      ? `Force Store Owner override refund for order ${orderId}?` 
+    const confirmMsg = force
+      ? `Force Store Owner override refund for order ${orderId}?`
       : `Process standard 24-hour refund for order ${orderId}?`;
 
     if (!window.confirm(confirmMsg)) return;
@@ -31,7 +31,7 @@ export default function RefundsTab() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
       <div>
-        <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.4rem', fontWeight: 800, color: '#fff' }}>
+        <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-primary)' }}>
           Refunds & 24h Policy Governance Engine
         </h2>
         <p style={{ fontSize: '0.82rem', color: '#94a3b8' }}>
@@ -65,12 +65,12 @@ export default function RefundsTab() {
                 return (
                   <tr key={ord.order_id}>
                     <td>
-                      <strong style={{ fontFamily: 'monospace', color: '#fff' }}>{ord.order_id}</strong>
+                      <strong style={{ fontFamily: 'monospace', color: 'var(--text-primary)' }}>{ord.order_id}</strong>
                     </td>
                     <td style={{ fontSize: '0.78rem', color: '#94a3b8' }}>
                       {date.toLocaleString()}
                     </td>
-                    <td style={{ fontFamily: 'monospace', color: parseFloat(ageHours) <= 24 ? '#34d399' : '#fb7185' }}>
+                    <td style={{ fontFamily: 'monospace', color: parseFloat(ageHours) <= 24 ? '#4a7042' : '#fb7185' }}>
                       {ageHours} hrs
                     </td>
                     <td>
@@ -80,7 +80,7 @@ export default function RefundsTab() {
                         padding: '0.15rem 0.5rem',
                         borderRadius: '9999px',
                         background: isRefunded ? 'rgba(244, 63, 94, 0.15)' : 'rgba(16, 185, 129, 0.15)',
-                        color: isRefunded ? '#fb7185' : '#34d399'
+                        color: isRefunded ? '#fb7185' : '#4a7042'
                       }}>
                         {ord.status || 'Confirmed'}
                       </span>
@@ -89,7 +89,7 @@ export default function RefundsTab() {
                       {isRefunded ? (
                         <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Refund Completed</span>
                       ) : isEligible ? (
-                        <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#34d399', fontSize: '0.75rem', fontWeight: 700 }}>
+                        <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#4a7042', fontSize: '0.75rem', fontWeight: 700 }}>
                           <CheckCircle2 size={13} />
                           <span>Eligible for Auto-Refund (&le;24h)</span>
                         </span>
@@ -100,18 +100,18 @@ export default function RefundsTab() {
                         </span>
                       )}
                     </td>
-                    <td style={{ fontFamily: 'monospace', fontWeight: 800, color: '#fff' }}>
+                    <td style={{ fontFamily: 'monospace', fontWeight: 800, color: 'var(--text-primary)' }}>
                       ₹{Number(ord.total || 0).toFixed(2)}
                     </td>
                     <td>
                       {!isRefunded ? (
                         <div style={{ display: 'flex', gap: '0.4rem' }}>
-                          <button 
+                          <button
                             className="action-btn"
-                            style={{ 
-                              padding: '0.2rem 0.55rem', 
+                            style={{
+                              padding: '0.2rem 0.55rem',
                               fontSize: '0.72rem',
-                              color: isEligible ? '#34d399' : '#fb7185'
+                              color: isEligible ? '#4a7042' : '#fb7185'
                             }}
                             onClick={() => handleCancelOrder(ord.order_id, false)}
                           >
@@ -119,7 +119,7 @@ export default function RefundsTab() {
                             <span>Auto-Evaluate</span>
                           </button>
 
-                          <button 
+                          <button
                             className="action-btn"
                             style={{ padding: '0.2rem 0.55rem', fontSize: '0.72rem', color: '#f59e0b' }}
                             onClick={() => handleCancelOrder(ord.order_id, true)}

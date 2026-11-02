@@ -1,11 +1,14 @@
-import json
+from backend.transactions import serialized
+from backend.config import DATA_DIR, data_file
 import os
 import threading
 import uuid
 from datetime import datetime, timezone
 from typing import List, Dict, Any, Optional
 
-TREASURY_FILE = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "treasury.json"))
+from backend.async_store import AsyncJSONStore
+
+TREASURY_FILE = data_file("treasury.json")
 _lock = threading.RLock()
 
 
@@ -18,113 +21,137 @@ class TreasuryManager:
     def __init__(self, file_path: str = TREASURY_FILE):
         self.file_path = file_path
         self._default_balance = float(os.environ.get("CEO_BANK_BALANCE", "1000.0"))
+        self._store = AsyncJSONStore(self.file_path, default_factory=self._get_default_treasury)
         self._ensure_file()
 
-
     def _ensure_file(self):
-        with _lock:
-            if not os.path.exists(self.file_path):
-                data = {
-                    "bank_balance": self._default_balance,
-                    "initial_bank_balance": self._default_balance,
-                    "total_sales_revenue": 0.0,
-                    "total_inventory_spend": 0.0,
-                    "total_salaries_paid": 0.0,
-                    "total_refunds_deducted": 0.0,
-                    "created_at": datetime.now(timezone.utc).isoformat(),
-                    "transactions": [
-                        {
-                            "id": f"tx_{uuid.uuid4().hex[:8]}",
-                            "type": "INITIAL_CAPITAL",
-                            "amount": self._default_balance,
-                            "balance_after": self._default_balance,
-                            "description": f"Initial Store Capital & CEO Bank Balance configured from .env (₹{self._default_balance:,.2f})",
-                            "actor": "System / Store Owner",
-                            "timestamp": datetime.now(timezone.utc).isoformat()
-                        }
-                    ]
+        self._store.get()
+
+    def _get_default_treasury(self) -> Dict[str, Any]:
+        return {
+            "bank_balance": self._default_balance,
+            "initial_bank_balance": self._default_balance,
+            "total_sales_revenue": 0.0,
+            "total_inventory_spend": 0.0,
+            "total_salaries_paid": 0.0,
+            "total_refunds_deducted": 0.0,
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "transactions": [
+                {
+                    "id": f"tx_{uuid.uuid4().hex[:8]}",
+                    "type": "INITIAL_CAPITAL",
+                    "amount": self._default_balance,
+                    "balance_after": self._default_balance,
+                    "description": f"Starting treasury capital initialized to ₹{self._default_balance:,.2f}.",
+                    "actor": "System",
+                    "timestamp": datetime.now(timezone.utc).isoformat()
                 }
-                self._write_treasury(data)
+            ]
+        }
 
     def _read_treasury(self) -> Dict[str, Any]:
-        with _lock:
-            if not os.path.exists(self.file_path):
-                self._ensure_file()
-            try:
-                with open(self.file_path, "r", encoding="utf-8") as f:
-                    return json.load(f)
-            except Exception:
-                return {
-                    "bank_balance": self._default_balance,
-                    "initial_bank_balance": self._default_balance,
-                    "total_sales_revenue": 0.0,
-                    "total_inventory_spend": 0.0,
-                    "total_salaries_paid": 0.0,
-                    "total_refunds_deducted": 0.0,
-                    "transactions": []
-                }
+        return self._store.get()
+
+    async def _read_treasury_async(self) -> Dict[str, Any]:
+        return await self._store.get_async()
 
     def _write_treasury(self, data: Dict[str, Any]) -> None:
-        with _lock:
-            tmp_file = f"{self.file_path}.{os.getpid()}.{threading.get_ident()}.tmp"
-            try:
-                with open(tmp_file, "w", encoding="utf-8") as f:
-                    json.dump(data, f, indent=2)
-                os.replace(tmp_file, self.file_path)
-            except Exception:
-                if os.path.exists(tmp_file):
-                    try:
-                        os.remove(tmp_file)
-                    except Exception:
-                        pass
-                with open(self.file_path, "w", encoding="utf-8") as f:
-                    json.dump(data, f, indent=2)
+        self._store.set(data)
+
+    async def _write_treasury_async(self, data: Dict[str, Any]) -> None:
+        await self._store.set_async(data)
 
     def get_summary(self) -> Dict[str, Any]:
-        """Returns high-level treasury metrics, cash flows, and profit calculation."""
+        """Returns high-level treasury metrics, cash flows, and profit calculation (served from memory)."""
+        t = self._read_treasury()
+        balance = float(t.get("bank_balance", 0.0))
+        init_balance = float(t.get("initial_bank_balance", self._default_balance))
+        revenue = float(t.get("total_sales_revenue", 0.0))
+        inv_spend = float(t.get("total_inventory_spend", 0.0))
+        salaries = float(t.get("total_salaries_paid", 0.0))
+        refunds = float(t.get("total_refunds_deducted", 0.0))
+
+        gross_profit = revenue - inv_spend
+        net_profit = revenue - inv_spend - salaries - refunds
+        net_cash_flow = balance - init_balance
+        roi_pct = (net_profit / inv_spend * 100) if inv_spend > 0 else 0.0
+
+        return {
+            "success": True,
+            "currency": "INR",
+            "bank_balance": round(balance, 2),
+            "initial_bank_balance": round(init_balance, 2),
+            "total_sales_revenue": round(revenue, 2),
+            "total_inventory_spend": round(inv_spend, 2),
+            "total_wholesale_stock_spend": round(inv_spend, 2),
+            "total_salaries_paid": round(salaries, 2),
+            "total_salary_expenses": round(salaries, 2),
+            "total_refunds_deducted": round(refunds, 2),
+            "total_refunds_issued": round(refunds, 2),
+            "gross_profit": round(gross_profit, 2),
+            "net_profit": round(net_profit, 2),
+            "net_cash_flow": round(net_cash_flow, 2),
+            "roi_percentage": round(roi_pct, 1),
+            "roi_pct": round(roi_pct, 1),
+            "gross_profit_margin_pct": round((gross_profit / revenue * 100) if revenue > 0 else 0.0, 1),
+            "transaction_count": len(t.get("transactions", [])),
+            "transactions": t.get("transactions", []),
+            "recent_transactions": t.get("transactions", [])[-15:]
+        }
+
+    async def get_summary_async(self) -> Dict[str, Any]:
+        """Non-blocking async retrieval of treasury metrics."""
+        t = await self._read_treasury_async()
+        balance = float(t.get("bank_balance", 0.0))
+        init_balance = float(t.get("initial_bank_balance", self._default_balance))
+        revenue = float(t.get("total_sales_revenue", 0.0))
+        inv_spend = float(t.get("total_inventory_spend", 0.0))
+        salaries = float(t.get("total_salaries_paid", 0.0))
+        refunds = float(t.get("total_refunds_deducted", 0.0))
+
+        gross_profit = revenue - inv_spend
+        net_profit = revenue - inv_spend - salaries - refunds
+        net_cash_flow = balance - init_balance
+        roi_pct = (net_profit / inv_spend * 100) if inv_spend > 0 else 0.0
+
+        return {
+            "success": True,
+            "currency": "INR",
+            "bank_balance": round(balance, 2),
+            "initial_bank_balance": round(init_balance, 2),
+            "total_sales_revenue": round(revenue, 2),
+            "total_inventory_spend": round(inv_spend, 2),
+            "total_wholesale_stock_spend": round(inv_spend, 2),
+            "total_salaries_paid": round(salaries, 2),
+            "total_salary_expenses": round(salaries, 2),
+            "total_refunds_deducted": round(refunds, 2),
+            "total_refunds_issued": round(refunds, 2),
+            "gross_profit": round(gross_profit, 2),
+            "net_profit": round(net_profit, 2),
+            "net_cash_flow": round(net_cash_flow, 2),
+            "roi_percentage": round(roi_pct, 1),
+            "roi_pct": round(roi_pct, 1),
+            "gross_profit_margin_pct": round((gross_profit / revenue * 100) if revenue > 0 else 0.0, 1),
+            "transaction_count": len(t.get("transactions", [])),
+            "transactions": t.get("transactions", []),
+            "recent_transactions": t.get("transactions", [])[-15:]
+        }
+
+    def get_transactions(self, limit: int = 50, tx_type: Optional[str] = None) -> List[Dict[str, Any]]:
         with _lock:
             t = self._read_treasury()
-            balance = float(t.get("bank_balance", 0.0))
-            init_balance = float(t.get("initial_bank_balance", self._default_balance))
-            revenue = float(t.get("total_sales_revenue", 0.0))
-            inv_spend = float(t.get("total_inventory_spend", 0.0))
-            salaries = float(t.get("total_salaries_paid", 0.0))
-            refunds = float(t.get("total_refunds_deducted", 0.0))
+            txs = t.get("transactions", [])
+            if tx_type:
+                txs = [x for x in txs if x.get("type") == tx_type]
+            return txs[-limit:] if limit > 0 else txs
 
-            # Profit Formulas:
-            # Gross Profit = Sales Revenue - Cost of Goods Sold/Acquired
-            gross_profit = revenue - inv_spend
-            # Net Realized Profit = Gross Profit - Salaries Paid - Refunds
-            net_profit = revenue - inv_spend - salaries - refunds
-            
-            # Net Balance Change
-            net_cash_flow = balance - init_balance
-            roi_pct = (net_profit / inv_spend * 100) if inv_spend > 0 else 0.0
-
-            return {
-                "success": True,
-                "currency": "INR",
-                "bank_balance": round(balance, 2),
-                "initial_bank_balance": round(init_balance, 2),
-                "total_sales_revenue": round(revenue, 2),
-                "total_inventory_spend": round(inv_spend, 2),
-                "total_wholesale_stock_spend": round(inv_spend, 2),
-                "total_salaries_paid": round(salaries, 2),
-                "total_salary_expenses": round(salaries, 2),
-                "total_refunds_deducted": round(refunds, 2),
-                "total_refunds_issued": round(refunds, 2),
-                "gross_profit": round(gross_profit, 2),
-                "net_profit": round(net_profit, 2),
-                "net_cash_flow": round(net_cash_flow, 2),
-                "roi_percentage": round(roi_pct, 2),
-                "roi_pct": round(roi_pct, 2),
-                "gross_profit_margin_pct": round((gross_profit / revenue * 100) if revenue > 0 else 0.0, 1),
-                "transaction_count": len(t.get("transactions", [])),
-                "transactions": t.get("transactions", [])[:30],
-                "recent_transactions": t.get("transactions", [])[:10]
-            }
+    async def get_transactions_async(self, limit: int = 30) -> List[Dict[str, Any]]:
+        t = await self._read_treasury_async()
+        txs = t.get("transactions", [])
+        return txs[-limit:] if limit > 0 else txs
 
 
+    @serialized
     def spend_for_stock(
         self,
         product_id: str,
@@ -182,6 +209,7 @@ class TreasuryManager:
                 "transaction": tx
             }
 
+    @serialized
     def deposit_sales(
         self,
         amount: float,
@@ -194,6 +222,11 @@ class TreasuryManager:
         """
         with _lock:
             t = self._read_treasury()
+            deposited = t.setdefault("deposited_order_ids", [])
+            if order_id and (order_id in deposited or any(tx.get("order_id") == order_id and tx.get("type") == "SALES_REVENUE" for tx in t.get("transactions", []))):
+                return {"success": True, "already_deposited": True, "deposited_amount": 0.0, "new_balance": t.get("bank_balance", 0.0)}
+            if order_id:
+                deposited.append(order_id)
             amount_clean = round(float(amount), 2)
             balance = float(t.get("bank_balance", 0.0))
             new_balance = round(balance + amount_clean, 2)
@@ -225,6 +258,7 @@ class TreasuryManager:
                 "transaction": tx
             }
 
+    @serialized
     def deduct_refund(
         self,
         amount: float,
@@ -262,11 +296,13 @@ class TreasuryManager:
 
             return {
                 "success": True,
+                "message": f"Refund of ₹{amount_clean:,.2f} deducted from treasury for Order #{order_id}.",
                 "refunded_amount": amount_clean,
                 "new_balance": new_balance,
                 "transaction": tx
             }
 
+    @serialized
     def deduct_salary(
         self,
         agent_name: str,
@@ -316,57 +352,7 @@ class TreasuryManager:
                 "transaction": tx
             }
 
-    def deduct_refund(
-        self,
-        amount: float,
-        order_id: str,
-        reason: str = "Customer Refund",
-        actor: str = "Payment Manager"
-    ) -> Dict[str, Any]:
-        """
-        Deducts a refund amount from the CEO Bank Balance and tracks it
-        under total_refunds_deducted. This is called by payment_manager.process_refund.
-        """
-        with _lock:
-            t = self._read_treasury()
-            amount_clean = round(float(amount), 2)
-            balance = float(t.get("bank_balance", 0.0))
-            new_balance = round(balance - amount_clean, 2)
-
-            t["bank_balance"] = new_balance
-            t["total_refunds_deducted"] = round(float(t.get("total_refunds_deducted", 0.0)) + amount_clean, 2)
-
-            tx = {
-                "id": f"tx_{uuid.uuid4().hex[:8]}",
-                "type": "REFUND_DEDUCTION",
-                "amount": amount_clean,
-                "balance_after": new_balance,
-                "order_id": order_id,
-                "description": f"Refund of ₹{amount_clean:,.2f} processed for Order #{order_id}. Reason: {reason}.",
-                "actor": actor,
-                "timestamp": datetime.now(timezone.utc).isoformat()
-            }
-            tx_list = t.get("transactions", [])
-            tx_list.insert(0, tx)
-            t["transactions"] = tx_list[:500]
-
-            self._write_treasury(t)
-
-            return {
-                "success": True,
-                "message": f"Refund of ₹{amount_clean:,.2f} deducted from treasury for Order #{order_id}.",
-                "new_balance": new_balance,
-                "transaction": tx
-            }
-
-    def get_transactions(self, limit: int = 50, tx_type: Optional[str] = None) -> List[Dict[str, Any]]:
-        with _lock:
-            t = self._read_treasury()
-            txs = t.get("transactions", [])
-            if tx_type:
-                txs = [x for x in txs if x.get("type") == tx_type]
-            return txs[:limit]
-
+    @serialized
     def reset_treasury(self, new_balance: Optional[float] = None) -> Dict[str, Any]:
         """Resets the treasury ledger and initializes starting balance."""
         with _lock:

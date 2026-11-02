@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Briefcase, Send, Check, MessageSquare } from 'lucide-react';
+import { Briefcase, Send, Check } from 'lucide-react';
 import { useAdmin } from '../../context/AdminContext';
 import { useStore } from '../../context/StoreContext';
 import { api } from '../../api/client';
@@ -86,12 +86,12 @@ export default function SalaryNegotiationModal() {
           fontSize: '0.82rem'
         }}>
           <div>
-            <strong style={{ color: '#fff' }}>{negotiatingAgent.role_title}</strong>
-            <div style={{ color: '#fbbf24', fontSize: '0.74rem' }}>
+            <strong style={{ color: 'var(--text-primary)' }}>{negotiatingAgent.role_title}</strong>
+            <div style={{ color: '#92733b', fontSize: '0.74rem' }}>
               Current Rate: ₹{negotiatingAgent.current_salary || 50} / 100 cycles • Performance: {negotiatingAgent.performance_score || 95}%
             </div>
           </div>
-          <span style={{ fontSize: '0.72rem', background: 'rgba(245, 158, 11, 0.2)', color: '#fbbf24', padding: '0.2rem 0.5rem', borderRadius: '4px', fontWeight: 700 }}>
+          <span style={{ fontSize: '0.72rem', background: 'rgba(245, 158, 11, 0.2)', color: '#92733b', padding: '0.2rem 0.5rem', borderRadius: '4px', fontWeight: 700 }}>
             {negotiatingAgent.negotiation_status || 'Agreed'}
           </span>
         </div>
@@ -118,10 +118,10 @@ export default function SalaryNegotiationModal() {
                 padding: '0.6rem 0.85rem',
                 borderRadius: '6px'
               }}>
-                <strong style={{ color: isOwner ? '#22d3ee' : '#c084fc', display: 'block', fontSize: '0.74rem', marginBottom: '2px' }}>
+                <strong style={{ color: isOwner ? '#4a7042' : '#7a6f50', display: 'block', fontSize: '0.74rem', marginBottom: '2px' }}>
                   {turn.speaker}:
                 </strong>
-                <span style={{ color: '#cbd5e1' }}>{turn.message}</span>
+                <span style={{ color: 'var(--text-primary)' }}>{turn.message}</span>
               </div>
             );
           })}
@@ -132,7 +132,7 @@ export default function SalaryNegotiationModal() {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '0.75rem' }}>
             <div className="form-group" style={{ marginBottom: 0 }}>
               <label>Proposed Rate (₹ / 100 cycles)</label>
-              <input 
+              <input
                 type="number"
                 min="10"
                 step="5"
@@ -145,7 +145,7 @@ export default function SalaryNegotiationModal() {
 
             <div className="form-group" style={{ marginBottom: 0 }}>
               <label>Owner Rationale / Performance Justification</label>
-              <input 
+              <input
                 type="text"
                 className="form-input"
                 value={rationale}
@@ -156,8 +156,8 @@ export default function SalaryNegotiationModal() {
           </div>
 
           <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.5rem' }}>
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               className="action-btn primary"
               style={{ flex: 1, justifyContent: 'center' }}
               disabled={isSending}
@@ -166,10 +166,10 @@ export default function SalaryNegotiationModal() {
               <span>{isSending ? 'Formulating Response...' : 'Send Salary Proposal'}</span>
             </button>
 
-            <button 
-              type="button" 
+            <button
+              type="button"
               className="action-btn"
-              style={{ background: 'rgba(16, 185, 129, 0.2)', borderColor: '#10b981', color: '#34d399', justifyContent: 'center' }}
+              style={{ background: 'rgba(16, 185, 129, 0.2)', borderColor: '#10b981', color: '#4a7042', justifyContent: 'center' }}
               onClick={handleAcceptAgreement}
             >
               <Check size={15} />

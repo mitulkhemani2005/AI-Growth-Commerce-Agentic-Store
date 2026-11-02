@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ShieldCheck, AlertOctagon, CheckCircle2, RefreshCw, FileText, ArrowRight } from 'lucide-react';
+import { RefreshCw } from 'lucide-react';
 import { api } from '../../api/client';
 
 export default function AuditTrailTab() {
@@ -29,7 +29,7 @@ export default function AuditTrailTab() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.75rem' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
-          <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.4rem', fontWeight: 800, color: '#fff' }}>
+          <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-primary)' }}>
             🛡️ Explainable Money Actions, Bounds & Financial Guardrails
           </h2>
           <p style={{ fontSize: '0.82rem', color: '#94a3b8' }}>
@@ -37,7 +37,7 @@ export default function AuditTrailTab() {
           </p>
         </div>
 
-        <button 
+        <button
           onClick={fetchAudit}
           className="action-btn"
           style={{ fontSize: '0.78rem' }}
@@ -50,10 +50,10 @@ export default function AuditTrailTab() {
       {/* Chronological Audit Trail Table */}
       <div className="glass-panel">
         <div style={{ paddingBottom: '1rem', marginBottom: '1rem', borderBottom: '1px solid rgba(255, 255, 255, 0.08)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h4 style={{ fontSize: '1rem', fontWeight: 800, color: '#fff', textTransform: 'uppercase' }}>
+          <h4 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--text-primary)', textTransform: 'uppercase' }}>
             Immutable Financial Transaction Ledger ({auditData.length})
           </h4>
-          <span style={{ fontSize: '0.72rem', background: 'rgba(16, 185, 129, 0.15)', color: '#34d399', padding: '0.2rem 0.6rem', borderRadius: '4px', fontWeight: 700 }}>
+          <span style={{ fontSize: '0.72rem', background: 'rgba(16, 185, 129, 0.15)', color: '#4a7042', padding: '0.2rem 0.6rem', borderRadius: '4px', fontWeight: 700 }}>
             BOUNDS ENFORCED ✓
           </span>
         </div>
@@ -84,24 +84,24 @@ export default function AuditTrailTab() {
                       {tx.transaction_id}
                     </td>
                     <td>
-                      <span style={{ fontSize: '0.72rem', fontWeight: 800, color: isCredit ? '#34d399' : '#fb7185' }}>
+                      <span style={{ fontSize: '0.72rem', fontWeight: 800, color: isCredit ? '#4a7042' : '#fb7185' }}>
                         {tx.type}
                       </span>
                     </td>
-                    <td style={{ fontFamily: 'monospace', fontWeight: 800, color: isCredit ? '#34d399' : '#fb7185' }}>
+                    <td style={{ fontFamily: 'monospace', fontWeight: 800, color: isCredit ? '#4a7042' : '#fb7185' }}>
                       {isCredit ? '+' : '-'}₹{Math.abs(tx.amount || 0).toFixed(2)}
                     </td>
-                    <td style={{ fontFamily: 'monospace', color: '#fff' }}>
+                    <td style={{ fontFamily: 'monospace', color: 'var(--text-primary)' }}>
                       ₹{Number(tx.balance_after || 0).toFixed(2)}
                     </td>
-                    <td style={{ fontSize: '0.76rem', fontWeight: 600, color: '#e2e8f0' }}>
+                    <td style={{ fontSize: '0.76rem', fontWeight: 600, color: 'var(--text-primary)' }}>
                       {tx.actor}
                     </td>
                     <td style={{ fontSize: '0.78rem', color: '#94a3b8', maxWidth: '280px' }}>
                       {tx.explainability}
                     </td>
                     <td>
-                      <span style={{ fontSize: '0.68rem', background: 'rgba(16, 185, 129, 0.15)', color: '#34d399', border: '1px solid rgba(16, 185, 129, 0.3)', padding: '0.15rem 0.45rem', borderRadius: '4px', fontWeight: 700 }}>
+                      <span style={{ fontSize: '0.68rem', background: 'rgba(16, 185, 129, 0.15)', color: '#4a7042', border: '1px solid rgba(16, 185, 129, 0.3)', padding: '0.15rem 0.45rem', borderRadius: '4px', fontWeight: 700 }}>
                         BOUNDED ✓
                       </span>
                     </td>

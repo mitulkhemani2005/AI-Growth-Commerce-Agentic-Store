@@ -13,8 +13,8 @@ Risk Levels:
 """
 
 from dataclasses import dataclass, field
-from typing import Dict, Any, List, Optional, Set
-from backend.policy_engine import policy_engine, PolicyResult
+from typing import Dict, Any, List, Optional
+from backend.policy_engine import PolicyResult
 
 
 @dataclass

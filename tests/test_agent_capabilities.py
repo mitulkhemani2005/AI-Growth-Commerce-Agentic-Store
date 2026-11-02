@@ -115,13 +115,12 @@ async def test_order_management_advance_order():
             user_id="user_test",
             items=[{"id": "prod_001", "PRODUCT_NAME": "Nova Phone", "quantity": 1, "price": 1000.0}],
             total=1000.0,
-            shipping_address="Test Address"
+            shipping_address="Test Address",
+            initial_status="Pending"
         )
         orders = order_manager.get_all_orders()
 
     oid = orders[0]["order_id"]
-    # Update to Confirmed first if needed
-    order_manager.update_order_status(oid, "Pending")
     res = await order_management_agent.advance_order(oid, "Confirmed", reason="Payment confirmed")
     assert res.get("success") is True
 

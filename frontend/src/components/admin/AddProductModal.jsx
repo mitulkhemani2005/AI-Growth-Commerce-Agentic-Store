@@ -59,10 +59,10 @@ export default function AddProductModal() {
       <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
         <div className="form-group">
           <label>Product Name</label>
-          <input 
-            type="text" 
-            className="form-input" 
-            required 
+          <input
+            type="text"
+            className="form-input"
+            required
             placeholder="e.g. Apex HyperFlex Pro"
             value={formData.PRODUCT_NAME}
             onChange={(e) => setFormData({ ...formData, PRODUCT_NAME: e.target.value })}
@@ -72,7 +72,7 @@ export default function AddProductModal() {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
           <div className="form-group">
             <label>Category</label>
-            <select 
+            <select
               className="form-select"
               value={formData.PRODUCT_TYPE}
               onChange={(e) => setFormData({ ...formData, PRODUCT_TYPE: e.target.value })}
@@ -86,8 +86,8 @@ export default function AddProductModal() {
 
           <div className="form-group">
             <label>Specs / Size</label>
-            <input 
-              type="text" 
+            <input
+              type="text"
               className="form-input"
               value={formData.PRODUCT_SIZE}
               onChange={(e) => setFormData({ ...formData, PRODUCT_SIZE: e.target.value })}
@@ -99,9 +99,9 @@ export default function AddProductModal() {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.75rem' }}>
           <div className="form-group">
             <label>Base Price Floor (₹)</label>
-            <input 
-              type="number" 
-              step="0.01" 
+            <input
+              type="number"
+              step="0.01"
               className="form-input"
               required
               value={formData.BASE_PRICE}
@@ -111,9 +111,9 @@ export default function AddProductModal() {
 
           <div className="form-group">
             <label>Initial Price (₹)</label>
-            <input 
-              type="number" 
-              step="0.01" 
+            <input
+              type="number"
+              step="0.01"
               className="form-input"
               required
               value={formData.PRICE}
@@ -123,8 +123,8 @@ export default function AddProductModal() {
 
           <div className="form-group">
             <label>Initial Stock Units</label>
-            <input 
-              type="number" 
+            <input
+              type="number"
               min="0"
               className="form-input"
               required
@@ -136,7 +136,7 @@ export default function AddProductModal() {
 
         <div className="form-group">
           <label>Description & Technical Specs</label>
-          <textarea 
+          <textarea
             rows="3"
             className="form-textarea"
             value={formData.DESCRIPTION}
@@ -145,8 +145,8 @@ export default function AddProductModal() {
           />
         </div>
 
-        <button 
-          type="submit" 
+        <button
+          type="submit"
           className="checkout-btn"
           disabled={isSubmitting}
         >

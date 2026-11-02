@@ -2,14 +2,19 @@ from dotenv import load_dotenv
 load_dotenv()
 
 import asyncio
+import json
 import os
+import time
+import hmac
 from contextlib import asynccontextmanager
 from typing import Optional, List, Dict, Any
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse, JSONResponse
-from pydantic import BaseModel
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel, Field, ConfigDict
+from backend.config import AI_ENABLED, BACKGROUND_AGENTS_ENABLED, PAYMENT_MODE
+from backend.transactions import serialized
 
 from backend.inventory_manager import inventory_manager
 from backend.cart_manager import cart_manager
@@ -21,24 +26,17 @@ from backend.treasury_manager import treasury_manager
 from backend.salary_manager import salary_manager
 from backend.buyer_agents import buyer_agents_fleet
 from backend.admin_agents import (
-    price_manager_agent,
-    inventory_manager_agent,
-    order_management_agent,
-    finance_manager_agent,
-    dispatcher_agent,
-    review_feedback_agent,
     ceo_agent,
     admin_chat_agent,
     message_bus,
-    # Legacy aliases for backward compatibility
-    order_manager_agent,
     refund_manager_agent
 )
 from backend.background_workers import background_worker
-from backend.ollama_loader import ensure_ollama_ready, unload_all_models_from_vram
+from backend.ollama_loader import ensure_ollama_ready, unload_model_from_vram
+from backend.llm_runtime import gpu_status, configured_model
 from backend.agent_tasks import task_manager
 from backend.observability import observability_manager
-from backend.policy_engine import policy_engine, validate_policy
+from backend.policy_engine import validate_policy
 from backend.idempotency import idempotency_manager
 from backend.agents.upsell_agent import UpsellAgent
 from backend.agents.campaign_orchestrator import CampaignOrchestrator
@@ -54,26 +52,88 @@ campaign_orchestrator = CampaignOrchestrator(
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Ensure Ollama daemon is active and primary model is in GPU VRAM
-    ensure_ollama_ready()
-    # Start 24/7 autonomous background fleet
-    background_worker.start()
-    yield
-    # Graceful shutdown
-    background_worker.stop()
-    # Unload all models from GPU VRAM
-    unload_all_models_from_vram()
+    # Validate every mounted route before reporting a healthy startup.
+    app.openapi()
+    app.state.manual_tasks = set()
+    app.state.ai_ready = False
+    if AI_ENABLED:
+        app.state.ai_ready = await asyncio.to_thread(ensure_ollama_ready)
+        os.environ["AI_RUNTIME_AVAILABLE"] = str(app.state.ai_ready).lower()
+    app.state.runtime_error = None
+    if AI_ENABLED and not app.state.ai_ready:
+        app.state.runtime_error = f"Configured model {configured_model()} is not fully GPU-resident. Agent inference is blocked."
+    if BACKGROUND_AGENTS_ENABLED and (not AI_ENABLED or app.state.ai_ready):
+        background_worker.start()
+    elif app.state.runtime_error:
+        from backend.admin_agents import log_agent_action
+        log_agent_action("Nova Runtime", "GPU readiness blocked", app.state.runtime_error)
+    try:
+        yield
+    finally:
+        background_worker.stop()
+        for task in app.state.manual_tasks:
+            task.cancel()
+        await asyncio.gather(*app.state.manual_tasks, return_exceptions=True)
+        if background_worker._task:
+            await asyncio.gather(background_worker._task, return_exceptions=True)
+        if AI_ENABLED:
+            await asyncio.to_thread(unload_model_from_vram, configured_model())
 
-app = FastAPI(title="Nava: Agentic AI Store", version="1.0.0", lifespan=lifespan)
+app = FastAPI(title="Nova: Agentic AI Store", version="1.0.0", lifespan=lifespan)
+app.state.manual_tasks = set()
 
 # Enable CORS for local development
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
+    allow_origins=[origin.strip() for origin in os.getenv("CORS_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173").split(",") if origin.strip()],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.middleware("http")
+async def protect_owner_actions(request: Request, call_next):
+    owner_path = request.url.path.startswith("/api/admin") or request.url.path in {
+        "/api/payment/credentials", "/api/settings", "/api/simulation/failure-test"
+    }
+    token = os.getenv("NOVA_ADMIN_TOKEN", "")
+    if owner_path and token and request.method != "OPTIONS":
+        supplied = request.headers.get("Authorization", "")
+        if not hmac.compare_digest(supplied.encode(), f"Bearer {token}".encode()):
+            return JSONResponse({"detail": "Owner access requires a valid Nova admin token."}, status_code=401)
+    response = await call_next(request)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["Referrer-Policy"] = "same-origin"
+    return response
+
+
+@app.get("/api/health")
+def health():
+    gpu = gpu_status() if AI_ENABLED else {"model": configured_model(), "gpu_resident": False, "processor": "Disabled"}
+    return {"status": "ok" if not AI_ENABLED or gpu["gpu_resident"] else "degraded", "name": "Nova",
+            "payment_mode": PAYMENT_MODE, "ai_enabled": AI_ENABLED, "ai_ready": gpu["gpu_resident"],
+            "background_agents_enabled": background_worker._running, "gpu": gpu,
+            "runtime_error": getattr(app.state, "runtime_error", None),
+            "frontend_url": os.getenv("FRONTEND_URL", "http://127.0.0.1:5173")}
+
+
+@app.get("/api/admin/runtime")
+def runtime_status():
+    return {**health(), "fleet": background_worker.get_status()}
+
+
+@app.post("/api/admin/runtime/retry")
+async def retry_runtime():
+    if not AI_ENABLED:
+        raise HTTPException(status_code=409, detail="Enable AI_ENABLED in .env and restart the API.")
+    ready = await asyncio.to_thread(ensure_ollama_ready, configured_model())
+    app.state.ai_ready = ready
+    os.environ["AI_RUNTIME_AVAILABLE"] = str(ready).lower()
+    app.state.runtime_error = None if ready else "GPU readiness failed. Check the configured local model and available VRAM."
+    if ready and BACKGROUND_AGENTS_ENABLED:
+        background_worker.start()
+    return {"success": ready, **health()}
 
 # Paths
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -85,19 +145,12 @@ os.makedirs(STATIC_DIR, exist_ok=True)
 os.makedirs(os.path.join(STATIC_DIR, "images"), exist_ok=True)
 os.makedirs(FRONTEND_DIR, exist_ok=True)
 
-# Mount static files & React bundle assets
-app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
-app.mount("/frontend", StaticFiles(directory=FRONTEND_DIR), name="frontend")
-FRONTEND_DIST_DIR = os.path.join(FRONTEND_DIR, "dist")
-ASSETS_DIR = os.path.join(FRONTEND_DIST_DIR, "assets")
-if os.path.exists(ASSETS_DIR):
-    app.mount("/assets", StaticFiles(directory=ASSETS_DIR), name="assets")
-
-# Mount AgentsOffice visual RPG simulator
+# The frontend runs separately on port 5173. Only product/office assets are hosted here.
 OFFICE_STATIC_DIR = os.path.join(BASE_DIR, "agents_office", "app", "static", "office")
 if os.path.exists(OFFICE_STATIC_DIR):
-    app.mount("/office", StaticFiles(directory=OFFICE_STATIC_DIR, html=True), name="office")
-    app.mount("/static/office", StaticFiles(directory=OFFICE_STATIC_DIR, html=True), name="static_office")
+    app.mount("/static/office", StaticFiles(directory=OFFICE_STATIC_DIR), name="static_office")
+
+app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 try:
     import sys
@@ -109,43 +162,46 @@ except Exception as e:
 
 
 # Request Models
-class ChatRequest(BaseModel):
+class RequestModel(BaseModel):
+    model_config = ConfigDict(allow_inf_nan=False, str_strip_whitespace=True)
+
+class ChatRequest(RequestModel):
     user_id: str = "user_alex"
-    prompt: str
+    prompt: str = Field(min_length=1, max_length=10000)
     conversation_history: Optional[List[Dict[str, str]]] = None
 
-class AddToCartRequest(BaseModel):
+class AddToCartRequest(RequestModel):
     user_id: str = "user_alex"
     product_id: str
-    quantity: int = 1
+    quantity: int = Field(default=1, gt=0, le=1000, strict=True)
     size: Optional[str] = None
 
-class RemoveFromCartRequest(BaseModel):
+class RemoveFromCartRequest(RequestModel):
     user_id: str = "user_alex"
     product_id: str
-    quantity: Optional[int] = None
+    quantity: Optional[int] = Field(default=None, gt=0, le=1000, strict=True)
 
-class CheckoutRequest(BaseModel):
+class CheckoutRequest(RequestModel):
     user_id: str = "user_alex"
     shipping_address: Optional[str] = None
     payment_method: str = "Razorpay Gateway (Online)"
 
-class RazorpayCreateOrderRequest(BaseModel):
+class RazorpayCreateOrderRequest(RequestModel):
     user_id: str = "user_alex"
     currency: str = "INR"
 
-class RazorpayVerifyPaymentRequest(BaseModel):
+class RazorpayVerifyPaymentRequest(RequestModel):
     user_id: str = "user_alex"
     razorpay_order_id: str
     razorpay_payment_id: str
     razorpay_signature: str
     shipping_address: Optional[str] = None
 
-class RazorpayCredentialsRequest(BaseModel):
+class RazorpayCredentialsRequest(RequestModel):
     key_id: str
     key_secret: str
 
-class CardPaymentRequest(BaseModel):
+class CardPaymentRequest(RequestModel):
     user_id: str = "user_alex"
     card_number: str
     expiry_date: str
@@ -154,27 +210,27 @@ class CardPaymentRequest(BaseModel):
     shipping_address: Optional[str] = None
     currency: str = "INR"
 
-class SaveCustomerCardRequest(BaseModel):
+class SaveCustomerCardRequest(RequestModel):
     user_id: str = "user_alex"
     card_number: str
     expiry_date: str
     cvv: str
     cardholder_name: str
 
-class AP2SaveTokenRequest(BaseModel):
+class AP2SaveTokenRequest(RequestModel):
     user_id: str = "user_alex"
     razorpay_payment_id: str
     razorpay_order_id: str
     card_details: Optional[Dict[str, Any]] = None
 
-class SettingsRequest(BaseModel):
+class SettingsRequest(RequestModel):
     api_key: Optional[str] = None
     model: Optional[str] = None
 
 # API Endpoints
 
 @app.get("/api/user")
-async def get_user_profile(user_id: str = "user_alex"):
+def get_user_profile(user_id: str = "user_alex"):
     user = cart_manager.get_user(user_id)
     if not user:
         # Return default fallback
@@ -188,7 +244,7 @@ async def get_user_profile(user_id: str = "user_alex"):
     return user
 
 @app.get("/api/inventory")
-async def get_inventory(
+def get_inventory(
     query: Optional[str] = None,
     product_type: Optional[str] = None,
     size: Optional[str] = None,
@@ -208,19 +264,19 @@ async def get_inventory(
     }
 
 @app.get("/api/inventory/{product_id}")
-async def get_product(product_id: str):
+def get_product(product_id: str):
     product = inventory_manager.get_product_by_id(product_id)
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
     return product
 
 @app.get("/api/cart")
-async def get_cart(user_id: str = "user_alex"):
+def get_cart(user_id: str = "user_alex"):
     cart = cart_manager.get_cart(user_id)
     return cart
 
 @app.post("/api/cart/add")
-async def add_to_cart(req: AddToCartRequest):
+def add_to_cart(req: AddToCartRequest):
     result = cart_manager.add_to_cart(
         user_id=req.user_id,
         product_identifier=req.product_id,
@@ -232,7 +288,7 @@ async def add_to_cart(req: AddToCartRequest):
     return result
 
 @app.post("/api/cart/remove")
-async def remove_from_cart(req: RemoveFromCartRequest):
+def remove_from_cart(req: RemoveFromCartRequest):
     result = cart_manager.remove_from_cart(
         user_id=req.user_id,
         product_identifier=req.product_id,
@@ -243,12 +299,14 @@ async def remove_from_cart(req: RemoveFromCartRequest):
     return result
 
 @app.post("/api/cart/clear")
-async def clear_cart(user_id: str = "user_alex"):
+def clear_cart(user_id: str = "user_alex"):
     result = cart_manager.clear_cart(user_id)
     return result
 
 @app.post("/api/checkout")
-async def checkout(req: CheckoutRequest):
+def checkout(req: CheckoutRequest):
+    if PAYMENT_MODE != "demo":
+        raise HTTPException(status_code=400, detail="Complete verified Razorpay checkout first.")
     result = order_manager.create_order_from_cart(
         user_id=req.user_id,
         shipping_address=req.shipping_address,
@@ -270,15 +328,16 @@ async def checkout(req: CheckoutRequest):
 # Razorpay Payment Gateway Endpoints
 
 @app.get("/api/payment/config")
-async def get_payment_config():
+def get_payment_config():
     """Returns the active Razorpay Key ID for client-side checkout popup."""
     return {
         "key_id": payment_manager.get_public_key_id(),
-        "gateway": "Razorpay"
+        "gateway": "Razorpay" if PAYMENT_MODE == "razorpay" else "Nova Demo",
+        "mode": PAYMENT_MODE
     }
 
 @app.post("/api/payment/create-order")
-async def create_razorpay_order(req: RazorpayCreateOrderRequest):
+def create_razorpay_order(req: RazorpayCreateOrderRequest):
     """
     Creates a Razorpay Order based on the current cart total.
     """
@@ -294,21 +353,25 @@ async def create_razorpay_order(req: RazorpayCreateOrderRequest):
         receipt_id=receipt_id,
         currency=req.currency
     )
+    if not order_data.get("success"):
+        raise HTTPException(status_code=502, detail=order_data.get("error", "Payment initialization failed."))
+    payment_manager.bind_checkout(order_data, req.user_id, cart)
     order_data["cart"] = cart
     return order_data
 
 @app.post("/api/payment/verify")
-async def verify_razorpay_payment(req: RazorpayVerifyPaymentRequest):
+@serialized
+def verify_razorpay_payment(req: RazorpayVerifyPaymentRequest):
     """
     Verifies Razorpay HMAC signature, deducts stock, and records the confirmed order.
     """
-    is_valid = payment_manager.verify_payment_signature(
-        razorpay_order_id=req.razorpay_order_id,
-        razorpay_payment_id=req.razorpay_payment_id,
-        razorpay_signature=req.razorpay_signature
-    )
-    if not is_valid:
-        raise HTTPException(status_code=400, detail="Razorpay signature verification failed. Invalid payment.")
+    validation = payment_manager.validate_checkout(
+        req.user_id, req.razorpay_order_id, req.razorpay_payment_id, req.razorpay_signature,
+        cart_manager.get_cart(req.user_id))
+    if not validation["success"]:
+        raise HTTPException(status_code=400, detail=validation["error"])
+    if validation.get("result"):
+        return validation["result"]
 
     # Payment is authentic! Confirm order & deduct stock
     order_result = order_manager.create_order_from_cart(
@@ -318,6 +381,7 @@ async def verify_razorpay_payment(req: RazorpayVerifyPaymentRequest):
         payment_details={
             "razorpay_order_id": req.razorpay_order_id,
             "razorpay_payment_id": req.razorpay_payment_id,
+            "is_demo": PAYMENT_MODE == "demo",
             "verified": True
         }
     )
@@ -350,30 +414,30 @@ async def verify_razorpay_payment(req: RazorpayVerifyPaymentRequest):
         print(f"[Payment Event Error]: {e}", flush=True)
 
     # AP2 Protocol: Save payment token for future autonomous agent payments
-    saved_card = cart_manager.get_customer_payment_details(req.user_id) or {}
-    payment_manager.save_ap2_token_from_payment(
-        user_id=req.user_id,
-        razorpay_payment_id=req.razorpay_payment_id,
-        razorpay_order_id=req.razorpay_order_id,
-        card_details=saved_card
-    )
+    if PAYMENT_MODE == "demo":
+        payment_manager.save_ap2_token_from_payment(
+            user_id=req.user_id, razorpay_payment_id=req.razorpay_payment_id,
+            razorpay_order_id=req.razorpay_order_id,
+            card_details=cart_manager.get_customer_payment_details(req.user_id) or {})
 
-    return {
+    result = {
         "success": True,
-        "message": f"Payment {req.razorpay_payment_id} verified successfully via Razorpay! AP2 auto-pay token saved.",
+        "message": f"Payment {req.razorpay_payment_id} verified successfully.",
         "order": order_result.get("order"),
         "razorpay_payment_id": req.razorpay_payment_id,
-        "ap2_token_saved": True
+        "ap2_token_saved": PAYMENT_MODE == "demo"
     }
+    payment_manager.complete_checkout(req.razorpay_order_id, req.razorpay_payment_id, result)
+    return result
 
 @app.post("/api/payment/credentials")
-async def update_razorpay_credentials(req: RazorpayCredentialsRequest):
+def update_razorpay_credentials(req: RazorpayCredentialsRequest):
     """Update Razorpay Key ID and Secret dynamically."""
     res = payment_manager.update_credentials(req.key_id, req.key_secret)
     return res
 
 @app.post("/api/payment/card-checkout")
-async def card_checkout_razorpay(req: CardPaymentRequest):
+def card_checkout_razorpay(req: CardPaymentRequest):
     """
     Validates customer card, saves to profile, creates Razorpay Order & Payment, confirms order.
     """
@@ -401,7 +465,7 @@ async def card_checkout_razorpay(req: CardPaymentRequest):
     return result
 
 @app.get("/api/customer/payment-details")
-async def get_customer_payment_details(user_id: str = "user_alex"):
+def get_customer_payment_details(user_id: str = "user_alex"):
     """Returns saved customer payment card details if available."""
     details = cart_manager.get_customer_payment_details(user_id)
     return {
@@ -410,7 +474,7 @@ async def get_customer_payment_details(user_id: str = "user_alex"):
     }
 
 @app.post("/api/customer/payment-details")
-async def save_customer_payment_details(req: SaveCustomerCardRequest):
+def save_customer_payment_details(req: SaveCustomerCardRequest):
     """Validates and saves customer payment card details."""
     val = payment_manager.validate_card_details(
         card_number=req.card_number,
@@ -431,7 +495,7 @@ async def save_customer_payment_details(req: SaveCustomerCardRequest):
     return saved
 
 @app.get("/api/orders")
-async def get_orders(user_id: Optional[str] = None):
+def get_orders(user_id: Optional[str] = None):
     """
     Returns orders list. If user_id is None or 'ALL', returns all store orders.
     Otherwise returns orders for the specified user.
@@ -446,7 +510,7 @@ async def get_orders(user_id: Optional[str] = None):
     }
 
 @app.get("/api/admin/orders")
-async def get_admin_all_orders():
+def get_admin_all_orders():
     """Returns 100% of all customer and AI shopper orders for the Admin Dashboard."""
     orders = order_manager.get_all_orders()
     return {
@@ -456,44 +520,37 @@ async def get_admin_all_orders():
 
 
 @app.get("/api/orders/{order_id}")
-async def get_order_details(order_id: str):
+def get_order_details(order_id: str):
     order = order_manager.get_order_by_id(order_id)
     if not order:
         raise HTTPException(status_code=404, detail="Order not found")
     return order
 
 @app.post("/api/orders/{order_id}/refund")
-async def refund_order(order_id: str, reason: Optional[str] = "Customer Request"):
+def refund_order(order_id: str, reason: Optional[str] = "Customer Request"):
     """
     Issues a refund on Razorpay Gateway and updates customer account & inventory.
     """
-    order = order_manager.get_order_by_id(order_id)
-    res = payment_manager.process_refund(order_id=order_id, reason=reason)
+    res = payment_manager.process_refund(order_id=order_id, reason=reason or "Customer Request")
     if not res.get("success"):
         raise HTTPException(status_code=400, detail=res.get("error", "Refund failed"))
-    if order:
-        treasury_manager.deduct_refund(
-            amount=order.get("total", 0.0),
-            order_id=order_id,
-            reason=reason or "Customer Refund"
-        )
     return res
 
 
 @app.get("/api/payment/dashboard-info")
-async def get_payment_dashboard_info():
+def get_payment_dashboard_info():
     """
     Returns Razorpay dashboard links, test credentials status, and navigation guide.
     """
     return payment_manager.get_dashboard_info()
 
 @app.get("/api/payment/ap2-status")
-async def get_ap2_authorization_status(user_id: str = "user_alex"):
+def get_ap2_authorization_status(user_id: str = "user_alex"):
     """
     AP2 Protocol: Check if the user has an active cryptographically signed AP2 spending mandate for autonomous agent payments.
     """
     token = cart_manager.get_ap2_payment_token(user_id)
-    if token and (token.get("status") in ["authorized", "ACTIVE_AND_VERIFIED"] or token.get("mandate_id")):
+    if PAYMENT_MODE == "demo" and token and payment_manager.verify_ap2_spending_mandate(token, 0.01)["valid"]:
         return {
             "authorized": True,
             "mandate_id": token.get("mandate_id"),
@@ -511,11 +568,17 @@ async def get_ap2_authorization_status(user_id: str = "user_alex"):
 
 
 @app.post("/api/payment/ap2-save-token")
-async def save_ap2_token(req: AP2SaveTokenRequest):
+def save_ap2_token(req: AP2SaveTokenRequest):
     """
     AP2 Protocol: Manually save an AP2 authorization token after a verified Razorpay payment.
     Called by the frontend after Razorpay Checkout completes successfully.
     """
+    matching = [order for order in order_manager.get_orders_by_user(req.user_id)
+                if order.get("razorpay_order_id") == req.razorpay_order_id
+                and order.get("razorpay_payment_id") == req.razorpay_payment_id
+                and order.get("payment_details", {}).get("verified")]
+    if not matching:
+        raise HTTPException(status_code=400, detail="A verified payment belonging to this customer is required.")
     res = payment_manager.save_ap2_token_from_payment(
         user_id=req.user_id,
         razorpay_payment_id=req.razorpay_payment_id,
@@ -525,12 +588,12 @@ async def save_ap2_token(req: AP2SaveTokenRequest):
     return res
 
 @app.post("/api/payment/agent-autopay")
-async def agent_autonomous_pay(user_id: str = "user_alex", shipping_address: Optional[str] = None):
+async def agent_autonomous_pay(req: CheckoutRequest):
     """
     AP2 Protocol: Backend endpoint for fully autonomous agent payment using stored token.
     No frontend checkout modal — payment is captured server-side.
     """
-    res = payment_manager.autonomous_agent_pay(user_id=user_id, shipping_address=shipping_address)
+    res = await payment_manager.autonomous_agent_pay_async(user_id=req.user_id, shipping_address=req.shipping_address)
     if not res.get("success"):
         raise HTTPException(status_code=400, detail=res.get("error", "AP2 autonomous payment failed"))
     return res
@@ -549,7 +612,7 @@ async def chat_with_agent(req: ChatRequest):
 
 
 @app.post("/api/settings")
-async def update_settings(req: SettingsRequest):
+def update_settings(req: SettingsRequest):
     if req.api_key:
         commerce_agent.api_key = req.api_key
         commerce_agent._init_client()
@@ -568,7 +631,7 @@ async def update_settings(req: SettingsRequest):
 
 @app.get("/.well-known/agent-catalog.json")
 @app.get("/api/agent-catalog")
-async def get_agent_readable_catalog():
+def get_agent_readable_catalog():
     """
     Standards-compliant Agent-Readable Catalog adhering to UAP / ACP specifications.
     Enables external and local autonomous AI agents to discover inventory, price floors,
@@ -608,7 +671,7 @@ async def get_agent_readable_catalog():
     return {
         "protocol": "UAP/ACP/AP2",
         "version": "1.0",
-        "store_name": "Nava: Agentic AI Store",
+        "store_name": "Nova: Agentic AI Store",
         "currency": "INR",
         "tax_policy": "0% Tax Storewide",
         "merchant_endpoints": {
@@ -625,12 +688,12 @@ async def get_agent_readable_catalog():
 
 
 @app.get("/.well-known/ap2-manifest.json")
-async def get_ap2_manifest():
+def get_ap2_manifest():
     """Manifest specification for Agentic Payments Protocol (AP2)."""
     return {
         "protocol": "AP2",
         "version": "2.4",
-        "issuer": "Nava: Agentic AI Store",
+        "issuer": "Nova: Agentic AI Store",
         "supported_currencies": ["INR"],
         "mandate_limits": {
             "max_single_transaction_inr": 25000.0,
@@ -651,7 +714,7 @@ async def get_ap2_manifest():
 # =====================================================================
 
 @app.get("/api/cart/cross-sells")
-async def get_cart_cross_sells(user_id: str = "user_alex"):
+def get_cart_cross_sells(user_id: str = "user_alex"):
     """
     Returns explainable, margin-preserving cross-sell accessory recommendations
     tailored to items currently in the customer's cart.
@@ -671,14 +734,14 @@ async def get_cart_cross_sells(user_id: str = "user_alex"):
 # =====================================================================
 
 @app.get("/api/campaigns/active")
-async def get_active_campaign():
+def get_active_campaign():
     """Returns current active promotional flash sale campaign."""
     campaign = campaign_orchestrator.get_active_campaign()
     return {"success": True, "campaign": campaign}
 
 
 @app.get("/api/admin/campaigns")
-async def get_admin_campaigns():
+def get_admin_campaigns():
     """Returns all promotional marketing campaigns."""
     return {
         "success": True,
@@ -686,15 +749,15 @@ async def get_admin_campaigns():
     }
 
 
-class LaunchCampaignRequest(BaseModel):
-    title: str
+class LaunchCampaignRequest(RequestModel):
+    title: str = Field(min_length=1, max_length=200)
     category: str = "ALL"
-    discount_percent: float = 10.0
-    duration_hours: int = 24
+    discount_percent: float = Field(default=10.0, ge=1, le=25)
+    duration_hours: int = Field(default=24, gt=0, le=8760)
 
 
 @app.post("/api/admin/campaigns/launch")
-async def launch_admin_campaign(req: LaunchCampaignRequest):
+def launch_admin_campaign(req: LaunchCampaignRequest):
     """Launches or schedules a promotional campaign bounded by base price floors."""
     res = campaign_orchestrator.launch_campaign(
         title=req.title,
@@ -706,7 +769,7 @@ async def launch_admin_campaign(req: LaunchCampaignRequest):
     return res
 
 @app.post("/api/admin/campaigns/{campaign_id}/activate")
-async def activate_admin_campaign(campaign_id: str):
+def activate_admin_campaign(campaign_id: str):
     """Activates a campaign ensuring at most 1 active campaign per category."""
     res = campaign_orchestrator.activate_campaign(campaign_id)
     if not res.get("success"):
@@ -714,7 +777,7 @@ async def activate_admin_campaign(campaign_id: str):
     return res
 
 @app.post("/api/admin/campaigns/{campaign_id}/stop")
-async def stop_admin_campaign(campaign_id: str):
+def stop_admin_campaign(campaign_id: str):
     """Stops an active campaign and restores baseline pricing."""
     res = campaign_orchestrator.stop_campaign(campaign_id)
     if not res.get("success"):
@@ -722,7 +785,7 @@ async def stop_admin_campaign(campaign_id: str):
     return res
 
 @app.delete("/api/admin/campaigns/{campaign_id}")
-async def delete_admin_campaign(campaign_id: str):
+def delete_admin_campaign(campaign_id: str):
     """Deletes a promotional campaign."""
     res = campaign_orchestrator.delete_campaign(campaign_id)
     if not res.get("success"):
@@ -735,14 +798,14 @@ async def delete_admin_campaign(campaign_id: str):
 # 💬 IN-APP CONVERSATIONAL CHECKOUT (AP2 TOKENIZED DIRECT SETTLEMENT)
 # =====================================================================
 
-class ConversationalCheckoutRequest(BaseModel):
+class ConversationalCheckoutRequest(RequestModel):
     user_id: str = "user_alex"
     payment_method: str = "AP2"
     shipping_address: Optional[str] = None
 
 
 @app.post("/api/chat/conversational-checkout")
-async def conversational_checkout(req: ConversationalCheckoutRequest):
+def conversational_checkout(req: ConversationalCheckoutRequest):
     """
     Executes in-app conversational checkout directly from the chat copilot
     using the customer's AP2 tokenized mandate without frontend popups.
@@ -767,12 +830,6 @@ async def conversational_checkout(req: ConversationalCheckoutRequest):
         raise HTTPException(status_code=400, detail=res.get("error", "AP2 conversational checkout failed."))
     
     order = res.get("order", {})
-    treasury_manager.deposit_sales(
-        amount=order.get("total", total),
-        order_id=order.get("order_id", ""),
-        items_summary=f"{len(order.get('items', []))} items (Conversational AP2)",
-        customer=order.get("customer_name", req.user_id)
-    )
     return {
         "success": True,
         "order_id": order.get("order_id"),
@@ -787,7 +844,7 @@ async def conversational_checkout(req: ConversationalCheckoutRequest):
 # =====================================================================
 
 @app.get("/api/admin/audit-trail")
-async def get_audit_trail():
+def get_audit_trail():
     """
     Returns an immutable chronological audit trail where every financial transaction
     is explainable, bounded, and gated.
@@ -813,12 +870,12 @@ async def get_audit_trail():
     }
 
 
-class FailureSimulationRequest(BaseModel):
+class FailureSimulationRequest(RequestModel):
     failure_type: str  # "AP2_OVERSPEND" | "EXPIRED_REFUND" | "BASE_FLOOR_BREACH"
 
 
 @app.post("/api/simulation/failure-test")
-async def simulate_failure_mode(req: FailureSimulationRequest):
+def simulate_failure_mode(req: FailureSimulationRequest):
     """
     Demonstrates graceful, explainable failure handling for financial edge cases.
     """
@@ -864,118 +921,92 @@ async def simulate_failure_mode(req: FailureSimulationRequest):
     raise HTTPException(status_code=400, detail=f"Unknown failure test type: {req.failure_type}")
 
 
-# Admin agent imports (already imported above at module level)
-from backend.background_workers import background_worker
-from backend.review_manager import review_manager
-
-@app.on_event("startup")
-async def startup_event():
-    """Start 24/7 background agent loop on server boot."""
-    background_worker.start()
-
-class AdminChatRequest(BaseModel):
-    prompt: str
+class AdminChatRequest(RequestModel):
+    prompt: str = Field(min_length=1, max_length=10000)
     conversation_history: Optional[List[Dict[str, str]]] = None
 
-class AdminInventoryUpdateRequest(BaseModel):
+class AdminInventoryUpdateRequest(RequestModel):
     product_id: str
-    stock: Optional[int] = None
-    price: Optional[float] = None
-    base_price: Optional[float] = None
+    stock: Optional[int] = Field(default=None, ge=0, strict=True)
+    price: Optional[float] = Field(default=None, gt=0)
+    base_price: Optional[float] = Field(default=None, ge=0)
 
-class AdminProductAddRequest(BaseModel):
+class AdminProductAddRequest(RequestModel):
     PRODUCT_NAME: str
     PRODUCT_TYPE: str = "Accessories"
     PRODUCT_SIZE: str = "One Size"
-    STOCK_REMAINING: int = 15
-    BASE_PRICE: Optional[float] = None
-    PRICE: float = 49.99
+    STOCK_REMAINING: int = Field(default=15, ge=0, strict=True)
+    BASE_PRICE: Optional[float] = Field(default=None, ge=0)
+    PRICE: float = Field(default=49.99, gt=0)
     DESCRIPTION: str = ""
     IMAGE: Optional[str] = "/static/images/cyberflex_runner.svg"
-    TAGS: Optional[List[str]] = []
+    TAGS: List[str] = Field(default_factory=list)
 
-class AdminBulkPriceRequest(BaseModel):
+class AdminBulkPriceRequest(RequestModel):
     category: Optional[str] = None
-    percentage: float
+    percentage: float = Field(gt=-100, le=1000)
 
-class AdminOrderStatusUpdateRequest(BaseModel):
+class AdminOrderStatusUpdateRequest(RequestModel):
     status: str
     tracking_number: Optional[str] = None
     notes: Optional[str] = None
 
-class AdminOrderCancelRequest(BaseModel):
+class AdminOrderCancelRequest(RequestModel):
     reason: Optional[str] = "Customer Request"
     force_override: bool = False
 
-class AdminReviewAddRequest(BaseModel):
+class AdminReviewAddRequest(RequestModel):
     product_id: str
     customer_name: str
-    rating: int = 5
+    rating: int = Field(default=5, ge=1, le=5, strict=True)
     review_text: str
     product_name: Optional[str] = None
 
-class AdminGenerateReviewSummaryRequest(BaseModel):
+class AdminGenerateReviewSummaryRequest(RequestModel):
     product_id: str
 
-class AdminAgentTriggerRequest(BaseModel):
+class AdminAgentTriggerRequest(RequestModel):
     agent_key: str
 
-class AdminAgentIntervalRequest(BaseModel):
+class AdminAgentIntervalRequest(RequestModel):
     agent_key: str
-    interval_seconds: int
+    interval_seconds: int = Field(ge=5, le=86400)
 
-class AdminChatRequest(BaseModel):
-    prompt: str
-    conversation_history: Optional[List[Dict[str, str]]] = None
-
-class AdminAcquireStockRequest(BaseModel):
+class AdminAcquireStockRequest(RequestModel):
     product_id: str
-    quantity: int = 20
+    quantity: int = Field(default=20, gt=0, le=10000, strict=True)
     actor: Optional[str] = "Store Owner"
 
-class AdminResetTreasuryRequest(BaseModel):
+class AdminResetTreasuryRequest(RequestModel):
     bank_balance: Optional[float] = None
 
-class AdminNegotiateSalaryRequest(BaseModel):
+class AdminNegotiateSalaryRequest(RequestModel):
     agent_name: str
     proposed_salary: float
     rationale: Optional[str] = "Performance and store growth review"
 
-class AdminPaySalaryRequest(BaseModel):
+class AdminPaySalaryRequest(RequestModel):
     agent_name: Optional[str] = None
     actor: Optional[str] = "Store Owner"
 
-class AdminUpdateSalaryRequest(BaseModel):
+class AdminUpdateSalaryRequest(RequestModel):
     agent_name: str
     new_salary: float
     status: Optional[str] = "Agreed"
 
-class AdminBuyerTriggerRequest(BaseModel):
+class AdminBuyerTriggerRequest(RequestModel):
     buyer_id: str = "buyer_alex"
 
-class AdminBuyerToggleRequest(BaseModel):
+class AdminBuyerToggleRequest(RequestModel):
     enabled: Optional[bool] = None
 
-class AdminCEODiscussionRequest(BaseModel):
+class AdminCEODiscussionRequest(RequestModel):
     topic: str
     participants: Optional[str] = "ALL_AGENTS"
 
 
-@app.get("/admin")
-async def serve_admin_panel():
-    react_index = os.path.join(FRONTEND_DIR, "dist", "index.html")
-    if os.path.exists(react_index):
-        return FileResponse(react_index)
-    admin_index = os.path.join(FRONTEND_DIR, "legacy", "admin", "index.html")
-    if os.path.exists(admin_index):
-        return FileResponse(admin_index)
-    admin_index_legacy = os.path.join(FRONTEND_DIR, "admin", "index.html")
-    if os.path.exists(admin_index_legacy):
-        return FileResponse(admin_index_legacy)
-    return {"message": "Admin panel frontend index.html not found"}
-
 @app.get("/api/admin/overview")
-async def get_admin_overview():
+def get_admin_overview():
     """Returns comprehensive KPIs, revenue, order breakdown, and stock metrics."""
     orders = order_manager.get_all_orders()
     products = inventory_manager.get_all_products()
@@ -1016,7 +1047,7 @@ async def get_admin_overview():
     }
 
 @app.get("/api/admin/agents/status")
-async def get_admin_agents_status():
+def get_admin_agents_status():
     """Returns live telemetry for all 6 autonomous agents and their independent schedules."""
     return background_worker.get_status()
 
@@ -1030,7 +1061,11 @@ async def trigger_admin_agent(req: AdminAgentTriggerRequest):
     # Reset last_run_ts so the background loop picks it up on next tick
     state["last_run_ts"] = 0.0
     # Fire-and-forget: schedule the cycle as a background task so HTTP returns immediately
-    asyncio.create_task(background_worker.trigger_agent(agent_key))
+    from backend.admin_agents import log_agent_action
+    log_agent_action(state.get("name", agent_key), "Cycle queued", "Manual run requested from the operations console.", autonomous=False)
+    task = asyncio.create_task(background_worker.trigger_agent(agent_key))
+    app.state.manual_tasks.add(task)
+    task.add_done_callback(app.state.manual_tasks.discard)
     return {
         "success": True,
         "agent": agent_key,
@@ -1039,7 +1074,7 @@ async def trigger_admin_agent(req: AdminAgentTriggerRequest):
     }
 
 @app.post("/api/admin/agents/interval")
-async def update_admin_agent_interval(req: AdminAgentIntervalRequest):
+def update_admin_agent_interval(req: AdminAgentIntervalRequest):
     """Dynamically updates the schedule interval for an admin agent (e.g. 120 for 2m, 300 for 5m, 7200 for 2h)."""
     res = background_worker.update_agent_interval(req.agent_key, req.interval_seconds)
     if not res.get("success"):
@@ -1047,20 +1082,14 @@ async def update_admin_agent_interval(req: AdminAgentIntervalRequest):
     return res
 
 @app.get("/api/admin/agent-logs")
-async def get_admin_agent_logs(limit: int = 60):
+def get_admin_agent_logs(limit: int = 60):
     """Returns recent 24/7 autonomous agent audit log entries."""
     from backend.admin_agents import get_agent_logs as fetch_agent_logs
     logs = fetch_agent_logs(limit=limit)
     return {"logs": logs, "count": len(logs)}
 
-@app.get("/api/admin/agent-messages")
-async def get_admin_agent_messages(limit: int = 60):
-    """Returns recent inter-agent communications recorded on the persistent message bus."""
-    messages = message_bus.get_all_messages(limit=limit)
-    return {"messages": messages, "count": len(messages)}
-
 @app.get("/api/admin/agent-memory")
-async def get_admin_agent_memory(agent_name: Optional[str] = None):
+def get_admin_agent_memory(agent_name: Optional[str] = None):
     """Returns the 5-layer Hybrid Layered Memory state for all agents or a specific agent."""
     from backend.agent_memory import memory_manager
     if agent_name:
@@ -1068,7 +1097,7 @@ async def get_admin_agent_memory(agent_name: Optional[str] = None):
     return {"fleet_memory": memory_manager.get_all_memories_report()}
 
 @app.get("/api/admin/agent-rl")
-async def get_admin_agent_rl(agent_name: Optional[str] = None):
+def get_admin_agent_rl(agent_name: Optional[str] = None):
     """Returns the Reinforcement Learning (RL) performance report and Q-learning metrics."""
     from backend.agent_rl import rl_manager
     if agent_name:
@@ -1077,7 +1106,7 @@ async def get_admin_agent_rl(agent_name: Optional[str] = None):
     return {"fleet_rl": rl_manager.get_fleet_performance_report()}
 
 @app.post("/api/admin/inventory/update")
-async def admin_update_inventory(req: AdminInventoryUpdateRequest):
+def admin_update_inventory(req: AdminInventoryUpdateRequest):
     """Directly modifies stock, price, or base_price for a product."""
     updated = {}
     if req.stock is not None:
@@ -1099,22 +1128,25 @@ async def admin_update_inventory(req: AdminInventoryUpdateRequest):
             enforce_base_price=True
         )
         updated["price"] = price_res
+    for change in updated.values():
+        if not change.get("success"):
+            raise HTTPException(status_code=400, detail=change.get("error", "Inventory update failed"))
     return {"success": True, "updated": updated}
 
 @app.post("/api/admin/inventory/add")
-async def admin_add_product(req: AdminProductAddRequest):
+def admin_add_product(req: AdminProductAddRequest):
     """Adds a new product to catalog."""
-    res = inventory_manager.add_product(req.dict())
+    res = inventory_manager.add_product(req.model_dump())
     return res
 
 @app.post("/api/admin/inventory/bulk-price")
-async def admin_bulk_price(req: AdminBulkPriceRequest):
+def admin_bulk_price(req: AdminBulkPriceRequest):
     """Applies bulk percentage discount or increase."""
     res = inventory_manager.bulk_price_adjustment(category=req.category, percentage=req.percentage)
     return res
 
 @app.post("/api/admin/orders/{order_id}/status")
-async def admin_update_order_status(order_id: str, req: AdminOrderStatusUpdateRequest):
+def admin_update_order_status(order_id: str, req: AdminOrderStatusUpdateRequest):
     """Updates order status across the lifecycle."""
     res = order_manager.update_order_status(
         order_id=order_id,
@@ -1133,7 +1165,7 @@ async def admin_cancel_order(order_id: str, req: AdminOrderCancelRequest):
     If eligible, processes automated Razorpay refund and stock restoration.
     """
     if req.force_override:
-        res = await refund_manager_agent.execute_command(action="refund", order_id=order_id, reason=req.reason, force=True)
+        res = await asyncio.to_thread(payment_manager.process_refund, order_id=order_id, reason=req.reason or "Owner refund", force_override=True)
     else:
         res = order_manager.evaluate_24h_cancellation_and_refund(order_id=order_id, reason=req.reason)
     
@@ -1142,12 +1174,12 @@ async def admin_cancel_order(order_id: str, req: AdminOrderCancelRequest):
     return res
 
 @app.get("/api/admin/reviews")
-async def admin_get_reviews():
+def admin_get_reviews():
     """Returns all verified customer reviews."""
     return {"reviews": review_manager.get_all_reviews()}
 
 @app.post("/api/admin/reviews/add")
-async def admin_add_review(req: AdminReviewAddRequest):
+def admin_add_review(req: AdminReviewAddRequest):
     """Adds a customer review."""
     res = review_manager.add_review(
         product_id=req.product_id,
@@ -1167,7 +1199,7 @@ async def admin_generate_review_summary(req: AdminGenerateReviewSummaryRequest):
     return res
 
 @app.get("/api/admin/agent-messages")
-async def get_agent_messages(limit: int = 50):
+def get_agent_messages(limit: int = 50):
     """Returns the inter-agent message bus history for admin dashboard visibility."""
     return {
         "messages": message_bus.get_all_messages(limit=limit),
@@ -1175,7 +1207,7 @@ async def get_agent_messages(limit: int = 50):
     }
 
 @app.get("/api/admin/agent-conversations")
-async def get_admin_agent_conversations(agent_name: Optional[str] = None, limit: int = 20):
+def get_admin_agent_conversations(agent_name: Optional[str] = None, limit: int = 20):
     """Returns conversation and instruction history for all agents or a specific specialist agent."""
     from backend.admin_agents import conversation_history
     if agent_name:
@@ -1206,7 +1238,7 @@ async def admin_chat(req: AdminChatRequest):
 # =====================================================================
 
 @app.get("/api/admin/treasury")
-async def get_treasury_summary(limit: int = 30):
+def get_treasury_summary(limit: int = 30):
     """Returns live Treasury Bank Balance, sales revenues, inventory spend, salary payouts, and net profit."""
     summary = treasury_manager.get_summary()
     transactions = treasury_manager.get_transactions(limit=limit)
@@ -1214,7 +1246,7 @@ async def get_treasury_summary(limit: int = 30):
     return summary
 
 @app.post("/api/admin/treasury/acquire-stock")
-async def admin_acquire_stock(req: AdminAcquireStockRequest):
+def admin_acquire_stock(req: AdminAcquireStockRequest):
     """Acquires inventory stock at wholesale BASE_PRICE using CEO Treasury Bank Balance."""
     res = inventory_manager.acquire_wholesale_stock(
         product_identifier=req.product_id,
@@ -1226,7 +1258,7 @@ async def admin_acquire_stock(req: AdminAcquireStockRequest):
     return res
 
 @app.post("/api/admin/treasury/reset")
-async def admin_reset_treasury(req: AdminResetTreasuryRequest):
+def admin_reset_treasury(req: AdminResetTreasuryRequest):
     """Resets the store treasury bank balance."""
     res = treasury_manager.reset_treasury(req.bank_balance)
     return res
@@ -1237,7 +1269,7 @@ async def admin_reset_treasury(req: AdminResetTreasuryRequest):
 # =====================================================================
 
 @app.get("/api/admin/salaries")
-async def get_agent_salaries():
+def get_agent_salaries():
     """Returns salary breakdown, performance metrics, and negotiation status for all specialist agents."""
     return salary_manager.get_all_salaries()
 
@@ -1255,7 +1287,7 @@ async def negotiate_agent_salary(req: AdminNegotiateSalaryRequest):
     return res
 
 @app.post("/api/admin/salaries/pay")
-async def pay_agent_salaries(req: AdminPaySalaryRequest):
+def pay_agent_salaries(req: AdminPaySalaryRequest):
     """Disburses salary payments to specialist agents from the CEO Treasury Bank Balance."""
     res = salary_manager.pay_salaries(agent_name=req.agent_name, actor=req.actor or "Store Owner")
     if not res.get("success"):
@@ -1263,7 +1295,7 @@ async def pay_agent_salaries(req: AdminPaySalaryRequest):
     return res
 
 @app.post("/api/admin/salaries/update")
-async def update_agent_salary(req: AdminUpdateSalaryRequest):
+def update_agent_salary(req: AdminUpdateSalaryRequest):
     """Directly sets an agent's salary amount."""
     res = salary_manager.update_agent_salary(agent_name=req.agent_name, new_salary=req.new_salary, status=req.status or "Agreed")
     if not res.get("success"):
@@ -1276,7 +1308,7 @@ async def update_agent_salary(req: AdminUpdateSalaryRequest):
 # =====================================================================
 
 @app.get("/api/admin/buyers")
-async def get_ai_buyers():
+def get_ai_buyers():
     """Returns all 5 AI buyer personas, activity statuses, total spent, and preferences."""
     buyers = buyer_agents_fleet.get_all_buyers()
     return {
@@ -1306,7 +1338,7 @@ async def trigger_ai_buyer(req: AdminBuyerTriggerRequest):
     }
 
 @app.post("/api/admin/buyers/toggle")
-async def toggle_ai_buyers(req: AdminBuyerToggleRequest):
+def toggle_ai_buyers(req: AdminBuyerToggleRequest):
     """Enables or disables 24/7 background autonomous buyer simulation."""
     b_state = background_worker.agent_states.get("buyer_agents", {})
     if req.enabled is not None:
@@ -1319,26 +1351,29 @@ async def toggle_ai_buyers(req: AdminBuyerToggleRequest):
         "message": f"Autonomous Buyer Simulation is now {'ENABLED' if b_state['enabled'] else 'PAUSED'}."
     }
 
-class AdminBuyerIntervalRequest(BaseModel):
+class AdminBuyerIntervalRequest(RequestModel):
     buyer_id: Optional[str] = "all"
     interval_seconds: int = 60
 
 @app.post("/api/admin/buyers/interval")
-async def update_ai_buyer_interval(req: AdminBuyerIntervalRequest):
+def update_ai_buyer_interval(req: AdminBuyerIntervalRequest):
     """Updates browsing schedule interval for AI buyers fleet or a specific buyer."""
     interval_sec = max(5, int(req.interval_seconds))
     background_worker.update_agent_interval("buyer_agents", interval_sec)
     b_id = (req.buyer_id or "all").lower().strip()
+    buyers = buyer_agents_fleet.get_all_buyers()
     if b_id in ["all", "all_buyers"]:
-        for b in buyer_agents_fleet.buyers:
+        for b in buyers:
             b["interval_seconds"] = interval_sec
             b["next_action_ts"] = time.time() + interval_sec
     else:
-        buyer = buyer_agents_fleet.get_buyer_by_id(b_id)
+        buyer = next((b for b in buyers if b["id"] == b_id), None)
+        if not buyer:
+            raise HTTPException(status_code=404, detail="Buyer not found")
         if buyer:
             buyer["interval_seconds"] = interval_sec
             buyer["next_action_ts"] = time.time() + interval_sec
-    buyer_agents_fleet._save_buyers()
+    buyer_agents_fleet._write_buyers(buyers)
     return {
         "success": True,
         "buyer_id": req.buyer_id,
@@ -1361,7 +1396,8 @@ async def start_ceo_discussion(req: AdminCEODiscussionRequest):
     return res
 
 @app.post("/api/admin/reset-store")
-async def reset_store_complete():
+@serialized
+def reset_store_complete():
     """
     Resets the store to initial clean state:
     1. Sets all 27 products inventory stock to 0 STOCK (wholesale restock required).
@@ -1399,9 +1435,13 @@ async def reset_store_complete():
     buyer_agents_fleet.reset_buyers()
 
     # 7. Clear carts
-    for b in buyer_agents_fleet.get_all_buyers():
-        cart_manager.clear_cart(b["id"])
-    cart_manager.clear_cart("user_alex")
+    users = cart_manager._read_users()
+    for user in users:
+        user["cart"] = []
+        user.pop("ap2_payment_token", None)
+    cart_manager._write_users(users)
+    campaign_orchestrator.store.set([])
+    payment_manager._intents.set({})
 
     # 8. Clear message bus, conversation history, and audit logs
     message_bus.clear_history()
@@ -1419,7 +1459,7 @@ async def reset_store_complete():
     return {
         "success": True,
         "bank_balance": 10000.0,
-        "message": "Store successfully reset: All 27 products at 0 stock (Wholesale restock required), Orders & Reviews cleared, Bank Balance reset to ₹1,000.0, Staff Salaries reset to ₹50/100 cycles, and AI Shoppers staggered across 0–5 minutes."
+        "message": "Store successfully reset: All 27 products at 0 stock (Wholesale restock required), Orders & Reviews cleared, Bank Balance reset to ₹10,000.0, Staff Salaries reset to ₹50/100 cycles, and AI Shoppers staggered across 0–5 minutes."
     }
 
 
@@ -1427,7 +1467,7 @@ async def reset_store_complete():
 # 📋 AGENT TASKS & DELEGATION ENDPOINTS
 # =====================================================================
 
-class CreateTaskRequest(BaseModel):
+class CreateTaskRequest(RequestModel):
     created_by: str = "Store Owner"
     assigned_to: str
     objective: str
@@ -1435,22 +1475,22 @@ class CreateTaskRequest(BaseModel):
     constraints: Optional[List[str]] = None
     deadline: Optional[str] = None
 
-class ClaimTaskRequest(BaseModel):
+class ClaimTaskRequest(RequestModel):
     task_id: str
     agent_name: str
 
-class CompleteTaskRequest(BaseModel):
+class CompleteTaskRequest(RequestModel):
     task_id: str
     result: Any
 
 @app.get("/api/admin/tasks")
-async def get_agent_tasks(assigned_to: Optional[str] = None, status: Optional[str] = None, limit: int = 50):
+def get_agent_tasks(assigned_to: Optional[str] = None, status: Optional[str] = None, limit: int = 50):
     """Returns agent tasks with optional filtering."""
     tasks = task_manager.get_tasks(assigned_to=assigned_to, status=status, limit=limit)
     return {"success": True, "count": len(tasks), "tasks": tasks}
 
 @app.post("/api/admin/tasks")
-async def create_agent_task(req: CreateTaskRequest):
+def create_agent_task(req: CreateTaskRequest):
     """Creates a new structured agent delegation task."""
     task = task_manager.create_task(
         created_by=req.created_by,
@@ -1463,14 +1503,14 @@ async def create_agent_task(req: CreateTaskRequest):
     return {"success": True, "task": task.to_dict()}
 
 @app.post("/api/admin/tasks/claim")
-async def claim_agent_task(req: ClaimTaskRequest):
+def claim_agent_task(req: ClaimTaskRequest):
     task = task_manager.claim_task(req.task_id, req.agent_name)
     if not task:
         raise HTTPException(status_code=404, detail="Task not found or not in pending state")
     return {"success": True, "task": task.to_dict()}
 
 @app.post("/api/admin/tasks/complete")
-async def complete_agent_task(req: CompleteTaskRequest):
+def complete_agent_task(req: CompleteTaskRequest):
     task = task_manager.complete_task(req.task_id, req.result)
     if not task:
         raise HTTPException(status_code=404, detail="Task not found")
@@ -1482,17 +1522,17 @@ async def complete_agent_task(req: CompleteTaskRequest):
 # =====================================================================
 
 @app.get("/api/admin/observability/metrics")
-async def get_observability_metrics():
+def get_observability_metrics():
     """Returns execution metrics, failure counts, and latency averages per tool."""
     return {"success": True, "metrics": observability_manager.get_tool_metrics()}
 
 @app.get("/api/admin/observability/alerts")
-async def get_observability_alerts(timeframe_seconds: float = 3600.0):
+def get_observability_alerts(timeframe_seconds: float = 3600.0):
     """Returns aggregated executive alert summaries."""
     return {"success": True, "alerts": observability_manager.aggregate_alerts(timeframe_seconds)}
 
 @app.get("/api/admin/observability/activity")
-async def get_observability_activity(limit: int = 50, agent_name: Optional[str] = None):
+def get_observability_activity(limit: int = 50, agent_name: Optional[str] = None):
     return {"success": True, "activity": observability_manager.get_agent_activity(limit, agent_name)}
 
 
@@ -1500,14 +1540,14 @@ async def get_observability_activity(limit: int = 50, agent_name: Optional[str] 
 # 🛡️ POLICY ENGINE & INVARIANT VALIDATION ENDPOINTS
 # =====================================================================
 
-class ValidatePolicyRequest(BaseModel):
+class ValidatePolicyRequest(RequestModel):
     action: str
     actor: str
     resource: Optional[str] = None
     parameters: Optional[Dict[str, Any]] = None
 
 @app.post("/api/admin/policy/validate")
-async def validate_policy_endpoint(req: ValidatePolicyRequest):
+def validate_policy_endpoint(req: ValidatePolicyRequest):
     """Validates an action against deterministic policy rules."""
     res = validate_policy(
         action=req.action,
@@ -1518,13 +1558,13 @@ async def validate_policy_endpoint(req: ValidatePolicyRequest):
     return res
 
 @app.get("/api/admin/qa/invariants")
-async def validate_qa_invariants():
+def validate_qa_invariants():
     """Continuous integration invariant validation check across catalog, treasury, and orders."""
     res = buyer_agents_fleet.validate_business_invariants()
     return res
 
 @app.get("/api/admin/qa/report")
-async def get_qa_report():
+def get_qa_report():
     """Generates continuous QA testing report."""
     res = buyer_agents_fleet.generate_test_report()
     return res
@@ -1534,26 +1574,18 @@ async def get_qa_report():
 # 🔮 STRATEGIC DECISION SIMULATION ENDPOINTS
 # =====================================================================
 
-class SimulateDecisionRequest(BaseModel):
+class SimulateDecisionRequest(RequestModel):
     scenario: str
     assumptions: Optional[Dict[str, Any]] = None
 
 @app.post("/api/admin/simulation/decision")
-async def simulate_decision_endpoint(req: SimulateDecisionRequest):
+def simulate_decision_endpoint(req: SimulateDecisionRequest):
     """Simulates business decision impact on revenue, margins, and turnover."""
     res = ceo_agent.simulate_business_decision(req.scenario, req.assumptions)
     return res
 
 
-# Serve root frontend
 @app.get("/")
-async def root():
-    react_index = os.path.join(FRONTEND_DIR, "dist", "index.html")
-    if os.path.exists(react_index):
-        return FileResponse(react_index)
-    index_file = os.path.join(FRONTEND_DIR, "index.html")
-    if os.path.exists(index_file):
-        return FileResponse(index_file)
-    return {"message": "AI Growth Commerce Agentic Store API is running."}
-
-
+def root():
+    return {"name": "Nova Backend", "service": "api", "docs": "/docs", "health": "/api/health",
+            "frontend": os.getenv("FRONTEND_URL", "http://127.0.0.1:5173")}

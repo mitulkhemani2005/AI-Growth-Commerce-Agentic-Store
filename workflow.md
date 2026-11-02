@@ -1,4 +1,6 @@
-# 🔄 AI Growth Commerce - Agentic Store
+> Historical design notes. See [README.md](README.md) for current setup, runtime modes, and implementation limits.
+
+# 🔄 Nova
 ## Complete Operational & Multi-Agent Workflow Specification
 
 ---

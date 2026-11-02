@@ -1,10 +1,10 @@
 """
-Nava: Agentic AI Store — Cross-Sell & Upsell Intelligence Agent
+Nova: Agentic AI Store — Cross-Sell & Upsell Intelligence Agent
 Analyzes current customer carts, browsing behavior, and hardware specifications
 to recommend high-margin, complementary hardware accessories with explainable rationales.
 """
 
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any
 
 # Complementary affinity matrix by product category & keyword
 CROSS_SELL_MATRIX = {
@@ -74,7 +74,7 @@ class UpsellAgent:
                     cand_name = candidate.get("PRODUCT_NAME", "").lower()
                     
                     # Must be in stock and match target category or keywords
-                    if cand_stock > 0 and (cand_type == target_type or any(k in cand_name for k in keywords)):
+                    if cand_stock > 0 and (cand_type == target_type and any(k in cand_name for k in keywords)):
                         base_price = float(candidate.get("BASE_PRICE", candidate.get("PRICE", 100)))
                         selling_price = float(candidate.get("PRICE", base_price))
                         
@@ -91,7 +91,7 @@ class UpsellAgent:
                             "bundle_price": discounted_bundle_price,
                             "savings": savings,
                             "stock": cand_stock,
-                            "rationale": rule["rationale"],
+                            "rationale": f"Suggested {target_type.lower()} for your {cat.lower()} selection.",
                             "paired_with": item.get("PRODUCT_NAME", "Cart Item"),
                             "is_bounded_by_floor": discounted_bundle_price == base_price
                         }
@@ -117,7 +117,7 @@ class UpsellAgent:
                         "bundle_price": max(base_price, round(selling_price * 0.90, 2)),
                         "savings": round(selling_price - max(base_price, round(selling_price * 0.90, 2)), 2),
                         "stock": candidate.get("STOCK_REMAINING", 0),
-                        "rationale": "Popular customer accessory pairing with 0% tax.",
+                        "rationale": "More items to explore from the Nova catalog.",
                         "paired_with": "Storewide Essential",
                         "is_bounded_by_floor": False
                     }

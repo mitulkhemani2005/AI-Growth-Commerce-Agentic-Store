@@ -1,3 +1,4 @@
+from backend.config import DATA_DIR, data_file
 """
 Agent Task Management — Shared Structured Delegation & Task Lifecycle
 ======================================================================
@@ -18,7 +19,7 @@ from dataclasses import dataclass, field, asdict
 from backend.events import event_router, create_event, EventType
 
 
-TASKS_FILE = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "agent_tasks.json"))
+TASKS_FILE = data_file("agent_tasks.json")
 _task_lock = threading.RLock()
 
 
@@ -203,6 +204,35 @@ class TaskManager:
             pass
 
         return task
+
+    def recover_stale_claims(self, max_age_seconds: int = 300) -> List[str]:
+        """Return abandoned running tasks to the queue after a process crash.
+
+        A task is never silently marked complete.  The retry count is retained
+        for the admin UI and a task that keeps failing remains inspectable.
+        """
+        recovered: List[str] = []
+        now = datetime.now(timezone.utc)
+        with _task_lock:
+            for task_id, task in self._tasks.items():
+                if task.get("status") != "running" or not task.get("claimed_at"):
+                    continue
+                try:
+                    claimed = datetime.fromisoformat(task["claimed_at"].replace("Z", "+00:00"))
+                except (TypeError, ValueError):
+                    claimed = now
+                if (now - claimed).total_seconds() <= max_age_seconds:
+                    continue
+                metadata = task.setdefault("metadata", {})
+                metadata["retry_count"] = int(metadata.get("retry_count", 0)) + 1
+                metadata["last_recovery_at"] = now.isoformat()
+                task["status"] = "pending"
+                task["claimed_at"] = None
+                task["error"] = "Recovered after the previous agent execution stopped responding."
+                recovered.append(task_id)
+            if recovered:
+                self._save()
+        return recovered
 
     def get_task(self, task_id: str) -> Optional[AgentTask]:
         with _task_lock:

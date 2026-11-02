@@ -7,10 +7,9 @@ import Header from './components/shared/Header';
 
 // Storefront Components
 import HeroSection from './components/storefront/HeroSection';
-import FeaturedCarousel from './components/storefront/FeaturedCarousel';
 import ProductCatalog from './components/storefront/ProductCatalog';
 import InnovationStories from './components/storefront/InnovationStories';
-import NavaCopilot from './components/storefront/NavaCopilot';
+import NovaCopilot from './components/storefront/NovaCopilot';
 import CartDrawer from './components/storefront/CartDrawer';
 import OrdersModal from './components/storefront/OrdersModal';
 import RazorpayConfigModal from './components/storefront/RazorpayConfigModal';
@@ -19,6 +18,7 @@ import UserSwitchModal from './components/storefront/UserSwitchModal';
 // Admin Components
 import AdminSidebar from './components/admin/AdminSidebar';
 import OverviewTab from './components/admin/OverviewTab';
+import ActivityPanel from './components/admin/ActivityPanel';
 import CampaignsTab from './components/admin/CampaignsTab';
 import AuditTrailTab from './components/admin/AuditTrailTab';
 import TreasuryTab from './components/admin/TreasuryTab';
@@ -42,9 +42,26 @@ function MainApp() {
 
   const [activeCategory, setActiveCategory] = useState('ALL');
   const [isNovaOpen, setIsNovaOpen] = useState(false);
+  const [ownerAccessRequired, setOwnerAccessRequired] = useState(false);
+  const [ownerToken, setOwnerToken] = useState('');
 
-  const { toastMessage } = useStore();
-  const { activeTab } = useAdmin();
+  const { toastMessage, currentUser } = useStore();
+  const { activeTab, loadAllAdminData } = useAdmin();
+
+  useEffect(() => {
+    if (currentView === 'admin') loadAllAdminData();
+  }, [currentView, loadAllAdminData]);
+
+  useEffect(() => {
+    const onPopState = () => setCurrentView(window.location.pathname.startsWith('/admin') ? 'admin' : 'store');
+    const onOwnerAccess = () => setOwnerAccessRequired(true);
+    window.addEventListener('popstate', onPopState);
+    window.addEventListener('nova:owner-access-required', onOwnerAccess);
+    return () => {
+      window.removeEventListener('popstate', onPopState);
+      window.removeEventListener('nova:owner-access-required', onOwnerAccess);
+    };
+  }, []);
 
   useEffect(() => {
     const targetPath = currentView === 'admin' ? '/admin' : '/';
@@ -59,7 +76,7 @@ function MainApp() {
       {toastMessage && (
         <div style={{
           position: 'fixed',
-          top: '90px',
+          top: '110px',
           right: '24px',
           zIndex: 999,
           background: toastMessage.type === 'error' ? '#fa5400' : '#111111',
@@ -79,8 +96,8 @@ function MainApp() {
       )}
 
       {/* Nike 3-Tier Header */}
-      <Header 
-        currentView={currentView} 
+      <Header
+        currentView={currentView}
         setCurrentView={setCurrentView}
         activeCategory={activeCategory}
         setActiveCategory={setActiveCategory}
@@ -88,9 +105,9 @@ function MainApp() {
 
       {/* View 1: Customer Storefront (Nike-Style Editorial) */}
       {currentView === 'store' && (
-        <main>
+        <main className="store-main">
           {/* Hero Editorial Banner */}
-          <HeroSection 
+          <HeroSection
             onOpenNova={() => setIsNovaOpen(true)}
             onExploreAgents={() => {
               const el = document.getElementById('innovation-stories-anchor');
@@ -99,25 +116,27 @@ function MainApp() {
           />
 
           {/* Featured Drops Horizontal Snap Carousel */}
-          <FeaturedCarousel />
+
 
           {/* Main Product Catalog & Sticky Sub-Filters */}
-          <ProductCatalog 
+          <ProductCatalog
             activeCategory={activeCategory}
             setActiveCategory={setActiveCategory}
           />
 
           {/* Innovation Stories Section (The 7 Autonomous Agents) */}
-          <InnovationStories 
+          <InnovationStories
             onOpenNova={() => setIsNovaOpen(true)}
           />
 
-          {/* Floating Athletic Nava AI Copilot Capsule & Flyout */}
-          <NavaCopilot 
+          {/* Floating Athletic Nova AI Copilot Capsule & Flyout */}
+          <NovaCopilot
+            key={currentUser.id}
             isOpen={isNovaOpen}
             setIsOpen={setIsNovaOpen}
           />
 
+          <footer className="site-footer page-width"><span className="brand"><span className="brand-symbol">✳</span>nova.</span><p>Considered tech. Intelligent commerce.</p><span>Designed for your everyday.</span></footer>
           {/* Modals & Drawers */}
           <CartDrawer />
           <OrdersModal />
@@ -131,8 +150,23 @@ function MainApp() {
         <div className="admin-layout">
           <AdminSidebar onOpenStorefront={() => setCurrentView('store')} />
           <section className="admin-main-view">
+            {ownerAccessRequired && (
+              <form className="glass-panel owner-access-form" onSubmit={async event => {
+                event.preventDefault();
+                sessionStorage.setItem('novaAdminToken', ownerToken.trim());
+                setOwnerAccessRequired(false);
+                setOwnerToken('');
+                await loadAllAdminData();
+              }}>
+                <label htmlFor="owner-token">Owner access token</label>
+                <input id="owner-token" type="password" className="form-input" required autoComplete="off"
+                  value={ownerToken} onChange={event => setOwnerToken(event.target.value)} />
+                <button className="nike-pill-btn accent-volt" type="submit">Unlock Owner Studio</button>
+              </form>
+            )}
 
             {activeTab === 'overview' && <OverviewTab />}
+            {activeTab === 'activity' && <><div className="ops-heading"><div><span className="eyebrow">LIVE OPERATIONS</span><h1>The activity stream<span>.</span></h1><p>Real agent work, as it happens. Updated every two seconds.</p></div></div><ActivityPanel expanded /></>}
             {activeTab === 'campaigns' && <CampaignsTab />}
             {activeTab === 'audit' && <AuditTrailTab />}
             {activeTab === 'treasury' && <TreasuryTab />}

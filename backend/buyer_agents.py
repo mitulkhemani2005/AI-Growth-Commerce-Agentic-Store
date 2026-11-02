@@ -1,3 +1,4 @@
+from backend.config import DATA_DIR, data_file
 """
 Autonomous AI Buyer Fleet & Continuous Integration / QA Invariant Testing
 =========================================================================
@@ -12,7 +13,6 @@ import os
 import random
 import threading
 import time
-import uuid
 from datetime import datetime, timezone
 from typing import List, Dict, Any, Optional
 
@@ -22,15 +22,12 @@ from backend.order_manager import order_manager
 from backend.review_manager import review_manager
 from backend.treasury_manager import treasury_manager
 from backend.payment_manager import payment_manager
-from backend.admin_agents import message_bus, log_agent_action, conversation_history
-from backend.agent_memory import memory_manager
-from backend.agent_rl import rl_manager
+from backend.admin_agents import log_agent_action
 from backend.policy_engine import policy_engine
-from backend.observability import observability_manager
+from backend.async_store import AsyncJSONStore
 
-
-BUYERS_FILE = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "buyer_agents.json"))
-USERS_FILE = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "users.json"))
+BUYERS_FILE = data_file("buyer_agents.json")
+USERS_FILE = data_file("users.json")
 _lock = threading.RLock()
 
 
@@ -124,75 +121,76 @@ class BuyerAgentsFleet:
     """
     def __init__(self, file_path: str = BUYERS_FILE):
         self.file_path = file_path
+        self.store = AsyncJSONStore(file_path, default_factory=lambda: list(DEFAULT_BUYER_PERSONAS))
         self._ensure_files()
 
     def _ensure_files(self):
-        with _lock:
-            if not os.path.exists(self.file_path):
-                self._write_buyers(DEFAULT_BUYER_PERSONAS)
+        data = self.store.get()
+        if not data:
+            self.store.set(list(DEFAULT_BUYER_PERSONAS))
 
-            users = []
-            if os.path.exists(USERS_FILE):
-                try:
-                    with open(USERS_FILE, "r", encoding="utf-8") as f:
-                        users = json.load(f)
-                except Exception:
-                    users = []
-
-            user_ids = {u.get("user_id") for u in users}
-            for b in DEFAULT_BUYER_PERSONAS:
-                if b["id"] not in user_ids:
-                    users.append({
-                        "user_id": b["id"],
-                        "name": b["name"],
-                        "email": f"{b['id']}@growthcommerce.ai",
-                        "shipping_address": f"{b['name']} Residence, Innovation Hub Blvd, Sector 4",
-                        "auto_pay_enabled": True,
-                        "cart": [],
-                        "payment_details": {
-                            "card_holder_name": b["name"],
-                            "card_number_masked": "4242 •••• •••• 4242",
-                            "card_last4": "4242",
-                            "exp_month": "12",
-                            "exp_year": "2028",
-                            "ap2_preauthorized": True
-                        }
-                    })
+        users = []
+        if os.path.exists(USERS_FILE):
             try:
-                with open(USERS_FILE, "w", encoding="utf-8") as f:
-                    json.dump(users, f, indent=2)
+                with open(USERS_FILE, "r", encoding="utf-8") as f:
+                    users = json.load(f)
             except Exception:
-                pass
+                users = []
+
+        user_ids = {u.get("user_id") for u in users}
+        for b in DEFAULT_BUYER_PERSONAS:
+            if b["id"] not in user_ids:
+                users.append({
+                    "user_id": b["id"],
+                    "name": b["name"],
+                    "email": f"{b['id']}@growthcommerce.ai",
+                    "shipping_address": f"{b['name']} Residence, Innovation Hub Blvd, Sector 4",
+                    "auto_pay_enabled": True,
+                    "cart": [],
+                    "payment_details": {
+                        "card_holder_name": b["name"],
+                        "card_number_masked": "4242 •••• •••• 4242",
+                        "card_last4": "4242",
+                        "exp_month": "12",
+                        "exp_year": "2028",
+                        "ap2_preauthorized": True
+                    }
+                })
+        try:
+            if len(users) == len(user_ids):
+                return
+            with open(USERS_FILE, "w", encoding="utf-8") as f:
+                json.dump(users, f, indent=2)
+        except Exception:
+            pass
 
     def _read_buyers(self) -> List[Dict[str, Any]]:
-        with _lock:
-            if os.path.exists(self.file_path):
-                try:
-                    with open(self.file_path, "r", encoding="utf-8") as f:
-                        return json.load(f)
-                except Exception:
-                    return list(DEFAULT_BUYER_PERSONAS)
-            return list(DEFAULT_BUYER_PERSONAS)
+        return self.store.get()
 
     def _write_buyers(self, buyers: List[Dict[str, Any]]):
-        with _lock:
-            try:
-                tmp_file = f"{self.file_path}.tmp"
-                with open(tmp_file, "w", encoding="utf-8") as f:
-                    json.dump(buyers, f, indent=2)
-                os.replace(tmp_file, self.file_path)
-            except Exception:
-                try:
-                    with open(self.file_path, "w", encoding="utf-8") as f:
-                        json.dump(buyers, f, indent=2)
-                except Exception:
-                    pass
+        self.store.set(buyers)
+
+    async def _read_buyers_async(self) -> List[Dict[str, Any]]:
+        return await self.store.get_async()
+
+    async def _write_buyers_async(self, buyers: List[Dict[str, Any]]):
+        await self.store.set_async(buyers)
 
     def get_all_buyers(self) -> List[Dict[str, Any]]:
         return self._read_buyers()
 
+    async def get_all_buyers_async(self) -> List[Dict[str, Any]]:
+        return await self._read_buyers_async()
+
     def get_buyer_by_id(self, buyer_id: str) -> Optional[Dict[str, Any]]:
         buyers = self._read_buyers()
+        for b in buyers:
+            if b["id"] == buyer_id:
+                return b
+        return None
+
+    async def get_buyer_by_id_async(self, buyer_id: str) -> Optional[Dict[str, Any]]:
+        buyers = await self._read_buyers_async()
         for b in buyers:
             if b["id"] == buyer_id:
                 return b
@@ -362,13 +360,13 @@ class BuyerAgentsFleet:
 
     async def execute_buyer_step(self, buyer_id: str) -> Dict[str, Any]:
         """Executes single autonomous purchasing or return cycle for buyer persona."""
-        buyers = self._read_buyers()
+        buyers = await self._read_buyers_async()
         buyer = next((b for b in buyers if b["id"] == buyer_id), None)
         if not buyer:
             return {"success": False, "error": f"Buyer '{buyer_id}' not found."}
 
         # 1. 24-Hour Return Policy Testing
-        user_orders = order_manager.get_orders_by_user(buyer_id)
+        user_orders = await order_manager.get_orders_by_user_async(buyer_id)
         return_prob = float(buyer.get("return_probability", 0.10))
 
         if user_orders and random.random() < return_prob:
@@ -387,7 +385,7 @@ class BuyerAgentsFleet:
                 if cancel_res.get("success"):
                     buyer["returns_count"] = buyer.get("returns_count", 0) + 1
                     buyer["status"] = f"Refunded #{oid} (₹{target_order.get('total', 0):,.2f})"
-                    self._write_buyers(buyers)
+                    await self._write_buyers_async(buyers)
                     return {
                         "success": True,
                         "buyer_id": buyer_id,
@@ -398,7 +396,7 @@ class BuyerAgentsFleet:
 
         # 2. Autonomous Catalog Shopping & AP2 Checkout
         preferred_cats = buyer.get("preferred_categories", ["Mobiles", "Laptops"])
-        all_products = inventory_manager.get_all_products()
+        all_products = await inventory_manager.get_all_products_async()
 
         matching_products = [
             p for p in all_products
@@ -410,7 +408,7 @@ class BuyerAgentsFleet:
 
         if not matching_products:
             buyer["status"] = "Waiting for warehouse restock"
-            self._write_buyers(buyers)
+            await self._write_buyers_async(buyers)
             return {
                 "success": False,
                 "buyer_id": buyer_id,
@@ -422,15 +420,15 @@ class BuyerAgentsFleet:
         selected_product = random.choice(matching_products)
         qty = 1
 
-        cart_manager.clear_cart(buyer_id)
-        cart_manager.add_to_cart(
+        await cart_manager.clear_cart_async(buyer_id)
+        await cart_manager.add_to_cart_async(
             user_id=buyer_id,
             product_identifier=selected_product["id"],
             quantity=qty,
             size=selected_product.get("PRODUCT_SIZE", "Standard")
         )
 
-        ap2_res = payment_manager.execute_automated_preauthorized_payment(
+        ap2_res = await payment_manager.execute_automated_preauthorized_payment_async(
             user_id=buyer_id,
             shipping_address=f"{buyer['name']} Residence, Innovation Hub Blvd, Sector 4",
             customer_name=buyer["name"],
@@ -441,7 +439,7 @@ class BuyerAgentsFleet:
 
         if not ap2_res.get("success"):
             buyer["status"] = "Checkout failed"
-            self._write_buyers(buyers)
+            await self._write_buyers_async(buyers)
             return {"success": False, "buyer_id": buyer_id, "error": ap2_res.get("error")}
 
         order_id = ap2_res.get("order_id")
@@ -454,7 +452,7 @@ class BuyerAgentsFleet:
 
         # Write customer review
         review_text, rating = await self._generate_persona_review(buyer, selected_product)
-        review_manager.add_review(
+        await review_manager.add_review_async(
             product_id=selected_product["id"],
             customer_name=buyer["name"],
             rating=rating,
@@ -471,7 +469,7 @@ class BuyerAgentsFleet:
         buyer["next_delay_seconds"] = next_delay
         buyer["status"] = f"Browsing catalog (Next order in ~{next_delay}s)"
 
-        self._write_buyers(buyers)
+        await self._write_buyers_async(buyers)
 
         details = (
             f"🛍️ AI Buyer {buyer['name']} ({buyer['persona_title']}) purchased {qty}x '{selected_product['PRODUCT_NAME']}' "
@@ -514,7 +512,7 @@ class BuyerAgentsFleet:
             resp = await asyncio.to_thread(
                 _call_ollama_sync,
                 "ollama",
-                os.environ.get("BUYER_MODEL", "qwen2.5:7b"),
+                os.environ.get("OLLAMA_MODEL", "qwen2.5:0.5b"),
                 [
                     {"role": "system", "content": f"You are {b_name} ({b_title}). Write a short 1-2 sentence product review in your distinct voice."},
                     {"role": "user", "content": prompt}

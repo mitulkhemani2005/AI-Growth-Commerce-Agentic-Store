@@ -5,13 +5,12 @@ Defines structured events, standardized event types, event publishing,
 and asynchronous event routing across all autonomous agents.
 """
 
-import json
 import uuid
 import threading
 import asyncio
 from dataclasses import dataclass, field, asdict
 from datetime import datetime, timezone
-from typing import Dict, Any, List, Optional, Callable, Awaitable, Set
+from typing import Dict, Any, List, Optional, Callable
 import inspect
 
 

@@ -43,6 +43,8 @@ async def test_live_fleet_flow():
     products = inventory_manager.get_all_products()
     for p in products:
         p["STOCK_REMAINING"] = 0
+        p["BASE_PRICE"] = 20.0
+        p["PRICE"] = 40.0
     inventory_manager._write_inventory(products)
     order_manager._write_orders([])
     review_manager._write_reviews([])

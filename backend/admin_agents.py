@@ -1,3 +1,5 @@
+from backend.config import AI_ENABLED
+from backend.config import DATA_DIR, data_file
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -11,7 +13,7 @@ import time
 import uuid
 from collections import defaultdict
 from datetime import datetime, timezone
-from typing import List, Dict, Any, Optional, Set, Tuple
+from typing import List, Dict, Any, Optional, Set
 from openai import OpenAI
 
 # Domain Managers & Infrastructure
@@ -21,66 +23,38 @@ from backend.review_manager import review_manager
 from backend.treasury_manager import treasury_manager
 from backend.salary_manager import salary_manager
 from backend.agent_memory import memory_manager
-from backend.agent_rl import rl_manager
-from backend.policy_engine import policy_engine, validate_policy, PolicyResult
-from backend.idempotency import idempotency_manager, execute_idempotent_operation
-from backend.events import event_router, create_event, Event, EventType
-from backend.agent_tasks import task_manager, AgentTask
+from backend.policy_engine import policy_engine
+from backend.idempotency import execute_idempotent_operation
+from backend.events import event_router, create_event
+from backend.agent_tasks import task_manager
 from backend.observability import observability_manager
 
 OLLAMA_BASE_URL = os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434/v1")
-DEFAULT_ADMIN_MODEL = os.environ.get("ADMIN_MODEL", os.environ.get("OLLAMA_MODEL", "qwen2.5:7b"))
+DEFAULT_ADMIN_MODEL = os.environ.get("OLLAMA_MODEL", "qwen2.5:0.5b")
 OLLAMA_NUM_CTX = int(os.environ.get("OLLAMA_NUM_CTX", "4096"))
 
 # =====================================================================
 # LOGGING INFRASTRUCTURE
 # =====================================================================
-LOGS_FILE = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "agent_logs.json"))
+LOGS_FILE = data_file("agent_logs.json")
 _log_lock = threading.RLock()
 
 
 def log_agent_action(agent_name: str, action: str, details: str, affected_items: Optional[List[str]] = None, autonomous: bool = True):
     """Appends an event to the autonomous agent audit log in agent_logs.json."""
+    from backend.async_store import AsyncJSONStore
+    entry = {"id": f"log_{uuid.uuid4().hex[:12]}", "agent_name": agent_name, "action": action,
+             "details": details, "affected_items": affected_items or [], "autonomous": autonomous,
+             "timestamp": datetime.now(timezone.utc).isoformat()}
     with _log_lock:
-        logs = []
-        if os.path.exists(LOGS_FILE):
-            try:
-                with open(LOGS_FILE, "r", encoding="utf-8") as f:
-                    logs = json.load(f)
-            except Exception:
-                logs = []
-
-        entry = {
-            "id": f"log_{uuid.uuid4().hex[:8]}",
-            "agent_name": agent_name,
-            "action": action,
-            "details": details,
-            "affected_items": affected_items or [],
-            "autonomous": autonomous,
-            "timestamp": datetime.now(timezone.utc).isoformat()
-        }
-        logs.insert(0, entry)
-        logs = logs[:200]
-
-        try:
-            with open(LOGS_FILE, "w", encoding="utf-8") as f:
-                json.dump(logs, f, indent=2)
-        except Exception:
-            pass
+        AsyncJSONStore(LOGS_FILE, list).mutate(lambda logs: [entry, *logs][:500])
     return entry
 
 
 def get_agent_logs(limit: int = 100) -> List[Dict[str, Any]]:
-    """Returns the most recent agent audit logs."""
+    from backend.async_store import AsyncJSONStore
     with _log_lock:
-        if os.path.exists(LOGS_FILE):
-            try:
-                with open(LOGS_FILE, "r", encoding="utf-8") as f:
-                    logs = json.load(f)
-                return logs[:limit]
-            except Exception:
-                return []
-        return []
+        return AsyncJSONStore(LOGS_FILE, list).get()[:max(0, min(limit, 500))]
 
 
 def clean_think_tags(text: str) -> str:
@@ -92,8 +66,8 @@ def clean_think_tags(text: str) -> str:
     return cleaned.strip()
 
 
-MESSAGES_FILE = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "agent_messages.json"))
-CONVERSATIONS_FILE = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "agent_conversations.json"))
+MESSAGES_FILE = data_file("agent_messages.json")
+CONVERSATIONS_FILE = data_file("agent_conversations.json")
 _conversation_lock = threading.RLock()
 
 
@@ -351,30 +325,11 @@ def _call_ollama_sync(
     fallback_models: Optional[List[str]] = None,
     base_url: str = OLLAMA_BASE_URL
 ) -> Any:
-    client = OpenAI(base_url=base_url or OLLAMA_BASE_URL, api_key=api_key or "ollama")
-    models_to_try = list(dict.fromkeys([model] + (fallback_models or []) + ["qwen2.5:7b", "llama3.1:8b", "llama3:8b", "qwen2.5:14b", "gemma4:e2b-it-qat"]))
-
-    last_err = None
-    with _ollama_gpu_lock:
-        for m in models_to_try:
-            try:
-                kwargs = {
-                    "model": m,
-                    "messages": messages or [],
-                    "temperature": temperature,
-                    "max_tokens": max_tokens,
-                    "timeout": 120.0,
-                    "extra_body": {"options": {"num_ctx": OLLAMA_NUM_CTX, "num_gpu": 999}, "keep_alive": -1}
-                }
-                if tools:
-                    kwargs["tools"] = tools
-                    kwargs["tool_choice"] = "auto"
-                resp = client.chat.completions.create(**kwargs)
-                return resp
-            except Exception as e:
-                last_err = e
-                continue
-    raise last_err or Exception("All Ollama models exhausted.")
+    if not AI_ENABLED or os.getenv("AI_RUNTIME_AVAILABLE", "true") != "true":
+        raise RuntimeError("Local AI is disabled; using built-in agent rules.")
+    from backend.llm_runtime import complete_chat
+    return complete_chat(model=model, messages=messages or [], tools=tools, temperature=temperature,
+                         max_tokens=max_tokens, base_url=base_url, api_key=api_key)
 
 _call_groq_sync = _call_ollama_sync
 
@@ -402,7 +357,7 @@ OPERATIONAL PRINCIPLES & MULTI-AGENT ETIQUETTE:
 - Base Price Governance: Product BASE_PRICE is an immutable floor set exclusively by the Store Owner.
 """
 
-PRICE_MANAGER_SYSTEM_PROMPT = """You are the Price Manager Agent of the AI Growth Commerce Store.
+PRICE_MANAGER_SYSTEM_PROMPT = """You are the Price Manager Agent of the Nova.
 You report directly to the CEO Agent and Store Owner.
 CORE DOMAIN & TASKS:
 - Dynamic SKU Pricing: Calculate optimal prices using demand elasticity, stock scarcity (+15% surge for <=3 stock), and velocity.
@@ -412,7 +367,7 @@ CORE DOMAIN & TASKS:
 - Currency: Indian Rupee (INR ₹), 0% Tax storewide.
 """ + _FLEET_DIRECTORY + _AGENT_PERSONALITY
 
-INVENTORY_MANAGER_SYSTEM_PROMPT = """You are the Inventory Manager Agent of the AI Growth Commerce Store.
+INVENTORY_MANAGER_SYSTEM_PROMPT = """You are the Inventory Manager Agent of the Nova.
 You report directly to the CEO Agent and Store Owner.
 CORE DOMAIN & TASKS:
 - Warehouse Auditing: Track real-time stock levels across Mobiles, Laptops, Audio, and Accessories.
@@ -422,7 +377,7 @@ CORE DOMAIN & TASKS:
 - Task Fulfillment: Proactively claim and execute warehouse stock audit and restock proposal tasks.
 """ + _FLEET_DIRECTORY + _AGENT_PERSONALITY
 
-ORDER_MANAGER_SYSTEM_PROMPT = """You are the Order Management Agent of the AI Growth Commerce Store.
+ORDER_MANAGER_SYSTEM_PROMPT = """You are the Order Management Agent of the Nova.
 You report directly to the CEO Agent and Store Owner.
 CORE DOMAIN & TASKS:
 - Order Lifecycle Progression: Enforce monotonic state transitions (Pending → Confirmed → Dispatched → Shipped → Delivered).
@@ -431,7 +386,7 @@ CORE DOMAIN & TASKS:
 - Task Fulfillment: Proactively claim and execute order lifecycle audit, SLA tracking, and expediting tasks.
 """ + _FLEET_DIRECTORY + _AGENT_PERSONALITY
 
-FINANCE_MANAGER_SYSTEM_PROMPT = """You are the Finance Manager Agent of the AI Growth Commerce Store — THE SOLE PAYMENT AUTHORITY.
+FINANCE_MANAGER_SYSTEM_PROMPT = """You are the Finance Manager Agent of the Nova — THE SOLE PAYMENT AUTHORITY.
 You report directly to the CEO Agent and Store Owner.
 CORE DOMAIN & TASKS:
 - Exclusive Payment Authority: You are the ONLY agent authorized to verify Razorpay payments, validate AP2 cryptographic spending mandates, process refunds, and disburse salaries.
@@ -441,7 +396,7 @@ CORE DOMAIN & TASKS:
 - Task Fulfillment: Proactively claim and execute financial audit, refund processing, and treasury reconciliation tasks.
 """ + _FLEET_DIRECTORY + _AGENT_PERSONALITY
 
-DISPATCHER_SYSTEM_PROMPT = """You are the Dispatcher Agent of the AI Growth Commerce Store.
+DISPATCHER_SYSTEM_PROMPT = """You are the Dispatcher Agent of the Nova.
 You report directly to the CEO Agent and Store Owner.
 CORE DOMAIN & TASKS:
 - Logistics Fulfillment: Package confirmed orders and allocate trusted express carriers (BlueDart, Delhivery, Express logistics).
@@ -450,7 +405,7 @@ CORE DOMAIN & TASKS:
 - Task Fulfillment: Proactively claim and execute priority dispatch and logistics optimization tasks.
 """ + _FLEET_DIRECTORY + _AGENT_PERSONALITY
 
-REVIEW_FEEDBACK_SYSTEM_PROMPT = """You are the Review and Feedback Manager of the AI Growth Commerce Store.
+REVIEW_FEEDBACK_SYSTEM_PROMPT = """You are the Review and Feedback Manager of the Nova.
 You report directly to the CEO Agent and Store Owner.
 CORE DOMAIN & TASKS:
 - Sentiment Synthesis: Continuously analyze customer reviews, Bayesian average ratings, and positive/negative trends.
@@ -468,8 +423,8 @@ class PriceManagerAgent:
 
     def __init__(self):
         self.api_key = "ollama"
-        self.model = os.environ.get("PRICE_MANAGER_MODEL", DEFAULT_ADMIN_MODEL)
-        self.fallback_models = ["qwen2.5:7b", "llama3:8b", "gemma4:e2b-it-qat"]
+        self.model = DEFAULT_ADMIN_MODEL
+        self.fallback_models = [DEFAULT_ADMIN_MODEL]
         self.last_adjusted_skus: List[str] = []
 
     def estimate_optimal_price(self, product_id: str) -> Dict[str, Any]:
@@ -496,7 +451,9 @@ class PriceManagerAgent:
             multiplier = 1.0
             reason = "Optimal equilibrium price"
 
-        recommended = round(current_price * multiplier, 2)
+        # Anchor scarcity to the immutable cost floor. Multiplying the last
+        # selling price on every scheduled cycle produces exponential growth.
+        recommended = round(base_price * 1.35 * multiplier, 2)
         # Enforce policy floor
         if recommended < base_price:
             recommended = base_price
@@ -674,7 +631,6 @@ class PriceManagerAgent:
 
     async def handle_message_or_query(self, query_or_directive: str, sender: str = "CEO Agent", context_payload: Optional[Dict] = None) -> Dict[str, Any]:
         products = inventory_manager.get_all_products()
-        orders = order_manager.get_all_orders()
         conversation_history.add(self.name, "directive", f"📥 [{sender}] Directive/Inquiry: {query_or_directive}")
 
         actions_taken = []
@@ -691,7 +647,7 @@ class PriceManagerAgent:
 
         prompt = (
             f"{memory_ctx}\n"
-            f"You are {self.name} of AI Growth Commerce Store.\n"
+            f"You are {self.name} of Nova.\n"
             f"Inquiry from {sender}: \"{query_or_directive}\"\n\n"
             f"CATALOG STATE: {len(products)} active SKUs. Sample: {'; '.join(cat_summary)}\n"
             f"Actions Taken: {'; '.join(actions_taken) if actions_taken else 'None'}\n\n"
@@ -728,7 +684,7 @@ class PriceManagerAgent:
             res_summary = "Pricing analysis and policy verification completed."
             if "discount" in obj or "promo" in obj or "sale" in obj:
                 promo_res = self.create_promotion(category=None, discount_percentage=10.0)
-                res_summary = f"Created promotional pricing: {promo_res.get('items_updated', 0)} items adjusted."
+                res_summary = f"Created promotional pricing: {promo_res.get('skus_updated', 0)} items adjusted."
             elif "margin" in obj or "elasticity" in obj:
                 anom = self.detect_price_anomaly()
                 res_summary = f"Margin audit completed. Detected {anom.get('anomalies_detected', 0)} pricing anomalies."
@@ -748,10 +704,9 @@ class PriceManagerAgent:
 
     async def run_autonomous_cycle(self) -> Dict[str, Any]:
         """Event-aware dynamic pricing cycle."""
-        claimed_tasks = await self.process_assigned_tasks()
+        await self.process_assigned_tasks()
         inbox = message_bus.get_inbox(self.name)
         products = inventory_manager.get_all_products()
-        orders = order_manager.get_all_orders()
         adjusted = []
         anomalies_fixed = []
 
@@ -800,8 +755,9 @@ class PriceManagerAgent:
             if stock <= 3:
                 opt = self.estimate_optimal_price(pid)
                 if opt.get("success") and opt.get("recommended_price") > float(p.get("PRICE", 0)):
-                    await self.set_approved_price(pid, opt["recommended_price"], reason="Low stock scarcity surge")
-                    adjusted.append(f"{p['PRODUCT_NAME']} -> ₹{opt['recommended_price']:,.2f}")
+                    result = await self.set_approved_price(pid, opt["recommended_price"], reason="Low stock scarcity surge")
+                    if result.get("success"):
+                        adjusted.append(f"{p['PRODUCT_NAME']} -> ₹{opt['recommended_price']:,.2f}")
 
         details = f"Audited {len(products)} catalog SKUs. Dynamically adjusted {len(adjusted)} prices. Corrected {len(anomalies_fixed)} anomalies."
         log_agent_action(self.name, "Dynamic Pricing Calibration", details, affected_items=adjusted, autonomous=True)
@@ -831,8 +787,8 @@ class InventoryManagerAgent:
 
     def __init__(self):
         self.api_key = "ollama"
-        self.model = os.environ.get("INVENTORY_MANAGER_MODEL", DEFAULT_ADMIN_MODEL)
-        self.fallback_models = ["qwen2.5:7b", "llama3:8b", "gemma4:e2b-it-qat"]
+        self.model = DEFAULT_ADMIN_MODEL
+        self.fallback_models = [DEFAULT_ADMIN_MODEL]
         self.pending_restock_requests: Set[str] = set()
 
     def calculate_reorder_point(self, product_id: str) -> Dict[str, Any]:
@@ -993,7 +949,7 @@ class InventoryManagerAgent:
 
         prompt = (
             f"{memory_ctx}\n"
-            f"You are {self.name} of AI Growth Commerce Store.\n"
+            f"You are {self.name} of Nova.\n"
             f"Inquiry/Directive from {sender}: \"{query_or_directive}\"\n\n"
             f"WAREHOUSE STATE: {len(products)} active catalog SKUs. {len(low_stock)} SKUs below safety threshold.\n"
             f"Sample Inventory: {'; '.join(stock_summary)}\n"
@@ -1053,7 +1009,7 @@ class InventoryManagerAgent:
 
     async def run_autonomous_cycle(self) -> Dict[str, Any]:
         """Event-driven warehouse cycle."""
-        claimed_tasks = await self.process_assigned_tasks()
+        await self.process_assigned_tasks()
         inbox = message_bus.get_inbox(self.name)
         approved_restocks: Dict[str, int] = {}
 
@@ -1144,8 +1100,8 @@ class OrderManagementAgent:
 
     def __init__(self):
         self.api_key = "ollama"
-        self.model = os.environ.get("ORDER_MANAGER_MODEL", DEFAULT_ADMIN_MODEL)
-        self.fallback_models = ["qwen2.5:7b", "llama3:8b", "gemma4:e2b-it-qat"]
+        self.model = DEFAULT_ADMIN_MODEL
+        self.fallback_models = [DEFAULT_ADMIN_MODEL]
         self.reported_sla_ids: Set[str] = set()
 
     def validate_order_transition(self, order_id: str, target_state: str) -> Dict[str, Any]:
@@ -1247,7 +1203,7 @@ class OrderManagementAgent:
 
         prompt = (
             f"{memory_ctx}\n"
-            f"You are {self.name} of AI Growth Commerce Store.\n"
+            f"You are {self.name} of Nova.\n"
             f"Inquiry/Directive from {sender}: \"{query_or_directive}\"\n\n"
             f"ORDER PIPELINE STATE: {len(all_orders)} total orders. Status Breakdown: {dict(status_counts)}.\n"
             f"SLA Breaches: {sla_report.get('breached_orders_count', 0)} orders pending > 1h.\n\n"
@@ -1307,8 +1263,7 @@ class OrderManagementAgent:
 
     async def run_autonomous_cycle(self) -> Dict[str, Any]:
         """Order lifecycle transition audit."""
-        claimed_tasks = await self.process_assigned_tasks()
-        inbox = message_bus.get_inbox(self.name)
+        await self.process_assigned_tasks()
         all_orders = order_manager.get_all_orders()
         auto_advanced = []
         now = datetime.now(timezone.utc)
@@ -1391,8 +1346,8 @@ class FinanceManagerAgent:
 
     def __init__(self):
         self.api_key = "ollama"
-        self.model = os.environ.get("FINANCE_MANAGER_MODEL", DEFAULT_ADMIN_MODEL)
-        self.fallback_models = ["qwen2.5:7b", "llama3:8b", "gemma4:e2b-it-qat"]
+        self.model = DEFAULT_ADMIN_MODEL
+        self.fallback_models = [DEFAULT_ADMIN_MODEL]
 
     async def process_refund(self, order_id: str, reason: str = "Customer return request", operation_id: Optional[str] = None) -> Dict[str, Any]:
         """
@@ -1414,18 +1369,10 @@ class FinanceManagerAgent:
                 return {"success": False, "error": pol.reason}
 
             refund_amt = float(order.get("total", 0.0))
-
-            # Deduct refund from Treasury
-            treasury_res = treasury_manager.deduct_refund(refund_amt, order_id, reason=reason, actor=self.name)
-
-            # Restock items in catalog
-            for item in order.get("items", []):
-                pid = item.get("id") or item.get("product_id")
-                qty = item.get("quantity", 1)
-                inventory_manager.reconcile_stock(pid, qty)
-
-            # Mark order as Refunded
-            order_manager.update_order_status(order_id, "Refunded", notes=f"Refund of ₹{refund_amt:,.2f} processed by Finance Manager.")
+            from backend.payment_manager import payment_manager
+            result = await asyncio.to_thread(payment_manager.process_refund, order_id, reason=reason)
+            if not result.get("success"):
+                return result
 
             message_bus.publish(
                 from_agent=self.name,
@@ -1536,7 +1483,7 @@ class FinanceManagerAgent:
 
         prompt = (
             f"{memory_ctx}\n"
-            f"You are {self.name} of AI Growth Commerce Store — THE SOLE PAYMENT AUTHORITY.\n"
+            f"You are {self.name} of Nova — THE SOLE PAYMENT AUTHORITY.\n"
             f"Inquiry/Directive from {sender}: \"{query_or_directive}\"\n\n"
             f"TREASURY STATE:\n"
             f"- Bank Balance: ₹{summary.get('bank_balance', 0.0):,.2f}\n"
@@ -1598,7 +1545,7 @@ class FinanceManagerAgent:
 
     async def run_autonomous_cycle(self) -> Dict[str, Any]:
         """Event-driven financial cycle."""
-        claimed_tasks = await self.process_assigned_tasks()
+        await self.process_assigned_tasks()
         inbox = message_bus.get_inbox(self.name)
         refunds_processed = []
         stock_expenditures = []
@@ -1651,8 +1598,8 @@ class DispatcherAgent:
 
     def __init__(self):
         self.api_key = "ollama"
-        self.model = os.environ.get("DISPATCHER_MODEL", DEFAULT_ADMIN_MODEL)
-        self.fallback_models = ["qwen2.5:7b", "llama3:8b", "gemma4:e2b-it-qat"]
+        self.model = DEFAULT_ADMIN_MODEL
+        self.fallback_models = [DEFAULT_ADMIN_MODEL]
 
     def select_best_carrier(self, destination: Optional[str] = None, package: Optional[str] = None, priority: Optional[str] = None) -> Dict[str, Any]:
         """Selects optimal carrier based on ETA, cost, and reliability score."""
@@ -1717,7 +1664,7 @@ class DispatcherAgent:
 
         prompt = (
             f"{memory_ctx}\n"
-            f"You are {self.name} of AI Growth Commerce Store.\n"
+            f"You are {self.name} of Nova.\n"
             f"Inquiry/Directive from {sender}: \"{query_or_directive}\"\n\n"
             f"LOGISTICS STATE:\n"
             f"- Confirmed Orders Awaiting Dispatch: {len(confirmed)}\n"
@@ -1774,8 +1721,7 @@ class DispatcherAgent:
 
     async def run_autonomous_cycle(self) -> Dict[str, Any]:
         """Dispatches confirmed orders with carrier shipping labels."""
-        claimed_tasks = await self.process_assigned_tasks()
-        inbox = message_bus.get_inbox(self.name)
+        await self.process_assigned_tasks()
         orders = order_manager.get_all_orders()
         confirmed = [o for o in orders if o.get("status") == "Confirmed"]
         dispatched_list = []
@@ -1826,8 +1772,8 @@ class ReviewFeedbackAgent:
 
     def __init__(self):
         self.api_key = "ollama"
-        self.model = os.environ.get("REVIEW_MANAGER_MODEL", DEFAULT_ADMIN_MODEL)
-        self.fallback_models = ["qwen2.5:7b", "llama3:8b", "gemma4:e2b-it-qat"]
+        self.model = DEFAULT_ADMIN_MODEL
+        self.fallback_models = [DEFAULT_ADMIN_MODEL]
         self.reported_low_rating_ids: Set[str] = set()
 
     def cluster_review_issues(self) -> Dict[str, Any]:
@@ -1918,7 +1864,7 @@ class ReviewFeedbackAgent:
 
         prompt = (
             f"{memory_ctx}\n"
-            f"You are {self.name} of AI Growth Commerce Store.\n"
+            f"You are {self.name} of Nova.\n"
             f"Inquiry/Directive from {sender}: \"{query_or_directive}\"\n\n"
             f"CUSTOMER SENTIMENT STATE:\n"
             f"- Average Storewide Rating: {trend.get('average_rating', 4.8)}★\n"
@@ -1970,8 +1916,7 @@ class ReviewFeedbackAgent:
 
     async def run_autonomous_cycle(self) -> Dict[str, Any]:
         """Review sentiment and quality audit."""
-        claimed_tasks = await self.process_assigned_tasks()
-        inbox = message_bus.get_inbox(self.name)
+        await self.process_assigned_tasks()
         products = inventory_manager.get_all_products()
         low_rated = []
 
@@ -2013,7 +1958,7 @@ class ReviewFeedbackAgent:
 # =====================================================================
 # 7. 👔 CEO AGENT (Strategic Executive Orchestration Layer)
 # =====================================================================
-CEO_SYSTEM_PROMPT = """You are the Chief Executive Officer (CEO Agent) of the AI Growth Commerce Store.
+CEO_SYSTEM_PROMPT = """You are the Chief Executive Officer (CEO Agent) of the Nova.
 You lead an autonomous executive fleet of 6 specialist AI agents:
 1. 🏷️ Price Manager Agent — dynamic quantity/scarcity pricing, BASE_PRICE floor enforcement
 2. 📦 Inventory Manager Agent — warehouse inventory management, restocking, logistics signaling
@@ -2276,8 +2221,8 @@ class CEOAgent:
 
     def __init__(self):
         self.api_key = "ollama"
-        self.model = os.environ.get("CEO_MODEL", DEFAULT_ADMIN_MODEL)
-        self.fallback_models = ["qwen2.5:7b", "llama3:8b", "gemma4:e2b-it-qat"]
+        self.model = DEFAULT_ADMIN_MODEL
+        self.fallback_models = [DEFAULT_ADMIN_MODEL]
         self.cycle_counter = 0
 
     async def delegate_task(self, agent: str, objective: str, priority: str = "normal", constraints: Optional[List[str]] = None, deadline: Optional[str] = None) -> Dict[str, Any]:
@@ -2438,8 +2383,6 @@ class CEOAgent:
                 p_ident = args.get("product_identifier", "")
                 qty = int(args.get("quantity", 5))
                 approved = args.get("approved", True)
-                t_sum = treasury_manager.get_summary()
-                bank_bal = float(t_sum.get("bank_balance", 0.0))
                 if approved:
                     message_bus.publish(from_agent=self.name, to_agent="Inventory Manager Agent", subject="RESTOCK_APPROVED", payload={"product_id": p_ident, "quantity": qty})
                     return {"success": True, "approved": True, "message": f"CEO approved restock: {qty} units of '{p_ident}'."}
@@ -2573,7 +2516,7 @@ class CEOAgent:
                 resp = await asyncio.to_thread(_call_ollama_sync, self.api_key, self.model, messages, temperature=0.2, max_tokens=1500, fallback_models=self.fallback_models)
                 final_text = clean_think_tags(resp.choices[0].message.content or "")
 
-        except Exception as e:
+        except Exception:
             t_out = await self._execute_ceo_tool("get_admin_dashboard_metrics", {})
             executed_tools.append({"name": "get_admin_dashboard_metrics", "args": {}, "output": t_out})
             final_text = f"👔 **CEO Executive Briefing**: Revenue ₹{t_out.get('total_revenue', 0.0):,.2f} | Orders: {t_out.get('total_orders', 0)}. Specialist fleet active."
@@ -2593,7 +2536,7 @@ class CEOAgent:
 
         # 1. AI-Generated CEO Opening
         opening_prompt = (
-            f"You are the CEO Agent of AI Growth Commerce Store convening an executive roundtable meeting.\n"
+            f"You are the CEO Agent of Nova convening an executive roundtable meeting.\n"
             f"Meeting Agenda / Topic: \"{topic}\"\n"
             f"Current Treasury State: Bank Balance: ₹{summary.get('bank_balance', 0.0):,.2f}, Sales Revenue: ₹{summary.get('total_sales_revenue', 0.0):,.2f}, Active SKUs: {len(products)}.\n\n"
             f"Write a commanding, articulate executive opening statement (2-3 sentences) setting the agenda, priorities, and expectations for your specialist agents."
@@ -2753,17 +2696,14 @@ class CEOAgent:
         self.cycle_counter += 1
         inbox = message_bus.get_inbox(self.name)
         orders = order_manager.get_all_orders()
-        products = inventory_manager.get_all_products()
         summary = treasury_manager.get_summary()
 
-        total_rev = summary.get("total_sales_revenue", 0.0)
         bank_bal = summary.get("bank_balance", 1000.0)
         directives_issued = []
 
         for msg in inbox:
             subj = msg.get("subject")
             payload = msg.get("payload", {})
-            from_ag = msg.get("from", "Agent")
 
             if subj == "RESTOCK_REQUEST":
                 pid = payload.get("product_id", "")

@@ -1,0 +1,38 @@
+{
+  "verified_date": "2026-11-02",
+  "frontend": "http://127.0.0.1:5173",
+  "backend": "http://127.0.0.1:8000",
+  "gpu": {
+    "model": "qwen2.5:0.5b",
+    "loaded": true,
+    "gpu_resident": true,
+    "processor": "100% GPU",
+    "model_bytes": 481810185,
+    "vram_bytes": 481810185,
+    "gpu_percent": 100,
+    "context_length": 4096,
+    "inference": {
+      "requests": 3,
+      "completed": 2,
+      "failed": 0,
+      "active": true,
+      "last_duration_seconds": 5.62,
+      "last_error": null
+    }
+  },
+  "agent_cycles": {
+    "dispatcher": 4,
+    "inventory_manager": 3,
+    "finance_manager": 4,
+    "price_manager": 4,
+    "order_manager": 4,
+    "review_manager": 4,
+    "ceo": 4,
+    "buyer_agents": 3
+  },
+  "recent_log_count": 80,
+  "most_recent_timestamp": "2026-11-02T17:54:20.064365+00:00",
+  "backend_tests_passed": 104,
+  "external_tests_skipped": 1,
+  "frontend_tests_passed": 4
+}

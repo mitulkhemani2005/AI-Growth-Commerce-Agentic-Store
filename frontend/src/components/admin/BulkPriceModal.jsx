@@ -47,7 +47,7 @@ export default function BulkPriceModal() {
       <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
         <div className="form-group">
           <label>Target Category</label>
-          <select 
+          <select
             className="form-select"
             value={category}
             onChange={(e) => setCategory(e.target.value)}
@@ -62,7 +62,7 @@ export default function BulkPriceModal() {
 
         <div className="form-group">
           <label>Percentage Change (+ for Increase, - for Discount)</label>
-          <input 
+          <input
             type="number"
             step="0.5"
             className="form-input"
@@ -77,8 +77,8 @@ export default function BulkPriceModal() {
           *Note: Selling prices will automatically enforce the <strong>BASE_PRICE floor</strong> — prices will never drop below wholesale base cost.
         </p>
 
-        <button 
-          type="submit" 
+        <button
+          type="submit"
           className="checkout-btn"
           disabled={isApplying}
         >
