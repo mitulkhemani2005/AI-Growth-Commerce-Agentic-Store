@@ -42,6 +42,19 @@ On Windows, activity snapshots retain atomic replacement and briefly retry file-
 
 ## GPU model and autonomous agents
 
+### Vercel frontend with an ngrok backend
+
+Use `frontend` as the Vercel project root (Vite, build `npm run build`, output `dist`).
+Run the backend locally with `.venv/bin/python -m uvicorn backend.main:app --host 127.0.0.1 --port 8000`
+and forward it with `ngrok http 8000`. Keep both processes running.
+Set the Vercel server environment variable `NOVA_BACKEND_URL` to the ngrok HTTPS origin, without `/api`,
+and redeploy when it changes. The existing `VITE_API_BASE_URL` setting is supported as a server fallback.
+Vercel builds use relative browser API URLs regardless of that legacy setting.
+`frontend/api/backend.js` proxies `/api/*` and `/static/*`, preserves owner bearer tokens,
+and skips ngrok's browser warning so API calls return JSON and images return image bytes.
+Check `/api/health` on the Vercel domain: it must return JSON, not the SPA HTML.
+The proxy does not supply ngrok Basic Auth credentials. The local demo's public deployment limitations below still apply.
+
 The provided local configuration uses the installed **qwen2.5:0.5b** model. Install it with `ollama pull qwen2.5:0.5b` on another machine. Ollama must be running on port 11434.
 
 ```dotenv

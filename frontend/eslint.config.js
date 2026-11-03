@@ -6,7 +6,7 @@ import hooks from 'eslint-plugin-react-hooks';
 export default [
   { ignores: ['dist/**', 'node_modules/**'] },
   {
-    files: ['src/**/*.{js,jsx}', 'tests/**/*.js', '*.js'],
+    files: ['src/**/*.{js,jsx}', 'api/**/*.js', 'tests/**/*.js', '*.js'],
     ...js.configs.recommended,
     languageOptions: {
       ecmaVersion: 'latest',

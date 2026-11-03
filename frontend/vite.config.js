@@ -9,6 +9,8 @@ export default defineConfig(({ mode }) => {
     prefix, { target, changeOrigin: true },
   ]));
   return {
+    // Vercel's function proxies /api and /static; avoid browser CORS and ngrok warnings.
+    define: process.env.VERCEL ? { 'import.meta.env.VITE_API_BASE_URL': JSON.stringify('') } : {},
     plugins: [react(), officePlugin()],
     server: { host: '127.0.0.1', port: 5173, strictPort: true, proxy },
     preview: { host: '127.0.0.1', port: 4173, strictPort: true, proxy },

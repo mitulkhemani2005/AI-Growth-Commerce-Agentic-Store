@@ -36,3 +36,8 @@ test('does not cache failed requests', async () => {
   globalThis.fetch = async () => Response.json({ status: 'ok' });
   assert.equal((await api.getHealth()).status, 'ok');
 });
+
+test('reports an HTML warning page instead of treating it as API data', async () => {
+  globalThis.fetch = async () => new Response('<html>ngrok warning</html>', { headers: { 'content-type': 'text/html' } });
+  await assert.rejects(api.getHealth(), /non-JSON response/);
+});

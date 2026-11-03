@@ -45,6 +45,9 @@ async function apiRequest(endpoint, options = {}) {
         data = await res.json();
       } else {
         data = await res.text();
+        if (res.ok) {
+          throw new Error('Nova API returned a non-JSON response. Check the backend URL and ngrok connection.');
+        }
       }
 
       if (!res.ok) {
